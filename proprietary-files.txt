@@ -1,0 +1,2 @@
+# No proprietary or device-specific firmware blobs are committed here.
+# Patched binaries that are required for phase 1 live under patches/overlays.

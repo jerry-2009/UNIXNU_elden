@@ -1,0 +1,56 @@
+# Board description for the Lenovo Legion Y700 Gen 4 (elden, SM8750P).
+
+[board]
+name = "elden"
+soc = "SM8750P"
+model_id = "TB322FC"
+description = "Lenovo Legion Y700 Gen 4"
+kit = "elden"
+stage = 1
+
+[board.hardware]
+display = "1904x3040 bonded dual-DSI + DSC"
+timebase_hz = 19200000
+dram_base = "0x80000000"
+gic_distributor = "0x16000000"
+gic_redistributors = "0x16080000"
+gic_redistributor_stride = "0x40000"
+ufs_host = "0x1d84000"
+ufs_phy = "0x1d80000"
+
+[ipsw]
+url = "https://updates.cdn-apple.com/2025SpringFCS/fullrestores/122-77166/DCA6CFE8-90E9-4B92-880D-3DE171798E40/iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw"
+product = "iPad7,1"
+version = "17.7.11"
+build = "21H461"
+fetch = ["KernelCache", "DeviceTree", "StaticTrustCache"]
+
+[kernel]
+defconfig = "elden_defconfig"
+status = "phase-2-pending"
+
+[firmware]
+baseline = "mu_wide_platforms"
+device = "lenovo-y700g4"
+target = "DEBUG"
+toolchain = "CLANGPDB"
+dsc = "Platforms/PakalaPkg/PakalaNoSb.dsc"
+fd = "Build/PakalaPkg/{target}_CLANGPDB/FV/SM8750_EFI.fd"
+output_fd = "out/SILICIUM_UEFI.fd"
+output_image = "out/elden-phase1.img"
+submodules = ["MU_BASECORE", "Common/MU", "Common/MU_TIANO"]
+
+[payload]
+status = "phase-1"
+volume = "ELDENRAM"
+size_mib = 4
+title = "UniXNU | elden phase 1"
+entry = "Return to firmware"
+driver = "drivers/EldenRamDiskDxe"
+config = "package/unixnu.toml"
+
+[payload.adt]
+status = "phase-2-pending"
+root_match_volume_uuid = "required"
+unique_chip_id = "required"
+

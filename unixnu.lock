@@ -1,0 +1,20 @@
+# Resolved upstream sources used by this device repository.
+
+[source."UniXNU"]
+commit = "c62bf12595f9a86c1b7282cf12d5af40b441fdac"
+
+[source."mu_wide_platforms"]
+commit = "3e1d052064beb6e59cda3cfba87d50e6cc088174"
+
+[source."UniXNU-piano"]
+commit = "98b3f94a067aff93a9296de7b80fdddc03dae380"
+
+[source."UniXNU-sheng"]
+commit = "251b291adf941b9953fe3ae66a808b9b626e164d"
+
+[source."elden-linux"]
+commit = "2ea1a67cad14032e3c9c5d1c61e4ee92ad30742b"
+
+[source."Project-SunUEFI"]
+commit = "2d4752a1455f6448ec0d300aece28ec6eb148b20"
+

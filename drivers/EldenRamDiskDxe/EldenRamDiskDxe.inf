@@ -1,0 +1,36 @@
+## @file
+#  Expose the embedded phase-1 FAT payload as a read-only Block I/O device.
+##
+
+[Defines]
+  INF_VERSION    = 0x00010019
+  BASE_NAME      = EldenRamDiskDxe
+  FILE_GUID      = 03AD2B0E-0E8E-46D9-A976-C424B7F2D7F6
+  MODULE_TYPE    = DXE_DRIVER
+  VERSION_STRING = 0.1
+  ENTRY_POINT    = EldenRamDiskDxeEntry
+
+[Sources]
+  EldenRamDiskDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DxeServicesLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+
+[Depex]
+  TRUE
+

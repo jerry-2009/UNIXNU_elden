@@ -1,0 +1,20 @@
+version = 1
+
+[boot]
+timeout = -1
+fallback_timeout = 10
+default = "firmware"
+
+[ui]
+title = "UniXNU | elden phase 1"
+scale = 1
+logo = true
+layout = "portrait"
+console = "graphics"
+
+[[entry]]
+id = "firmware"
+title = "Return to firmware"
+type = "action"
+action = "exit"
+

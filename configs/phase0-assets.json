@@ -1,0 +1,48 @@
+{
+  "schema": "unixnu-elden-phase0/v1",
+  "device": {
+    "model": "Lenovo Legion Y700 Gen 4",
+    "model_id": "TB322FC",
+    "codename": "elden",
+    "soc": "SM8750P"
+  },
+  "status": "complete",
+  "confirmed_at": "2026-10-25",
+  "confirmation": {
+    "source": "device_owner",
+    "note": "Owner confirmed that recovery assets exist. Automated tools must not inspect or record their location."
+  },
+  "recovery_assets": [
+    {
+      "id": "edl-9008",
+      "description": "Working Qualcomm 9008 recovery entry path",
+      "state": "confirmed",
+      "evidence": "owner_confirmed",
+      "path_recorded": false
+    },
+    {
+      "id": "recovery-package",
+      "description": "Known-good recovery package for returning to Android",
+      "state": "confirmed",
+      "evidence": "owner_confirmed",
+      "path_recorded": false
+    },
+    {
+      "id": "full-firmware-backup",
+      "description": "Complete device firmware backup",
+      "state": "confirmed",
+      "evidence": "owner_confirmed",
+      "path_recorded": false
+    }
+  ],
+  "test_policy": {
+    "boot_operator": "device_owner",
+    "ram_boot_only": true,
+    "forbid_fastboot_flash": true,
+    "forbid_slot_changes": true,
+    "forbid_erase_or_format": true,
+    "forbid_gpt_changes": true,
+    "require_artifact_sha256": true,
+    "require_two_consecutive_boots": true
+  }
+}

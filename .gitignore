@@ -1,0 +1,23 @@
+# Local toolchains, caches and generated products.
+.cache/
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+/out/
+
+# Keep the pinned upstream checkouts local. Reproducible modifications live in
+# platform/overlays and are applied by scripts/bootstrap_third_party.py.
+third_party/
+
+# Finder/editor noise.
+.DS_Store
+.idea/
+.vscode/
+
+# Local signing keys, device identifiers and backups must never be committed.
+*.p12
+*.pem
+*.key
+backup/
+backups/
