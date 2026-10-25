@@ -14,7 +14,7 @@ paths = ["board.toml", "feeds.toml", "soc/**", "configs/**", ".github/**", ".git
 inputs = ["Use the ARM64 and iPadOS 17.7.11 profiles supplied by UniXNU.", "Select the shared platform, CPU and DarwinBoot components.", "Provide an SM8750 profile until an official shared SoC repository exists."]
 configuration = ["board.toml declares schema_version = 2, soc_source = sm8750 and os_profile = ipados-17.7.11-21H461.", "The complete component list is explicit because profile arrays replace inherited arrays.", "Configuration and patch roots are ordered as ARM64, SoC, OS and device.", "soc/sm8750 supplies the transition profile and is referenced from feeds.toml."]
 procedure = ["Run defconfig from a current UniXNU checkout.", "Inspect status JSON for profile order, component dependencies, patch order and output path.", "Replace the local SoC source with a reviewed UniXNU-sm8750-common commit before release."]
-findings = ["The repository was format 1 and did not select shared SoC or OS profiles.", "A public UniXNU-sm8750-common repository was not available during migration.", "Keeping a separate local SoC profile preserves parser validation without mislabelling unqualified hardware support as shared."]
+findings = ["The repository was format 1 and did not select shared SoC or OS profiles.", "A public UniXNU-sm8750-common repository was not available during migration.", "Keeping a separate local SoC profile preserves parser validation without mislabelling unqualified hardware support as shared.", "Current UniXNU resolves all five selected components and 56 ordered patches; defconfig, status, tree and the 13-area porting record pass."]
 completion = ["board.toml resolves four ordered configuration layers.", "All selected components come from the UniXNU catalog and include their dependencies.", "No array field depends accidentally on inheritance.", "The SoC source is a reviewed remote commit and unixnu.lock records it."]
 limits = ["soc/sm8750 is local and is not yet a release-quality shared source.", "The first resolution pass selects only platform, CPU, AES, prelink and DarwinBoot components."]
 next_action = ["Publish UniXNU-sm8750-common, replace feeds.toml local with git and commit, then regenerate unixnu.lock and status output."]
@@ -22,7 +22,7 @@ evidence = [
   { kind = "source", reference = "board.toml", result = "Schema 2 profile, component, kernel, device-tree and payload declarations." },
   { kind = "source", reference = "feeds.toml", result = "SM8750 transition source with the release replacement documented." },
   { kind = "source", reference = "soc/sm8750/soc.toml", result = "Shared-profile-shaped SM8750 transition metadata." },
-  { kind = "source", reference = "docs/FORMAT2-MIGRATION.md", result = "Migration result, preserved phase 1 inputs and remaining release work." },
+  { kind = "source", reference = "docs/FORMAT2-MIGRATION.md", result = "Migration result, host validation commands, preserved phase 1 inputs and remaining release work." },
 ]
 
 [[area]]
@@ -30,15 +30,16 @@ id = "firmware"
 status = "device-verified"
 components = ["DarwinBoot"]
 paths = ["scripts/**", "drivers/**", "patches/overlays/**", "package/**", "proprietary-files.txt"]
-inputs = ["mu_wide_platforms lenovo-y700g4 UEFI source and patched PMIC binaries.", "UniXNU, UniXNUDxe, DarwinBoot and EldenRamDiskDxe firmware modules.", "A 4 MiB FAT16 payload containing package/unixnu.toml."]
-configuration = ["firmware.dsc points to PakalaPkg/PakalaNoSb.dsc.", "firmware.fd points to the DEBUG CLANGPDB SM8750_EFI.fd.", "payload volume is ELDENRAM and loader is firmware.", "panic_screen remains false because the phase 2 panic renderer is not integrated."]
-procedure = ["Build the phase 1 image with scripts/build_phase1.py.", "Run scripts/verify_artifact.py against the FD and Android v3 image.", "Owner performs two RAM cold boots with fastboot boot."]
-findings = ["The vendor UFSDxe crashed before the menu, so it was removed from the phase 1 APRIORI, DSC and FDF.", "The embedded FAT payload avoids persistent storage and makes the menu independent of UFS.", "The same image reached the visible menu twice and returned to stock Android after reset."]
+inputs = ["mu_wide_platforms lenovo-y700g4 UEFI source and patched PMIC binaries.", "UniXNU, UniXNUDxe, DarwinBoot and the phase-selected RAM-disk driver.", "Phase 1 uses a 4 MiB embedded FAT16 payload; phase 2 uses a 64 MiB Android boot-image ramdisk."]
+configuration = ["firmware.dsc points to PakalaPkg/PakalaNoSb.dsc.", "firmware.defines selects UniXNURamDiskDxe for format 2 while build_phase1.py passes ELDEN_USE_RAMDISK=FALSE.", "payload volume is ELDENRAM and loader is firmware.", "panic_screen remains false because the phase 2 panic renderer is not integrated."]
+procedure = ["Build phase 1 with scripts/build_phase1.py or phase 2 with scripts/build_phase2.py.", "Run the matching verifier against the FD and Android v3 image.", "Owner performs two RAM cold boots with fastboot boot."]
+findings = ["The vendor UFSDxe crashed before the menu, so it was removed from the phase 1 APRIORI, DSC and FDF.", "The embedded FAT payload avoids persistent storage and makes the menu independent of UFS.", "The same image reached the visible menu twice and returned to stock Android after reset.", "Phase 2 conditionally selects the shared UniXNURamDiskDxe and omits the embedded phase 1 payload; the phase 1 direct build explicitly keeps ELDEN_USE_RAMDISK=FALSE."]
 completion = ["Firmware contains UniXNU, UniXNUDxe, DarwinBoot and the RAM payload driver.", "The payload config is readable and the menu accepts volume-key input.", "Two RAM boots produce the same visible checkpoint and do not modify persistent partitions."]
-limits = ["The verified firmware is phase 1 and does not contain a bootable XNU payload.", "The new format 2 firmware command is not yet switched from the project build script."]
-next_action = ["Adapt the Pakala device package to the format 2 firmware recipe after phase 2 kernel inputs are available."]
+limits = ["Only the phase 1 firmware has device evidence.", "Phase 2 has passed static verification but has not published the ramdisk or reached DarwinBoot on hardware."]
+next_action = ["RAM boot the owner-built phase 2 image and confirm UNIXNURAMDISK plus DarwinBoot output twice."]
 evidence = [
   { kind = "source", reference = "docs/PHASE1-STATUS.md", result = "Accepted phase 1 artifact and firmware/module inventory." },
+  { kind = "source", reference = "docs/PHASE2-STATUS.md", result = "Phase 2 64 MiB ramdisk payload, shared RAM-disk driver and static artifact verification." },
   { kind = "source", reference = "scripts/verify_artifact.py", result = "Static FD, Android image and embedded FAT verification." },
   { kind = "device", reference = "docs/PHASE1-HANDOFF.md", command = "fastboot boot out/elden-phase1.img", revision = "c591b1a0a471f24978aba25c56c8f6ec9bd06668", result = "Two owner-run RAM cold boots reached the UniXNU menu and returned to Android." },
 ]
@@ -192,16 +193,17 @@ id = "packaging"
 status = "implemented"
 components = []
 paths = ["scripts/**", "package/**", "patches/**", "out/build.json", "unixnu.lock"]
-inputs = ["iPad7,1 iPadOS 17.7.11 build 21H461 restore inputs.", "Android v3 RAM-boot image and a 4 MiB embedded FAT payload.", "XNU prelink and ADT generation remain gated on kernel inputs."]
-configuration = ["The phase 1 image is produced by the project build script and verified against recorded hashes.", "Format 2 output is out/elden/ipados-17.7.11-21H461/elden/.", "The phase 2 source and prelink inputs are not present."]
-procedure = ["Run scripts/build_phase1.py for the accepted firmware path.", "Compile the hardware DTS and generate an ADT from it.", "Switch to the shared kernel, payload and bootimg steps after supplying kernelcache and ABI inputs."]
-findings = ["Phase 1 packaging is reproducible and device-verified.", "The verified UniXNU third-party pin is intentionally retained for the accepted build.", "The phase 2 payload exceeds the current 4 MiB RAM volume and needs a separately validated transport."]
+inputs = ["iPad7,1 iPadOS 17.7.11 build 21H461 restore inputs.", "Android v3 RAM-boot image and a 64 MiB FAT payload for phase 2.", "The phase 2 host build currently uses a public prelinked kernel artifact identified by SHA-256."]
+configuration = ["The phase 1 image is produced by scripts/build_phase1.py and verified against recorded hashes.", "Format 2 output is out/elden/ipados-17.7.11-21H461/elden/.", "scripts/build_phase2.py verifies the prelinked kernel hash, builds the FAT payload, FD and Android v3 image, and runs the matching artifact verifier."]
+procedure = ["Run scripts/build_phase1.py for the accepted firmware path.", "Run scripts/build_phase2.py with the device seed for the XNU RAM-boot path.", "Inspect phase2-build.json and run verify_phase2_artifact.py before any owner-operated boot."]
+findings = ["Phase 1 packaging is reproducible and device-verified.", "The verified UniXNU third-party pin is intentionally retained for the accepted build.", "Phase 2 carries its 64 MiB FAT payload as the Android v3 ramdisk; the kernel, ADT and TOML round-trip through the final image.", "The public prelinked kernel is accepted only as a host-test input and is not stored in the repository."]
 completion = ["All format 2 build steps run from the resolved output directory.", "The payload contains the kernel, ADT and declared optional inputs.", "The boot image matches the ABL header and size limits."]
-limits = ["The format 2 kernel, payload and bootimg pipeline is not yet connected to the verified firmware build.", "The current payload volume is too small for a prelinked XNU."]
-next_action = ["Prepare kernelcache/ABI inputs and validate a larger read-only payload channel before switching build entry points."]
+limits = ["The phase 2 image has not been RAM booted on the device.", "The host image uses a test seed and carries no trust cache or Data seed.", "The kernel input is not yet reproducible from repository-pinned kernelcache and ABI inputs."]
+next_action = ["Rebuild with the device owner's unique-chip-id, then RAM boot the exact image twice and capture the first loader result."]
 evidence = [
   { kind = "source", reference = "docs/PHASE1-HANDOFF.md", result = "Reproducible phase 1 build commands, hashes and verification checklist." },
   { kind = "source", reference = "docs/FORMAT2-MIGRATION.md", result = "Preserved build inputs and remaining format 2 handoff work." },
+  { kind = "source", reference = "docs/PHASE2-STATUS.md", result = "Phase 2 host artifact hashes, verifier scope and device-test limits." },
 ]
 
 [[area]]
@@ -210,14 +212,15 @@ status = "device-verified"
 components = []
 paths = ["scripts/check-*", "scripts/verify_*", "docs/**", "out/build.json", "assets/**"]
 inputs = ["RAM-only owner-operated boot procedure.", "Build and artifact SHA-256 values.", "UEFI screen output and recovery path."]
-configuration = ["verify_artifact.py checks the FD, Android image and embedded FAT.", "build.json records artifact sizes and hashes.", "The phase 1 acceptance requires two consecutive cold boots."]
+configuration = ["verify_artifact.py checks the phase 1 FD, Android image and embedded FAT.", "verify_phase2_artifact.py checks the phase 2 boot ramdisk, FD modules, kernel, ADT and TOML.", "build.json and phase2-build.json record artifact sizes and hashes.", "Each phase requires two consecutive matching cold boots for device acceptance."]
 procedure = ["Build and verify the image.", "Owner runs fastboot boot twice and records the visible result.", "Power off and confirm stock Android before further work."]
-findings = ["The accepted image is b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1.", "Earlier UFSDxe failure images are identified and must not be reused.", "Phase 2 requires separate kernel and DarwinBoot evidence."]
+findings = ["The accepted phase 1 image is b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1.", "Earlier UFSDxe failure images are identified and must not be reused.", "Phase 2 host verification confirms a byte-identical kernel and ADT-bearing FAT ramdisk but provides no hardware evidence."]
 completion = ["Every claimed checkpoint has a reproducible command, image hash and visible result.", "Failures reach a diagnosable screen or log instead of a silent hang."]
-limits = ["There is no phase 2 XNU log or ADT handoff evidence yet."]
-next_action = ["After generating an ADT, verify its required nodes with the shared generator and add the result to the packaging evidence."]
+limits = ["There is no phase 2 device XNU log or ADT handoff evidence yet."]
+next_action = ["RAM boot the owner-built phase 2 image and record the UNIXNURAMDISK and DarwinBoot result twice."]
 evidence = [
   { kind = "source", reference = "out/build.json", result = "Recorded phase 1 artifact sizes and SHA-256 values." },
+  { kind = "source", reference = "docs/PHASE2-STATUS.md", result = "Host-only phase 2 build and static verification; hardware_tested remains false." },
   { kind = "device", reference = "docs/PHASE1-STATUS.md", command = "fastboot boot out/elden-phase1.img", revision = "c591b1a0a471f24978aba25c56c8f6ec9bd06668", result = "Two cold boots reached DISPLAY OK, INPUT OK, config loaded and menu shown." },
   { kind = "device", reference = "assets/phase1-menu-20261025.jpg", command = "fastboot boot out/elden-phase1.img", revision = "c591b1a0a471f24978aba25c56c8f6ec9bd06668", result = "Screen capture shows the rendered UniXNU menu on the tablet." },
 ]

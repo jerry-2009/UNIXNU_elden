@@ -5,8 +5,8 @@ Lenovo Legion Y700 四代（TB322FC / `elden`，SM8750P）的设备仓。目录�
 描述、设备 DTS、组件选择、固定源码、载荷配置和构建脚本分别管理。
 
 当前进度：**阶段 0 已完成；阶段 1 的 UniXNU 菜单、GOP 显示、音量键输入和
-FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2 尚未生成可启动
-XNU 的镜像。**
+FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2 已生成并静态
+校验主机镜像，尚未进行实机 RAM 启动。**
 
 ## 仓库结构
 
@@ -35,6 +35,7 @@ XNU 的镜像。**
 - [阶段 1：构建与测试](docs/PHASE1.md)
 - [阶段 1：实机验收状态](docs/PHASE1-STATUS.md)
 - [阶段 2：交接文档](docs/PHASE2-HANDOFF.md)
+- [阶段 2：主机验证状态](docs/PHASE2-STATUS.md)
 - [完整移植分析](docs/porting-analysis.md)
 - [格式 2 迁移记录](docs/FORMAT2-MIGRATION.md)
 - [第三方源码版本](docs/third-party.md)
@@ -109,6 +110,23 @@ b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
 ```
 
 详细命令和排查步骤见 [阶段 1 构建与测试](docs/PHASE1.md)。
+
+## 阶段 2 构建
+
+阶段 2 保留阶段 1 的 4 MiB 嵌入式载荷路径，并通过
+`UniXNURamDiskDxe` 从 Android v3 启动镜像的 ramdisk 读取 XNU 载荷。构建
+需要一个当前 UniXNU 检出和已校验的预链接内核：
+
+```sh
+python scripts/build_phase2.py \
+  --kernel .cache/elden-kernel-6912319a/kernel.macho \
+  --unique-chip-id <device-seed> \
+  --crypto-path "$PWD/.cache/phase1/basecrypto"
+```
+
+主机验证可传 `--test-seed`，此时 `phase2-build.json` 会明确标记镜像不是
+设备可用产物。当前内核、payload、FD 和镜像的哈希及已知限制见
+[阶段 2 主机验证状态](docs/PHASE2-STATUS.md)。
 
 ## 设备支持
 

@@ -58,8 +58,9 @@ target = "DEBUG"
 toolchain = "CLANGPDB"
 dsc = "Platforms/PakalaPkg/PakalaNoSb.dsc"
 fd = "Build/PakalaPkg/{target}_CLANGPDB/FV/SM8750_EFI.fd"
-output_fd = "out/SILICIUM_UEFI.fd"
-output_image = "out/elden-phase1.img"
+output_fd = "out/SILICIUM_UEFI-phase2.fd"
+output_image = "out/elden-phase2.img"
+defines = { ELDEN_USE_RAMDISK = "TRUE" }
 submodules = ["MU_BASECORE", "Common/MU", "Common/MU_TIANO"]
 packages = [
   "{uefi}",
@@ -69,6 +70,7 @@ packages = [
   "{edk2}",
   "{uefi}/Common/MU",
   "{uefi}/Common/MU_TIANO",
+  "{uefi}/Common/MU_TIANO/EmbeddedPkg",
   "{uefi}/Common/MU_OEM_SAMPLE",
   "{uefi}/Silicon/Arm/MU_TIANO",
   "{uefi}/Features/DFCI",
@@ -81,9 +83,9 @@ packages = [
 
 [payload]
 volume = "ELDENRAM"
-size_mib = 4
+size_mib = 64
 loader = "firmware"
-title = "UniXNU | elden phase 1"
+title = "UniXNU | elden phase 2"
 dram_size = "0x80000000"
 panic_screen = false
 kernel_args = [
