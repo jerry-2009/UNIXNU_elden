@@ -4,6 +4,11 @@
 
 状态：**阶段 1 已通过；阶段 2 尚未生成可启动 XNU 的镜像。**
 
+格式 2 迁移后，板级 ADT 输入由 `dts/elden.dts`、`soc/sm8750/dts/`
+和 `board.toml` 的 `[payload.adt]` 共同提供。共享生成器替代了原来的
+设备专用 `make-elden-adt.py`。迁移范围和未完成硬件输入见
+[`FORMAT2-MIGRATION.md`](FORMAT2-MIGRATION.md)。
+
 ## 目标
 
 从阶段 1 已验证的 UniXNU 菜单进入 DarwinBoot，并让 4 KiB XNU 到达内核入口
@@ -50,11 +55,13 @@ b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
 
 ## 当前阻塞项
 
-### 1. 固件 DTB 仍是占位文件
+### 1. 固件 DTB 仍是占位文件；XNU 硬件树只覆盖首个里程碑
 
 `third_party/mu_wide_platforms/Platforms/PakalaPkg/Device/lenovo-y700g4/`
-`DeviceTreeBlob/Linux/linux-y700g4.dtb` 仍为 6 字节 `dummy`。阶段 2 应优先
-从设备 `/sys/firmware/fdt` 或可复现的 `elden` Linux DTB 构建取得真实树。
+`DeviceTreeBlob/Linux/linux-y700g4.dtb` 仍为 6 字节 `dummy`。格式 2 的
+`dts/elden.dts` 已提供 CPU、GIC、定时器、PSCI 和 2 GiB 连续 DRAM
+窗口，但它不是完整硬件树。阶段 2 仍需从设备 `/sys/firmware/fdt` 或可复现的
+`elden` Linux DTB 取得完整内存、保留区、UFS、显示和触控输入。
 
 ### 2. 缺少可打包的 XNU 输入
 
@@ -90,10 +97,11 @@ b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
 
 ## 推荐实施顺序
 
-1. 建立 `phase2/board.toml`，填入 SKU 对应 DRAM 大小、CPU/GIC/timebase、
+1. 使用当前 `board.toml` 的格式 2 配置，核对 SKU DRAM 窗口、CPU/GIC/timebase、
    本机生成的 `unique-chip-id` 和阶段 2 内核参数。
-2. 从 `UniXNU-piano` 适配 `make-elden-adt.py` 和独立校验器，保留随机种子，
-   生成 `/chosen`、`/cpus`、`/psci`、`/arm-io`、`/defaults`、`/options`。
+2. 编译 `dts/elden.dts`，用 UniXNU 共享 ADT 生成器校验 `/chosen`、
+   `/cpus`、`/psci`、`/arm-io`、`/defaults`、`/options` 和 NVRAM proxy；
+   补齐真实内存保留区后再加入 UFS、显示与触控节点。
 3. 取得并校验预链接 `kernel.macho`，生成对应的 `kernel.macho.adt`。
 4. 解决大载荷的只读传递通道，并把文件放进
    `EFI/UniXNU/Payloads/`。

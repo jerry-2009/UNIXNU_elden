@@ -1,0 +1,10 @@
+schema_version = 2
+
+[soc]
+name = "sm8750"
+description = "Qualcomm SM8750 / SM8750P transition profile"
+source_repository = "https://github.com/h0cheung/tb322fc-linux-kernel"
+source_revision = "6f97250ead155fc3b980856323e99a4623dae73d"
+
+[components]
+include = ["ArmDTPlatform", "ArmCpu"]

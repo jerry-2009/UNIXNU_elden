@@ -1,0 +1,11 @@
+# Copy to local.toml (ignored by Git) to use local source checkouts.
+# Relative paths are resolved from this file.
+
+[[source]]
+kind = "soc"
+name = "sm8750"
+local = "../UniXNU-sm8750-common"
+
+[local]
+drivers = "~/Code/UniXNU-dev/drivers"
+kits = "~/Code/UniXNU-dev/kits"

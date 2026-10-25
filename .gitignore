@@ -5,6 +5,7 @@ __pycache__/
 *.py[cod]
 *.log
 /out/
+/local.toml
 
 # Keep the pinned upstream checkouts local. Reproducible modifications live in
 # platform/overlays and are applied by scripts/bootstrap_third_party.py.

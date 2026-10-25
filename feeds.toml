@@ -1,0 +1,16 @@
+# SM8750 currently has no public UniXNU-<soc>-common repository.
+#
+# The committed soc/sm8750 directory is the same profile layout as
+# UniXNU-sm8550-common and keeps the format 2 parser runnable. Replace this
+# local source with the reviewed shared repository before publishing:
+#
+# [[source]]
+# name = "sm8750"
+# kind = "soc"
+# git = "https://github.com/UniXNU/UniXNU-sm8750-common"
+# commit = "<reviewed 40-character commit>"
+
+[[source]]
+name = "sm8750"
+kind = "soc"
+local = "soc/sm8750"

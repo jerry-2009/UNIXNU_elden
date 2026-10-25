@@ -1,0 +1,2 @@
+# Board XNU patches, one repository-relative path per line in apply order.
+# Shared ARM64, SM8750 and iPadOS series are listed in board.toml.

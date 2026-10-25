@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: BSD-3-Clause
+//
+// Lenovo Legion Y700 Gen 4 (TB322FC / elden) hardware description.
+
+/dts-v1/;
+/include/ "sm8750.dtsi"
+
+/ {
+	model = "Lenovo Legion Y700 Gen 4";
+	compatible = "lenovo,elden", "qcom,sm8750";
+
+	// Conservative window used by the first DarwinBoot/XNU handoff. The
+	// platform reserves a larger fragmented map; expand only after reading
+	// the live memory map on the target unit.
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0x0 0x80000000>;
+	};
+};

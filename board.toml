@@ -1,12 +1,25 @@
+schema_version = 2
+
 # Board description for the Lenovo Legion Y700 Gen 4 (elden, SM8750P).
 
 [board]
 name = "elden"
 soc = "SM8750P"
+soc_source = "sm8750"
+os_profile = "ipados-17.7.11-21H461"
 model_id = "TB322FC"
 description = "Lenovo Legion Y700 Gen 4"
 kit = "elden"
 stage = 1
+
+[components]
+include = [
+  "ArmDTPlatform",
+  "ArmCpu",
+  "SoftwareAES",
+  "XnuPrelink",
+  "DarwinBoot",
+]
 
 [board.hardware]
 display = "1904x3040 bonded dual-DSI + DSC"
@@ -18,18 +31,27 @@ gic_redistributor_stride = "0x40000"
 ufs_host = "0x1d84000"
 ufs_phy = "0x1d80000"
 
-[ipsw]
-url = "https://updates.cdn-apple.com/2025SpringFCS/fullrestores/122-77166/DCA6CFE8-90E9-4B92-880D-3DE171798E40/iPad_Pro_HFR_17.7.11_21H461_Restore.ipsw"
-product = "iPad7,1"
-version = "17.7.11"
-build = "21H461"
-fetch = ["KernelCache", "DeviceTree", "StaticTrustCache"]
-
 [kernel]
 defconfig = "elden_defconfig"
+config_fragments = [
+  "arch:configs/common.config",
+  "soc:configs/sm8750.config",
+  "os:configs/ipados.config",
+]
+patch_series = [
+  "arch:patches/xnu/series",
+  "soc:patches/xnu/series",
+  "os:patches/xnu/series",
+  "device:patches/xnu/series",
+]
 status = "phase-2-pending"
 
+[device_tree]
+source = "device:dts/elden.dts"
+include_dirs = ["soc:dts"]
+
 [firmware]
+config = "lenovo-y700g4"
 baseline = "mu_wide_platforms"
 device = "lenovo-y700g4"
 target = "DEBUG"
@@ -39,18 +61,42 @@ fd = "Build/PakalaPkg/{target}_CLANGPDB/FV/SM8750_EFI.fd"
 output_fd = "out/SILICIUM_UEFI.fd"
 output_image = "out/elden-phase1.img"
 submodules = ["MU_BASECORE", "Common/MU", "Common/MU_TIANO"]
+packages = [
+  "{uefi}",
+  "{uefi}/Platforms",
+  "{tree}/package",
+  "{tree}/drivers/DarwinBoot",
+  "{edk2}",
+  "{uefi}/Common/MU",
+  "{uefi}/Common/MU_TIANO",
+  "{uefi}/Common/MU_OEM_SAMPLE",
+  "{uefi}/Silicon/Arm/MU_TIANO",
+  "{uefi}/Features/DFCI",
+  "{uefi}/Features/CONFIG",
+  "{uefi}/Binaries",
+  "{uefi}/Silicon/QC/Sm8750",
+  "{uefi}/Platforms/CranePkg",
+  "{uefi}/Platforms/SurfaceDuoACPI",
+]
 
 [payload]
-status = "phase-1"
 volume = "ELDENRAM"
 size_mib = 4
+loader = "firmware"
 title = "UniXNU | elden phase 1"
-entry = "Return to firmware"
-driver = "drivers/EldenRamDiskDxe"
-config = "package/unixnu.toml"
+dram_size = "0x80000000"
+panic_screen = false
+kernel_args = [
+  "-v",
+  "serial=3",
+  "debug=0x14e",
+  "boot-progress=2",
+  "armcpu-diagnostics=1",
+  "armcpu-spi-ipi=1",
+  "-no_slto_panic",
+]
 
 [payload.adt]
-status = "phase-2-pending"
-root_match_volume_uuid = "required"
+chip_id = "207"
 unique_chip_id = "required"
 
