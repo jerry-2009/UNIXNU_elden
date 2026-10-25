@@ -1,14 +1,5 @@
-!if $(ELDEN_USE_RAMDISK) == TRUE
-[LibraryClasses.common]
-  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
-  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-
-[Components.common]
-UniXNUPkg/Driver/UniXNURamDiskDxe/UniXNURamDiskDxe.inf
-!else
 [Components.common]
 EldenPhase1Pkg/EldenRamDiskDxe.inf
-!endif
 UniXNUPkg/Application/UniXNU/UniXNU.inf
 UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe.inf
 DarwinBootPkg/Driver/DarwinBoot.inf

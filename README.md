@@ -5,8 +5,9 @@ Lenovo Legion Y700 四代（TB322FC / `elden`，SM8750P）的设备仓。目录�
 描述、设备 DTS、组件选择、固定源码、载荷配置和构建脚本分别管理。
 
 当前进度：**阶段 0 已完成；阶段 1 的 UniXNU 菜单、GOP 显示、音量键输入和
-FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2 已生成并静态
-校验主机镜像，尚未进行实机 RAM 启动。**
+FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2.0 已完成：格式 2
+配置与输出隔离通过，现行阶段 1 基线也完成两次 RAM 冷启动复核；阶段 2 尚未生成
+可启动 XNU 的镜像。**
 
 ## 仓库结构
 
@@ -34,8 +35,8 @@ FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2
 - [阶段 0：恢复路径](docs/PHASE0.md)
 - [阶段 1：构建与测试](docs/PHASE1.md)
 - [阶段 1：实机验收状态](docs/PHASE1-STATUS.md)
-- [阶段 2：交接文档](docs/PHASE2-HANDOFF.md)
-- [阶段 2：主机验证状态](docs/PHASE2-STATUS.md)
+- [阶段 2：实施计划与验收关卡](docs/PHASE2-HANDOFF.md)
+- [阶段 2：主机状态与基线](docs/PHASE2-STATUS.md)
 - [完整移植分析](docs/porting-analysis.md)
 - [格式 2 迁移记录](docs/FORMAT2-MIGRATION.md)
 - [第三方源码版本](docs/third-party.md)
@@ -82,8 +83,9 @@ UNIXNU_DIR=../UniXNU
 dtc -I dts -O dtb -i soc/sm8750/dts -o /tmp/elden.dtb dts/elden.dts
 ```
 
-`unixnu fetch` 和 `unixnu tree` 需要先准备格式 2 的 XNU 输入。当前
-`third_party/UniXNU` 仍固定为阶段 1 已验证的提交，因此阶段 1 构建继续使用
+首次 `tree` 会初始化共享组件子模块；若 `status` 提示组件补丁缺失，先运行 `tree`
+再重试。源码树可组装不代表 XNU reference、SDK、kernelcache 和 ABI 输入已齐备，
+内核构建前仍需完成对应准备。当前 `third_party/UniXNU` 仍固定为阶段 1 已验证的提交，因此阶段 1 构建继续使用
 `scripts/build_phase1.py`，不会因迁移改变已验收镜像的构建路径。
 
 ## 阶段 1 构建
@@ -111,23 +113,6 @@ b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
 
 详细命令和排查步骤见 [阶段 1 构建与测试](docs/PHASE1.md)。
 
-## 阶段 2 构建
-
-阶段 2 保留阶段 1 的 4 MiB 嵌入式载荷路径，并通过
-`UniXNURamDiskDxe` 从 Android v3 启动镜像的 ramdisk 读取 XNU 载荷。构建
-需要一个当前 UniXNU 检出和已校验的预链接内核：
-
-```sh
-python scripts/build_phase2.py \
-  --kernel .cache/elden-kernel-6912319a/kernel.macho \
-  --unique-chip-id <device-seed> \
-  --crypto-path "$PWD/.cache/phase1/basecrypto"
-```
-
-主机验证可传 `--test-seed`，此时 `phase2-build.json` 会明确标记镜像不是
-设备可用产物。当前内核、payload、FD 和镜像的哈希及已知限制见
-[阶段 2 主机验证状态](docs/PHASE2-STATUS.md)。
-
 ## 设备支持
 
 | 功能 | 状态 | 说明 |
@@ -140,6 +125,18 @@ python scripts/build_phase2.py \
 | DarwinBoot / XNU | ❌ | 阶段 2 尚未开始实机验证 |
 | UFS 根卷 / iPadOS 用户态 | ❌ | 后续阶段 |
 | 触摸 | ❌ | 后续阶段 |
+
+## 阶段 2 推进顺序
+
+按[实施计划](docs/PHASE2-HANDOFF.md)依次通过：**2.0 基线与配置 →
+2.1 硬件树/内存与 2.2 内核输入（并行）→ 2.3 大载荷 RAM 通道 →
+2.4 DarwinBoot → 2.5 XNU 入口、平台专家和 boot CPU**。
+
+2.0 的结果见[阶段 2 状态](docs/PHASE2-STATUS.md)。历史验收镜像的原始字节
+未保留；当前 `out/elden-phase1.img` 已由设备所有者完成两次 RAM 冷启动复核，
+成为现行阶段 1 基线。
+下一步可补齐真实固件 FDT、内存保留区与 XNU 输入；4 MiB 内嵌 FAT 与仅剩
+920 字节的内层 FV 不能直接容纳阶段 2。DarwinBoot 的输入校验日志不计为 XNU 验收。
 
 ## 迁移边界
 

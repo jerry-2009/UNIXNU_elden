@@ -13,7 +13,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MU = ROOT / "third_party" / "mu_wide_platforms"
-UNIXNU = ROOT / "third_party" / "UniXNU"
 BASE = MU / "MU_BASECORE"
 BASE_TOOLS = BASE / "BaseTools"
 CONF = MU / "Build" / "Conf"
@@ -28,18 +27,9 @@ def main() -> None:
     parser.add_argument("--jobs", default=str(os.cpu_count() or 4))
     parser.add_argument("--toolchain", type=Path, default=TOOLCHAIN)
     parser.add_argument("--crypto-path", type=Path, help="directory containing Driver/Bin/CryptoDriver.inc.dsc")
-    parser.add_argument("--unixnu", type=Path, default=UNIXNU)
-    parser.add_argument(
-        "--define",
-        action="append",
-        default=[],
-        metavar="NAME=VALUE",
-        help="additional EDK II define (repeatable)",
-    )
     args = parser.parse_args()
 
     toolchain = args.toolchain.expanduser().resolve()
-    unixnu = args.unixnu.expanduser().resolve()
     for executable in ("clang", "lld-link", "llvm-lib", "llvm-rc"):
         if not os.access(toolchain / executable, os.X_OK):
             raise SystemExit(f"missing executable: {toolchain / executable}")
@@ -64,18 +54,16 @@ def main() -> None:
     for name in ("target", "tools_def", "build_rule"):
         source = BASE_TOOLS / "Conf" / f"{name}.template"
         destination = CONF / f"{name}.txt"
-        if not destination.is_file() or source.read_bytes() != destination.read_bytes():
-            shutil.copy2(source, destination)
+        shutil.copy2(source, destination)
 
     packages = [
         MU,
         MU / "Platforms",
-        unixnu / "package",
-        unixnu / "drivers" / "DarwinBoot",
+        ROOT / "third_party" / "UniXNU" / "package",
+        ROOT / "third_party" / "UniXNU" / "drivers" / "DarwinBoot",
         BASE,
         MU / "Common" / "MU",
         MU / "Common" / "MU_TIANO",
-        MU / "Common" / "MU_TIANO" / "EmbeddedPkg",
         MU / "Common" / "MU_OEM_SAMPLE",
         MU / "Silicon" / "Arm" / "MU_TIANO",
         MU / "Features" / "DFCI",
@@ -120,8 +108,6 @@ def main() -> None:
         "-D",
         f"SHARED_CRYPTO_PATH={crypto_define}",
     ]
-    for value in args.define:
-        command += ["-D", value]
     print("+", " ".join(command))
     subprocess.run(command, cwd=MU, env=env, check=True)
 

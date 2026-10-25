@@ -4,11 +4,7 @@
 #}
 
 INF AndromedaPkg/Driver/SimpleFbDxe/SimpleFbDxe.inf
-!if $(ELDEN_USE_RAMDISK) == TRUE
-INF UniXNUPkg/Driver/UniXNURamDiskDxe/UniXNURamDiskDxe.inf
-!else
 INF EldenPhase1Pkg/EldenRamDiskDxe.inf
-!endif
 INF UniXNUPkg/Application/UniXNU/UniXNU.inf
 INF UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe.inf
 INF DarwinBootPkg/Driver/DarwinBoot.inf
@@ -102,12 +98,10 @@ FILE FREEFORM = A91D838E-A5FA-4138-825D-455E23030794 {
     SECTION RAW = $(PACKAGE_NAME)/Device/$(TARGET_DEVICE)/Binaries/RawFiles/logo1.bmp
 }
 
-!if $(ELDEN_USE_RAMDISK) == FALSE
 FILE FREEFORM = 6A6B6F43-2AE5-4A7E-9C4E-7C9A9136D2B0 {
     SECTION UI = "elden-phase1-payload.img"
     SECTION RAW = EldenPhase1Pkg/Payload/payload.img
 }
-!endif
 
 
 FILE FREEFORM = 8CAE2C55-FC5A-410B-812B-8CA22F572F36 {

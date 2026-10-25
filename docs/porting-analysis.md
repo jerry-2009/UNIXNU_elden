@@ -238,29 +238,27 @@ UNIXNU: menu: shown
 
 ### 阶段 2：DarwinBoot 与 XNU 入口
 
-目标：从 UniXNU 菜单加载最小 4 KiB XNU，稳定到达平台专家和控制台，为后续用户态准备正确的 ADT 与启动参数。
+目标：从菜单加载与 `iPad7,1 / iPadOS 17.7.11 / 21H461` 一致的最小 4 KiB XNU，
+证明入口执行、`ArmDTPlatform` 匹配和 boot CPU 的 `ArmCpu`、GIC/定时器基本路径。
+2026-10-25 重排后的详细工作与验收以 [PHASE2-HANDOFF.md](PHASE2-HANDOFF.md) 为准。
 
-工作：
+1. **2.0 基线与配置**：当前本地产物与历史实机哈希不同，先保存可确认来源的基线；
+   独立当前主仓解析格式 2，阶段 1 的固定依赖和产物继续保留。
+2. **2.1 硬件树与内存**：补真实固件 FDT 和保留区；硬件 DTS 经共享 ADT 生成器生成
+   sidecar，核对 CPU/GIC/timebase、产品身份、内存占位符与禁用休眠设置。
+   候选低 2 GiB 窗口不等于已确认可全部分配。
+3. **2.2 内核输入**（与 2.1 并行）：准备目标 kernelcache/ABI、4 KiB 配置和可复现
+   kernel/link/prelink 产物，保存符号与哈希；可选 trust cache/Data seed 不阻塞早期验证。
+4. **2.3 大载荷通道**：先验证 Android ramdisk → 固件 FDT → HOB → 共享 RAM disk 驱动
+   的候选路径及近最终尺寸 FAT 的完整性；重新测量 FV、BootShim 和内存交叠。
+   此路径尚未在 elden 验证，不能直接向现有 4 MiB FAT 复制内核。
+5. **2.4 DarwinBoot**：验证菜单、内核/ADT 对应关系与拒绝路径，记录退出 boot services
+   前的边界。loader/inputs validated 日志只算加载器证据。
+6. **2.5 XNU 实机**：逐项证明入口、平台专家和 boot CPU；同一最终镜像两次冷 RAM 启动
+   到相同可定位阶段，随后原厂 Android 正常启动。仅有入口色条或早期 panic 不算完成。
 
-1. 建立 `make-elden-adt.py`，先填 `/chosen`、`/cpus`、`/psci`、`/arm-io`、GIC、定时器、NVRAM proxy、DRAM；
-2. 使用真实 MPIDR 和 boot CPU；SM8750 通常为 6 个 Affinity1 核加 2 个 Affinity2 核；
-3. 先不带完整 iPad 产品身份，先用最小树隔离 CPU、内存和中断问题；
-4. 用 `boot-progress`、色条、panic 屏幕或串口确定最后通过的启动阶段；
-5. 验证 DarwinBoot 的 kernel、ADT、trust cache 占位符和启动参数。
-
-验收：
-
-```text
-DARWINBOOT: loader v2 installed EL1
-DARWINBOOT: inputs validated
-```
-
-- 内核入口执行；
-- 平台专家匹配 `ArmDTPlatform`；
-- 能看到明确的缺失 provider 或 panic，而不是无输出死机；
-- 连续两次 RAM 启动到达相同阶段。
-
-本阶段完成只说明 UniXNU 到 XNU 的桥已搭好，**不视为“进入 iPadOS 用户态”**。
+平台专家和 boot CPU 通过后，已知根卷等待或后续 provider 缺失可作为本阶段终点。
+UFS、根卷、原生显示、触摸、SMP 和用户态均后置；本阶段完成不代表进入 iPadOS 用户态。
 
 ### 阶段 3：UFS、根卷与用户态输入准备
 
@@ -373,23 +371,15 @@ GPU/Metal、相机、音频、网络、休眠、手写笔和传感器不在本�
 
 所有 UEFI、载荷、DarwinBoot 和 XNU 入口问题都可以在零写盘的 `fastboot boot` 路径中先发现。测试流程不得使用 `fastboot flash`，不得切换启动槽、擦除或格式化分区，也不得修改 GPT；这些写入操作都会扩大故障面，并使 Android 恢复更复杂。
 
-## 8. 首个可执行里程碑
+## 8. 当前可执行里程碑
 
-建议把第一项编码任务限定为：
+原首个里程碑“RAM FAT 启动到可操作菜单并连续两次复现”已有
+[阶段 1 实机验收记录](PHASE1-STATUS.md)。当前应执行阶段 2.0：核对历史验收产物与
+本地文件的哈希差异，保存基线，并用独立当前主仓解析格式 2 配置。
 
-> **用 `uefi-elden` 从 RAM disk 正常启动到可见、可操作的 UniXNU 菜单，并连续两次复现；UFS 暂时不参与。**
-
-它同时验证了 ABL、BootShim、UEFI 内存映射、GOP、输入、FAT 和 UniXNU 配置解析。只有这个里程碑通过后，才值得投入 SM8750 `NativeUfs` 和 XNU 显示驱动。
-
-推荐的首组改动：
-
-1. 建 `UniXNU-elden`，从 `UniXNU-piano` 复制 `board.toml`、最小 defconfig 和 ADT 脚本；
-2. 改 ADT：`qcom,sm8750`、SM8750P、实际 DRAM、CPU 拓扑、GIC、UART；
-3. 建 `uefi-elden`，以 `lenovo-y700g4` 设备包为起点；
-4. 加入 UniXNU 和 DarwinBoot INF；
-5. 加入只读 RAM FAT payload；
-6. 只执行 `fastboot boot`，记录屏幕日志和镜像 SHA-256，不刷写任何分区；
-7. 通过后只打开与三个目标相关的 `NativeUfs`、显示路径和 `NativeNovatekTouch`。
+随后并行补齐真实 FDT/内存保留区与目标 XNU 输入，再验证大载荷通道。
+使用共享 ADT 生成器，按[阶段 2 计划](PHASE2-HANDOFF.md)逐关推进；UFS、显示和
+触摸驱动不作为当前首次 XNU 入口验证的前置任务。
 
 ## 9. 最终判断
 

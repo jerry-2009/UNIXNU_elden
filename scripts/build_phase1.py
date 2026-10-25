@@ -121,7 +121,6 @@ def main() -> None:
                 "--toolchain", str(args.toolchain),
                 "--crypto-path", str(args.crypto_path),
                 "--jobs", str(args.jobs),
-                "--define", "ELDEN_USE_RAMDISK=FALSE",
             ]
         )
         # Preserve the board's Android v3 packaging after the direct EDK II build.
