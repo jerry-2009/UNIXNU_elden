@@ -46,8 +46,8 @@ DEPENDENCIES = {
     ),
     "elden-linux": Dependency(
         "elden-linux",
-        "https://github.com/xiaquwan1001/lenovo-legion-y700-gen4-tb322fc-elden-linux.git",
-        "2ea1a67cad14032e3c9c5d1c61e4ee92ad30742b",
+        "https://github.com/h0cheung/tb322fc-linux-kernel.git",
+        "6f97250ead155fc3b980856323e99a4623dae73d",
         "device constants and Linux bring-up evidence",
     ),
     "UniXNU-sheng": Dependency(

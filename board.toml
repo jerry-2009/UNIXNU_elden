@@ -41,8 +41,8 @@ config_fragments = [
 patch_series = [
   "arch:patches/xnu/series",
   "soc:patches/xnu/series",
-  "os:patches/xnu/series",
   "device:patches/xnu/series",
+  "os:patches/xnu/series",
 ]
 status = "phase-2-pending"
 
@@ -84,19 +84,22 @@ volume = "ELDENRAM"
 size_mib = 4
 loader = "firmware"
 title = "UniXNU | elden phase 1"
-dram_size = "0x80000000"
+dram_size = "0x10000000"
 panic_screen = false
 kernel_args = [
   "-v",
   "serial=3",
   "debug=0x14e",
-  "boot-progress=2",
   "armcpu-diagnostics=1",
-  "armcpu-spi-ipi=1",
   "-no_slto_panic",
 ]
 
 [payload.adt]
 chip_id = "207"
 unique_chip_id = "required"
+owned_memory_size = "0x10000000"
+
+[adt.defaults.u32]
+# Suspend is not implemented for the first boot-CPU milestone.
+sleep-disabled = 1
 

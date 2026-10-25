@@ -6,8 +6,11 @@ Lenovo Legion Y700 四代（TB322FC / `elden`，SM8750P）的设备仓。目录�
 
 当前进度：**阶段 0 已完成；阶段 1 的 UniXNU 菜单、GOP 显示、音量键输入和
 FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2.0 已完成：格式 2
-配置与输出隔离通过，现行阶段 1 基线也完成两次 RAM 冷启动复核；阶段 2 尚未生成
-可启动 XNU 的镜像。**
+配置与输出隔离通过，现行阶段 1 基线也完成两次 RAM 冷启动复核。阶段 2.1 的
+live FDT、固件内存保留区、XNU ADT、boot CPU 和参数语义已完成审计；尚未生成
+可启动 XNU 的镜像。阶段 2.2 的主机输入已完成：目标 kernelcache、57 项补丁、
+4 KiB XNU、预链接 `kernel.macho` 和主机 ADT 已生成并审计；尚未执行 DarwinBoot
+或 XNU 实机启动。**
 
 ## 仓库结构
 
@@ -37,6 +40,8 @@ FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2
 - [阶段 1：实机验收状态](docs/PHASE1-STATUS.md)
 - [阶段 2：实施计划与验收关卡](docs/PHASE2-HANDOFF.md)
 - [阶段 2：主机状态与基线](docs/PHASE2-STATUS.md)
+- [阶段 2.1：FDT、ADT 与内存审计](docs/PHASE2.1-STATUS.md)
+- [阶段 2.2：可追溯的最小 XNU](docs/PHASE2.2-STATUS.md)
 - [完整移植分析](docs/porting-analysis.md)
 - [格式 2 迁移记录](docs/FORMAT2-MIGRATION.md)
 - [第三方源码版本](docs/third-party.md)
@@ -121,7 +126,8 @@ b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
 | GOP 显示 | ✅ | 1904×3040，菜单可见 |
 | 音量键输入 | ✅ | 可移动、确认菜单项 |
 | UniXNU 菜单 | ✅ | 从内置只读 FAT 载荷读取配置 |
-| DTB | ⚠️ | 上游仍为 `dummy` 占位文件 |
+| XNU 输入 | ✅ | 4 KiB 原生内核、预链接 kernelcache 与 ADT 主机审计通过 |
+| DTB / ADT | ⚠️ | live FDT 与 ADT 主机审计通过；XNU 启动尚未验证 |
 | DarwinBoot / XNU | ❌ | 阶段 2 尚未开始实机验证 |
 | UFS 根卷 / iPadOS 用户态 | ❌ | 后续阶段 |
 | 触摸 | ❌ | 后续阶段 |
@@ -132,18 +138,23 @@ b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
 2.1 硬件树/内存与 2.2 内核输入（并行）→ 2.3 大载荷 RAM 通道 →
 2.4 DarwinBoot → 2.5 XNU 入口、平台专家和 boot CPU**。
 
-2.0 的结果见[阶段 2 状态](docs/PHASE2-STATUS.md)。历史验收镜像的原始字节
+2.0 的结果见[阶段 2 状态](docs/PHASE2-STATUS.md)，2.1 的结果见
+[阶段 2.1 状态](docs/PHASE2.1-STATUS.md)，2.2 的结果见
+[阶段 2.2 状态](docs/PHASE2.2-STATUS.md)。历史验收镜像的原始字节
 未保留；当前 `out/elden-phase1.img` 已由设备所有者完成两次 RAM 冷启动复核，
 成为现行阶段 1 基线。
-下一步可补齐真实固件 FDT、内存保留区与 XNU 输入；4 MiB 内嵌 FAT 与仅剩
-920 字节的内层 FV 不能直接容纳阶段 2。DarwinBoot 的输入校验日志不计为 XNU 验收。
+下一步是在独立候选上验证 56 MiB 大载荷 RAM 通道（2.3）；DarwinBoot 和 XNU
+实机检查点分别留在 2.4–2.5。4 MiB 内嵌 FAT 与仅剩 920 字节的内层 FV 不能直接
+容纳阶段 2。
+DarwinBoot 的输入校验日志不计为 XNU 验收。
 
 ## 迁移边界
 
 - `components.include` 只选择第一里程碑需要的平台、CPU、AES、预链接和
   DarwinBoot 组件；UFS、显示、触摸、GPU、网络和音频在实现与验证前不虚报。
-- `dts/elden.dts` 先发布 2 GiB 连续 DRAM 窗口、8 核 MPIDR、GICv3 和
-  PSCI 输入。整机内存映射、UFS、显示和触控节点仍待板级适配。
+- `dts/elden.dts` 使用 UEFI `DXE Heap` 中的 256 MiB 连续 XNU 窗口、
+  8 核 MPIDR、GICv3 和 PSCI 输入。`dts/elden-firmware-memory.dts` 保存脱敏的
+  固件 RAM／保留区描述；UFS、显示和触控节点仍待后续适配。
 - `soc/sm8750` 是过渡目录，用来在没有公开
   `UniXNU-sm8750-common` 时保持格式 2 可解析。发布前必须迁入共享仓并在
   `feeds.toml` 固定 40 位提交，不能把本地目录当作发布来源。

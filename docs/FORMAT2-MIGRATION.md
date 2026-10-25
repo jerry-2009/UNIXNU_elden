@@ -65,10 +65,11 @@ repository, pin its reviewed commit and update `unixnu.lock`.
 
 ## Remaining hardware inputs
 
-The first board DTS deliberately exports only the resources required by
-`ArmDTPlatform` and `ArmCpu`:
+The current board DTS exports only the resources required by `ArmDTPlatform`
+and `ArmCpu`:
 
-- one contiguous 2 GiB DRAM window at `0x80000000`;
+- one contiguous 256 MiB XNU handoff window at `0xC2400000`, contained in the
+  live 12 GiB RAM map and UEFI `DXE Heap` conventional memory;
 - eight declared MPIDR values from `0x0` through `0x10100`, with secondary
   startup still opt-in;
 - GIC distributor `0x16000000 + 0x10000`;
@@ -76,9 +77,11 @@ The first board DTS deliberately exports only the resources required by
 - timebase `19,200,000 Hz`;
 - PSCI SMC conduit.
 
+The sanitised live 12 GiB firmware memory description is in
+`dts/elden-firmware-memory.dts`; the raw device FDT remains local-only.
+
 Still required before a complete format 2 release:
 
-- a full live memory map and reserved-memory ownership;
 - the reviewed SM8750 shared SoC repository and commit;
 - kernelcache/ABI inputs and the unique per-device seed;
 - UFS controller, PHY, clocks, power domains and SMMU ownership;

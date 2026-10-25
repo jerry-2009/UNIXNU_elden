@@ -1,10 +1,16 @@
-# Resolved upstream sources used by this device repository.
+# Resolved git sources, written by "unixnu fetch". Local sources are never recorded.
+
+[source."AvailabilityVersions"]
+commit = "933f9360f1b70dfbda5548386a3d65e0358b4f7d"
+
+[source."IOStorageFamily"]
+commit = "e45fbe30a7879e0b16e26dddb78538f1b00e0bff"
+
+[source."Project-SunUEFI"]
+commit = "2d4752a1455f6448ec0d300aece28ec6eb148b20"
 
 [source."UniXNU"]
 commit = "c62bf12595f9a86c1b7282cf12d5af40b441fdac"
-
-[source."mu_wide_platforms"]
-commit = "3e1d052064beb6e59cda3cfba87d50e6cc088174"
 
 [source."UniXNU-piano"]
 commit = "98b3f94a067aff93a9296de7b80fdddc03dae380"
@@ -12,37 +18,26 @@ commit = "98b3f94a067aff93a9296de7b80fdddc03dae380"
 [source."UniXNU-sheng"]
 commit = "251b291adf941b9953fe3ae66a808b9b626e164d"
 
-[source."elden-linux"]
-commit = "2ea1a67cad14032e3c9c5d1c61e4ee92ad30742b"
-
-[source."Project-SunUEFI"]
-commit = "2d4752a1455f6448ec0d300aece28ec6eb148b20"
-
-# Format 2 base feeds. The current SM8750 SoC source is local and therefore is
-# intentionally not recorded here; replace it with a reviewed git commit before
-# publication.
-
-[source."xnu"]
-commit = "d8b80295118ef25ac3a784134bcf95cd8e88109f"
-
-[source."libplatform"]
-commit = "a00a4cc36da2110578bcf3b8eeeeb93dcc7f4e11"
-
-[source."libdispatch"]
-commit = "30fe6a7d945340ce69cef121132f049e810089a5"
-
-[source."AvailabilityVersions"]
-commit = "933f9360f1b70dfbda5548386a3d65e0358b4f7d"
+[source."corecrypto-2023"]
+commit = "11fba65b12d8830630e248dfa8344caf8b065f26"
 
 [source."edk2"]
 commit = "cfb93724a06ff86ff5ba971413368a7809ee42a5"
 
+[source."elden-linux"]
+commit = "6f97250ead155fc3b980856323e99a4623dae73d"
+
+[source."libdispatch"]
+commit = "30fe6a7d945340ce69cef121132f049e810089a5"
+
+[source."libplatform"]
+commit = "a00a4cc36da2110578bcf3b8eeeeb93dcc7f4e11"
+
 [source."libpthread"]
 commit = "c0e60fb5ecfc54cf379c261d3f9572cc22ded891"
 
-[source."corecrypto-2023"]
-commit = "11fba65b12d8830630e248dfa8344caf8b065f26"
+[source."mu_wide_platforms"]
+commit = "3e1d052064beb6e59cda3cfba87d50e6cc088174"
 
-[source."IOStorageFamily"]
-commit = "e45fbe30a7879e0b16e26dddb78538f1b00e0bff"
-
+[source."xnu"]
+commit = "d8b80295118ef25ac3a784134bcf95cd8e88109f"

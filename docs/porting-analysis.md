@@ -67,7 +67,7 @@
 | [UniXNU 核心仓](https://github.com/UniXNU/UniXNU) | BootShim、UniXNU 启动器、DarwinBoot、4 KiB XNU、通用 ARM64 驱动和预链接框架已经存在 | 通用框架不等于 SoC 驱动已适配 |
 | [UniXNU-piano](https://github.com/code002-2/UniXNU-piano) | 与 `elden` 同为 SM8750 族；有可用 `board.toml`、ADT 生成器、内核构建和 prelink 流程 | 其 README 仍把设备描述为未上机；没有证明完整 XNU 用户态可用 |
 | [UniXNU-piano 构建记录](https://github.com/code002-2/UniXNU-piano/blob/main/KERNEL-BUILD.md) | 同一 SoC 上 XNU 可构建、预链接，UniXNU 菜单可实机显示；源码给出了 RAM disk 载荷绕过内部存储的方案 | 内部存储仍未打通；不能证明 `elden` 的 UFS、屏幕或 GPU 可用 |
-| [Y700 四代 Linux bring-up](https://github.com/xiaquwan1001/lenovo-legion-y700-gen4-tb322fc-elden-linux) | 大部分板级地址、外设、分区和 UEFI 实验记录；Linux 已能在设备上运行 | Linux 驱动不能直接链接进 XNU |
+| [Y700 四代 Linux bring-up](https://github.com/h0cheung/tb322fc-linux-kernel) | 大部分板级地址、外设、分区和 UEFI 实验记录；Linux 已能在设备上运行 | Linux 驱动不能直接链接进 XNU |
 | [`mu_wide_platforms` `lenovo-y700g4`](https://github.com/sunflower2333/mu_wide_platforms/tree/main/Platforms/PakalaPkg/Device/lenovo-y700g4) | 已有本机型原厂 DXE、内存图、ACPI、1904×3040 framebuffer 配置和 BootShim 启动链 | 老版本 UFS/SMMU bring-up 不完整 |
 | [Project-SunUEFI](https://github.com/slwyts/Project-SunUEFI) | 证明 SM8750 + EDK2 + 双 DSI + Linux 的完整启动链在现代平板上可工作 | 它是 `piano` 产品移植，含小米 ABL、合体 BOOT 和板级假设，不能直接套到 `elden` |
 | [Android `elden` 设备仓](https://github.com/lolipuru/android_device_lenovo_elden) | Android 分区、关键属性、触屏键位和原厂系统基线 | 不含 XNU 或 UEFI 实现 |
@@ -246,9 +246,12 @@ UNIXNU: menu: shown
    独立当前主仓解析格式 2，阶段 1 的固定依赖和产物继续保留。
 2. **2.1 硬件树与内存**：补真实固件 FDT 和保留区；硬件 DTS 经共享 ADT 生成器生成
    sidecar，核对 CPU/GIC/timebase、产品身份、内存占位符与禁用休眠设置。
-   候选低 2 GiB 窗口不等于已确认可全部分配。
-3. **2.2 内核输入**（与 2.1 并行）：准备目标 kernelcache/ABI、4 KiB 配置和可复现
-   kernel/link/prelink 产物，保存符号与哈希；可选 trust cache/Data seed 不阻塞早期验证。
+   原低 2 GiB 候选已确认与多个保留区冲突，UEFI `Kernel` carveout 候选又撞上
+   live initrd；当前改用 `0xC2400000` 的 256 MiB DXE conventional window，详见
+   [阶段 2.1 状态](PHASE2.1-STATUS.md)。
+3. **2.2 内核输入**：目标 kernelcache/ABI、4 KiB 配置和可复现 kernel/link/prelink
+   产物已完成，保存了符号与哈希；可选 trust cache/Data seed 不阻塞早期验证，详见
+   [阶段 2.2 状态](PHASE2.2-STATUS.md)。
 4. **2.3 大载荷通道**：先验证 Android ramdisk → 固件 FDT → HOB → 共享 RAM disk 驱动
    的候选路径及近最终尺寸 FAT 的完整性；重新测量 FV、BootShim 和内存交叠。
    此路径尚未在 elden 验证，不能直接向现有 4 MiB FAT 复制内核。
@@ -374,10 +377,11 @@ GPU/Metal、相机、音频、网络、休眠、手写笔和传感器不在本�
 ## 8. 当前可执行里程碑
 
 原首个里程碑“RAM FAT 启动到可操作菜单并连续两次复现”已有
-[阶段 1 实机验收记录](PHASE1-STATUS.md)。当前应执行阶段 2.0：核对历史验收产物与
-本地文件的哈希差异，保存基线，并用独立当前主仓解析格式 2 配置。
+[阶段 1 实机验收记录](PHASE1-STATUS.md)。阶段 2.0、2.1 和 2.2 的主机工作已完成，
+结果见[阶段 2 状态](PHASE2-STATUS.md)、[阶段 2.1 状态](PHASE2.1-STATUS.md)和
+[阶段 2.2 状态](PHASE2.2-STATUS.md)。当前进入阶段 2.3，验证大载荷 RAM 通道。
 
-随后并行补齐真实 FDT/内存保留区与目标 XNU 输入，再验证大载荷通道。
+真实 FDT/内存保留区与目标 XNU 输入已经完成，下一步验证大载荷通道。
 使用共享 ADT 生成器，按[阶段 2 计划](PHASE2-HANDOFF.md)逐关推进；UFS、显示和
 触摸驱动不作为当前首次 XNU 入口验证的前置任务。
 

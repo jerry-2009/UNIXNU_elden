@@ -1,2 +1,8 @@
 # Board XNU patches, one repository-relative path per line in apply order.
 # Shared ARM64, SM8750 and iPadOS series are listed in board.toml.
+#
+# UniXNU 16e592ab's zzz-boot-progress patch carries PMGR probe context that
+# depends on the separately maintained sheng-platform-power patch. elden does
+# not enable XNU_SHENG_PMGR, so add the same compile-time-disabled context
+# before the shared iPadOS series. Keep this adapter ahead of "os:".
+phase2.2-boot-progress-pmgr-context.patch

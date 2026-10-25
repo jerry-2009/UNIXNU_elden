@@ -9,11 +9,13 @@
 	model = "Lenovo Legion Y700 Gen 4";
 	compatible = "lenovo,elden", "qcom,sm8750";
 
-	// Conservative window used by the first DarwinBoot/XNU handoff. The
-	// platform reserves a larger fragmented map; expand only after reading
-	// the live memory map on the target unit.
-	memory@80000000 {
+	// The initial XNU handoff uses 256 MiB of the UEFI DXE heap. The live
+	// 12 GiB elden FDT places the Android initrd at B74AC000-B7FFEE30, so the
+	// former A8000000 "Kernel" carveout is not safe for a RAM-boot payload.
+	// C2400000 starts after the source-described ramoops region and remains
+	// below the hwfence reservation at D4E23000.
+	memory@c2400000 {
 		device_type = "memory";
-		reg = <0x0 0x80000000 0x0 0x80000000>;
+		reg = <0x0 0xc2400000 0x0 0x10000000>;
 	};
 };

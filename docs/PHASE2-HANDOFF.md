@@ -2,8 +2,9 @@
 
 更新时间：2026-10-25
 
-状态：**阶段 2.0 已完成：格式 2 配置、输出隔离和现行阶段 1 候选的两次 RAM
-冷启动均通过；阶段 2 尚无可启动 XNU 的镜像或实机证据。**
+状态：**阶段 2.0、2.1 和 2.2 的主机工作已完成：配置与输出隔离、live FDT、
+4 KiB XNU、目标 kernelcache、预链接和 ADT 均已审计；阶段 2 尚无可启动 XNU
+的镜像或实机证据。**
 本计划替代原先直接“准备内核 → 打包 → 看 DarwinBoot 日志”的顺序。
 `board.stage = 1` 和 `kernel.status = "phase-2-pending"` 保持不变。
 
@@ -101,6 +102,25 @@ UEFI 菜单、加载器日志和入口色条分别只证明其所在层，不能
 `94b6a6315b04fc9d276bc15e9519107be292244380fc3bf139f5af6c96a3bb0a`
 已由所有者完成新基线复核，可以作为后续阶段 2 工作的现行阶段 1 基线。
 
+### 2.1 主机结果
+
+2.1 的主机审计已完成，详细记录见 [PHASE2.1-STATUS.md](PHASE2.1-STATUS.md)：
+
+- 从已连接设备只读采集 885,861 字节 live FDT，SHA-256 为
+  `8a653a3e790f29bf2b0f3545135f06fe771360f31da3d37c04f648c26b95e26e`；
+  固定 Linux 提交仍用于生成 142,699 字节完整候选树；
+- 原低 2 GiB 候选与 44 个 `no-map` 保留区冲突，已替换为 UEFI `Kernel`
+  carveout 中的 `0xA8000000 + 0x10000000`；live FDT 又证明该范围承载
+  `B74AC000–B7FFEE30` initrd，因此最终迁至 `0xC2400000 + 0x10000000`；
+- 共享生成器生成并独立解码 ADT；8 个 MPIDR、只启动 `cpu0`、19.2 MHz、
+  PSCI SMC、GICv3、CHRP NVRAM 和 64 字节 seed 检查通过；
+- `sleep-disabled=1` 已进入 `/defaults`，`armcpu-spi-ipi=1` 因缺少 elden
+  SGI/SPI 证据而从最低 boot CPU 参数集移除；
+- 可选的 RAMDisk、TrustCache 和 GPU addon 占位符与当前实际输入一致，均为空。
+
+该结果证明 live FDT、主机生成和静态交叉检查通过。仍未启动阶段 2 镜像；
+DarwinBoot 的运行时 ADT、boot args 和实际分配地址必须在后续设备日志中记录。
+
 ## 2.1：固件 FDT、XNU ADT 与内存交接
 
 保留两条不同用途的树：
@@ -115,7 +135,10 @@ UEFI 菜单、加载器日志和入口色条分别只证明其所在层，不能
    记录来源与哈希。原始树可能含设备标识，只留本机；仓库提交脱敏后的资源描述。
 2. 建立地址区间表，逐项记录 FD/BootShim、解压工作区、UEFI 分配、initrd、GOP framebuffer、
    XNU、ADT、boot_args 的起止、生命周期和归属，核对实际 reserved-memory。
-   当前 `[0x80000000, 0x100000000)` 只是候选 2 GiB 窗口，不能假定整段空闲。
+   原 `[0x80000000, 0x100000000)` 候选已确认与 44 个保留区冲突。
+   `[0xA8000000, 0xB8000000)` 随后被 live initrd 排除；当前
+   `[0xC2400000, 0xD2400000)` 位于 live RAM、DXE conventional memory，并避开
+   所有 live 保留区和 initrd。
 3. 用共享生成器检查 `/chosen`、`/cpus`、`/psci`、`/arm-io/intc`、`/defaults`、
    `/options`、CHRP NVRAM、产品身份、64 字节熵及 `/chosen/memory-map` 占位符。
    占位符必须与实际打包的可选输入一致；不得为尚无根卷的镜像虚构 UUID。
@@ -131,7 +154,8 @@ UEFI 菜单、加载器日志和入口色条分别只证明其所在层，不能
 
 5. 审计现有内核参数，尤其 `armcpu-spi-ipi=1` 等开关的实际作用。
    单 boot CPU 起步；描述八核拓扑不代表本关启动所有核心。
-   当前 OS profile 不提供 `sleep-disabled=1`，需确认有效的禁用休眠配置进入最终 ADT。
+   当前 OS profile 不提供 `sleep-disabled=1`，设备 `[adt.defaults.u32]` 已提供并由
+   ADT 解码检查确认。
 
 出口：有效的固件 FDT、可检查的 ADT、内存区间和保留区审计；生成器成功只算主机证据。
 完整 UFS/显示/触摸节点按后续阶段补齐，不阻塞最小 CPU 路径。
@@ -156,6 +180,26 @@ UEFI 菜单、加载器日志和入口色条分别只证明其所在层，不能
 
 出口：内核/ADT 大小和哈希明确、ABI 与 prelink 一致，有可复现构建记录及符号。
 此时据实际文件大小计算 FAT 元数据、对齐和余量，确定载荷尺寸，不先拍定 64 MiB。
+
+### 2.2 结果
+
+主机出口已完成，完整记录见 [PHASE2.2-STATUS.md](PHASE2.2-STATUS.md)：
+
+- 目标 kernelcache 为 46,415,872 字节，SHA-256 与 OS profile 固定值一致；
+- XNU `10063.141.1` 和 57 个有序补丁成功应用；新增设备补丁只补齐
+  boot-progress 对未启用 PMGR 补丁的可选上下文依赖；
+- Command Line Tools 环境使用 iPhone 平台 shim 生成 arm64/iOS 17 4 KiB 内核；正式发布仍需
+  在完整 Xcode/iPhoneOS SDK 重建；
+- 原生内核 21,206,040 字节，预链接 `kernel.macho` 54,050,816 字节；
+- 预链接包含 30 个可执行 Apple 组件、7 个内核接口、119 个段范围和 30 个模块入口；
+- 1,010 个目标文件审计 0 失败，TG0/TG1 均为 4 KiB，关键 ArmDTPlatform/ArmCpu
+  符号存在；
+- 主机 ADT 为 13,152 字节，使用非设备 chip ID；最终身份输入留给所有者；
+- 54,063,968 字节的载荷输入可装入 56 MiB FAT16 测试卷，剩余 3,734,016 字节。
+
+最低 2.2 内核关闭 `CONFIG_XNU_BOOT_PROGRESS`，因为当前共享实现要求同时启用
+UFS、owner-root 和 Virtio，而存储不属于本关。预链接报告仍标记
+`runtime_qualified=false`；只有后续加载和实机执行才能改变该判断。
 
 ## 2.3：先证明大载荷 RAM 通道
 
@@ -244,6 +288,7 @@ shasum -a 256 out/elden-phase1.img out/SILICIUM_UEFI.fd
 "$PYTHON" "$UNIXNU_DIR/unixnu" status --json -D "$PWD"
 "$PYTHON" "$UNIXNU_DIR/scripts/porting-record.py" check --device "$PWD"
 dtc -I dts -O dtb -i soc/sm8750/dts -o /tmp/elden.dtb dts/elden.dts
+"$PYTHON" scripts/phase2_1_audit.py
 "$PYTHON" scripts/make_payload.py --verify-only
 "$PYTHON" scripts/verify_artifact.py --fd out/SILICIUM_UEFI.fd --image out/elden-phase1.img
 ```
