@@ -5,18 +5,13 @@ Lenovo Legion Y700 四代（TB322FC / `elden`，SM8750P）的设备仓。目录�
 描述、设备 DTS、组件选择、固定源码、载荷配置和构建脚本分别管理。
 
 当前进度：**阶段 0 已完成；阶段 1 的 UniXNU 菜单、GOP 显示、音量键输入和
-FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2.0 已完成：格式 2
-配置与输出隔离通过，现行阶段 1 基线也完成两次 RAM 冷启动复核。阶段 2.1 的
-live FDT、固件内存保留区、XNU ADT、boot CPU 和参数语义已完成审计；尚未生成
-可启动 XNU 的镜像。阶段 2.2 的主机输入已完成：目标 kernelcache、57 项补丁、
-4 KiB XNU、预链接 `kernel.macho` 和主机 ADT 已生成并审计；尚未执行 DarwinBoot
-或 XNU 实机启动。阶段 2.3 的主机出口已完成：56 MiB FAT 载荷、8 MiB 探针卷、
-独立阶段 2 固件和两种 Android v3 启动镜像已生成并通过静态校验；ABL 的
-initrd/FDT 交接仍需设备所有者用探针镜像做 RAM 启动确认。阶段 2.3 的
-embed-payload 通道已于 2026-11-01 在设备上验证；阶段 2.4 的 DarwinBoot 交接
-也已完成两次 RAM 冷启动（EL1、256 MiB 窗口、退出 boot services、绿色色带），
-XNU 入口探针镜像 `out/phase2.4/elden-phase2.4-probe-boot.img` 已生成并通过
-主机校验，等待设备启动。**
+FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2.0–2.2 的主机输入
+（格式 2 配置、live FDT/ADT、57 项补丁的 4 KiB XNU 与预链接内核）已完成并
+审计。阶段 2.3 的 56 MiB FAT16 embed-payload 通道与阶段 2.4 的 DarwinBoot
+交接都已在设备上完成两次 RAM 冷启动：EL1、256 MiB 窗口、退出 boot services
+和绿色面包屑已确认，交接后尚无内核输出。阶段 2.5 的 XNU 入口探针镜像
+`out/phase2.4/elden-phase2.4-probe-boot.img` 已生成并通过主机校验，等待设备
+启动；蓝条出现才算入口执行。**
 
 ## 仓库结构
 
