@@ -17,6 +17,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/BlockIo.h>
 #include <Protocol/DevicePath.h>
+#include <Protocol/GraphicsOutput.h>
 
 #define ELDEN_PAYLOAD_BLOCK_SIZE  512
 
@@ -40,6 +41,98 @@ STATIC UINT8                 *mPayload;
 STATIC UINTN                  mPayloadSize;
 STATIC EFI_BLOCK_IO_MEDIA     mMedia;
 STATIC EFI_BLOCK_IO_PROTOCOL  mBlockIo;
+
+//
+// Screen checkpoint: a coloured band at the bottom of the panel tells the
+// operator which layer failed without needing a photo of the log.
+//   red    - driver ran but no payload HOB arrived (BootShim/PrePi handoff)
+//   yellow - HOB arrived but the payload is not a valid FAT image
+//   green  - payload validated and the BlockIo handle is installed
+//
+STATIC EFI_GRAPHICS_OUTPUT_PROTOCOL  *mIndicatorGop;
+STATIC EFI_EVENT                     mIndicatorTimer;
+STATIC UINT32                        mIndicatorTicks;
+STATIC EFI_GRAPHICS_OUTPUT_BLT_PIXEL mIndicatorColor = { 0x00, 0x00, 0xE0, 0x00 };
+
+STATIC
+VOID
+EldenDrawIndicator (
+  VOID
+  )
+{
+  if ((mIndicatorGop == NULL) || (mIndicatorGop->Mode == NULL) ||
+      (mIndicatorGop->Mode->Info == NULL))
+  {
+    return;
+  }
+
+  mIndicatorGop->Blt (
+                    mIndicatorGop,
+                    &mIndicatorColor,
+                    EfiBltVideoFill,
+                    0,
+                    0,
+                    0,
+                    mIndicatorGop->Mode->Info->VerticalResolution - 160,
+                    mIndicatorGop->Mode->Info->HorizontalResolution,
+                    160,
+                    0
+                    );
+}
+
+STATIC
+VOID
+EFIAPI
+EldenIndicatorTick (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  if (mIndicatorGop == NULL) {
+    gBS->LocateProtocol (&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&mIndicatorGop);
+  }
+  EldenDrawIndicator ();
+  mIndicatorTicks++;
+  if (mIndicatorTicks > 150) {
+    gBS->CloseEvent (Event);
+    mIndicatorTimer = NULL;
+  }
+}
+
+STATIC
+VOID
+EldenSetIndicator (
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Color
+  )
+{
+  mIndicatorColor = Color;
+  if (mIndicatorGop == NULL) {
+    gBS->LocateProtocol (&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&mIndicatorGop);
+  }
+  EldenDrawIndicator ();
+}
+
+STATIC
+VOID
+EldenStartIndicator (
+  VOID
+  )
+{
+  mIndicatorGop = NULL;
+  gBS->LocateProtocol (&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&mIndicatorGop);
+  EldenDrawIndicator ();
+
+  if (gBS->CreateEvent (
+                  EVT_TIMER | EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  EldenIndicatorTick,
+                  NULL,
+                  &mIndicatorTimer
+                  ) == EFI_SUCCESS)
+  {
+    gBS->SetTimer (mIndicatorTimer, TimerPeriodic, 2000000);
+  }
+}
 
 STATIC
 EFI_STATUS
@@ -137,6 +230,9 @@ EldenPayloadDxeEntry (
   mPayload = NULL;
   mPayloadSize = 0;
 
+  EldenSetIndicator ((EFI_GRAPHICS_OUTPUT_BLT_PIXEL){ 0x00, 0x00, 0xE0, 0x00 });
+  EldenStartIndicator ();
+
   Hob = GetFirstGuidHob (&mEldenPayloadHobGuid);
   if ((Hob == NULL) || (GET_GUID_HOB_DATA_SIZE (Hob) < sizeof (ELDEN_PAYLOAD_INFO))) {
     DEBUG ((DEBUG_ERROR, "ELDEN-PAYLOAD: entry argument HOB is missing\n"));
@@ -144,6 +240,7 @@ EldenPayloadDxeEntry (
   }
 
   Info = (ELDEN_PAYLOAD_INFO *)GET_GUID_HOB_DATA (Hob);
+  EldenSetIndicator ((EFI_GRAPHICS_OUTPUT_BLT_PIXEL){ 0x00, 0xE0, 0xE0, 0x00 });
   if ((Info->Base == 0) ||
       (Info->Size == 0) ||
       ((Info->Size % ELDEN_PAYLOAD_BLOCK_SIZE) != 0))
@@ -232,5 +329,6 @@ EldenPayloadDxeEntry (
     Info->Size,
     (UINT64)mMedia.LastBlock + 1
     ));
+  EldenSetIndicator ((EFI_GRAPHICS_OUTPUT_BLT_PIXEL){ 0x00, 0xE0, 0x00, 0x00 });
   return EFI_SUCCESS;
 }

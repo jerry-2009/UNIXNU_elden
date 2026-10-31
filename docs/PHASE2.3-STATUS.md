@@ -259,3 +259,25 @@ fastboot boot out/phase2.3/elden-phase2-probe-v4.img
 两次，菜单出现 `ELDEN 2.3 PROBE - initrd FAT` 即证明 payload HOB → BlockIo →
 FAT 通道成立；再启动 56 MiB 终版镜像，确认标题为
 `ELDEN 2.3 INITRD 56M`，不要选择 `xnu` 条目。
+
+## 2026-11-01 四色检查点（诊断）
+
+设备连续两次在 embed_payload 镜像上进入 built-in 菜单，且串口/二维码日志尚未接入。为在不拍照的前提下定位失败层，`EldenPayloadDxe` 启动时在屏幕底部绘制 160 px 色带（GOP Blt，每 200 ms 重绘一次，持续 30 s），颜色含义：
+
+| 颜色 | 含义 |
+| --- | --- |
+| 无色带 | 驱动没有执行（DSC/APRIORI 集成问题） |
+| 红 | 驱动已执行，但没有收到 payload HOB（BootShim → PrePi 交接失败） |
+| 黄 | 收到 HOB，但 payload 地址/大小/`55 AA` 校验失败 |
+| 绿 | payload 有效且只读 BlockIo 已发布（问题在 PartitionDxe/Fat/UniXNU 配置发现） |
+
+该色带只用于诊断，不改变启动流程；去掉 `EldenDrawIndicator`/`EldenStartIndicator` 调用即可移除。
+
+产物（2026-11-01）：
+
+| 文件 | 字节 | SHA-256 |
+| --- | --- | --- |
+| `out/phase2.3/SILICIUM_UEFI.fd` | 4,194,304 | `20b4b370d599aee9b081a283bd62faffe6ee66005d0de32967284d7d53adf245` |
+| `out/phase2.3/elden-phase2-embed-probe.img` | 2,695,168 | `574be59c2165fef3e4cbccbe9dd50d657e44446d66a6c818b18361587c6ca828` |
+
+镜像为 Android v4、ramdisk 0，解压后为 128 字节 shim + 4 MiB 固件 + 8 MiB 探针 FAT 卷。
