@@ -215,3 +215,47 @@ fastboot boot out/phase2.3/elden-phase2-probe-v4.img
 在 v4 判别结果出来前，不修改已提交的 initrd 固件与镜像；判别镜像只存在于
 `out/phase2.3/`。
 
+
+## 2026-11-01 结果与实施：embed_payload
+
+设备所有者启动 v4 判别镜像后仍是 built-in 配置（"还是不行"），initrd 通道正
+式关闭。按上一节的兜底方案实现 embed_payload：
+
+- `patches/overlays/mu_wide_platforms/BootShim/BootShim.S`：定义
+  `EMBEDDED_PAYLOAD_SIZE` 时 ARM64 头的 `image_size` 为 `UEFI_SIZE + payload`
+  （不再是 `UEFI_SIZE`），复制循环只搬运 FD，`_Entry` 把 payload 基址/长度放进
+  `x2`/`x3` 后跳 `UEFI_BASE`。不定义该宏时输出与阶段 1 的 112 字节 shim 完全
+  一致（已用 `verify_artifact.py` 复核阶段 1 镜像）。
+- `Platforms/AndromedaPkg/PrePi`：入口第一条指令把 `x2`/`x3` 保存到 `x20`/`x21`
+  （先于任何函数调用），`_PrepareArguments` 以 `x0=MpId, x1=payload base,
+  x2=payload size` 调 `CEntryPoint`；`PrePiMain` 在 `BuildStackHob` 后写
+  GUID `5E1D9C3A-7B24-4F0E-9A6D-2C8F1B4E7D10` 的 payload HOB。
+- `drivers/EldenPayloadDxe`：读 HOB，校验 512 字节对齐与 FAT 引导扇区
+  `55 AA`，发布只读 `BlockIo`（512 字节块）+ RAM-disk `DevicePath`。只在
+  `ELDEN_PHASE2` 下进入 DSC/FDF/APRIORI；阶段 1 仍用 `EldenRamDiskDxe` 与内嵌
+  payload。阶段 2 固件同时移除了 `UniXNURamDiskDxe`，避免两个 FAT 卷争抢配置
+  发现。
+- 打包：`--embed-payload` 时 `kernel = gzip(BootShim + FD + payload)`，ramdisk
+  为空，头部按 Android v4 重新标记；`scripts/verify_phase2_artifact.py
+  --embed-payload` 校验空 ramdisk、shim 头 `image_size`、`shim+FD+payload`
+  逐字节一致、HOB 驱动存在与阶段 1 卷/`UFSDxe` 不存在，并用 mtools 读回 FAT
+  配置与 kernel。
+
+主机产物（`out/phase2.3/`）：
+
+| 文件 | 字节 | SHA-256 |
+| --- | ---: | --- |
+| `SILICIUM_UEFI.fd` | 4,194,304 | `97f4ef9e2c24c6cb51d57ef1a93370dc2e630db1e6b058e29277622e173ebf9a` |
+| `elden-phase2-embed-probe.img` | 2,695,168 | `132a7e55a32fb0afdf085e4661f8a31e9444e531775573e7fcc1f52c99cfe007` |
+| `elden-phase2-embed-boot.img` | 12,836,864 | `0bead57045cecc24173cd919e89b96ad8d493e0335bdad8f2996783985f9df93` |
+
+探针镜像内嵌 8 MiB `ELDENPROBE` 卷，只含一个 `probe` 条目；终版镜像内嵌
+56 MiB `ELDENRAM` 卷（kernel.macho 54,050,816 字节、ADT 13,152 字节）。两者
+均通过 `scripts/verify_phase2_artifact.py --embed-payload`，FD 内
+`EldenPayloadDxe` 存在、`UniXNURamDiskDxe`/`EldenRamDiskDxe`/阶段 1 payload 均
+不存在。
+
+设备验收仍是两步：先 `fastboot boot out/phase2.3/elden-phase2-embed-probe.img`
+两次，菜单出现 `ELDEN 2.3 PROBE - initrd FAT` 即证明 payload HOB → BlockIo →
+FAT 通道成立；再启动 56 MiB 终版镜像，确认标题为
+`ELDEN 2.3 INITRD 56M`，不要选择 `xnu` 条目。

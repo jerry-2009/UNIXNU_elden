@@ -127,11 +127,15 @@ def overlay_files(name: str) -> list[tuple[Path, Path]]:
                 files.append((source, target_root / relative))
 
     if name == "mu_wide_platforms":
-        driver_root = DRIVERS / "EldenRamDiskDxe"
-        driver_target = target_root / "Platforms" / "EldenPhase1Pkg"
-        for source in sorted(driver_root.iterdir()):
-            if source.is_file():
-                files.append((source, driver_target / source.name))
+        for driver_name, package_name in (
+            ("EldenRamDiskDxe", "EldenPhase1Pkg"),
+            ("EldenPayloadDxe", "EldenPhase2Pkg"),
+        ):
+            driver_root = DRIVERS / driver_name
+            driver_target = target_root / "Platforms" / package_name
+            for source in sorted(driver_root.iterdir()):
+                if source.is_file():
+                    files.append((source, driver_target / source.name))
     return files
 
 

@@ -17,6 +17,11 @@ ASM_FUNC(_ModuleEntryPoint)
   // Save the bootloader FDT pointer before ArmReadMpidr overwrites x0.
   mov   x19, x0
 #endif
+#ifdef ELDEN_EMBEDDED_PAYLOAD
+  // BootShim passes the embedded FAT image in x2/x3; keep them across calls.
+  mov   x20, x2
+  mov   x21, x3
+#endif
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
@@ -104,13 +109,18 @@ _EnableCache:
 
 _PrepareArguments:
   mov   x0, x10
-#ifdef ELDEN_INITRD_HANDOFF
+#if defined (ELDEN_EMBEDDED_PAYLOAD)
+  // x1 = embedded payload base, x2 = payload size (saved at entry)
+  mov   x1, x20
+  mov   x2, x21
+#elif defined (ELDEN_INITRD_HANDOFF)
   // x1 = bootloader FDT address (saved at entry)
   mov   x1, x19
+  mov   x2, x12
 #else
   mov   x1, x11
-#endif
   mov   x2, x12
+#endif
 
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)

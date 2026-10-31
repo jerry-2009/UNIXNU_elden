@@ -1,0 +1,35 @@
+## @file
+#  Publish the FAT image appended after the firmware as a read-only Block I/O device.
+##
+
+[Defines]
+  INF_VERSION    = 0x00010019
+  BASE_NAME      = EldenPayloadDxe
+  FILE_GUID      = 8C2F0D5E-41B7-4E63-9A2D-5F6B8C1E3A70
+  MODULE_TYPE    = DXE_DRIVER
+  VERSION_STRING = 0.1
+  ENTRY_POINT    = EldenPayloadDxeEntry
+
+[Sources]
+  EldenPayloadDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HobLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+
+[Depex]
+  TRUE

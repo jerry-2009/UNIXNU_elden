@@ -63,7 +63,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--clang", default="clang")
+    parser.add_argument(
+        "--payload-bytes", type=int, default=0,
+        help="embedded FAT payload appended after the firmware volume",
+    )
     args = parser.parse_args()
+    if args.payload_bytes < 0:
+        parser.error("--payload-bytes must not be negative")
 
     with tempfile.TemporaryDirectory(prefix="elden-shim-") as temp:
         obj = Path(temp) / "BootShim.elf"
@@ -77,7 +83,10 @@ def main() -> None:
                 str(obj),
                 f"-DUEFI_BASE=0x{UEFI_BASE:08X}",
                 f"-DUEFI_SIZE=0x{UEFI_SIZE:08X}",
-            ],
+            ] + (
+                [f"-DEMBEDDED_PAYLOAD_SIZE={args.payload_bytes}"]
+                if args.payload_bytes else []
+            ),
             check=True,
         )
         image = extract_alloc_sections(obj.read_bytes())
@@ -86,8 +95,9 @@ def main() -> None:
         raise ValueError("BootShim image header magic is missing")
     if struct.unpack_from("<Q", image, 0x08)[0] != UEFI_BASE:
         raise ValueError("BootShim firmware base does not match the SM8750 config")
-    if struct.unpack_from("<Q", image, 0x10)[0] != UEFI_SIZE:
-        raise ValueError("BootShim firmware size does not match the SM8750 config")
+    expected_size = UEFI_SIZE + args.payload_bytes
+    if struct.unpack_from("<Q", image, 0x10)[0] != expected_size:
+        raise ValueError("BootShim image size does not match the SM8750 config")
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(image)

@@ -3,10 +3,7 @@
 EldenPhase1Pkg/EldenRamDiskDxe.inf
 !endif
 !ifdef ELDEN_PHASE2
-UniXNUPkg/Driver/UniXNURamDiskDxe/UniXNURamDiskDxe.inf {
-  <LibraryClasses>
-    FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
-}
+EldenPhase2Pkg/EldenPayloadDxe.inf
 !endif
 UniXNUPkg/Application/UniXNU/UniXNU.inf
 UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe.inf

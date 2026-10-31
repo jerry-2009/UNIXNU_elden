@@ -49,6 +49,22 @@ STATIC CONST EFI_GUID  mEntryArgHobGuid = {
 STATIC UINT64  mEntryFdt = 0;
 #endif
 
+#ifdef ELDEN_EMBEDDED_PAYLOAD
+//
+// Phase 2.3 embed_payload: BootShim appends the FAT image after the UEFI FD and
+// passes its base and size in x2/x3.  EldenPayloadDxe publishes it in DXE.
+//
+typedef struct {
+  UINT64  Base;
+  UINT64  Size;
+} ELDEN_PAYLOAD_INFO;
+
+STATIC CONST EFI_GUID  mEldenPayloadHobGuid = {
+  0x5E1D9C3A, 0x7B24, 0x4F0E, { 0x9A, 0x6D, 0x2C, 0x8F, 0x1B, 0x4E, 0x7D, 0x10 }
+};
+STATIC ELDEN_PAYLOAD_INFO  mEldenPayload = { 0, 0 };
+#endif
+
 ////////////////////////////////////////////
 // Patch: call lk scheduler related function.
 extern VOID _ModuleEntryPoint(VOID);
@@ -187,6 +203,16 @@ PrePiMain (
   }
 #endif
 
+#ifdef ELDEN_EMBEDDED_PAYLOAD
+  //
+  // Publish the FAT image appended to the kernel so a DXE driver can expose it
+  // as a read-only block device for UniXNU.
+  //
+  if (mEldenPayload.Size != 0) {
+    BuildGuidDataHob (&mEldenPayloadHobGuid, &mEldenPayload, sizeof (mEldenPayload));
+  }
+#endif
+
   if (ArmIsMpCore ()) {
     // Only MP Core platform need to produce gArmMpCoreInfoPpiGuid
     Status = GetPlatformPpi (&gArmMpCoreInfoPpiGuid, (VOID **)&ArmMpCoreInfoPpi);
@@ -269,7 +295,11 @@ PeiContinueBoot(VOID* ARGS)
 
 VOID
 CEntryPoint (
-#ifdef ELDEN_INITRD_HANDOFF
+#ifdef ELDEN_EMBEDDED_PAYLOAD
+  IN UINT64  MpId,
+  IN UINT64  PayloadBase,
+  IN UINT64  PayloadSize
+#elif defined (ELDEN_INITRD_HANDOFF)
   IN UINT64  MpId,
   IN UINT64  Fdt
 #endif
@@ -278,6 +308,18 @@ CEntryPoint (
   UINT64  StartTimeStamp;
   EFI_STATUS Status;
   ARM_MEMORY_REGION_DESCRIPTOR_EX UefiFd;
+
+#ifdef ELDEN_EMBEDDED_PAYLOAD
+  //
+  // Keep the first payload description: a later scheduler re-entry must not
+  // replace it.
+  //
+  (VOID)MpId;
+  if (mEldenPayload.Size == 0) {
+    mEldenPayload.Base = PayloadBase;
+    mEldenPayload.Size = PayloadSize;
+  }
+#endif
 
 #ifdef ELDEN_INITRD_HANDOFF
   //

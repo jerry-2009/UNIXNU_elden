@@ -8,7 +8,7 @@ INF AndromedaPkg/Driver/SimpleFbDxe/SimpleFbDxe.inf
 INF EldenPhase1Pkg/EldenRamDiskDxe.inf
 !endif
 !ifdef ELDEN_PHASE2
-INF UniXNUPkg/Driver/UniXNURamDiskDxe/UniXNURamDiskDxe.inf
+INF EldenPhase2Pkg/EldenPayloadDxe.inf
 !endif
 INF UniXNUPkg/Application/UniXNU/UniXNU.inf
 INF UniXNUPkg/Driver/UniXNUDxe/UniXNUDxe.inf
