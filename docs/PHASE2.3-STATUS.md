@@ -2,10 +2,11 @@
 
 更新时间：2026-11-01
 
-状态：**阶段 2.3 的失败根因已定位并修复（8 MiB 探针卷此前是 FAT32，被
-EnhancedFatDxe 以 `EFI_VOLUME_CORRUPTED` 拒收；现已改为 FAT16）。embed_payload
-的两个镜像已按 FAT16 重建并通过静态校验，等待所有者再做两次 RAM 冷启动确认
-探针条目。**
+状态：**阶段 2.3 已在设备上验证通过。FAT16 探针卷与 56 MiB 终版卷都能被
+EnhancedFatDxe 挂载，UniXNU 从内嵌卷读到 `\EFI\UniXNU\unixnu.toml` 并显示
+载荷条目，绿色色带保持；payload HOB → BlockIo → Partition/FAT → 配置发现整条
+链路成立。菜单原先按 `Width / 270` 自动放大到 7 倍，现已用 `[ui] scale = 4`
+收小并重新出图。**
 
 本阶段不改变 `board.stage = 1` 或 `kernel.status = "phase-2-pending"`。阶段 1
 的固件、启动镜像和 `out/` 基线没有被覆盖；阶段 2 候选全部位于 `out/phase2.3/`。
@@ -398,6 +399,9 @@ from the built shim” 失败。
 | `out/phase2.3/elden-phase2-embed-probe.img` | 2,695,168 | `d6bf11a7a260856a525a831689def5b12ea028dedaca7dc2c78009bc6f0c6adf` | 内嵌 8 MiB 探针卷 |
 | `out/phase2.3/elden-phase2-embed-boot.img` | 12,738,560 | `863d1b02ae7c7c5b7a7de0ac6cd8590aa36332dbf25540735ed4a264de8288e9` | 内嵌 56 MiB 终版卷 |
 
+上表是菜单缩放修复前的构建，设备已用这两个镜像完成验证；缩放后的新哈希见文末
+“菜单缩放”一节。
+
 `out/phase2.3/elden-phase2-probe.img`、`…-probe-v4.img` 和
 `elden-phase2-boot.img` 仍是 2026-10-31 的 ramdisk 通道候选（内嵌 FAT32 探针
 卷、配套固件为 `f8c35ca2…`），仅作历史证据保留，不要用于下一轮设备测试。
@@ -406,16 +410,65 @@ from the built shim” 失败。
 `verify.json` 两条记录均返回 `artifact: OK` 与 `FAT type for EnhancedFatDxe:
 FAT12/16`。
 
-### 设备验证（下一轮）
+### 设备验证（已完成）
 
 ```sh
-fastboot boot out/phase2.3/elden-phase2-embed-probe.img
+fastboot boot out/phase2.3/elden-phase2-embed-probe.img   # d6bf11a7…
+fastboot boot out/phase2.3/elden-phase2-embed-boot.img    # 863d1b02…
 ```
 
-两次冷启动都应出现 `ELDEN 2.3 PROBE - initrd FAT`。探针条目出现即证明 payload
-HOB → BlockIo → Partition/FAT → UniXNU 配置发现整条链路成立；随后启动终版镜像
-确认 `ELDEN 2.3 INITRD 56M`，仍然不要选择 `xnu` 条目。
+两个镜像都在设备上进入菜单：绿色色带保持，`config:` 一行显示
+`\EFI\UniXNU\unixnu.toml`，终版镜像列出 `ELDEN 2.3 INITRD 56M` 与 `Restart`
+两个条目，说明配置确实来自内嵌 FAT16 卷而不是内建回退。阶段 2.3 的载荷通道就
+此关闭。缩放前的现场截图保存在
+[`assets/phase23-menu-embed-20261101.jpg`](../assets/phase23-menu-embed-20261101.jpg)
+（可见页脚被截断）。
 
-若色带仍为绿色但菜单仍是 built-in，说明 FAT16 卷也没有被挂载，下一轮的范围就缩
-到 `DiskIoDxe`/`PartitionDxe` 是否绑定这个只读可移动 RAM 句柄，以及 UniXNU
-`Config.c` 的句柄枚举时机；此时再按上文“下一步”补第二级检查点颜色。
+## 2026-11-01 菜单缩放：从自动 7 倍改为固定 4 倍
+
+设备上的字符尺寸过大。`third_party/UniXNU/package/UniXNUPkg/Library/UniXNULib/Ui.c:679`
+在竖屏时按 `Max (1, Width / 270)` 选倍率；1904 像素的短边得到 7 倍，字模
+`8x16` 被放大成 56x112 像素，页脚第三行因此被截断成 `Esc: stop t…`。
+
+UniXNU 已提供 `[ui] scale` 键（`Config.c:1395`，
+`Config->Scale = MAX (0, TomlGetInteger (Ui, "scale", 0))`，0 表示自动），因此
+不需要改共享代码，只把设备策略写进配置：
+
+- 新增受版本控制的 `package/phase2.3-unixnu.toml`：内容与设备上验证过的终版
+  配置一致（`timeout = -1`、`default = "reset"`、`[kits] autoload = false`、
+  `xnu`/`reset`/`shutdown` 三个条目），另加 `[ui] scale = 4`。
+  `scripts/make_phase2_payload.py` 现在默认读这个文件，`--from-image` 只负责
+  取出 `kernel.macho` 与 `.adt`，配置不再依赖从镜像里回捞。
+- `scripts/make_phase2_probe.py` 的探针配置同样写入 `[ui] scale = 4`。
+- `scripts/verify_phase2_artifact.py` 增加断言：配置必须显式给出 `scale`，且
+  取值在 1..6 之间。
+
+4 倍时光模为 32x64 像素，20 个字符的条目标题约占屏宽的三分之一，页脚也可以
+整行显示（每行约 66 个字符，此前只有约 31 个）。要再调只需改
+`package/phase2.3-unixnu.toml` 与 `scripts/make_phase2_probe.py` 里的这一个数字
+后重新出图：
+
+```sh
+python3 scripts/make_phase2_probe.py
+python3 scripts/make_phase2_payload.py --from-image out/phase2.3/payload.img
+python3 scripts/build_phase2_image.py --kind probe --embed-payload
+python3 scripts/build_phase2_image.py --kind boot --embed-payload
+python3 scripts/verify_phase2_artifact.py --kind probe --image out/phase2.3/elden-phase2-embed-probe.img --shim out/phase2.3/shim-probe-embed.bin --embed-payload --payload out/phase2.3/probe.img
+python3 scripts/verify_phase2_artifact.py --kind boot --image out/phase2.3/elden-phase2-embed-boot.img --shim out/phase2.3/shim-boot-embed.bin --embed-payload --payload out/phase2.3/payload.img
+```
+
+阶段 1 的 `package/unixnu.toml` 保持 `scale = 1` 不动，它是已验收阶段 1 固件的
+内嵌配置，改它会让阶段 1 的载荷字节变化。
+
+缩放后的产物（固件仍为 `20b4b370d599…`，静态校验通过）：
+
+| 文件 | 字节 | SHA-256 |
+| --- | ---: | --- |
+| `out/phase2.3/probe.img` | 8,388,608 | `8d83847c6a27fc2f205ce33032025cc7b5ca0768629eb88c91c68cfcbaf6a36b` |
+| `out/phase2.3/payload.img` | 58,720,256 | `0d3abb76356a45af2986240fe69981f55aa35000cd9e7084b334dc7e93478412` |
+| `out/phase2.3/elden-phase2-embed-probe.img` | 2,695,168 | `d40537f5a752d306e57d5d7672f1bd2ca3706b933b356f0e4d9b2c1af796ff7e` |
+| `out/phase2.3/elden-phase2-embed-boot.img` | 12,738,560 | `3dc8ae9611ec899ff14d50032ecd0ce2dd1035b3af9f9d3183bbab6cd41bcd93` |
+
+如果以后再次出现“绿色色带 + built-in 菜单”，说明卷没有被挂载，范围就缩到
+`DiskIoDxe`/`PartitionDxe` 是否绑定这个只读可移动 RAM 句柄，以及 UniXNU
+`Config.c` 的句柄枚举时机；那时再补第二级检查点颜色。
