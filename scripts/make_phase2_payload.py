@@ -75,10 +75,14 @@ def build_payload(
     kernel: Path,
     adt: Path,
     size_mib: int,
+    expect_kernel_bytes: int = KERNEL_MACHO_BYTES,
+    expect_kernel_sha256: str = KERNEL_MACHO_SHA256,
 ) -> None:
     data = kernel.read_bytes()
-    if len(data) != KERNEL_MACHO_BYTES or sha256(kernel) != KERNEL_MACHO_SHA256:
-        raise SystemExit("kernel.macho differs from the phase-2.2 prelinked kernel")
+    if len(data) != expect_kernel_bytes or sha256(kernel) != expect_kernel_sha256:
+        raise SystemExit(
+            f"kernel.macho is {len(data)} bytes sha256={sha256(kernel)}, "
+            f"expected {expect_kernel_bytes} bytes sha256={expect_kernel_sha256}")
     if adt.stat().st_size == 0:
         raise SystemExit("kernel.macho.adt is empty")
     total_sectors = size_mib * 1024 * 1024 // 512
@@ -101,6 +105,10 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--kernel", type=Path)
     parser.add_argument("--adt", type=Path)
+    parser.add_argument("--kernel-bytes", type=int, default=KERNEL_MACHO_BYTES,
+                        help="expected kernel size; override for a probe kernel")
+    parser.add_argument("--kernel-sha256", default=KERNEL_MACHO_SHA256,
+                        help="expected kernel SHA-256; override for a probe kernel")
     args = parser.parse_args()
 
     with tempfile.TemporaryDirectory(prefix="elden-payload-") as directory:
@@ -119,8 +127,11 @@ def main() -> None:
             files["kernel"],
             files["adt"],
             args.size_mib,
+            args.kernel_bytes,
+            args.kernel_sha256,
         )
 
+    print(f"kernel:  {files['kernel'].stat().st_size} bytes sha256={sha256(files['kernel'])}")
     print(f"payload: {args.output} ({args.output.stat().st_size} bytes)")
     print(f"sha256:  {sha256(args.output)}")
 

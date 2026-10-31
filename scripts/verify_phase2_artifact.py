@@ -188,7 +188,12 @@ def verify_fat_type(volume: bytes) -> tuple[str, str]:
     return fat_name, label
 
 
-def verify_ramdisk(ramdisk: bytes, kind: str) -> str:
+def verify_ramdisk(
+    ramdisk: bytes,
+    kind: str,
+    expect_kernel_bytes: int = KERNEL_MACHO_BYTES,
+    expect_kernel_sha256: str = KERNEL_MACHO_SHA256,
+) -> str:
     fat_name, volume_label = verify_fat_type(ramdisk)
     expected_label = "ELDENPROBE" if kind == "probe" else "ELDENRAM"
     if volume_label != expected_label:
@@ -227,8 +232,10 @@ def verify_ramdisk(ramdisk: bytes, kind: str) -> str:
                 "::/EFI/UniXNU/Payloads/kernel.macho", str(kernel),
             )
             data = kernel.read_bytes()
-            if len(data) != KERNEL_MACHO_BYTES or sha256(data) != KERNEL_MACHO_SHA256:
-                raise SystemExit("kernel.macho differs from the phase-2.2 prelinked kernel")
+            if len(data) != expect_kernel_bytes or sha256(data) != expect_kernel_sha256:
+                raise SystemExit(
+                    f"kernel.macho is {len(data)} bytes sha256={sha256(data)}, "
+                    f"expected {expect_kernel_bytes} bytes sha256={expect_kernel_sha256}")
             adt = Path(directory) / "adt.bin"
             mtools(
                 "mcopy", "-o", "-i", str(image),
@@ -248,6 +255,8 @@ def main() -> None:
     parser.add_argument("--report", type=Path, default=OUT / "verify.json")
     parser.add_argument("--embed-payload", action="store_true")
     parser.add_argument("--payload", type=Path)
+    parser.add_argument("--expect-kernel-bytes", type=int, default=KERNEL_MACHO_BYTES)
+    parser.add_argument("--expect-kernel-sha256", default=KERNEL_MACHO_SHA256)
     args = parser.parse_args()
 
     image = args.image.read_bytes()
@@ -297,7 +306,7 @@ def main() -> None:
             raise SystemExit("boot image is truncated inside the ramdisk")
 
     fvmain = verify_fd(fd, args.embed_payload)
-    fat_name = verify_ramdisk(ramdisk, args.kind)
+    fat_name = verify_ramdisk(ramdisk, args.kind, args.expect_kernel_bytes, args.expect_kernel_sha256)
 
     entry = {
         "image": str(args.image.resolve().relative_to(ROOT)),
@@ -312,6 +321,8 @@ def main() -> None:
         "shim_bytes": len(shim),
         "kind": args.kind,
         "fat_type": fat_name,
+        "kernel_macho_bytes": args.expect_kernel_bytes,
+        "kernel_macho_sha256": args.expect_kernel_sha256,
         "header_version": header_version,
     }
     report = {"schema": "unixnu-elden-phase2.3-verify/v1", "artifacts": []}

@@ -68,6 +68,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--header-version", type=int, choices=(3, 4), default=3)
     parser.add_argument("--embed-payload", action="store_true")
+    parser.add_argument("--work", type=Path, default=OUT,
+                        help="directory for the generated shim and kernel gzip")
     parser.add_argument("--clang", default=CLANG)
     args = parser.parse_args()
 
@@ -82,12 +84,14 @@ def main() -> None:
         )
     output = (args.output or default_output).resolve()
     fd = args.fd.resolve()
+    work = args.work.resolve()
+    work.mkdir(parents=True, exist_ok=True)
 
     if args.embed_payload:
         payload = (args.payload or default_ramdisk).resolve()
         if not payload.is_file():
             raise SystemExit(f"missing payload: {payload}")
-        shim = OUT / f"shim-{args.kind}-embed.bin"
+        shim = work / f"shim-{args.kind}-embed.bin"
         command = [
             sys.executable,
             str(ROOT / "scripts" / "build_boot_shim.py"),
@@ -98,7 +102,7 @@ def main() -> None:
         print("+ " + " ".join(command))
         subprocess.run(command, check=True)
         kernel_bytes = shim.read_bytes() + fd.read_bytes() + payload.read_bytes()
-        kernel = OUT / f"kernel-{args.kind}-embed.gzip"
+        kernel = work / f"kernel-{args.kind}-embed.gzip"
         kernel.write_bytes(gzip.compress(kernel_bytes, 9))
         ramdisk = None
     else:
@@ -108,7 +112,7 @@ def main() -> None:
         ramdisk = (args.ramdisk or default_ramdisk).resolve()
         if not ramdisk.is_file():
             raise SystemExit(f"missing ramdisk: {ramdisk}")
-        kernel = OUT / (
+        kernel = work / (
             f"kernel-{args.kind}-v4.gzip" if args.header_version == 4
             else f"kernel-{args.kind}.gzip"
         )

@@ -12,7 +12,11 @@ live FDT、固件内存保留区、XNU ADT、boot CPU 和参数语义已完成�
 4 KiB XNU、预链接 `kernel.macho` 和主机 ADT 已生成并审计；尚未执行 DarwinBoot
 或 XNU 实机启动。阶段 2.3 的主机出口已完成：56 MiB FAT 载荷、8 MiB 探针卷、
 独立阶段 2 固件和两种 Android v3 启动镜像已生成并通过静态校验；ABL 的
-initrd/FDT 交接仍需设备所有者用探针镜像做 RAM 启动确认。**
+initrd/FDT 交接仍需设备所有者用探针镜像做 RAM 启动确认。阶段 2.3 的
+embed-payload 通道已于 2026-11-01 在设备上验证；阶段 2.4 的 DarwinBoot 交接
+也已完成两次 RAM 冷启动（EL1、256 MiB 窗口、退出 boot services、绿色色带），
+XNU 入口探针镜像 `out/phase2.4/elden-phase2.4-probe-boot.img` 已生成并通过
+主机校验，等待设备启动。**
 
 ## 仓库结构
 
@@ -45,6 +49,7 @@ initrd/FDT 交接仍需设备所有者用探针镜像做 RAM 启动确认。**
 - [阶段 2.1：FDT、ADT 与内存审计](docs/PHASE2.1-STATUS.md)
 - [阶段 2.2：可追溯的最小 XNU](docs/PHASE2.2-STATUS.md)
 - [阶段 2.3：大载荷 RAM 通道（主机侧）](docs/PHASE2.3-STATUS.md)
+- [阶段 2.4：DarwinBoot 交接与内核入口探针](docs/PHASE2.4-STATUS.md)
 - [完整移植分析](docs/porting-analysis.md)
 - [格式 2 迁移记录](docs/FORMAT2-MIGRATION.md)
 - [第三方源码版本](docs/third-party.md)
@@ -141,6 +146,20 @@ python scripts/verify_phase2_artifact.py --kind boot \
 `payload.img` 由 UniXNU CLI 生成（需要 `dtc` 和 `--unique-chip-id`）。阶段 2.3
 的设备步骤与哈希见 [阶段 2.3 状态](docs/PHASE2.3-STATUS.md)。
 
+## 阶段 2.4 入口探针
+
+阶段 2.4 复用阶段 2.3 的固件，只替换载荷里的内核：探针在入口画一条蓝色色带
+再跳回内核，用来区分"XNU 入口执行"与"交接后挂住"。
+
+```sh
+python3 scripts/make_entry_probe_kernel.py
+python3 scripts/make_phase2_payload.py   --output out/phase2.4/payload.img   --kernel out/phase2.4/probe/kernel.macho   --adt out/phase2.4/probe/kernel.macho.adt   --kernel-bytes 54050912   --kernel-sha256 a8f04b455996a4656a3055254c127e42f0676187c9550aa0b5fa57bbbe94e2d9
+python3 scripts/build_phase2_image.py --kind boot   --fd out/phase2.3/SILICIUM_UEFI.fd   --payload out/phase2.4/payload.img   --output out/phase2.4/elden-phase2.4-probe-boot.img   --embed-payload --work out/phase2.4
+python3 scripts/darwinboot_preflight.py   --kernel out/phase2.4/probe/kernel.macho   --adt out/phase2.4/probe/kernel.macho.adt
+```
+
+产物、判读表和设备步骤见[阶段 2.4 状态](docs/PHASE2.4-STATUS.md)。
+
 ## 设备支持
 
 | 功能 | 状态 | 说明 |
@@ -149,10 +168,11 @@ python scripts/verify_phase2_artifact.py --kind boot \
 | GOP 显示 | ✅ | 1904×3040，菜单可见 |
 | 音量键输入 | ✅ | 可移动、确认菜单项 |
 | UniXNU 菜单 | ✅ | 从内置只读 FAT 载荷读取配置 |
-| 大载荷 RAM 通道 | ⏳ | 56 MiB 载荷、独立固件与启动镜像主机校验通过；等待两次 RAM 冷启动 |
+| 大载荷 RAM 通道 | ✅ | 56 MiB FAT16 嵌入载荷两次 RAM 冷启动通过 |
+| DarwinBoot 交接 | ✅ | 2.4：两次冷启动到 EL1、256 MiB 窗口与退出 boot services |
 | XNU 输入 | ✅ | 4 KiB 原生内核、预链接 kernelcache 与 ADT 主机审计通过 |
 | DTB / ADT | ⚠️ | live FDT 与 ADT 主机审计通过；XNU 启动尚未验证 |
-| DarwinBoot / XNU | ❌ | 阶段 2 尚未开始实机验证 |
+| XNU 入口 / 平台专家 | ⏳ | 入口探针镜像主机校验通过；等待设备两次 RAM 冷启动 |
 | UFS 根卷 / iPadOS 用户态 | ❌ | 后续阶段 |
 | 触摸 | ❌ | 后续阶段 |
 
@@ -167,11 +187,13 @@ python scripts/verify_phase2_artifact.py --kind boot \
 [阶段 2.2 状态](docs/PHASE2.2-STATUS.md)。历史验收镜像的原始字节
 未保留；当前 `out/elden-phase1.img` 已由设备所有者完成两次 RAM 冷启动复核，
 成为现行阶段 1 基线。
-下一步是阶段 2.3 的设备确认：`out/phase2.3/elden-phase2-probe.img` 与
-`elden-phase2-boot.img` 已生成并通过静态校验，等待设备所有者各完成两次 RAM
-冷启动，证明 initrd/FDT/HOB 通道可读；确认后进入 DarwinBoot（2.4）与 XNU
-实机检查点（2.5）。4 MiB 内嵌 FAT 与仅剩 920 字节的内层 FV 不能直接容纳
-阶段 2。
+阶段 2.3 的嵌入载荷通道与阶段 2.4 的 DarwinBoot 交接都已取得两次设备证据。
+下一步是阶段 2.5 的入口探针：所有者 RAM 启动
+`out/phase2.4/elden-phase2.4-probe-boot.img`
+（`a4ad1fc74abef35da9f947c350ff5763f2b8dea61da5adeee72aefcd0a67abf7`），
+在菜单选择 `xnu`。**蓝条出现才算 XNU 入口执行**；绿条只证明 `Entry.S` 面包屑。
+同一镜像两次结果一致后，再按 `arm_init` → `ArmDTPlatform` → `cpu_init` 逐级
+加探针。
 DarwinBoot 的输入校验日志不计为 XNU 验收。
 
 ## 迁移边界
