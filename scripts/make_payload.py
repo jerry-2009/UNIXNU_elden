@@ -29,7 +29,6 @@ DEFAULT_OUTPUT = (
 )
 
 BYTES_PER_SECTOR = 512
-SECTORS_PER_CLUSTER = 1
 RESERVED_SECTORS = 1
 NUMBER_OF_FATS = 2
 ROOT_ENTRY_COUNT = 512
@@ -39,16 +38,23 @@ CONFIG_IMAGE_PATH = "EFI/UniXNU/unixnu.toml"
 
 
 class Fat16Builder:
-    def __init__(self, total_sectors: int) -> None:
+    def __init__(
+        self,
+        total_sectors: int,
+        label: bytes = VOLUME_LABEL,
+        media_id: int = 0x454C444E,
+    ) -> None:
         self.total_sectors = total_sectors
-        self.fat_sectors = self._choose_fat_size()
+        self.label = label
+        self.media_id = media_id
+        self.sectors_per_cluster, self.fat_sectors = self._choose_geometry()
         data_sectors = (
             total_sectors
             - RESERVED_SECTORS
             - NUMBER_OF_FATS * self.fat_sectors
             - ROOT_DIR_SECTORS
         )
-        self.cluster_count = data_sectors // SECTORS_PER_CLUSTER
+        self.cluster_count = data_sectors // self.sectors_per_cluster
         if not 4085 <= self.cluster_count <= 65524:
             raise ValueError("image geometry does not produce a FAT16 volume")
 
@@ -61,18 +67,21 @@ class Fat16Builder:
         self.data_offset = self.root_dir_offset + ROOT_DIR_SECTORS * BYTES_PER_SECTOR
         self._write_boot_sector()
 
-    def _choose_fat_size(self) -> int:
-        for fat_sectors in range(1, self.total_sectors // 8):
-            data_sectors = (
-                self.total_sectors
-                - RESERVED_SECTORS
-                - NUMBER_OF_FATS * fat_sectors
-                - ROOT_DIR_SECTORS
-            )
-            clusters = data_sectors // SECTORS_PER_CLUSTER
-            capacity = fat_sectors * BYTES_PER_SECTOR // 2
-            if 4085 <= clusters <= 65524 and clusters <= capacity:
-                return fat_sectors
+    def _choose_geometry(self) -> tuple[int, int]:
+        """Pick the smallest sectors-per-cluster that still yields FAT16."""
+
+        for sectors_per_cluster in (1, 2, 4, 8, 16, 32, 64):
+            for fat_sectors in range(1, self.total_sectors // 8):
+                data_sectors = (
+                    self.total_sectors
+                    - RESERVED_SECTORS
+                    - NUMBER_OF_FATS * fat_sectors
+                    - ROOT_DIR_SECTORS
+                )
+                clusters = data_sectors // sectors_per_cluster
+                capacity = fat_sectors * BYTES_PER_SECTOR // 2
+                if 4085 <= clusters <= 65524 and clusters <= capacity:
+                    return sectors_per_cluster, fat_sectors
         raise ValueError("cannot select a FAT16 geometry")
 
     def _write_boot_sector(self) -> None:
@@ -80,7 +89,7 @@ class Fat16Builder:
         boot[0:3] = b"\xEB\x3C\x90"
         boot[3:11] = b"MSWIN4.1"
         struct.pack_into("<H", boot, 11, BYTES_PER_SECTOR)
-        boot[13] = SECTORS_PER_CLUSTER
+        boot[13] = self.sectors_per_cluster
         struct.pack_into("<H", boot, 14, RESERVED_SECTORS)
         boot[16] = NUMBER_OF_FATS
         struct.pack_into("<H", boot, 17, ROOT_ENTRY_COUNT)
@@ -95,21 +104,21 @@ class Fat16Builder:
         struct.pack_into("<I", boot, 28, 0)
         boot[36] = 0x80
         boot[38] = 0x29
-        struct.pack_into("<I", boot, 39, 0x454C444E)
-        boot[43:54] = VOLUME_LABEL.ljust(11, b" ")
+        struct.pack_into("<I", boot, 39, self.media_id)
+        boot[43:54] = self.label.ljust(11, b" ")[:11]
         boot[54:62] = b"FAT16   "
         boot[510:512] = b"\x55\xAA"
         self.image[:BYTES_PER_SECTOR] = boot
 
     def _allocate(self, data: bytes) -> int:
-        cluster_count = max(1, math.ceil(len(data) / (BYTES_PER_SECTOR * SECTORS_PER_CLUSTER)))
+        cluster_count = max(1, math.ceil(len(data) / self.cluster_size))
         first = self.next_cluster
         if first + cluster_count - 1 > self.cluster_count + 1:
             raise ValueError("payload image is too small")
         for index in range(cluster_count):
             cluster = first + index
             self.fat[cluster] = cluster + 1 if index + 1 < cluster_count else 0xFFFF
-        offset = self.data_offset + (first - 2) * BYTES_PER_SECTOR * SECTORS_PER_CLUSTER
+        offset = self.data_offset + (first - 2) * self.cluster_size
         self.image[offset : offset + len(data)] = data
         self.next_cluster += cluster_count
         return first
@@ -172,20 +181,26 @@ class Fat16Builder:
         self._write_cluster(parent_cluster, parent)
         return cluster
 
+    @property
+    def cluster_size(self) -> int:
+        return BYTES_PER_SECTOR * self.sectors_per_cluster
+
     def _read_cluster(self, cluster: int) -> bytearray:
         if cluster == 0:
             start = self.root_dir_offset
-            return bytearray(self.image[start : start + ROOT_DIR_SECTORS * BYTES_PER_SECTOR])
-        offset = self.data_offset + (cluster - 2) * BYTES_PER_SECTOR
-        return bytearray(self.image[offset : offset + BYTES_PER_SECTOR])
+            return bytearray(
+                self.image[start : start + ROOT_DIR_SECTORS * BYTES_PER_SECTOR]
+            )
+        offset = self.data_offset + (cluster - 2) * self.cluster_size
+        return bytearray(self.image[offset : offset + self.cluster_size])
 
     def _write_cluster(self, cluster: int, data: bytes) -> None:
         if cluster == 0:
             start = self.root_dir_offset
             length = ROOT_DIR_SECTORS * BYTES_PER_SECTOR
         else:
-            start = self.data_offset + (cluster - 2) * BYTES_PER_SECTOR
-            length = BYTES_PER_SECTOR
+            start = self.data_offset + (cluster - 2) * self.cluster_size
+            length = self.cluster_size
         self.image[start : start + length] = data[:length].ljust(length, b"\x00")
 
     def _first_free_entry(self, directory: bytearray) -> int:
@@ -200,6 +215,31 @@ class Fat16Builder:
             offset = (RESERVED_SECTORS + index * self.fat_sectors) * BYTES_PER_SECTOR
             self.image[offset : offset + len(fat_bytes)] = fat_bytes
         return bytes(self.image)
+
+
+def build_config_image(
+    config_path: Path,
+    output: Path,
+    size_mib: int,
+    label: bytes = VOLUME_LABEL,
+    media_id: int = 0x454C444E,
+) -> None:
+    """Write a FAT16 volume that holds only ``EFI/UniXNU/unixnu.toml``.
+
+    EnhancedFatDxe derives the FAT type from the cluster count, so a genuinely
+    FAT32 volume needs at least FAT_MAX_FAT16_CLUSTER (0xFFF5) clusters or
+    FatOpenDevice returns EFI_VOLUME_CORRUPTED.  Small volumes must therefore be
+    FAT12/FAT16; this builder always produces FAT16.
+    """
+    if size_mib < 2:
+        raise ValueError("payload image must be at least 2 MiB")
+    total_sectors = size_mib * 1024 * 1024 // BYTES_PER_SECTOR
+    builder = Fat16Builder(total_sectors, label=label, media_id=media_id)
+    efi = builder.add_directory(0, "EFI")
+    builder.add_directory(efi, "UNIXNU")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_bytes(builder.finish())
+    add_long_name_file(output, config_path, CONFIG_IMAGE_PATH)
 
 
 def build_payload(config_path: Path, output: Path, size_mib: int) -> None:

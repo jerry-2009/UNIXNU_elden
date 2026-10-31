@@ -129,14 +129,74 @@ def mtools(*arguments: str) -> str:
     return result.stdout
 
 
-def verify_ramdisk(ramdisk: bytes, kind: str) -> None:
+FAT_MAX_FAT12_CLUSTER = 0xFF5
+FAT_MAX_FAT16_CLUSTER = 0xFFF5
+
+
+def verify_fat_type(volume: bytes) -> tuple[str, str]:
+    """Reject volumes EnhancedFatDxe would not mount.
+
+    FatPkg/EnhancedFatDxe/Init.c decides the FAT type from MaxCluster, not from
+    the BPB size fields.  A FAT32 BPB below FAT_MAX_FAT16_CLUSTER clusters is
+    returned as EFI_VOLUME_CORRUPTED, so an 8 MiB FAT32 volume silently never
+    becomes a SimpleFileSystem and UniXNU falls back to the built-in menu.
+    """
+    if len(volume) < 512 or volume[510:512] != b"\x55\xAA":
+        raise SystemExit("FAT volume has no boot signature")
+    sector_size, = struct.unpack_from("<H", volume, 11)
+    sectors_per_cluster = volume[13]
+    reserved, = struct.unpack_from("<H", volume, 14)
+    fats = volume[16]
+    root_entries, = struct.unpack_from("<H", volume, 17)
+    total16, = struct.unpack_from("<H", volume, 19)
+    fat_sectors16, = struct.unpack_from("<H", volume, 22)
+    total32, = struct.unpack_from("<I", volume, 32)
+    fat_sectors32, = struct.unpack_from("<I", volume, 36)
+    ext_flags, = struct.unpack_from("<H", volume, 40)
+    fs_version, = struct.unpack_from("<H", volume, 42)
+    total_sectors = total16 or total32
+    fat_sectors = fat_sectors16 or fat_sectors32
+    if not sector_size or not sectors_per_cluster or not reserved or not fats:
+        raise SystemExit("FAT boot sector (BPB) is incomplete")
+    if not total_sectors or not fat_sectors:
+        raise SystemExit("FAT boot sector (BPB) has no geometry")
+    label = volume[43:54].decode("ascii", "replace").strip() if fat_sectors16 else ""
+    if fat_sectors16:
+        if root_entries == 0:
+            raise SystemExit("FAT12/16 BPB has no root directory entries")
+        fat_name = "FAT12/16"
+    else:
+        if fs_version != 0 or (ext_flags & 0x80):
+            raise SystemExit("FAT32 BPB has a version or mirroring flag FatDxe rejects")
+        fat_name = "FAT32"
+        label = volume[71:82].decode("ascii", "replace").strip()
+    root_sectors = (root_entries * 32 + sector_size - 1) // sector_size
+    first_data_sector = reserved + fats * fat_sectors + root_sectors
+    cluster_alignment = sectors_per_cluster.bit_length() - 1
+    max_cluster = (total_sectors - first_data_sector) >> cluster_alignment
+    if fat_sectors16:
+        if not FAT_MAX_FAT12_CLUSTER <= max_cluster < FAT_MAX_FAT16_CLUSTER:
+            raise SystemExit(
+                f"FAT16 volume has {max_cluster} clusters; EnhancedFatDxe wants "
+                f"{FAT_MAX_FAT12_CLUSTER}..{FAT_MAX_FAT16_CLUSTER - 1}"
+            )
+    elif max_cluster < FAT_MAX_FAT16_CLUSTER:
+        raise SystemExit(
+            f"FAT32 volume has only {max_cluster} clusters; EnhancedFatDxe "
+            f"returns EFI_VOLUME_CORRUPTED below {FAT_MAX_FAT16_CLUSTER}"
+        )
+    return fat_name, label
+
+
+def verify_ramdisk(ramdisk: bytes, kind: str) -> str:
+    fat_name, volume_label = verify_fat_type(ramdisk)
+    expected_label = "ELDENPROBE" if kind == "probe" else "ELDENRAM"
+    if volume_label != expected_label:
+        raise SystemExit(f"ramdisk volume label is {volume_label!r}, want {expected_label}")
     with tempfile.TemporaryDirectory(prefix="elden-2.3-") as directory:
         image = Path(directory) / "ramdisk.img"
         image.write_bytes(ramdisk)
-        listing = mtools("mdir", "-i", str(image), "-/", "::")
-        expected_label = "ELDENPROBE" if kind == "probe" else "ELDENRAM"
-        if expected_label not in listing:
-            raise SystemExit(f"ramdisk volume label is not {expected_label}")
+        mtools("mdir", "-i", str(image), "-/", "::")
         config = Path(directory) / "unixnu.toml"
         mtools(
             "mcopy", "-o", "-i", str(image),
@@ -170,6 +230,7 @@ def verify_ramdisk(ramdisk: bytes, kind: str) -> None:
             )
             if adt.stat().st_size == 0:
                 raise SystemExit("kernel.macho.adt is empty")
+    return fat_name
 
 
 def main() -> None:
@@ -230,7 +291,7 @@ def main() -> None:
             raise SystemExit("boot image is truncated inside the ramdisk")
 
     fvmain = verify_fd(fd, args.embed_payload)
-    verify_ramdisk(ramdisk, args.kind)
+    fat_name = verify_ramdisk(ramdisk, args.kind)
 
     entry = {
         "image": str(args.image.resolve().relative_to(ROOT)),
@@ -244,6 +305,7 @@ def main() -> None:
         "fd_sha256": sha256(fd),
         "shim_bytes": len(shim),
         "kind": args.kind,
+        "fat_type": fat_name,
         "header_version": header_version,
     }
     report = {"schema": "unixnu-elden-phase2.3-verify/v1", "artifacts": []}
@@ -267,6 +329,7 @@ def main() -> None:
     else:
         print(f"  unpacked: shim {len(shim)} + FD {len(fd)}")
     print(f"  ramdisk label: {'ELDENPROBE' if args.kind == 'probe' else 'ELDENRAM'}")
+    print(f"  FAT type for EnhancedFatDxe: {fat_name}")
     print(f"  decompressed FVMAIN: {len(fvmain)} bytes")
     print("  required FV files: " + ", ".join([*REQUIRED_FV_FILES, PAYLOAD_DRIVER[0]]))
     print("  forbidden FV files absent: " + ", ".join([*FORBIDDEN_FV_FILES, RAMDISK_DRIVER[0]]))

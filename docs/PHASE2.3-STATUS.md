@@ -1,11 +1,11 @@
 # 阶段 2.3 状态：大载荷 RAM 通道（主机侧）
 
-更新时间：2026-10-31
+更新时间：2026-11-01
 
-状态：**阶段 2.3 的主机出口已完成。56 MiB FAT 载荷、8 MiB 探针卷、独立阶段 2
-固件和两种 Android v3 启动镜像均已生成并通过静态校验；尚未执行实机 RAM
-启动，initrd 落点、ABL 的 `/chosen/linux,initrd-start/end` 和传入 `x0` 仍需
-设备所有者用探针镜像确认。**
+状态：**阶段 2.3 的失败根因已定位并修复（8 MiB 探针卷此前是 FAT32，被
+EnhancedFatDxe 以 `EFI_VOLUME_CORRUPTED` 拒收；现已改为 FAT16）。embed_payload
+的两个镜像已按 FAT16 重建并通过静态校验，等待所有者再做两次 RAM 冷启动确认
+探针条目。**
 
 本阶段不改变 `board.stage = 1` 或 `kernel.status = "phase-2-pending"`。阶段 1
 的固件、启动镜像和 `out/` 基线没有被覆盖；阶段 2 候选全部位于 `out/phase2.3/`。
@@ -76,7 +76,9 @@ seed；它不是设备身份，最终 ADT 必须由所有者提供唯一 chip ID
 镜像的哈希都变了。提交 `4d98c60` 记录的 `dc8a97dc…`、`9ea0174c…`、`d52dd8e3…`
 是同一代码路径的首次构建，作为历史证据保留在提交说明中。
 
-`payload.img` 是 56 MiB FAT16（卷标 `ELDENRAM`，序列号 `53484e47`），含：
+`payload.img` 是 56 MiB FAT16（卷标 `ELDENRAM`，序列号 `53484e47`）；2026-10-31
+的版本实际由 `mformat -F` 写成 FAT32，FatDxe 的 65,525 簇下限决定了只有 56 MiB
+这一档才侥幸可挂载，原因见后文“2026-11-01 根因”。它含：
 
 - `EFI/UniXNU/unixnu.toml`（`timeout = -1`、`default = "reset"`、条目
   `ELDEN 2.3 INITRD 56M`，XNU 参数沿用阶段 2.2）；
@@ -87,7 +89,9 @@ seed；它不是设备身份，最终 ADT 必须由所有者提供唯一 chip ID
 `default = "xnu"` 改为 `default = "reset"`，保证无输入时不会自动进入尚未完成的
 XNU 启动。
 
-`probe.img` 是 8 MiB FAT16（卷标 `ELDENPROBE`），只含一个配置：菜单显示
+`probe.img` 是 8 MiB FAT16（卷标 `ELDENPROBE`）；2026-10-31 的版本同样被
+`mformat -F` 写成只有 16,100 簇的 FAT32，FatDxe 直接返回
+`EFI_VOLUME_CORRUPTED`，这是设备上一直只能看到 built-in 菜单的直接原因。它只含一个配置：菜单显示
 `ELDEN 2.3 PROBE - initrd FAT`，动作为 `reset`，没有 XNU 条目。它用于先用小卷
 确认 FDT/initrd/HOB/磁盘栈通道，再换 56 MiB 终版。
 
@@ -300,10 +304,118 @@ FAT 通道成立；再启动 56 MiB 终版镜像，确认标题为
 3. UniXNU 配置发现只遍历了既有卷，未看到新出现的 SimpleFileSystem；
 4. 配置路径/文件名与 `PcdUniXNUConfigPath` 不一致。
 
-下一步（未实施，留给下一轮）：
+下一步（部分被 2026-11-01 的根因修复取代；探针卷格式已改，检查点颜色仍未加）：
 
 - 在 `EldenPayloadDxe` 中于安装 BlockIo 后显式 `gBS->ConnectController(Handle, NULL, NULL, TRUE)`，并按需对子句柄再次连接；
 - 增加第二级检查点颜色（青=找到含 `\EFI\UniXNU\unixnu.toml` 的 SimpleFileSystem；蓝=找到文件系统但读不到配置），把失败点进一步压缩；
 - 若文件系统可读而 UniXNU 仍 built-in，则转向 UniXNU 的 `Config.c` 发现逻辑（启动卷优先、句柄枚举时机）。
 
 当前固件与镜像保持绿色检查点版本；阶段 1 产物未受影响（`verify_artifact.py` 仍通过）。
+
+## 2026-11-01 根因：8 MiB 探针卷是 FAT32，被 FatDxe 拒收
+
+绿色检查点之后的失败点不在驱动链，而在探针卷本身。`scripts/make_phase2_probe.py`
+原先用 mtools 生成卷：
+
+```sh
+mformat -C -F -T 16384 -v ELDENPROBE -N 53484e47 -i out/phase2.3/probe.img ::
+```
+
+`-F` 强制 FAT32。实测 BPB：`ss=512 spc=1 res=32 nf=2 rootent=0 tot=16384
+spf=126`，卷标 `ELDENPROBE`，数据区 16,100 簇。EnhancedFatDxe 不看 BPB 的
+“FAT32”字样，而是从簇数反推类型
+（`third_party/mu_wide_platforms/Common/MU_TIANO/FatPkg/EnhancedFatDxe/Init.c`）：
+只要 `FatBytes.SectorsPerFat == 0` 就置 `FatType = Fat32`，随后
+
+```c
+if (Volume->MaxCluster < FAT_MAX_FAT16_CLUSTER) {
+  return EFI_VOLUME_CORRUPTED;
+}
+```
+
+其中 `FAT_MAX_FAT16_CLUSTER = 0xFFF5`（65,525，见
+`FatPkg/EnhancedFatDxe/FatFileSystem.h:31-36`）。16,100 < 65,525，于是挂载直接
+失败，卷永远不会产生 `SimpleFileSystem`，UniXNU 记录
+`config: none found, using built-in configuration` 并显示内建菜单——正好等于
+“绿色色带 + 内建菜单”的现场。
+
+同一批次里 56 MiB 的 `payload.img` 也是 `mformat -F` 写的，但它有 112,892 簇，
+高于 65,525，所以 FatDxe 能挂载：真正坏掉的只有 8 MiB 探针卷。
+
+由此需要更正两条既有记录：
+
+- v3、v4 两次 initrd 探针用的是**同一个** 8 MiB FAT32 坏卷，因此“ABL 不传
+  ramdisk / initrd 通道不成立”并未被那两次设备结果证明；该通道只是未经证实。
+  当前 FD 已移除 `UniXNURamDiskDxe`，重开这条路线需要另建固件，2.3 仍按
+  `embed_payload` 推进。
+- 2026-10-25 的 56 MiB“FAT16 拟合”其实也是 `mformat -F` 的 FAT32 卷，FAT16
+  的可挂载性此前并未在主机侧验证过。
+
+### 修复
+
+- `scripts/make_payload.py`：`Fat16Builder` 现在共享给所有阶段，接受
+  `label`/`media_id`，按 1、2、4… 自动选每簇扇区数（4 MiB 阶段 1 卷仍是
+  `spc=1`，重建只差 `mcopy` 写入的时间戳）；新增 `build_config_image()` 生成
+  只含 `EFI/UniXNU/unixnu.toml` 的卷。
+- `scripts/make_phase2_probe.py`：改用同一个写入器生成 8 MiB FAT16 探针卷，
+  不再调用 `mformat -F`。
+- `scripts/make_phase2_payload.py`（新增）：用同一写入器生成 56 MiB FAT16
+  `ELDENRAM` 卷（`spc=2`、`spf=224`、57,103 簇），支持 `--from-image` 从旧卷
+  取出 `unixnu.toml`/`kernel.macho`/`kernel.macho.adt`，并断言 kernel 的字节数
+  与 SHA-256。
+- `scripts/verify_phase2_artifact.py`：新增 `verify_fat_type()`，按
+  `FatOpenDevice` 的规则复算簇数并检查 BPB 卷标；旧探针会被拒绝并打印
+  `FAT32 volume has only 16100 clusters; EnhancedFatDxe returns
+  EFI_VOLUME_CORRUPTED below 65525`，结果写入 `verify.json` 的 `fat_type`。
+
+重建命令：
+
+```sh
+python3 scripts/make_phase2_probe.py
+python3 scripts/make_phase2_payload.py --from-image out/phase2.3/payload.img
+python3 scripts/build_phase2_image.py --kind probe --embed-payload
+python3 scripts/build_phase2_image.py --kind boot --embed-payload
+python3 scripts/verify_phase2_artifact.py --kind probe \
+  --image out/phase2.3/elden-phase2-embed-probe.img \
+  --shim out/phase2.3/shim-probe-embed.bin --embed-payload \
+  --payload out/phase2.3/probe.img
+python3 scripts/verify_phase2_artifact.py --kind boot \
+  --image out/phase2.3/elden-phase2-embed-boot.img \
+  --shim out/phase2.3/shim-boot-embed.bin --embed-payload \
+  --payload out/phase2.3/payload.img
+```
+
+`--shim` 必须指向对应的嵌入版 BootShim（128 字节）；默认的
+`BootShim/BootShim.bin` 是阶段 1 的 112 字节版本，会以 “BootShim bytes differ
+from the built shim” 失败。
+
+产物（两个镜像都是 Android v4、ramdisk 0）：
+
+| 文件 | 字节 | SHA-256 | FAT |
+| --- | ---: | --- | --- |
+| `out/phase2.3/probe.img` | 8,388,608 | `80e39fc565a7becd2eaa5077b1636ffda083b5651b8ac0554b0c82f1606be10d` | FAT16，16,223 簇 |
+| `out/phase2.3/payload.img` | 58,720,256 | `2baa5eeb4b8d8337d8fc217a694a2e265a3da73a8401de62c64c6c1946e879bb` | FAT16，57,103 簇 |
+| `out/phase2.3/elden-phase2-embed-probe.img` | 2,695,168 | `d6bf11a7a260856a525a831689def5b12ea028dedaca7dc2c78009bc6f0c6adf` | 内嵌 8 MiB 探针卷 |
+| `out/phase2.3/elden-phase2-embed-boot.img` | 12,738,560 | `863d1b02ae7c7c5b7a7de0ac6cd8590aa36332dbf25540735ed4a264de8288e9` | 内嵌 56 MiB 终版卷 |
+
+`out/phase2.3/elden-phase2-probe.img`、`…-probe-v4.img` 和
+`elden-phase2-boot.img` 仍是 2026-10-31 的 ramdisk 通道候选（内嵌 FAT32 探针
+卷、配套固件为 `f8c35ca2…`），仅作历史证据保留，不要用于下一轮设备测试。
+
+固件未变（`SILICIUM_UEFI.fd` 仍是 `20b4b370d599…`，含四色检查点）；
+`verify.json` 两条记录均返回 `artifact: OK` 与 `FAT type for EnhancedFatDxe:
+FAT12/16`。
+
+### 设备验证（下一轮）
+
+```sh
+fastboot boot out/phase2.3/elden-phase2-embed-probe.img
+```
+
+两次冷启动都应出现 `ELDEN 2.3 PROBE - initrd FAT`。探针条目出现即证明 payload
+HOB → BlockIo → Partition/FAT → UniXNU 配置发现整条链路成立；随后启动终版镜像
+确认 `ELDEN 2.3 INITRD 56M`，仍然不要选择 `xnu` 条目。
+
+若色带仍为绿色但菜单仍是 built-in，说明 FAT16 卷也没有被挂载，下一轮的范围就缩
+到 `DiskIoDxe`/`PartitionDxe` 是否绑定这个只读可移动 RAM 句柄，以及 UniXNU
+`Config.c` 的句柄枚举时机；此时再按上文“下一步”补第二级检查点颜色。
