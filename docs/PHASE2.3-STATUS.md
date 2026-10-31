@@ -29,7 +29,9 @@ seed；它不是设备身份，最终 ADT 必须由所有者提供唯一 chip ID
 
 - `ELDEN_PHASE2`：由 `scripts/build_phase2_firmware.py` 传给 EDK II；
 - `ELDEN_INITRD_HANDOFF`：由 DSC 的
-  `*_*_AARCH64_CC_FLAGS = -DELDEN_INITRD_HANDOFF=1` 追加。
+  `*_*_AARCH64_CC_FLAGS = -DELDEN_INITRD_HANDOFF=1` 和
+  `*_*_AARCH64_PP_FLAGS = -DELDEN_INITRD_HANDOFF=1` 追加（CC 给 C，PP 给
+  `.S` 的预处理；漏掉 PP 时 `mov x19,x0` 不会编译进 PrePi）。
 
 未定义宏时，DSC/FDF 不进入任何新分支，阶段 1 的模块集合与构建入口保持不变。
 
@@ -60,13 +62,19 @@ seed；它不是设备身份，最终 ADT 必须由所有者提供唯一 chip ID
 
 | 产物 | 字节 | SHA-256 |
 | --- | ---: | --- |
-| `out/phase2.3/SILICIUM_UEFI.fd` | 4,194,304 | `dc8a97dcf1369066114f0d10e50f0b163876b78a37796c29d7d468a7f6d9d9bf` |
+| `out/phase2.3/SILICIUM_UEFI.fd` | 4,194,304 | `f8c35ca26d539c630191c169357c5029f19918e622a645397ef0756a4db6ac56` |
 | `out/phase2.3/payload.img` | 58,720,256 | `b2c96e08f71bbd3f8a84018024b1dc048994b72c2a81b56789686e503da82f80` |
 | `out/phase2.3/probe.img` | 8,388,608 | `3183ca2b5943ba08574afaac8386eb903cc12733ac2cc5d020cda8aaa49ba4c3` |
-| `out/phase2.3/kernel-probe.gzip` | 2,680,700 | — |
-| `out/phase2.3/kernel-boot.gzip` | 2,680,700 | — |
-| `out/phase2.3/elden-phase2-probe.img` | 11,075,584 | `9ea0174c275e7ebb42d9727c770b7a06ae09a6d44df9e36657a667c8de7e051b` |
-| `out/phase2.3/elden-phase2-boot.img` | 61,407,232 | `d52dd8e37fa0ef87c44b2b15207497e93ac6285ca874cf20e5a668c4226ecf99` |
+| `out/phase2.3/kernel-probe.gzip` | 2,680,729 | — |
+| `out/phase2.3/kernel-probe-v4.gzip` | 2,680,729 | — |
+| `out/phase2.3/kernel-boot.gzip` | 2,680,729 | — |
+| `out/phase2.3/elden-phase2-probe.img` | 11,075,584 | `2284d1cc944eaa7fe671cc791cb78b6368b97c8b048b28f017e63f2d2ab3aa02` |
+| `out/phase2.3/elden-phase2-probe-v4.img` | 11,075,584 | `2f9c9e3d7c72e10727d72f43837d9691df26d3db5a38861591b7ae5b2cc16ce0` |
+| `out/phase2.3/elden-phase2-boot.img` | 61,407,232 | `d25c08d49e56f5de9b2613873b14883c49581c5269eb9f0b74904a509fa736f1` |
+
+2026-10-31 深夜为 v4 判别重建了一次：撤销临时诊断后干净重建，所以 FD 与三个
+镜像的哈希都变了。提交 `4d98c60` 记录的 `dc8a97dc…`、`9ea0174c…`、`d52dd8e3…`
+是同一代码路径的首次构建，作为历史证据保留在提交说明中。
 
 `payload.img` 是 56 MiB FAT16（卷标 `ELDENRAM`，序列号 `53484e47`），含：
 
@@ -151,3 +159,59 @@ fastboot boot out/phase2.3/elden-phase2-boot.img
 
 下一步：设备所有者完成探针与终版各两次 RAM 冷启动后，进入阶段 2.4
 （DarwinBoot）。若探针失败，先修 FDT/initrd/HOB 桥接。
+
+## 2026-10-31 复查与决策：initrd 通道判定
+
+两次设备 `fastboot boot` 都只进入 built-in 菜单：`x19` 交接与
+`BuildGuidDataHob` 已编译进 PrePi（HOB GUID 出现在 FD 0xb000），但
+`UniXNURamDiskDxe` 连一条诊断行都没有输出，说明 UEFI 根本没有拿到可用的
+initrd，而不是驱动读到了错误的 FDT。
+
+对照 unixnu.com 上同 SoC 的三台设备，现象与它们记录的平台限制一致：
+
+| 设备 | 通道 | 关键事实 |
+| --- | --- | --- |
+| OnePlus 13T（PKX110） | embedded payload + BootPayload HOB | ABL 在 `fastboot boot` 时用 `init_boot` 的通用 ramdisk；v4 头、空 ramdisk、约 160 MiB FAT |
+| erhai（一加平板 2 Pro） | `[bootimg] embed_payload = true` | 一加 ABL 会**整体替换**传入 ramdisk；payload 追加在固件后一起 gzip 进 kernel 字段，BootShim→SEC→payload HOB→`BootPayloadDxe` 发布只读 Block I/O |
+| hummer（一加 Ace 5 Pro） | embedded payload + native UFS 根卷 | v4 头、160 MiB FAT32、`build-native-ufs.py`、6 核、真根卷到 Hello；UFS 是后续阶段 |
+
+结论：**elden 的 initrd 假设在本机 ABL 上大概率不成立**。继续修
+`linux,initrd-start/end` 桥接的收益很低；先做一次 v4 判别，仍失败就转
+embed_payload。UFS 路线暂缓：阶段 1 已因 vendor `UFSDxe` 崩溃而移除它，native
+UFS 根卷的工程量远大于本阶段。
+
+### 立即执行：Android v4 判别
+
+已生成并校验：`out/phase2.3/elden-phase2-probe-v4.img`（11,075,584 字节，
+`2f9c9e3d7c72e10727d72f43837d9691df26d3db5a38861591b7ae5b2cc16ce0`），基于
+干净重建的固件（`f8c35ca2…`，已撤销临时诊断）。内容与 v3 探针镜像完全相同，
+只把头部改成 Android v4（`header_size = 1584`、`header_version = 4`、空 boot
+signature）。目的只有一个：区分“ABL 完全不看 ramdisk”与“ABL 只接受 v4 头”。
+
+```sh
+fastboot boot out/phase2.3/elden-phase2-probe-v4.img
+```
+
+- 菜单出现 `ELDEN 2.3 PROBE - initrd FAT`：ABL 接受 v4 ramdisk，问题只在头部
+  版本，保留 initrd 路线并补 v4 打包；
+- 仍是 built-in：确认 ABL 替换/忽略 ramdisk，按下节转 embed_payload。
+
+### 若 v4 仍失败：embed_payload（下一实现）
+
+1. `board.toml` 增加 `[bootimg] embed_payload = true`，ramdisk 留空；
+   kernel 字段 = `gzip(BootShim + FD + payload.img)`，BootShim 的 ARM64 头
+   `image_size` 改为 `FD_SIZE + payload` 字节，并新增
+   `-DEMBEDDED_PAYLOAD_SIZE=<payload 字节数>`。
+2. `BootShim.S` 在跳转前把 payload 地址（`_Payload + FD_SIZE`）与长度放进
+   `x2`/`x3`；`PrePi` 在 `HobConstructor` 后把它们写成 payload HOB（与阶段 1
+   的 `EldenRamDiskDxe` 解耦）。
+3. 新增 `BootPayloadDxe`：读 payload HOB，按 512 字节块发布只读
+   `BlockIo` + `DevicePath`（复用 `UniXNURamDiskDxe` 的发布代码，去掉 FDT
+   依赖）；`UniXNU` 即可从该 FAT 卷读 `EFI/UniXNU/unixnu.toml`。
+4. 复用现有 56 MiB FAT 载荷与校验脚本；`payload.img` 不再受 4 MiB 内嵌 FV
+   限制，也不需要 `x0`/FDT 交接。
+5. 设备验证仍先探针、后终版，各两次 RAM 冷启动。
+
+在 v4 判别结果出来前，不修改已提交的 initrd 固件与镜像；判别镜像只存在于
+`out/phase2.3/`。
+

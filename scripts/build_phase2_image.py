@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Pack a phase-2.3 Android v3 boot image (shim + FD as kernel, FAT ramdisk).
+"""Pack a phase-2.3 Android boot image (shim + FD as kernel, FAT ramdisk).
 
 The packaging matches the phase-1 board format (base 0, pagesize 4096,
-header v3, Android 13.0.0/2023-04-01) and adds the ramdisk field that carries
-the initrd FAT volume.
+Android 13.0.0/2023-04-01) and adds the ramdisk field that carries the initrd
+FAT volume. --header-version 4 re-labels the v3 header as the Android v4
+layout (header size 1584, empty boot signature) for bootloaders that only
+accept v4.
 """
 
 from __future__ import annotations
@@ -11,6 +13,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import hashlib
+import struct
 import subprocess
 import sys
 from pathlib import Path
@@ -28,6 +31,17 @@ KINDS = {
 }
 
 
+def relabel_v4(path: Path) -> None:
+    """Turn the v3 header into a v4 header with an empty boot signature."""
+    data = bytearray(path.read_bytes())
+    if data[:8] != b"ANDROID!":
+        raise SystemExit("mkbootimg did not produce an Android boot image")
+    struct.pack_into("<I", data, 20, 1584)
+    struct.pack_into("<I", data, 40, 4)
+    struct.pack_into("<I", data, 1580, 0)
+    path.write_bytes(data)
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as source:
@@ -43,9 +57,14 @@ def main() -> None:
     parser.add_argument("--shim", type=Path, default=SHIM)
     parser.add_argument("--ramdisk", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--header-version", type=int, choices=(3, 4), default=3)
     args = parser.parse_args()
 
     default_ramdisk, default_output = KINDS[args.kind]
+    if args.header_version == 4 and args.output is None:
+        default_output = default_output.with_name(
+            default_output.stem + "-v4" + default_output.suffix
+        )
     ramdisk = (args.ramdisk or default_ramdisk).resolve()
     output = (args.output or default_output).resolve()
     fd = args.fd.resolve()
@@ -55,7 +74,10 @@ def main() -> None:
         if not path.is_file():
             raise SystemExit(f"missing {label}: {path}")
 
-    kernel = OUT / f"kernel-{args.kind}.gzip"
+    kernel = OUT / (
+        f"kernel-{args.kind}-v4.gzip" if args.header_version == 4
+        else f"kernel-{args.kind}.gzip"
+    )
     kernel.write_bytes(gzip.compress(shim.read_bytes() + fd.read_bytes(), 9))
 
     command = [
@@ -73,6 +95,8 @@ def main() -> None:
     ]
     print("+ " + " ".join(command))
     subprocess.run(command, check=True)
+    if args.header_version == 4:
+        relabel_v4(output)
 
     print(f"image:   {output} ({output.stat().st_size} bytes)")
     print(f"sha256:  {sha256(output)}")

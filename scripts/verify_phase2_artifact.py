@@ -184,8 +184,13 @@ def main() -> None:
     kernel_size, ramdisk_size = struct.unpack_from("<II", image, 8)
     header_size, = struct.unpack_from("<I", image, 20)
     header_version, = struct.unpack_from("<I", image, 40)
-    if header_version != 3 or header_size != 1580:
+    expected_header = 1580 if header_version == 3 else 1584
+    if header_version not in (3, 4) or header_size != expected_header:
         raise SystemExit(f"unexpected boot header v{header_version}, size {header_size}")
+    if header_version == 4:
+        signature_size, = struct.unpack_from("<I", image, 1580)
+        if signature_size != 0:
+            raise SystemExit(f"unexpected v4 boot signature size: {signature_size}")
     if ramdisk_size == 0:
         raise SystemExit("boot image has no ramdisk")
 
@@ -215,6 +220,7 @@ def main() -> None:
         "fd_sha256": sha256(fd),
         "shim_bytes": len(shim),
         "kind": args.kind,
+        "header_version": header_version,
     }
     report = {"schema": "unixnu-elden-phase2.3-verify/v1", "artifacts": []}
     if args.report.is_file():
@@ -230,7 +236,7 @@ def main() -> None:
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
 
     print(f"artifact: OK ({len(image)} bytes)")
-    print(f"  boot header: v3, ramdisk {ramdisk_size} bytes")
+    print(f"  boot header: v{header_version}, ramdisk {ramdisk_size} bytes")
     print(f"  kernel gzip: {kernel_size} bytes -> shim {len(shim)} + FD {len(fd)}")
     print(f"  ramdisk label: {'ELDENPROBE' if args.kind == 'probe' else 'ELDENRAM'}")
     print(f"  decompressed FVMAIN: {len(fvmain)} bytes")

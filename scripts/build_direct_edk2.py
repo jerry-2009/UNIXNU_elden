@@ -28,6 +28,13 @@ def main() -> None:
     parser.add_argument("--toolchain", type=Path, default=TOOLCHAIN)
     parser.add_argument("--crypto-path", type=Path, help="directory containing Driver/Bin/CryptoDriver.inc.dsc")
     parser.add_argument(
+        "--module",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="build only this module, repeatable (for a quick check)",
+    )
+    parser.add_argument(
         "--define",
         action="append",
         default=[],
@@ -121,6 +128,8 @@ def main() -> None:
     ]
     for definition in args.define:
         command += ["-D", definition]
+    for module in args.module:
+        command += ["-m", module]
     print("+", " ".join(command))
     subprocess.run(command, cwd=MU, env=env, check=True)
 
