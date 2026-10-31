@@ -35,6 +35,8 @@ timeout = -1
 default = "reset"
 [kits]
 autoload = false
+[ui]
+scale = 4
 [[entry]]
 id = "probe"
 title = "ELDEN 2.3 PROBE - initrd FAT"

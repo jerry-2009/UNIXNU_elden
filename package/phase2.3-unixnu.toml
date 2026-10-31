@@ -1,0 +1,30 @@
+version = 1
+
+[boot]
+timeout = -1
+default = "reset"
+
+[kits]
+autoload = false
+
+[ui]
+scale = 4
+
+[[entry]]
+id = "xnu"
+title = "ELDEN 2.3 INITRD 56M"
+type = "xnu"
+path = "Payloads/kernel.macho"
+args = "-v serial=3 debug=0x14e armcpu-diagnostics=1 -no_slto_panic"
+
+[[entry]]
+id = "reset"
+title = "Restart"
+type = "action"
+action = "reset"
+
+[[entry]]
+id = "shutdown"
+title = "Power off"
+type = "action"
+action = "shutdown"

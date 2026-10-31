@@ -207,6 +207,12 @@ def verify_ramdisk(ramdisk: bytes, kind: str) -> str:
             raise SystemExit("unixnu.toml does not wait for input (timeout = -1)")
         if 'default = "reset"' not in text:
             raise SystemExit('unixnu.toml default is not reset')
+        scale = [line for line in text.splitlines() if line.strip().startswith("scale")]
+        if not scale:
+            raise SystemExit("unixnu.toml does not pin the menu scale ([ui] scale)")
+        value = int(scale[0].split("=", 1)[1].strip())
+        if not 1 <= value <= 6:
+            raise SystemExit(f"unixnu.toml menu scale {value} is outside 1..6")
         if kind == "probe":
             if "ELDEN 2.3 PROBE" not in text:
                 raise SystemExit("probe title is missing from unixnu.toml")
