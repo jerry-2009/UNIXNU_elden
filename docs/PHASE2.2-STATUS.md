@@ -165,3 +165,7 @@ python3 scripts/porting-record.py check --device ../../../..
 - 最终 ADT 需要一个本地唯一 chip ID；当前 ADT 只覆盖结构和 ABI sidecar 检查。
 - 下一关为 2.3：按 56 MiB 实际尺寸验证 Android v3 ramdisk、FDT/initrd 和 HOB 到
   UniXNURamDiskDxe/FAT 的只读 RAM 通道，再由设备所有者执行两次 RAM 冷启动。
+
+2026-10-31 更新：2.3 的主机侧已完成，56 MiB 载荷、独立固件和两种 Android v3
+启动镜像位于 `out/phase2.3/`，等待设备所有者探针与终版各两次 RAM 冷启动。
+详见[阶段 2.3 状态](PHASE2.3-STATUS.md)。

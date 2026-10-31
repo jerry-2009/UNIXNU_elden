@@ -10,7 +10,9 @@ FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2
 live FDT、固件内存保留区、XNU ADT、boot CPU 和参数语义已完成审计；尚未生成
 可启动 XNU 的镜像。阶段 2.2 的主机输入已完成：目标 kernelcache、57 项补丁、
 4 KiB XNU、预链接 `kernel.macho` 和主机 ADT 已生成并审计；尚未执行 DarwinBoot
-或 XNU 实机启动。**
+或 XNU 实机启动。阶段 2.3 的主机出口已完成：56 MiB FAT 载荷、8 MiB 探针卷、
+独立阶段 2 固件和两种 Android v3 启动镜像已生成并通过静态校验；ABL 的
+initrd/FDT 交接仍需设备所有者用探针镜像做 RAM 启动确认。**
 
 ## 仓库结构
 
@@ -42,6 +44,7 @@ live FDT、固件内存保留区、XNU ADT、boot CPU 和参数语义已完成�
 - [阶段 2：主机状态与基线](docs/PHASE2-STATUS.md)
 - [阶段 2.1：FDT、ADT 与内存审计](docs/PHASE2.1-STATUS.md)
 - [阶段 2.2：可追溯的最小 XNU](docs/PHASE2.2-STATUS.md)
+- [阶段 2.3：大载荷 RAM 通道（主机侧）](docs/PHASE2.3-STATUS.md)
 - [完整移植分析](docs/porting-analysis.md)
 - [格式 2 迁移记录](docs/FORMAT2-MIGRATION.md)
 - [第三方源码版本](docs/third-party.md)
@@ -110,13 +113,33 @@ python scripts/build_phase1.py \
   --crypto-path "$PWD/.cache/phase1/basecrypto"
 ```
 
-产物写入 `out/`。阶段 1 验收镜像 SHA-256：
+产物写入 `out/`。现行阶段 1 基线镜像 SHA-256：
 
 ```text
-b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
+94b6a6315b04fc9d276bc15e9519107be292244380fc3bf139f5af6c96a3bb0a
 ```
 
-详细命令和排查步骤见 [阶段 1 构建与测试](docs/PHASE1.md)。
+历史验收镜像 `b56ef4b7…` 的原始字节未保留。详细命令和排查步骤见
+[阶段 1 构建与测试](docs/PHASE1.md)。
+
+## 阶段 2.3 构建
+
+阶段 2.3 使用独立的 `out/phase2.3/` 输出，不覆盖阶段 1 基线：
+
+```sh
+python scripts/build_phase2_firmware.py \
+  --crypto-path "$PWD/.cache/phase1/basecrypto" --jobs 6
+python scripts/make_phase2_probe.py
+python scripts/build_phase2_image.py --kind probe
+python scripts/build_phase2_image.py --kind boot
+python scripts/verify_phase2_artifact.py --kind probe \
+  --image out/phase2.3/elden-phase2-probe.img
+python scripts/verify_phase2_artifact.py --kind boot \
+  --image out/phase2.3/elden-phase2-boot.img
+```
+
+`payload.img` 由 UniXNU CLI 生成（需要 `dtc` 和 `--unique-chip-id`）。阶段 2.3
+的设备步骤与哈希见 [阶段 2.3 状态](docs/PHASE2.3-STATUS.md)。
 
 ## 设备支持
 
@@ -126,6 +149,7 @@ b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
 | GOP 显示 | ✅ | 1904×3040，菜单可见 |
 | 音量键输入 | ✅ | 可移动、确认菜单项 |
 | UniXNU 菜单 | ✅ | 从内置只读 FAT 载荷读取配置 |
+| 大载荷 RAM 通道 | ⏳ | 56 MiB 载荷、独立固件与启动镜像主机校验通过；等待两次 RAM 冷启动 |
 | XNU 输入 | ✅ | 4 KiB 原生内核、预链接 kernelcache 与 ADT 主机审计通过 |
 | DTB / ADT | ⚠️ | live FDT 与 ADT 主机审计通过；XNU 启动尚未验证 |
 | DarwinBoot / XNU | ❌ | 阶段 2 尚未开始实机验证 |
@@ -143,9 +167,11 @@ b56ef4b7e5a71382b8c279c4ee1560764fabd126ba37ac0fd6e495c80b9ec6e1
 [阶段 2.2 状态](docs/PHASE2.2-STATUS.md)。历史验收镜像的原始字节
 未保留；当前 `out/elden-phase1.img` 已由设备所有者完成两次 RAM 冷启动复核，
 成为现行阶段 1 基线。
-下一步是在独立候选上验证 56 MiB 大载荷 RAM 通道（2.3）；DarwinBoot 和 XNU
-实机检查点分别留在 2.4–2.5。4 MiB 内嵌 FAT 与仅剩 920 字节的内层 FV 不能直接
-容纳阶段 2。
+下一步是阶段 2.3 的设备确认：`out/phase2.3/elden-phase2-probe.img` 与
+`elden-phase2-boot.img` 已生成并通过静态校验，等待设备所有者各完成两次 RAM
+冷启动，证明 initrd/FDT/HOB 通道可读；确认后进入 DarwinBoot（2.4）与 XNU
+实机检查点（2.5）。4 MiB 内嵌 FAT 与仅剩 920 字节的内层 FV 不能直接容纳
+阶段 2。
 DarwinBoot 的输入校验日志不计为 XNU 验收。
 
 ## 迁移边界

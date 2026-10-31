@@ -95,3 +95,8 @@
 !include $(PACKAGE_NAME)/Device/$(TARGET_DEVICE)/PcdsFixedAtBuild.dsc.inc
 !include AndromedaPkg/Andromeda.dsc.inc
 !include AndromedaPkg/Frontpage.dsc.inc
+
+!ifdef ELDEN_PHASE2
+[BuildOptions]
+  *_*_AARCH64_CC_FLAGS = -DELDEN_INITRD_HANDOFF=1
+!endif

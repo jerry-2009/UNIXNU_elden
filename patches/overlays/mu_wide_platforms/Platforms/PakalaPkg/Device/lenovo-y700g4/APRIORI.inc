@@ -19,7 +19,9 @@ APRIORI DXE {
     INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
     INF AndromedaPkg/Driver/RamPartitionDxe/RamPartitionDxe.inf
+!ifndef ELDEN_PHASE2
     INF EldenPhase1Pkg/EldenRamDiskDxe.inf
+!endif
     INF $(PACKAGE_NAME)/Device/$(TARGET_DEVICE)/Binaries/QcomPkg/Drivers/SmemDxe/SmemDxe.inf
     
     INF $(PACKAGE_NAME)/Device/$(TARGET_DEVICE)/Binaries/QcomPkg/Drivers/DALSYSDxe/DALSYSDxe.inf

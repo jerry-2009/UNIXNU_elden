@@ -81,9 +81,10 @@ packages = [
 
 [payload]
 volume = "ELDENRAM"
-size_mib = 4
+size_mib = 56
 loader = "firmware"
-title = "UniXNU | elden phase 1"
+title = "ELDEN 2.3 INITRD 56M"
+timeout = -1
 dram_size = "0x10000000"
 panic_screen = false
 kernel_args = [

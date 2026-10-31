@@ -27,7 +27,18 @@ def main() -> None:
     parser.add_argument("--jobs", default=str(os.cpu_count() or 4))
     parser.add_argument("--toolchain", type=Path, default=TOOLCHAIN)
     parser.add_argument("--crypto-path", type=Path, help="directory containing Driver/Bin/CryptoDriver.inc.dsc")
+    parser.add_argument(
+        "--define",
+        action="append",
+        default=[],
+        metavar="NAME=VALUE",
+        help="extra EDK II define, repeatable (for example ELDEN_PHASE2=1)",
+    )
     args = parser.parse_args()
+
+    for definition in args.define:
+        if "=" not in definition or definition.startswith("="):
+            raise SystemExit(f"invalid --define: {definition}")
 
     toolchain = args.toolchain.expanduser().resolve()
     for executable in ("clang", "lld-link", "llvm-lib", "llvm-rc"):
@@ -108,6 +119,8 @@ def main() -> None:
         "-D",
         f"SHARED_CRYPTO_PATH={crypto_define}",
     ]
+    for definition in args.define:
+        command += ["-D", definition]
     print("+", " ".join(command))
     subprocess.run(command, cwd=MU, env=env, check=True)
 
