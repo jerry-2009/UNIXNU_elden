@@ -281,3 +281,29 @@ FAT 通道成立；再启动 56 MiB 终版镜像，确认标题为
 | `out/phase2.3/elden-phase2-embed-probe.img` | 2,695,168 | `574be59c2165fef3e4cbccbe9dd50d657e44446d66a6c818b18361587c6ca828` |
 
 镜像为 Android v4、ramdisk 0，解压后为 128 字节 shim + 4 MiB 固件 + 8 MiB 探针 FAT 卷。
+
+## 2026-11-01 四色检查点结果：绿色
+
+设备所有者启动 `elden-phase2-embed-probe.img`（`574be59c…`，v4、ramdisk 0、shim 128 + FD + 8 MiB 探针卷）后，屏幕底部显示**绿色**色带。
+
+由此可以确定：
+
+- 驱动已被调度，`EldenPayloadDxe` 执行了；
+- BootShim 把 payload 追加在固件后、并通过 `x2`/`x3` 传给 PrePi 的路径成立；
+- PrePi 已写出 `ELDEN_PAYLOAD_INFO` HOB，地址与大小正确，512 字节对齐；
+- payload 首扇区 `55 AA` 校验通过，只读 BlockIo 已安装。
+
+**失败点已排除到 BlockIo 之后**：以下环节之一没有完成，导致 UniXNU 仍进入 built-in 菜单：
+
+1. `DiskIoDxe`/`PartitionDxe`/`FatDxe` 没有得到机会绑定这个新句柄（BDS `ConnectController` 未覆盖或时机太晚）；
+2. FAT16 超级软盘布局没有被 FatDxe 识别（BPB/卷结构）；
+3. UniXNU 配置发现只遍历了既有卷，未看到新出现的 SimpleFileSystem；
+4. 配置路径/文件名与 `PcdUniXNUConfigPath` 不一致。
+
+下一步（未实施，留给下一轮）：
+
+- 在 `EldenPayloadDxe` 中于安装 BlockIo 后显式 `gBS->ConnectController(Handle, NULL, NULL, TRUE)`，并按需对子句柄再次连接；
+- 增加第二级检查点颜色（青=找到含 `\EFI\UniXNU\unixnu.toml` 的 SimpleFileSystem；蓝=找到文件系统但读不到配置），把失败点进一步压缩；
+- 若文件系统可读而 UniXNU 仍 built-in，则转向 UniXNU 的 `Config.c` 发现逻辑（启动卷优先、句柄枚举时机）。
+
+当前固件与镜像保持绿色检查点版本；阶段 1 产物未受影响（`verify_artifact.py` 仍通过）。
