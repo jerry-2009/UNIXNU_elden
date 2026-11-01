@@ -2,12 +2,22 @@
 
 更新时间：2026-11-01
 
-状态：**进行中。内核 console 已在设备上打通；内核越过 `arm_init`、
-`kernel_bootstrap_thread` 与 `_bsd_init`，装载完 kext、跑到 BSD 阶段，最后
-在 AMFI 的 developer-mode 检查处 panic（`AMFI: not booted with
-security-mode-change-enabled`）。根设备仍未到达。** 本阶段仍不改变
-`board.stage = 1` 或 `kernel.status = "phase-2-pending"`：ArmDTPlatform、
-boot CPU、显示与存储都还没有内核侧证据。
+状态：**内核侧目标达成（v51）。** 内核 console 在设备上打通，越过
+`arm_init`、`kernel_bootstrap_thread` 与 `_bsd_init`，装载完 kext、跑到 BSD
+阶段，最后进入根设备等待循环——屏幕上反复出现
+`Waiting on <dict …>IOProviderClass…IOMedia…Apple_HFS…</dict>` 且**不再
+panic**。这证明 XNU 已跑到用户态之前的最后一步，剩下的是缺 UFS/APFS 驱动
+（阶段 3）。
+
+沿途清掉的两个 AMFI 关卡（都是 Apple 的策略路径，不是硬件描述缺失）：
+v49 卡在 `AMFI: not booted with security-mode-change-enabled`，v50 带上
+`security-mode-change-enable=1` 后变成 `AMFI: No PMGR?`（developer-mode
+latch 需要 `ApplePMGRNub`），v51 用一处 poke 让该 latch 直接返回。
+
+本阶段仍不改变 `board.stage = 1` 或 `kernel.status = "phase-2-pending"`：
+ArmCpu/GIC/timer 还没有各自命名的日志行，显示（`initialize_screen` 的
+正式映射）与存储（UFS/APFS）仍无内核侧证据，而且 console 是镜像内
+`--poke` 得到的，不是固件或驱动的正式修法。
 
 之前"死在 stage 16"的结论已被 v49 推翻：那几次 `冻结` 是没有 console 的
 panic，而不是 `kernel_startup_initialize_upto` 没返回。
@@ -160,6 +170,9 @@ v45/v46 另外跳过 `initialize_screen`；v48–v50 改用 `--poke`，不再需
 | v45 | 跳过 console 与 screen，复位 `0x985d68` | 冻结 | `49049b816d71652a52611a729240f7eb793fcfe85033b37b8c067692f229534a` |
 | v46 | 跳过 console 与 screen，复位 `0x985d54` | 冻结（v49 判定：无 console 的 panic，不是没返回） | `47865160c2b8bce1ce937aa17763d534f901bdd6818c6b56114c679837516626` |
 | v49 | console 试验：8 处 `--poke`，无复位 | **console 点亮**；内核打印到 kext 装载，最后 `AMFI: not booted with security-mode-change-enabled` @`ConfigurationSettings.cpp` panic | `0e3648192f2c2f3b1d6d01f75efa99b83b5f4d91fbcd06c07bd8790865fb41f9` |
+| v50 | v49 的 6 处 `--poke`，payload 换成 `package/phase2.5-unixnu.toml`（`security-mode-change-enable=1 amfi_get_out_of_my_way=1`） | **console 与 boot-arg 双通**：AMFI 的 `security-mode-change` 通过，panic 变成 `AMFI: No PMGR?` @`ConfigurationSettings.cpp:235`（`ApplePMGRNub` 查不到）；根设备等待文本与 panic 同屏 | `d12b56ecd6e3e53fb23982ab09fbd0a26820501b8cb8d8edf1eacfa95e0cae70` |
+| v51 | v50 的 6 处 console `--poke` + `0xfffffff004aaecfc: mov x0,x21 → b 0xfffffff004aaec4c`（AMFI 的 developer-mode latch 直接返回） | **不 panic 了**：反复打印 `Waiting on <dict ID="0"><key>IOProviderClass</key><string ID="1">IOMedia</string><key>Content</key><string ID="2">Apple_HFS</string></dict>`，停在根设备等待循环 | `cc739804217c3277bb07e4ce967381d5e1dd970eb46e9bb6637ebb83c5c668be` |
+
 
 v45/v46 当时被读成"第 16 号 `kernel_startup_initialize_upto`（`0x985d50`）
 没有返回"。v49 推翻了这个读法：同一条路径在 console 打开后完整跑过 stage 16
@@ -173,7 +186,6 @@ v45/v46 当时被读成"第 16 号 `kernel_startup_initialize_upto`（`0x985d50`
 | 版本 | 内容 | 镜像 SHA-256 |
 | --- | --- | --- |
 | v48 | 跳过 console 与 `0x985d64`，复位在第 7 个 stage-16 条目 `_set_awl_scratch_exists_flag_and_subscribe_for_pm`（stage-16 假设已被 v49 推翻，留作对照） | `cab3f3f8e6e7840b7e4c70fcffcbe6b0132c262dda9d5a7429d3c9ddce3afbfc` |
-| v50 | v49 的 6 处 console `--poke`（去掉 trace 噪声），payload 换成 `package/phase2.5-unixnu.toml`，boot-arg 加 `security-mode-change-enable=1 amfi_get_out_of_my_way=1` | `d12b56ecd6e3e53fb23982ab09fbd0a26820501b8cb8d8edf1eacfa95e0cae70` |
 
 ## 关键反汇编
 
@@ -238,23 +250,26 @@ _lockdown_mode_init                             rank UINT_MAX
 
 ## 下一步
 
-1. **先让所有者引导 v50。**
-   `fastboot boot out/phase2.4/v50/elden-phase2.4-probe-boot.img`，菜单里选
-   xnu（标题 `ELDEN 2.5 CONSOLE`）。它带
-   `security-mode-change-enable=1 amfi_get_out_of_my_way=1`，预期不再在
-   AMFI 处 panic，而是继续走到根设备：屏幕上应出现
-   `Waiting on <dict … IOMedia … Apple_HFS …>` 的轮询，最后要么
-   "Still waiting for root device"、要么 `Failed to mount root device` 一类的
-   panic。**那正是阶段 2.5 的终点**：它证明 XNU 一直跑到用户态之前的最后一步，
-   剩下的只是缺 UFS/APFS 驱动（阶段 3 的工作）。
-2. **如果 AMFI 仍然 panic**，说明那个 boot-arg 不是它检查的名字：在
-   `out/phase2.5-boot.log` 的截屏里读它实际抱怨的字符串，或直接把
-   `amfi_get_out_of_my_way=1` 换成 AMFI 的其它开关；也可以 poke AMFI 的比较
-   指令（kext 在 `__PRELINK_TEXT` 内，`make_entry_probe_kernel.py --poke`
-   已经能写任意可执行地址）。
-3. **把这次设备证据写进本节与 `porting.toml`**：v49 已证明 console、越过
-   stage 16、进入 BSD；v50 的屏幕最后一行就是阶段 2.5 的收尾证据。
+阶段 2.5 的内核侧到这里就结束了：v51 停在根设备等待，不再有 Apple 策略
+panic。继续往前需要换筹码——补硬件驱动，而不是继续 poke。
 
+1. **先做阶段 3 的存储入口：UFS。** 根设备等待的 `IOMedia/Apple_HFS` 匹配
+   表说明内核在等一个块设备；elden 的 UFS 控制器（SM8750，`1d84000.ufshc`
+   一类地址）还没有驱动，`IOMedia` 永远不会出现。要在 UniXNU 里选一个 UFS
+   组件并按 SM8750 的寄存器/PHY 描述接上，这是让"等待根设备"变成"挂载根
+   卷"的唯一路径。
+2. **把 console 变成正式修法。** 现在的输出靠镜像内 `--poke`（强映射帧缓冲、
+   跳过 iBoot 交接区、强制 `kPETextMode` 并打开 kprintf 两个闸门）。正解是
+   DarwinBoot 在 `Video[0]` 上带 bit0 物理地址标记（或 port 侧写 `/chosen`
+   的描述），让 `initialize_screen` 自己建映射；这需要重编固件，属于阶段 3
+   的固件条目。
+3. **补 ArmCpu/GIC/timer 的显式证据。** 内核能跑到 BSD 说明这些平台模块
+   在起作用，但日志里没有各自命名的行；用 `armcpu-diagnostics=1` 或
+   `debug=0x14e` 里对应的位把中断/定时器一次性打印出来，才能把 CPU 区域的
+   `completion` 判据逐条勾掉。
+4. **硬件描述缺口要单独立项。** `ApplePMGRNub`（电源管理）、`AppleSEPManager`
+   （安全协处理器）这类"缺 Apple 硬件"的检查目前靠 poke 绕过；阶段 3 之后
+   若要走真实设备，需要分别为它们提供驱动或明确的端口策略。
 ## 复现
 
 ```sh
@@ -318,7 +333,7 @@ v49（console 试验，无复位，纯 `--poke`）只把第一步换成：
   中复位，必须由所有者手动执行 `fastboot boot`。
 - `serial=3` 没有对应串口硬件；内核日志只走 video console，靠的是
   DarwinBoot 已经交给内核的 GOP 帧缓冲描述，不依赖任何串口。
-- v49/v50 的 console 是**靠 `--poke` 在镜像里打补丁**得到的：强制映射帧
+- v49–v51 的 console 与 AMFI 绕过都是**靠 `--poke` 在镜像里打补丁**得到的：强制映射帧
   缓冲、跳过 iBoot 交接区、把 console 模式改成 `kPETextMode`、并打开
   `kprintf` 的两个闸门标志。这不是最终形态——正式修法应当是 DarwinBoot 在
   `Video[0]` 里带上"这是物理地址"的 bit0 标记（或 UniXNU 在 port 侧写
