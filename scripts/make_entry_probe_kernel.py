@@ -32,6 +32,11 @@ wait and reset in the entry probe itself, which validates the reset mechanism
 at a point the band already proves is reached.  ``--ret-at`` writes ``ret``
 over a named handoff (for example the iBoot video-console read in
 ``PE_create_console``) to test whether the kernel can continue without it.
+
+``--poke`` replaces one 32-bit word at an arbitrary virtual address or symbol,
+including data.  It carries the console experiment: skip the iBoot panic-log
+read that faults, force ``initialize_screen`` to map the physical frame buffer,
+and set the ``startup_debug`` tunable so the kernel prints its startup entries.
 """
 
 from __future__ import annotations
@@ -288,34 +293,51 @@ def symbols(data: bytes) -> dict[str, int]:
     return table
 
 
-def executable_segments(data: bytes) -> list[tuple[int, int, int, int]]:
+def segments(data: bytes) -> list[dict]:
+    """Every ``LC_SEGMENT_64`` with a file offset, in load-command order."""
     ncmds = struct.unpack_from("<I", data, 16)[0]
     offset = 32
-    segments = []
+    table = []
     for _ in range(ncmds):
         command, size = struct.unpack_from("<II", data, offset)
         if command == LC_SEGMENT_64:
             vmaddr, vmsize, fileoff, filesize = struct.unpack_from("<QQQQ", data, offset + 24)
-            initprot = struct.unpack_from("<I", data, offset + 60)[0]
-            segments.append((vmaddr, vmsize, fileoff, filesize, initprot))
+            table.append({
+                "name": data[offset + 8:offset + 24].rstrip(b"\0").decode(),
+                "address": vmaddr,
+                "size": vmsize,
+                "file_offset": fileoff,
+                "file_size": filesize,
+                "protection": struct.unpack_from("<I", data, offset + 60)[0],
+            })
         offset += size
-    return segments
+    return table
 
 
-def patch_symbol(data: bytes, name: str, stub_va: int) -> tuple[bytes, dict]:
+def locate(data: bytes, va: int, size: int = 4, executable: bool = False) -> tuple[dict, int]:
+    """Return the segment holding ``va`` and its file offset."""
+    for segment in segments(data):
+        if segment["address"] <= va and va + size <= segment["address"] + segment["file_size"]:
+            if executable and not segment["protection"] & 4:
+                continue
+            return segment, segment["file_offset"] + (va - segment["address"])
+    raise ValueError(f"{va:#x} is not inside an executable segment" if executable
+                     else f"{va:#x} is not inside a file-backed segment")
+
+
+def symbol_address(data: bytes, name: str) -> tuple[str, int]:
     table = symbols(data)
     key = name if name.startswith("_") else "_" + name
     if key not in table and name in table:
         key = name
     if key not in table:
         raise ValueError(f"symbol {name} is not in the kernel symbol table")
-    va = table[key]
-    for vmaddr, vmsize, fileoff, filesize, initprot in executable_segments(data):
-        if vmaddr <= va < vmaddr + filesize and initprot & 4:
-            offset = fileoff + (va - vmaddr)
-            break
-    else:
-        raise ValueError(f"symbol {name} at {va:#x} is not inside an executable segment")
+    return key, table[key]
+
+
+def patch_symbol(data: bytes, name: str, stub_va: int) -> tuple[bytes, dict]:
+    key, va = symbol_address(data, name)
+    segment, offset = locate(data, va, 4, executable=True)
     word = struct.unpack_from("<I", data, offset)[0]
     output = bytearray(data)
     output[offset:offset + 4] = encode_b(va, stub_va)
@@ -332,12 +354,7 @@ def patch_address_in_place(data: bytes, va: int, stub: bytes) -> tuple[bytes, di
     """Write the reset stub at an arbitrary executable VA."""
     if va & 3:
         raise ValueError(f"{va:#x} is not 4-byte aligned")
-    for vmaddr, vmsize, fileoff, filesize, initprot in executable_segments(data):
-        if vmaddr <= va and va + len(stub) <= vmaddr + filesize and initprot & 4:
-            offset = fileoff + (va - vmaddr)
-            break
-    else:
-        raise ValueError(f"{va:#x} is not inside an executable segment")
+    segment, offset = locate(data, va, len(stub), executable=True)
     word = struct.unpack_from("<I", data, offset)[0]
     output = bytearray(data)
     output[offset:offset + len(stub)] = stub
@@ -350,18 +367,21 @@ def patch_address_in_place(data: bytes, va: int, stub: bytes) -> tuple[bytes, di
     }
 
 
-def patch_word_at(data: bytes, va: int, word: int) -> tuple[bytes, dict]:
-    """Replace one instruction word at an executable VA."""
-    for vmaddr, vmsize, fileoff, filesize, initprot in executable_segments(data):
-        if vmaddr <= va < vmaddr + filesize and initprot & 4:
-            offset = fileoff + (va - vmaddr)
-            break
-    else:
-        raise ValueError(f"{va:#x} is not inside an executable segment")
+def patch_word_at(data: bytes, va: int, word: int, executable: bool = True) -> tuple[bytes, dict]:
+    """Replace one instruction (or, with ``executable=False``, data) word at a VA."""
+    if va & 3:
+        raise ValueError(f"{va:#x} is not 4-byte aligned")
+    segment, offset = locate(data, va, 4, executable=executable)
     output = bytearray(data)
     old = struct.unpack_from("<I", output, offset)[0]
     struct.pack_into("<I", output, offset, word)
-    return bytes(output), {"va": va, "word": old, "new": word}
+    return bytes(output), {
+        "va": va,
+        "word": old,
+        "new": word,
+        "segment": segment["name"],
+        "file_offset": offset,
+    }
 
 
 def patch_symbol_in_place(data: bytes, name: str, stub: bytes) -> tuple[bytes, dict]:
@@ -372,21 +392,10 @@ def patch_symbol_in_place(data: bytes, name: str, stub: bytes) -> tuple[bytes, d
     when arm_vm_init replaces the bootstrap page tables with the kernel pmap.
     A stub appended after Kernel.End does not.
     """
-    table = symbols(data)
-    key = name if name.startswith("_") else "_" + name
-    if key not in table and name in table:
-        key = name
-    if key not in table:
-        raise ValueError(f"symbol {name} is not in the kernel symbol table")
-    va = table[key]
-    for vmaddr, vmsize, fileoff, filesize, initprot in executable_segments(data):
-        if vmaddr <= va < vmaddr + filesize and initprot & 4:
-            offset = fileoff + (va - vmaddr)
-            if offset + len(stub) > fileoff + filesize:
-                raise ValueError(f"symbol {name} at {va:#x} is too close to its segment end")
-            break
-    else:
-        raise ValueError(f"symbol {name} at {va:#x} is not inside an executable segment")
+    key, va = symbol_address(data, name)
+    segment, offset = locate(data, va, len(stub), executable=True)
+    if offset + len(stub) > segment["file_offset"] + segment["file_size"]:
+        raise ValueError(f"symbol {name} at {va:#x} is too close to its segment end")
     word = struct.unpack_from("<I", data, offset)[0]
     output = bytearray(data)
     output[offset:offset + len(stub)] = stub
@@ -398,6 +407,23 @@ def patch_symbol_in_place(data: bytes, name: str, stub: bytes) -> tuple[bytes, d
         "patched_bytes": len(stub),
         "patched_target": f"{va:#x} (in place)",
     }
+
+
+def parse_poke(text: str) -> tuple[str | None, int | None, int]:
+    """Parse ``ADDRESS=WORD`` or ``SYMBOL=WORD`` for ``--poke``."""
+    target, _, value = text.partition("=")
+    if not target or not value:
+        raise SystemExit(f"--poke expects ADDRESS=WORD or SYMBOL=WORD, got {text!r}")
+    try:
+        word = int(value, 0)
+    except ValueError:
+        raise SystemExit(f"--poke value {value!r} is not a number") from None
+    if not 0 <= word <= 0xFFFFFFFF:
+        raise SystemExit(f"--poke value {value!r} does not fit in 32 bits")
+    try:
+        return None, int(target, 0), word
+    except ValueError:
+        return target, None, word
 
 
 def main() -> None:
@@ -418,6 +444,8 @@ def main() -> None:
                         help="wait and reset when control reaches the given executable address")
     parser.add_argument("--ret-at", action="append", metavar="ADDRESS", default=[],
                         help="replace the instruction at ADDRESS with ret (may be repeated)")
+    parser.add_argument("--poke", action="append", metavar="TARGET=WORD", default=[],
+                        help="replace one 32-bit word at ADDRESS or SYMBOL (may be repeated)")
     parser.add_argument("--reset-delay", type=int, default=2, metavar="SECONDS",
                         help="seconds to wait before the PSCI reset (default 2)")
     args = parser.parse_args()
@@ -430,6 +458,7 @@ def main() -> None:
             raise SystemExit("--ret-at address must be 4-byte aligned")
     if args.reset_delay <= 0:
         raise SystemExit("--reset-delay must be positive")
+    pokes = [(text, *parse_poke(text)) for text in args.poke]
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     directory = args.output_dir / "probe"
@@ -469,6 +498,15 @@ def main() -> None:
     for address in args.ret_at:
         probed, ret_facts = patch_word_at(probed, int(address, 0), 0xD65F03C0)
         facts.setdefault("ret", []).append(ret_facts)
+    for text, symbol, address, word in pokes:
+        key = None
+        if symbol is not None:
+            key, address = symbol_address(probed, symbol)
+        probed, poke_facts = patch_word_at(probed, address, word, executable=False)
+        poke_facts["request"] = text
+        if key is not None:
+            poke_facts["symbol"] = key
+        facts.setdefault("poke", []).append(poke_facts)
 
     check = parse_kernel(probed)
     if check["entry"] != facts["entry_va"]:
@@ -501,6 +539,9 @@ def main() -> None:
         print("reset %#x (%s): %d bytes in place, delay %ss" % (
             facts["reset"]["patched_va"], facts["reset"].get("patched_symbol", "address"),
             facts["reset"]["patched_bytes"], args.reset_delay))
+    for item in facts.get("poke", []):
+        print("poke  %#x (%s): %#010x -> %#010x" % (
+            item["va"], item.get("symbol", item["segment"]), item["word"], item["new"]))
 
 
 if __name__ == "__main__":

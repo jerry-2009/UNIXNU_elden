@@ -193,6 +193,7 @@ def verify_ramdisk(
     kind: str,
     expect_kernel_bytes: int = KERNEL_MACHO_BYTES,
     expect_kernel_sha256: str = KERNEL_MACHO_SHA256,
+    xnu_title: str = "ELDEN 2.3 INITRD 56M",
 ) -> str:
     fat_name, volume_label = verify_fat_type(ramdisk)
     expected_label = "ELDENPROBE" if kind == "probe" else "ELDENRAM"
@@ -224,8 +225,8 @@ def verify_ramdisk(
             if 'type = "xnu"' in text:
                 raise SystemExit("probe configuration unexpectedly has an XNU entry")
         else:
-            if "ELDEN 2.3 INITRD 56M" not in text:
-                raise SystemExit("final title is missing from unixnu.toml")
+            if xnu_title not in text:
+                raise SystemExit(f"final title {xnu_title!r} is missing from unixnu.toml")
             kernel = Path(directory) / "kernel.macho"
             mtools(
                 "mcopy", "-o", "-i", str(image),
@@ -257,6 +258,11 @@ def main() -> None:
     parser.add_argument("--payload", type=Path)
     parser.add_argument("--expect-kernel-bytes", type=int, default=KERNEL_MACHO_BYTES)
     parser.add_argument("--expect-kernel-sha256", default=KERNEL_MACHO_SHA256)
+    parser.add_argument(
+        "--xnu-title",
+        default="ELDEN 2.3 INITRD 56M",
+        help="xnu entry title the payload configuration must carry",
+    )
     args = parser.parse_args()
 
     image = args.image.read_bytes()
@@ -306,7 +312,10 @@ def main() -> None:
             raise SystemExit("boot image is truncated inside the ramdisk")
 
     fvmain = verify_fd(fd, args.embed_payload)
-    fat_name = verify_ramdisk(ramdisk, args.kind, args.expect_kernel_bytes, args.expect_kernel_sha256)
+    fat_name = verify_ramdisk(
+        ramdisk, args.kind, args.expect_kernel_bytes, args.expect_kernel_sha256,
+        args.xnu_title,
+    )
 
     entry = {
         "image": str(args.image.resolve().relative_to(ROOT)),

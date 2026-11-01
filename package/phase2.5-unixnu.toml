@@ -1,0 +1,34 @@
+version = 1
+
+[boot]
+timeout = -1
+default = "reset"
+
+[kits]
+autoload = false
+
+[ui]
+scale = 4
+
+# Phase 2.5 probe payload: same menu as the phase 2.3 payload, but the xnu
+# entry carries the boot arguments the probe boots need.  DarwinBoot copies
+# these verbatim into boot_args->CommandLine, which is where PE_parse_boot_argn
+# reads them.
+[[entry]]
+id = "xnu"
+title = "ELDEN 2.5 CONSOLE"
+type = "xnu"
+path = "Payloads/kernel.macho"
+args = "-v serial=3 debug=0x14e armcpu-diagnostics=1 -no_slto_panic security-mode-change-enable=1 amfi_get_out_of_my_way=1"
+
+[[entry]]
+id = "reset"
+title = "Restart"
+type = "action"
+action = "reset"
+
+[[entry]]
+id = "shutdown"
+title = "Power off"
+type = "action"
+action = "shutdown"

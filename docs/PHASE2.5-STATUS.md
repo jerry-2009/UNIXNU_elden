@@ -2,10 +2,15 @@
 
 更新时间：2026-11-01
 
-状态：**进行中。XNU 入口执行已由设备证据确认；内核在 `arm_init` 之后
-停在 `kernel_bootstrap_thread` 的第 16 号启动里程碑内部。** 本阶段仍不改变
+状态：**进行中。内核 console 已在设备上打通；内核越过 `arm_init`、
+`kernel_bootstrap_thread` 与 `_bsd_init`，装载完 kext、跑到 BSD 阶段，最后
+在 AMFI 的 developer-mode 检查处 panic（`AMFI: not booted with
+security-mode-change-enabled`）。根设备仍未到达。** 本阶段仍不改变
 `board.stage = 1` 或 `kernel.status = "phase-2-pending"`：ArmDTPlatform、
 boot CPU、显示与存储都还没有内核侧证据。
+
+之前"死在 stage 16"的结论已被 v49 推翻：那几次 `冻结` 是没有 console 的
+panic，而不是 `kernel_startup_initialize_upto` 没返回。
 
 阶段 2.4 的交接镜像与 `out/phase2.3/` 证据未被覆盖；所有探针镜像都写在
 `out/phase2.4/<版本>/`，每个目录带自己的 `verify.json`。
@@ -18,10 +23,10 @@ boot CPU、显示与存储都还没有内核侧证据。
    同时证明入口指令与复位通道都成立。
 2. **`arm_init` 的唯一拦路石是 Apple iBoot 的 video console 交接区。**
    `_PE_create_console` 在 `0xfffffff007941e34` 读取物理地址 `0x3C0F0000`
-   的 magic；本设备没有 iBoot 写过的这块内存，该读取触发外部异常，内核在
-   console 建立之前静默挂死。把它的首指令改成 `ret` 之后，`arm_init`
-   一路走到 `_machine_startup`（v31 复位）。
-3. **下一个卡点在 `kernel_bootstrap_thread` 内。**
+   的 magic；本设备没有 iBoot 写过的这块内存，该读取触发外部异常并 panic
+   （当时 console 还没建立，所以屏幕上看不到任何东西）。把它的首指令改成
+   `ret` 之后，`arm_init` 一路走到 `_machine_startup`（v31 复位）。
+3. **（已被 v49 推翻，保留作过程记录）曾以为卡点在 `kernel_bootstrap_thread` 内。**
    该线程依次调用 `idle_thread_create`、`sched_startup`、
    `thread_daemon_init`、`kernel_startup_initialize_upto(…)`、`thread_bind`、
    `mapping_adjust`、`clock_service_create`、`device_service_create`、
@@ -30,7 +35,27 @@ boot CPU、显示与存储都还没有内核侧证据。
    `0xfffffff007985f60` 调 `bsd_init`。复位点 `0x985d44`（`PE_init_iokit`
    之后）已到达，`0x985d54` 未到达：**死在第 16 号
    `kernel_startup_initialize_upto` 调用（`0x985d50`，参数 `w0 = 0x10`）
-   内部，且该调用没有返回。**
+   内部，且该调用没有返回。** v49 打开 console 后证明这一次调用是正常返回的：
+   内核一路跑到 `_bsd_init`、kext 装载与 BSD 初始化，说明 v45/v46 的"冻结"
+   其实是 panic 之后无声停住（panic 文本因为 kprintf 被关掉而没上屏）。
+4. **console 已经可用，而且不需要改内核源码。** `PE_init_iokit`
+   （`0x985d40`）里的 `PE_init_printf(TRUE)` → `vcattach()` 会设置
+   `vm_initialized` 并在 `gc_graphics_boot == FALSE` 时执行
+   `initialize_screen(NULL, kPEAcquireScreen)` → `gc_enable(TRUE)`，把
+   video console 真正打开。v49 只做了三件事：强制映射物理帧缓冲
+   `0xFC800000`、跳过 iBoot 交接区读取、把 console 模式强制成
+   `kPETextMode`；再加上打开 `kprintf` 闸门的两处数据补丁。设备屏幕上随后
+   出现了完整的内核日志。
+5. **当前真正的卡点是 AMFI 的 developer-mode 策略。** 设备屏幕最后一行是
+   `panic(cpu 0 caller …): "AMFI: not booted with security-mode-change-enabled" @ConfigurationSettings.cpp`，
+   前面还打印了 `Waiting on <dict …><key>IOProviderClass</key>…<string>IOMedia</string>…<string>Apple_HFS</string>`。
+   也就是说：平台代码、`bsd_init`、IOKit、APFS、Skywalk、NVRAM、IOSurface
+   都已经跑起来，挡住启动的是 Apple 的安全策略开关（boot-arg），而不是
+   elden 的硬件描述。
+6. **boot-arg 通道是通的。** payload 配置 `package/phase2.5-unixnu.toml` 的
+   `args` 字段经 UniXNU → DarwinBoot `Request->BootArgs` 原样写入
+   `boot_args->CommandLine`，所以 `security-mode-change-enable=1` 与
+   `amfi_get_out_of_my_way=1` 直接可用；v50 就是带这两个参数的镜像。
 
 ## 探针机制
 
@@ -45,6 +70,10 @@ boot CPU、显示与存储都还没有内核侧证据。
   改用原地补丁。
 - **跳过函数**（v31 起）：`--ret-at ADDRESS` 把目标首指令写成 `ret`
   （`0xD65F03C0`），用来排除已知的 Apple 平台依赖。
+- **任意 32 位写入**（v49 起）：`--poke ADDRESS=WORD` 或 `--poke SYMBOL=WORD`
+  在指定虚地址写入一个 32 位字，代码段与数据段都可以；脚本会打印
+  `旧值 -> 新值` 和所在段名，写进 `probe.json` 便于审计。console 试验
+  只靠这种写入，不注入任何新代码。
 
 reset stub 先读 `CNTFRQ_EL0` 算出 2 秒的 tick 数，再在 `CNTPCT_EL0` 上
 忙等；随后 `mov x0,#0x84000009; movk x0,#0x8400,lsl#16; smc #0`。
@@ -54,11 +83,57 @@ ADT 的 `psci` 节点声明 `arm,psci-1.0` 且 conduit 为 `smc`，与调用一�
 判读规则：出现绿条（DarwinBoot 面包屑）后约 2 秒自行重启 = 到达检查点；
 一直冻结 = 没到。
 
+## 为什么屏幕上一直没有内核文字
+
+探针镜像从来没有打出过一行内核文字，原因有两道互相独立的闸门，缺一不可：
+
+1. **`kprintf` 本身被关掉。** `pexpert/arm/pe_kprintf.c:101` 的整个函数体
+   包在 `if (!disable_serial_output && !disable_kprintf_output)` 里，两个
+   `SECURITY_READ_ONLY_LATE(bool)` 初值都是 `true`；`PE_init_kprintf_config`
+   只有在 boot-arg 里带 `debug=0x…`（`DB_KPRT`）时才清第一个，第二个只在
+   `DEBUG` 构建或 DEVELOPMENT 的 `-enable_kprintf_spam` 下才清。所以即使
+   console 完全就绪，`kprintf` 也一个字都不输出。
+2. **video console 没有被启用。** `vcputc_options` 只在
+   `gc_initialized && gc_enabled` 时画字，而 `gc_enabled` 只由
+   `gc_enable(TRUE)` 置位；`gc_enable` 只由 `initialize_screen(…,
+   kPEAcquireScreen)` 调用，而 `PE_create_console` 用的是
+   `kPEGraphicsMode`，那条路径只把 `gc_graphics_boot` 置 `TRUE`、不做
+   `gc_enable`。
+
+好消息是第 2 道闸门有一条现成通路：`PE_init_iokit()`
+（`pexpert/arm/pe_init.c:267`）第一句就是 `PE_init_printf(TRUE)` →
+`vcattach()`，发生在 `0x985d40`，也就是第 16 号里程碑之前，并且 v41 已
+证明它返回。`vcattach` 会置 `vm_initialized = TRUE`（否则
+`vc_render_font` 直接返回）、并且在 `gc_graphics_boot == FALSE` 时执行
+`initialize_screen(NULL, kPEAcquireScreen)` → `gc_enable(TRUE)`（分配行
+缓冲、渲染字体、`gc_enabled = TRUE`、`disableConsoleOutput = FALSE`），
+最后把 ring buffer 里积压的 kprintf 全部刷到屏幕上。
+
+所以只要让 `PE_create_console` 走 **text** 模式（`gc_graphics_boot`
+保持 `FALSE`）并把帧缓冲映射好，console 就会在 stage 16 之前自动亮起来，
+不需要改 XNU 源码、不需要重编内核。v49 就是按这个思路做的纯 `--poke`
+镜像（8 处 32 位写入，全部可逆）：
+
+| 地址 | 原值 → 新值 | 作用 |
+| --- | --- | --- |
+| `0xfffffff0073bdf24` | `0x370000b5` → `0x14000005` | `initialize_screen` 强制走 `makeMapping`，把物理 `0xFC800000` 映射进内核 |
+| `0xfffffff007941e0c` | `0x97eac134` → `0x1400001d` | 跳过 `ml_io_map_wcomb(0x3C0F0000)` 与 iBoot magic 读取，直接落到模式选择 |
+| `0xfffffff007941e90` | `0x1a941681` → `0x52800041` | `cinc w1,w20,eq` → `mov w1,#2`，即 `kPETextMode`，保住 `gc_graphics_boot == FALSE` |
+| `0xfffffff0071fd970` | `0x00000101` → `0x00000000` | 清掉 `disable_serial_output`/`disable_kprintf_output`，打开 kprintf |
+| `0xfffffff0071fd978/7c` | `0` → `0xfffffff0073bb01c` | `PE_kputc` 预置成 `console_write_unbuffered`，避免 KPRINTF 阶段之前的 kprintf 空指针调用 |
+| `0xfffffff0071652a4` | `0` → `1` | `startup_debug = STARTUP_DEBUG_VERBOSE`，逐条打印启动条目 |
+| `0xfffffff007053aac` | `0x000a2970` → `0x000d2970` | 条目打印格式串结尾的 `\n` 改成 `\r`，只覆盖同一行、不滚动（行缓冲已分配，滚动一次要搬 16 MB） |
+
+上表后两行只在"要读 stage-16 逐条轨迹"时才有意义。v49 的屏幕证明了真正
+需要的是**普通内核日志**，所以 v50 只保留前六行 pokes（映射、跳过交接区、
+`kPETextMode`、两个闸门标志、`PE_kputc`），去掉 `startup_debug` 与格式串
+补丁，让日志自己换行滚动。
+
 ## 设备证据
 
 所有镜像 12,738,560 字节、v4 头，`scripts/verify_phase2_artifact.py` 全部
-`artifact: OK`。除 v3 外都带 `ret@_PE_create_console`（跳过 iBoot console）；
-v45/v46 另外跳过 `initialize_screen`。
+`artifact: OK`。v3–v46 带 `ret@_PE_create_console`（跳过 iBoot console），
+v45/v46 另外跳过 `initialize_screen`；v48–v50 改用 `--poke`，不再需要 `ret`。
 
 | 版本 | 检查点 | 结果 | 镜像 SHA-256 |
 | --- | --- | --- | --- |
@@ -83,11 +158,22 @@ v45/v46 另外跳过 `initialize_screen`。
 | v39 | `0x985cc8`（`early_random` 之后） | 重启 | `eb3ceacc4cec01d778cbb05bd5208adf557a081ebcd67ae7ff98069578dcf526` |
 | v41 | `0x985d44`（`PE_init_iokit` 返回） | 重启 | `d84712c575eadc2ff26c693679d8e8a448462fbd86a67c638470cbeca19368c2` |
 | v45 | 跳过 console 与 screen，复位 `0x985d68` | 冻结 | `49049b816d71652a52611a729240f7eb793fcfe85033b37b8c067692f229534a` |
-| v46 | 跳过 console 与 screen，复位 `0x985d54` | 冻结 | `47865160c2b8bce1ce937aa17763d534f901bdd6818c6b56114c679837516626` |
+| v46 | 跳过 console 与 screen，复位 `0x985d54` | 冻结（v49 判定：无 console 的 panic，不是没返回） | `47865160c2b8bce1ce937aa17763d534f901bdd6818c6b56114c679837516626` |
+| v49 | console 试验：8 处 `--poke`，无复位 | **console 点亮**；内核打印到 kext 装载，最后 `AMFI: not booted with security-mode-change-enabled` @`ConfigurationSettings.cpp` panic | `0e3648192f2c2f3b1d6d01f75efa99b83b5f4d91fbcd06c07bd8790865fb41f9` |
 
-v45 冻结说明 `0x985d64` 的 `initialize_screen` 没有被执行到；v46 冻结说明
-第 16 号 `kernel_startup_initialize_upto`（`0x985d50`）没有返回。二者把卡点
-夹在这一次调用内部。
+v45/v46 当时被读成"第 16 号 `kernel_startup_initialize_upto`（`0x985d50`）
+没有返回"。v49 推翻了这个读法：同一条路径在 console 打开后完整跑过 stage 16
+并进入 BSD。因此 v45/v46 的"冻结"是一次 panic 之后停住——panic 文本经过
+`kprintf`，而当时 `disable_serial_output`/`disable_kprintf_output` 仍为 `1`，
+所以屏幕上什么也没有。**复位探针只在"确实返回到该地址"时才重启，panic 会让
+它永远等不到；这正是把 panic 误判成挂死的机制。**
+
+已生成、但还没有设备结果的镜像（不计入证据）：
+
+| 版本 | 内容 | 镜像 SHA-256 |
+| --- | --- | --- |
+| v48 | 跳过 console 与 `0x985d64`，复位在第 7 个 stage-16 条目 `_set_awl_scratch_exists_flag_and_subscribe_for_pm`（stage-16 假设已被 v49 推翻，留作对照） | `cab3f3f8e6e7840b7e4c70fcffcbe6b0132c262dda9d5a7429d3c9ddce3afbfc` |
+| v50 | v49 的 6 处 console `--poke`（去掉 trace 噪声），payload 换成 `package/phase2.5-unixnu.toml`，boot-arg 加 `security-mode-change-enable=1 amfi_get_out_of_my_way=1` | `d12b56ecd6e3e53fb23982ab09fbd0a26820501b8cb8d8edf1eacfa95e0cae70` |
 
 ## 关键反汇编
 
@@ -119,23 +205,55 @@ v45 冻结说明 `0x985d64` 的 `initialize_screen` 没有被执行到；v46 冻
 0x985f60  bl _bsd_init
 ```
 
-`kernel_startup_initialize_upto` 遍历一张 `{stage, function, name}` 表，
-按顺序调用 `stage <= 里程碑` 的条目，条目之间用 `kprintf` 打印
-"Kernel startup, stage N: name"。因为 console 被跳过，这些打印在设备上
-不可见——这也是下一个对话要先做 console 补丁的原因。
+`kernel_startup_initialize_upto` 遍历的表在
+`__BOOTDATA,__init_entry_set`（本内核 VA `0xfffffff007b4c000`，96,144 字节，
+4,006 条），元素是 24 字节的
+`{u32 subsystem; u32 rank; void (*func)(const void *); const void *arg;}`。
+`startup.c:281` 用 `qsort` + `startup_entry_cmp`（先比 `subsystem` 再比
+`rank`，相等返回 0）排序，底层是 `bsd/kern/qsort.c` 的实现，**不稳定**，
+所以运行时顺序不能按链接顺序猜。在主机的 `/tmp/qs_harness` 上用同一份
+`qsort.c` 和同一个比较函数重放排序，得到的 stage 16（EARLY_BOOT）实际
+执行顺序是：
+
+```
+_socd_client_set_primary_kernelcache_uuid      rank 0
+_procinit                                       rank 0
+_ulock_initialize                               rank 0
+_source_pthread_bootstrap                       rank 1
+_pgz_init                                       rank INT_MAX
+_iotrace_init                                   rank INT_MAX
+_set_awl_scratch_exists_flag_and_subscribe_for_pm  rank INT_MAX
+_cs_text_fixup_init                             rank INT_MAX
+_telemetry_init                                 rank INT_MAX
+_vm_pageout_create_gc_thread                    rank INT_MAX
+_kmem_crypto_init                               rank INT_MAX
+_exe_boothash_salt_generate                     rank INT_MAX
+_lockdown_mode_init                             rank UINT_MAX
+```
+
+逐条打印的格式是 `"%s[%d, rank %d]: %p(%p)\n"`，而且只在
+`(startup_debug & STARTUP_DEBUG_VERBOSE) && startup_phase >= 4` 时才打；
+`startup_debug` 默认 0，所以正常启动下这一行也不出现。v49 同时打开了
+`startup_debug` 和 console，屏幕上就会依次显示这些行。
 
 ## 下一步
 
-1. **把 console 接到 boot_args 的 GOP 描述上。** 在 `PE_create_console`
-   里，iBoot 交接区读取失败时改用 `boot_args->Video[0..5]`
-   （base/row/width/height/depth，阶段 2.4 已由 DarwinBoot 打印并验证），
-   让 `kprintf` 能上屏。这一步之后所有后续检查点都能直接读屏幕，不必
-   每个都做一次复位探针。
-2. **解析 `kernel_startup_initialize_upto` 的 stage 表**，找出第 16 号
-   里程碑里第一个没有返回的条目，用 `--reset-va` 在条目调用点二分。
-3. 继续推进到 `_bsd_init`，再观察根文件系统挂载；本设备没有 UFS/APFS
-   驱动，预期在那里出现 "no root device" 一类的 panic —— 那是阶段 2.5
-   的终点与阶段 3 的起点。
+1. **先让所有者引导 v50。**
+   `fastboot boot out/phase2.4/v50/elden-phase2.4-probe-boot.img`，菜单里选
+   xnu（标题 `ELDEN 2.5 CONSOLE`）。它带
+   `security-mode-change-enable=1 amfi_get_out_of_my_way=1`，预期不再在
+   AMFI 处 panic，而是继续走到根设备：屏幕上应出现
+   `Waiting on <dict … IOMedia … Apple_HFS …>` 的轮询，最后要么
+   "Still waiting for root device"、要么 `Failed to mount root device` 一类的
+   panic。**那正是阶段 2.5 的终点**：它证明 XNU 一直跑到用户态之前的最后一步，
+   剩下的只是缺 UFS/APFS 驱动（阶段 3 的工作）。
+2. **如果 AMFI 仍然 panic**，说明那个 boot-arg 不是它检查的名字：在
+   `out/phase2.5-boot.log` 的截屏里读它实际抱怨的字符串，或直接把
+   `amfi_get_out_of_my_way=1` 换成 AMFI 的其它开关；也可以 poke AMFI 的比较
+   指令（kext 在 `__PRELINK_TEXT` 内，`make_entry_probe_kernel.py --poke`
+   已经能写任意可执行地址）。
+3. **把这次设备证据写进本节与 `porting.toml`**：v49 已证明 console、越过
+   stage 16、进入 BSD；v50 的屏幕最后一行就是阶段 2.5 的收尾证据。
 
 ## 复现
 
@@ -171,6 +289,26 @@ v45 冻结说明 `0x985d64` 的 `initialize_screen` 没有被执行到；v46 冻
 探针内核不是可启动系统：它跳过 Apple 平台初始化并主动复位，只用于
 定位检查点，不能作为阶段 2 的交付镜像。
 
+v49（console 试验，无复位，纯 `--poke`）只把第一步换成：
+
+```sh
+.venv/bin/python scripts/make_entry_probe_kernel.py \
+  --output-dir out/phase2.4/v49 \
+  --poke 0xfffffff0073bdf24=0x14000005 \
+  --poke 0xfffffff007941e0c=0x1400001d \
+  --poke 0xfffffff007941e90=0x52800041 \
+  --poke 0xfffffff0071fd970=0x00000000 \
+  --poke 0xfffffff0071fd978=0x073bb01c \
+  --poke 0xfffffff0071fd97c=0xfffffff0 \
+  --poke 0xfffffff0071652a4=0x00000001 \
+  --poke 0xfffffff007053aac=0x000d2970 \
+  --clang /opt/local/libexec/llvm-20/bin/clang
+```
+
+后面的 payload / 镜像 / 校验三步与上面完全相同，只是把 `v31` 换成 `v49`、
+把内核字节数与 SHA-256 换成新内核的值（54,050,920 /
+`8a57a771b987477135692dc6b7a0c25c2a94587b8e0200e3a5934f284483de08`）。
+
 ## 限制
 
 - 蓝带只能画在 MMU 打开之前：内核线性映射是
@@ -178,4 +316,13 @@ v45 冻结说明 `0x985d64` 的 `initialize_screen` 没有被执行到；v46 冻
   `0xFC800000` 相对窗口基址偏移 `0x43584000`，打开 MMU 后不在映射内。
 - 复位探针证明"到达"，不证明"该函数做了什么"；它会把设备从 RAM 引导
   中复位，必须由所有者手动执行 `fastboot boot`。
-- `serial=3` 没有对应串口硬件；在 console 补丁完成之前，内核日志不可见。
+- `serial=3` 没有对应串口硬件；内核日志只走 video console，靠的是
+  DarwinBoot 已经交给内核的 GOP 帧缓冲描述，不依赖任何串口。
+- v49/v50 的 console 是**靠 `--poke` 在镜像里打补丁**得到的：强制映射帧
+  缓冲、跳过 iBoot 交接区、把 console 模式改成 `kPETextMode`、并打开
+  `kprintf` 的两个闸门标志。这不是最终形态——正式修法应当是 DarwinBoot 在
+  `Video[0]` 里带上"这是物理地址"的 bit0 标记（或 UniXNU 在 port 侧写
+  `/chosen` 的描述），让 `initialize_screen` 自己建立映射；那需要重编固件，
+  留到阶段 3 之前处理。
+- panic 文本经过 `vcputc` 会重复渲染（屏幕上看得到叠字），拍照取证时以
+  内核字符串表交叉核对为准，不要逐字抄屏幕。
