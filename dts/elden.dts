@@ -19,3 +19,27 @@
 		reg = <0x0 0xc2400000 0x0 0x10000000>;
 	};
 };
+
+// UFS: the host controller and PHY are enabled here, but the supplies, reset
+// GPIO and clock resources stay in comments until their provider nodes (PMIC
+// regulators, TLMM, GCC, RPMh, TCSR, SMMU, ICE) exist in this source. The
+// Linux reference for this exact device is
+// arch/arm64/boot/dts/qcom/sm8750-lenovo-elden.dts (kernel repo pinned at
+// bf96c3d4048973298ede78487177c6f1b4f6bc0f, nodes at lines 2389-2404):
+//
+//   &ufs_mem_phy { vdda-phy-supply = <&vreg_l1j_0p91>;
+//                  vdda-pll-supply = <&vreg_l3g_1p2>; };
+//   &ufs_mem_hc  { reset-gpios = <&tlmm 215 GPIO_ACTIVE_LOW>;
+//                  vcc-supply = <&vreg_l17b_2p5>; vcc-max-microamp = <1300000>;
+//                  vccq-supply = <&vreg_l1d_1p2>; vccq-max-microamp = <1200000>; };
+//
+// The phase 3 read-only probe deliberately depends on none of that: it uses
+// the phase 2.5 RAM-boot path and assumes ABL already left the controller and
+// PHY running when it loaded this image.
+&ufs_mem_hc {
+	status = "okay";
+};
+
+&ufs_mem_phy {
+	status = "okay";
+};

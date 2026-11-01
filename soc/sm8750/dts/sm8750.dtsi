@@ -85,4 +85,32 @@
 		redistributor-stride = <0x0 0x40000>;
 		unixnu,adt-name = "intc";
 	};
+
+	// UFS host controller and QMP PHY. Values come from the public SM8750
+	// Linux tree; the board DTS enables them.
+	//
+	// These nodes describe the hardware for the ADT and for review, not the
+	// complete driver contract: the current ShengUfs/NativeUfs driver uses
+	// fixed SM8750 constants (host 0x1d84000, GCC 0x100000, SMMU 0x15000000,
+	// stream 0x60) rather than reading them from the device tree. Clocks,
+	// resets, power domains, SMMU stream and ICE are therefore not listed as
+	// properties yet - they would reference providers this source does not
+	// describe, and the ADT generator drops reference properties whose target
+	// node is missing. docs/PHASE3-STORAGE.md records the full inventory.
+	ufs_mem_hc: ufs@1d84000 {
+		compatible = "qcom,sm8750-ufshc", "qcom,ufshc", "jedec,ufs-2.0";
+		reg = <0x0 0x1d84000 0x0 0x3000>;
+		interrupt-parent = <&intc>;
+		interrupts = <0 265 4>;
+		dma-coherent;
+		unixnu,adt-name = "ufshc";
+		status = "disabled";
+	};
+
+	ufs_mem_phy: phy@1d80000 {
+		compatible = "qcom,sm8750-qmp-ufs-phy";
+		reg = <0x0 0x1d80000 0x0 0x2000>;
+		unixnu,adt-name = "ufsphy";
+		status = "disabled";
+	};
 };
