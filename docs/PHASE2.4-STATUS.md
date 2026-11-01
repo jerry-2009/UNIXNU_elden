@@ -4,8 +4,9 @@
 
 状态：**阶段 2.4 已在设备上通过两次 RAM 冷启动验证。DarwinBoot 接受阶段
 2.3 的内核与 ADT，打印 ARM64/视频/退出 boot services 三行后交出控制权并
-画出绿色面包屑；同一镜像第二次冷启动复现同一画面。阶段 2.5 的入口探针镜像
-已在主机侧生成并校验，等待设备所有者 RAM 启动。**
+画出绿色面包屑；同一镜像第二次冷启动复现同一画面。阶段 2.5 的入口探针与
+后续检查点见 [阶段 2.5 状态](PHASE2.5-STATUS.md)：XNU 入口执行已确认，
+内核现停在 `kernel_bootstrap_thread` 内部。**
 
 本阶段不改变 `board.stage = 1` 或 `kernel.status = "phase-2-pending"`：XNU
 入口、平台专家和 boot CPU 仍未取得设备证据。阶段 1 基线与 `out/phase2.3/`

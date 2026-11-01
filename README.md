@@ -9,9 +9,11 @@ FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2
 （格式 2 配置、live FDT/ADT、57 项补丁的 4 KiB XNU 与预链接内核）已完成并
 审计。阶段 2.3 的 56 MiB FAT16 embed-payload 通道与阶段 2.4 的 DarwinBoot
 交接都已在设备上完成两次 RAM 冷启动：EL1、256 MiB 窗口、退出 boot services
-和绿色面包屑已确认，交接后尚无内核输出。阶段 2.5 的 XNU 入口探针镜像
-`out/phase2.4/elden-phase2.4-probe-boot.img` 已生成并通过主机校验，等待设备
-启动；蓝条出现才算入口执行。**
+和绿色面包屑已确认。阶段 2.5 用入口蓝带和 PSCI 复位探针把内核推进到
+`kernel_bootstrap_thread` 内部：XNU 入口执行已确认，并定位到两个平台依赖
+——`PE_create_console` 读取 iBoot video console 交接区 `0x3C0F0000` 触发外部
+异常，以及第 16 号 `kernel_startup_initialize_upto` 里程碑没有返回。下一步是
+把 console 接到 `boot_args` 的 GOP 描述上，让内核日志能上屏。**
 
 ## 仓库结构
 
@@ -45,6 +47,7 @@ FAT 载荷已使用同一镜像完成两次实机 RAM 冷启动验收。阶段 2
 - [阶段 2.2：可追溯的最小 XNU](docs/PHASE2.2-STATUS.md)
 - [阶段 2.3：大载荷 RAM 通道（主机侧）](docs/PHASE2.3-STATUS.md)
 - [阶段 2.4：DarwinBoot 交接与内核入口探针](docs/PHASE2.4-STATUS.md)
+- [阶段 2.5：XNU 入口检查点与平台依赖](docs/PHASE2.5-STATUS.md)
 - [完整移植分析](docs/porting-analysis.md)
 - [格式 2 迁移记录](docs/FORMAT2-MIGRATION.md)
 - [第三方源码版本](docs/third-party.md)
@@ -155,6 +158,29 @@ python3 scripts/darwinboot_preflight.py   --kernel out/phase2.4/probe/kernel.mac
 
 产物、判读表和设备步骤见[阶段 2.4 状态](docs/PHASE2.4-STATUS.md)。
 
+## 阶段 2.5 检查点探针
+
+MMU 打开后帧缓冲不再映射，屏幕不能继续当输出。阶段 2.5 改用"复位即检查点"：
+`scripts/make_entry_probe_kernel.py` 把目标函数入口或任意指令地址原地替换成
+`等 2 秒 → PSCI SYSTEM_RESET` 的 stub；设备在绿条后约 2 秒自行重启说明内核
+到达该检查点，一直冻结说明没到。`--ret-at` 可把已知的 Apple 平台依赖（如
+iBoot console）直接改成 `ret` 跳过。
+
+```sh
+# 示例：跳过 PE_create_console，复位放在 _machine_startup
+.venv/bin/python scripts/make_entry_probe_kernel.py \
+  --output-dir out/phase2.4/v31 \
+  --reset-at _machine_startup \
+  --ret-at 0xfffffff007941dec \
+  --clang /opt/local/libexec/llvm-20/bin/clang
+# 再用 make_phase2_payload.py / build_phase2_image.py / verify_phase2_artifact.py
+# 生成镜像，参数与阶段 2.4 相同，只替换 --kernel 和额外字节数/SHA 断言。
+```
+
+检查点清单、每个镜像的 SHA-256 与反汇编依据见
+[阶段 2.5 状态](docs/PHASE2.5-STATUS.md)。探针内核不是可启动系统，只用于
+定位；跳过 Apple 平台初始化的镜像不能作为阶段 2 的交付产物。
+
 ## 设备支持
 
 | 功能 | 状态 | 说明 |
@@ -167,7 +193,8 @@ python3 scripts/darwinboot_preflight.py   --kernel out/phase2.4/probe/kernel.mac
 | DarwinBoot 交接 | ✅ | 2.4：两次冷启动到 EL1、256 MiB 窗口与退出 boot services |
 | XNU 输入 | ✅ | 4 KiB 原生内核、预链接 kernelcache 与 ADT 主机审计通过 |
 | DTB / ADT | ⚠️ | live FDT 与 ADT 主机审计通过；XNU 启动尚未验证 |
-| XNU 入口 / 平台专家 | ⏳ | 入口探针镜像主机校验通过；等待设备两次 RAM 冷启动 |
+| XNU 入口 | ✅ | 入口蓝带（中线整宽）与 2 秒 PSCI 复位两次成立 |
+| 平台专家 / boot CPU | ⏳ | 内核停在 `kernel_bootstrap_thread` 第 16 号启动里程碑 |
 | UFS 根卷 / iPadOS 用户态 | ❌ | 后续阶段 |
 | 触摸 | ❌ | 后续阶段 |
 
@@ -182,13 +209,11 @@ python3 scripts/darwinboot_preflight.py   --kernel out/phase2.4/probe/kernel.mac
 [阶段 2.2 状态](docs/PHASE2.2-STATUS.md)。历史验收镜像的原始字节
 未保留；当前 `out/elden-phase1.img` 已由设备所有者完成两次 RAM 冷启动复核，
 成为现行阶段 1 基线。
-阶段 2.3 的嵌入载荷通道与阶段 2.4 的 DarwinBoot 交接都已取得两次设备证据。
-下一步是阶段 2.5 的入口探针：所有者 RAM 启动
-`out/phase2.4/elden-phase2.4-probe-boot.img`
-（`a4ad1fc74abef35da9f947c350ff5763f2b8dea61da5adeee72aefcd0a67abf7`），
-在菜单选择 `xnu`。**蓝条出现才算 XNU 入口执行**；绿条只证明 `Entry.S` 面包屑。
-同一镜像两次结果一致后，再按 `arm_init` → `ArmDTPlatform` → `cpu_init` 逐级
-加探针。
+阶段 2.3 的嵌入载荷通道、阶段 2.4 的 DarwinBoot 交接与阶段 2.5 的入口检查点
+都已取得设备证据。当前结论：入口执行、`arm_init` 全程与线程启动都已确认；
+内核死在 `kernel_bootstrap_thread` 第 16 号 `kernel_startup_initialize_upto`
+里程碑内部。下一步先做 console 补丁（iBoot 交接区缺失时改用 `boot_args`
+的 `Video[0..5]`），让内核日志能上屏，再继续二分该里程碑直到 `_bsd_init`。
 DarwinBoot 的输入校验日志不计为 XNU 验收。
 
 ## 迁移边界
