@@ -1,0 +1,27 @@
+# Elden SM8750 UFS read-only probe configuration.
+#
+# Same minimal platform surface as elden_defconfig, plus the ShengUfs archive.
+# The archive is produced by scripts/build-sheng-ufs-probe.py, which checks out
+# the catalog-pinned ShengUfs revision, applies
+# scripts/driver-patches/sheng-ufs-sm8750.patch and builds probe mode only: nothing
+# publishes a block device and nothing imports IOBlockStorageDevice.
+#
+# The kernel step runs one record-only pass, then the archives listed in
+# board.toml [kernel].archives (including build-sheng-ufs-probe.py), then the
+# real link.
+
+CONFIG_XNU_BUILD_ARCHIVES=y
+CONFIG_XNU_SOURCE_CORECRYPTO14=y
+CONFIG_XNU_ARM_DT_PLATFORM=y
+CONFIG_XNU_ARMCPU=y
+CONFIG_XNU_NATIVE_ARCH_TIMER=y
+CONFIG_XNU_NATIVE_PAN=y
+CONFIG_XNU_NATIVE_CS_HASH_CACHE=y
+CONFIG_XNU_TRUST_CACHE_RUNTIME=y
+CONFIG_XNU_BOOT_PROGRESS=n
+
+CONFIG_XNU_NATIVE_UFS=y
+CONFIG_XNU_NATIVE_MOBILE_DISPLAY=n
+CONFIG_XNU_NATIVE_ADRENO=n
+CONFIG_XNU_ARMVIRT_PLATFORM=n
+CONFIG_XNU_EXTRA_LD_ARCHIVES=""

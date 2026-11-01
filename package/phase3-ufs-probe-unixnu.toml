@@ -1,0 +1,38 @@
+version = 1
+
+[boot]
+timeout = -1
+default = "reset"
+
+[kits]
+autoload = false
+
+[ui]
+scale = 4
+
+# Phase 3 UFS probe payload. Same menu as the phase 2.5 payload; the xnu entry
+# adds the ShengUfs probe arguments.
+#
+#   native-ufs-probe=2          read GCC/UFS registers only (no bring-up writes)
+#   native-ufs-diagnostics=1    record the failure reason if the probe bails out
+#
+# The kernel in this payload is built with NATIVE_UFS_PROBE_ONLY: root
+# publication, block publication and IOBlockStorageDevice are not linked.
+[[entry]]
+id = "xnu"
+title = "ELDEN 3 UFS PROBE"
+type = "xnu"
+path = "Payloads/kernel.macho"
+args = "-v serial=3 debug=0x14e armcpu-diagnostics=1 -no_slto_panic security-mode-change-enable=1 amfi_get_out_of_my_way=1 native-ufs-probe=2 native-ufs-diagnostics=1"
+
+[[entry]]
+id = "reset"
+title = "Restart"
+type = "action"
+action = "reset"
+
+[[entry]]
+id = "shutdown"
+title = "Power off"
+type = "action"
+action = "shutdown"

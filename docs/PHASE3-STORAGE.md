@@ -119,19 +119,68 @@ nub、由 `IOPlatformExpert::getNubResources` 用 `ranges` 换算，不整体映
   `arm-io/ufshc` 的 `reg = 0xd84000/+0x3000`、`arm-io/ufsphy` 的
   `reg = 0xd80000/+0x2000`、`interrupts = (0, 265, 4)`；`porting-record.py check`。
 
-### Stage 2（主机，构建面 spike）
+### Stage 2（主机，构建面 spike）—— 代码就位，主机工具链未通
 
-- `configs/elden-ufs_probe_defconfig`：在 `elden_defconfig` 之上加
-  `CONFIG_XNU_BUILD_ARCHIVES=y`、`CONFIG_XNU_NATIVE_UFS=y`、`CONFIG_XNU_SOURCE_PTHREAD=y`、
-  `CONFIG_XNU_DT_PANIC_REGION=y`、`CONFIG_XNU_CRYPTO_BOOTSTRAP="prelinked"`、
-  `CONFIG_XNU_NATIVE_CS_HASH_CACHE=y`、`CONFIG_XNU_TRUST_CACHE_RUNTIME=y`；
-  不开 `SHENG_PMGR` 与 `OWNER_ROOT_*`。
-- `package/phase3-ufs-probe-unixnu.toml`：`args` 含
-  `-v serial=0 debug=0x14e -no_slto_panic native-ufs-probe=<N> native-ufs-diagnostics=1`，
-  不含 `native-ufs-root=1`/`sheng-pmgr=2`。
-- 引入组件来源与 SM8750 补丁，`[kernel] archives` 只加探针所需构建器。
-- 验证：内核编出且 `llvm-nm` 有 `NativeUfs` 符号；`verify_phase2_artifact.py`
-  （`--xnu-title`）与 `darwinboot_preflight.py` 通过。
+代码已全部落库，但**尚未编出内核**：本机只装了 Command Line Tools，没有
+Xcode/iPhoneOS SDK，XNU 内核链接所需的 `mig`/`iig`/`xcrun` 查询在 2026-11-01 这轮
+调试里只推进到 XNU 编译阶段（`bsd/`、`security/`、`iokit/` 已能编译），随后卡在
+汇编命令与 `sysproto.h` 生成，属于主机工具链缺口，不是仓库问题。
+
+- `scripts/driver-patches/sheng-ufs-sm8750.patch`（37,397 B）：把 13T/hummer 的
+  `patches/native-ufs-sm8750.patch` 收敛到 ShengUfs 的 8 个非测试文件
+  （`GccUfs.h`、`LunDiscovery.h`、`NativeUfs.cpp`、`RootCommands.h`、
+  `RootDiagnostics.h`、`RootLayout.h`、`RootQueue.h`、`SmmuTakeover.h`），
+  丢掉 `tests/*` 的 8 个 hunk（对 catalog pin `e2b32cc4` 已不再适用）。
+  对 `e2b32cc429e8cf1501161c1d8c517f8994ceb9b2` 做 `git apply --check` 通过。
+  放在 `scripts/` 而不是 `patches/`：`scripts/unixnu/tree.py:88-90` 会把设备
+  `scripts/` 整棵树复制进引擎树，构建器才能从 `ROOT/scripts/driver-patches/` 取到它；
+  `tree/package` 是指向引擎 `package` 的符号链接，不能用来回指设备仓库。
+- `scripts/build-sheng-ufs-probe.py`：按 catalog 取 ShengUfs 的 `repository`/`revision`，
+  checkout 到 `build/sheng-ufs/src`，幂等打补丁，读
+  `build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json`
+  重放编译命令（换 `record['file']`、去掉 `-W` 旗标、加
+  `-I .cache/xnu-work/osfmk`、`-I src`、
+  `-DNATIVE_UFS_SM8750=1 -DNATIVE_UFS_READ_ONLY=1 -DNATIVE_UFS_PROBE_ONLY=1`），
+  校验 Mach-O 魔数 `0xfeedfacf/0x100000c/0/1`、拒绝 `IOBlockStorageDevice` 导入，
+  产出 `build/sheng-ufs/libShengUfs.a`。
+- `configs/elden-ufs_probe_defconfig`：`CONFIG_XNU_BUILD_ARCHIVES=y`、
+  `CONFIG_XNU_NATIVE_UFS=y`、SOURCE_CORECRYPTO14、ARM_DT_PLATFORM、ARMCPU、
+  NATIVE_ARCH_TIMER、NATIVE_PAN、NATIVE_CS_HASH_CACHE、TRUST_CACHE_RUNTIME；
+  不开 `SHENG_PMGR` 与 `OWNER_ROOT_*`，`CONFIG_XNU_EXTRA_LD_ARCHIVES=""`。
+- `board.toml [kernel].archives`：arm64 档案列表的完整替换（只有开 BUILD_ARCHIVES 时生效），
+  末项是 `build-sheng-ufs-probe.py`。`build-xnu-4k-baseline.sh:614-619` 在
+  `XNU_NATIVE_UFS=1` 时强制链接 `build/sheng-ufs/libShengUfs.a`，档案不需要另配。
+- `package/phase3-ufs-probe-unixnu.toml`：phase 2.5 payload 的副本，标题
+  `ELDEN 3 UFS PROBE`，args 含 `-v serial=3 debug=0x14e armcpu-diagnostics=1
+  -no_slto_panic security-mode-change-enable=1 amfi_get_out_of_my_way=1
+  native-ufs-probe=2 native-ufs-diagnostics=1`，不含 `native-ufs-root=1`/`sheng-pmgr=2`。
+- 工作目录按 defconfig 命名：`…/elden-ufs_probe/`（phase 2.5 的 `…/elden/` 不动）。
+
+#### 主机工具链（唯一阻塞项）
+
+阶段 2.2 在同一台只有 CLT 的机器上留下了 shim，位置
+`.cache/phase2-plan/toolchain/`：`bin/xcrun`（把任何 `-sdk` 映射到 macOS SDK，但
+`--show-sdk-platform-path` 返回 `xcode-iphone/Platforms/iPhoneOS.platform`，于是
+`PLATFORM=iPhoneOS`、`MACH_VM_MAX_ADDRESS` 取 iOS 值）、`bin/xcodebuild`、
+`iig`（源码构建的真二进制）、`xcode-iphone/`（合成 Xcode 树）。可用的环境是：
+
+```sh
+export PATH="$PWD/.cache/phase2-plan/toolchain/bin:$PWD/.venv/bin:$PATH"
+export CCC_OVERRIDE_OPTIONS="+-Wno-unknown-warning-option"
+.venv/bin/python .cache/phase2-plan/UniXNU/unixnu build kernel -D . -j 8
+```
+
+已踩过的坑（写在这里，避免下次重来）：新 lane 的 `tree/` 需要从 `…/elden/tree` 播种
+`.cache/fakeroot`（含 `.xnu-10063.141.1-headers`）、`build/xnu/ios-obj/EXPORT_HDRS`、
+`DEVELOPMENT_ARM64_BCM2837/link.filelist`（1006 行，`build-corecrypto-14.py` 缺它就拒绝）
+和 1011 个 `*.json` 编译记录（`build-mockfs-fixture.py` 要 `bsd/DEVELOPMENT/vfs_conf.o.json`）；
+`cmake`/`ninja` 装在 `.venv`（`pip install cmake ninja`）；`build-arm-driver.py` 自带
+`-Werror -Wno-unnecessary-virtual-specifier`，Apple clang 17 会把它当未知警告，
+靠 `CCC_OVERRIDE_OPTIONS` 压掉。仍余：汇编规则（`AS = $(CCACHE) $(CC)`）报
+`c: command not found`，以及 `EXPORT_HDRS/bsd/sys/sysproto.h` 被重生成成 44 行残片。
+
+**结论**：装完整 Xcode（iPhoneOS SDK）后这些 shim 全部不需要，构建与发布要求一致；
+在那之前不要把 CLT 产物当发布工具链（阶段 2.2 已立此规矩）。
 
 ### Stage 3（设备，所有者 RAM-boot 探针）
 

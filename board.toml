@@ -44,6 +44,21 @@ patch_series = [
   "device:patches/xnu/series",
   "os:patches/xnu/series",
 ]
+# Only consumed when a defconfig sets CONFIG_XNU_BUILD_ARCHIVES. The entries
+# mirror the arm64 arch profile and append the board UFS probe archive, which
+# has to be built here because the SM8750 substrate lives in a board patch
+# applied to the catalog-pinned ShengUfs source.
+archives = [
+  "build-corecrypto-14.py",
+  "build-corecrypto-14.py --namespace",
+  "component:ArmDTPlatform",
+  "component:ArmCpu",
+  "component:SoftwareAES",
+  "build-software-aes-bindings.py",
+  "build-mockfs-fixture.py",
+  "build-libpthread-kernel.py",
+  "build-sheng-ufs-probe.py",
+]
 status = "phase-2-pending"
 
 [device_tree]

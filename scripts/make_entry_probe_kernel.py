@@ -409,11 +409,11 @@ def patch_symbol_in_place(data: bytes, name: str, stub: bytes) -> tuple[bytes, d
     }
 
 
-def parse_poke(text: str) -> tuple[str | None, int | None, int]:
-    """Parse ``ADDRESS=WORD`` or ``SYMBOL=WORD`` for ``--poke``."""
+def parse_poke(text: str) -> tuple[str | None, int | None, int, int]:
+    """Parse ``ADDRESS=WORD``, ``SYMBOL=WORD`` or ``SYMBOL+OFFSET=WORD``."""
     target, _, value = text.partition("=")
     if not target or not value:
-        raise SystemExit(f"--poke expects ADDRESS=WORD or SYMBOL=WORD, got {text!r}")
+        raise SystemExit(f"--poke expects ADDRESS=WORD or SYMBOL[+OFFSET]=WORD, got {text!r}")
     try:
         word = int(value, 0)
     except ValueError:
@@ -421,9 +421,16 @@ def parse_poke(text: str) -> tuple[str | None, int | None, int]:
     if not 0 <= word <= 0xFFFFFFFF:
         raise SystemExit(f"--poke value {value!r} does not fit in 32 bits")
     try:
-        return None, int(target, 0), word
+        return None, int(target, 0), 0, word
     except ValueError:
-        return target, None, word
+        pass
+    symbol, separator, offset = target.partition("+")
+    if separator:
+        try:
+            return symbol, None, int(offset, 0), word
+        except ValueError:
+            raise SystemExit(f"--poke offset {offset!r} is not a number") from None
+    return target, None, 0, word
 
 
 def main() -> None:
@@ -498,14 +505,16 @@ def main() -> None:
     for address in args.ret_at:
         probed, ret_facts = patch_word_at(probed, int(address, 0), 0xD65F03C0)
         facts.setdefault("ret", []).append(ret_facts)
-    for text, symbol, address, word in pokes:
+    for text, symbol, address, offset, word in pokes:
         key = None
         if symbol is not None:
             key, address = symbol_address(probed, symbol)
+            address += offset
         probed, poke_facts = patch_word_at(probed, address, word, executable=False)
         poke_facts["request"] = text
         if key is not None:
             poke_facts["symbol"] = key
+            poke_facts["symbol_offset"] = offset
         facts.setdefault("poke", []).append(poke_facts)
 
     check = parse_kernel(probed)
