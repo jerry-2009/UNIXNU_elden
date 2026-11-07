@@ -17,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MU = ROOT / "third_party" / "mu_wide_platforms"
-SOURCE = MU / "BootShim" / "BootShim.S"
+SOURCE = ROOT / "patches/overlays/mu_wide_platforms/BootShim/BootShim.S"
 OUTPUT = MU / "BootShim" / "BootShim.bin"
 UEFI_BASE = 0xFF300000
 UEFI_SIZE = 0x00400000
@@ -63,6 +63,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--clang", default="clang")
+    parser.add_argument("--entry-fdt-mailbox", action="store_true",
+                        help="record ABL x0 at RAM FAT byte 0x1d0; requires reserved ELDFDT01 slot")
     parser.add_argument(
         "--payload-bytes", type=int, default=0,
         help="embedded FAT payload appended after the firmware volume",
@@ -70,6 +72,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.payload_bytes < 0:
         parser.error("--payload-bytes must not be negative")
+    if args.entry_fdt_mailbox and args.payload_bytes < 512:
+        parser.error("--entry-fdt-mailbox needs an embedded FAT payload")
 
     with tempfile.TemporaryDirectory(prefix="elden-shim-") as temp:
         obj = Path(temp) / "BootShim.elf"
@@ -86,13 +90,15 @@ def main() -> None:
             ] + (
                 [f"-DEMBEDDED_PAYLOAD_SIZE={args.payload_bytes}"]
                 if args.payload_bytes else []
-            ),
+            ) + (["-DENTRY_FDT_MAILBOX_OFFSET=0x1d0"] if args.entry_fdt_mailbox else []),
             check=True,
         )
         image = extract_alloc_sections(obj.read_bytes())
 
     if image[0x38:0x3C] != b"ARM\x64":
         raise ValueError("BootShim image header magic is missing")
+    if args.entry_fdt_mailbox and len(image) != 128:
+        raise ValueError("FDT mailbox shim must retain the accepted 128-byte layout")
     if struct.unpack_from("<Q", image, 0x08)[0] != UEFI_BASE:
         raise ValueError("BootShim firmware base does not match the SM8750 config")
     expected_size = UEFI_SIZE + args.payload_bytes

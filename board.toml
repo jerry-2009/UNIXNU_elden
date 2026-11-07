@@ -30,6 +30,9 @@ gic_redistributors = "0x16080000"
 gic_redistributor_stride = "0x40000"
 ufs_host = "0x1d84000"
 ufs_phy = "0x1d80000"
+usb_debug_controller = "0x0a600000"
+usb_debug_sid = "0x40"
+usb_debug_resources = "soc/sm8750/include/EldenUsbResources.h"
 
 [kernel]
 defconfig = "elden_defconfig"
@@ -43,6 +46,7 @@ patch_series = [
   "soc:patches/xnu/series",
   "device:patches/xnu/series",
   "os:patches/xnu/series",
+  "device:patches/xnu/console-series",
 ]
 # Only consumed when a defconfig sets CONFIG_XNU_BUILD_ARCHIVES. The entries
 # mirror the arm64 arch profile and append the board UFS probe archive, which
@@ -55,7 +59,7 @@ archives = [
   "component:ArmCpu",
   "component:SoftwareAES",
   "build-software-aes-bindings.py",
-  "build-mockfs-fixture.py",
+  "build-elden-mockfs-fixture.py",
   "build-libpthread-kernel.py",
   "build-sheng-ufs-probe.py",
 ]

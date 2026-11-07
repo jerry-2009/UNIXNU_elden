@@ -49,6 +49,45 @@ def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def verify_embedded_shim(shim: bytes, payload_bytes: int) -> None:
+    """Check both advertised size and the size actually handed to PrePi in x3.
+
+    Editing only the ARM64 header leaves the old compiled x3 constant intact.
+    Accept the two encodings clang emits for `ldr x3, =constant`; reject an
+    unfamiliar stub instead of guessing that its handoff is safe.
+    """
+    if len(shim) < 64 or shim[56:60] != b"ARM\x64":
+        raise SystemExit("BootShim ARM64 header is missing")
+    if struct.unpack_from("<Q", shim, 16)[0] != FD_SIZE + payload_bytes:
+        raise SystemExit("BootShim header size does not cover FD + payload")
+    # add x2, x1, #0x400, lsl #12: payload base follows the 4 MiB FD.
+    candidates = [offset for offset in range(64, len(shim) - 8, 4)
+                  if struct.unpack_from("<I", shim, offset)[0] == 0x91500022]
+    if len(candidates) != 1:
+        raise SystemExit("BootShim embedded payload-base instruction is missing/ambiguous")
+    offset = candidates[0] + 4
+    instruction = struct.unpack_from("<I", shim, offset)[0]
+    if instruction & 0xFF00001F == 0x58000003:  # ldr x3, literal
+        delta = (instruction >> 5) & 0x7FFFF
+        if delta & 0x40000:
+            delta -= 0x80000
+        literal = offset + delta * 4
+        if literal < 0 or literal + 8 > len(shim):
+            raise SystemExit("BootShim x3 literal is outside the shim")
+        actual = struct.unpack_from("<Q", shim, literal)[0]
+    elif instruction & 0xFF80001F == 0xD2800003:  # movz x3, imm16, lsl hw
+        actual = ((instruction >> 5) & 0xFFFF) << (((instruction >> 21) & 3) * 16)
+    else:
+        raise SystemExit("unrecognised BootShim x3 handoff; audit the new assembly")
+    branch = offset + 4
+    if struct.unpack_from("<I", shim, branch)[0] == 0xF900E840:  # str x0, [x2, #0x1d0]
+        branch += 4
+    if struct.unpack_from("<I", shim, branch)[0] != 0xD61F00A0:  # br x5
+        raise SystemExit("BootShim does not branch to firmware after loading x3")
+    if actual != payload_bytes:
+        raise SystemExit(f"BootShim passes x3={actual:#x}, payload is {payload_bytes:#x}")
+
+
 def decompress_fvmain(fd: bytes) -> bytes:
     fvmain_offset = fd.find(FVMAIN_FILE_GUID.bytes_le)
     if fvmain_offset < 0:
@@ -160,6 +199,11 @@ def verify_fat_type(volume: bytes) -> tuple[str, str]:
         raise SystemExit("FAT boot sector (BPB) is incomplete")
     if not total_sectors or not fat_sectors:
         raise SystemExit("FAT boot sector (BPB) has no geometry")
+    if (sector_size not in (512, 1024, 2048, 4096)
+            or sectors_per_cluster & (sectors_per_cluster - 1)):
+        raise SystemExit("FAT sector/cluster geometry is invalid")
+    if total_sectors * sector_size > len(volume):
+        raise SystemExit("FAT BPB extends past the published payload")
     label = volume[43:54].decode("ascii", "replace").strip() if fat_sectors16 else ""
     if fat_sectors16:
         if root_entries == 0:
@@ -194,6 +238,8 @@ def verify_ramdisk(
     expect_kernel_bytes: int = KERNEL_MACHO_BYTES,
     expect_kernel_sha256: str = KERNEL_MACHO_SHA256,
     xnu_title: str = "ELDEN 2.3 INITRD 56M",
+    expect_timeout: int = -1,
+    expect_default: str = "reset",
 ) -> str:
     fat_name, volume_label = verify_fat_type(ramdisk)
     expected_label = "ELDENPROBE" if kind == "probe" else "ELDENRAM"
@@ -209,10 +255,15 @@ def verify_ramdisk(
             "::/EFI/UniXNU/unixnu.toml", str(config),
         )
         text = config.read_text()
-        if "timeout = -1" not in text:
-            raise SystemExit("unixnu.toml does not wait for input (timeout = -1)")
-        if 'default = "reset"' not in text:
-            raise SystemExit('unixnu.toml default is not reset')
+        import tomllib
+        parsed = tomllib.loads(text)
+        boot = parsed.get('boot', {})
+        if type(boot.get('timeout')) is not int or boot['timeout'] != expect_timeout:
+            raise SystemExit(f'unixnu.toml timeout differs from explicitly expected {expect_timeout}')
+        if boot.get('default') != expect_default:
+            raise SystemExit(f'unixnu.toml default differs from explicitly expected {expect_default}')
+        if sum(entry.get('id') == expect_default for entry in parsed.get('entry', [])) != 1:
+            raise SystemExit('default menu entry is missing or ambiguous')
         scale = [line for line in text.splitlines() if line.strip().startswith("scale")]
         if not scale:
             raise SystemExit("unixnu.toml does not pin the menu scale ([ui] scale)")
@@ -263,7 +314,12 @@ def main() -> None:
         default="ELDEN 2.3 INITRD 56M",
         help="xnu entry title the payload configuration must carry",
     )
+    parser.add_argument('--expect-timeout', type=int, default=-1,
+                        help='exact expected menu countdown; default keeps the original manual gate')
+    parser.add_argument('--expect-default', default='reset', help='exact expected default entry ID')
     args = parser.parse_args()
+    if args.expect_timeout != -1 and not 1 <= args.expect_timeout <= 3600:
+        raise SystemExit('expected timeout must be -1 or 1..3600 seconds')
 
     image = args.image.read_bytes()
     fd = args.fd.read_bytes()
@@ -292,12 +348,7 @@ def main() -> None:
         if args.payload is None:
             raise SystemExit("--embed-payload requires --payload")
         payload = args.payload.read_bytes()
-        header_image_size, = struct.unpack_from("<Q", shim, 0x10)
-        if header_image_size != FD_SIZE + len(payload):
-            raise SystemExit(
-                f"BootShim header image size {header_image_size:#x} "
-                f"does not cover FD + payload ({FD_SIZE + len(payload):#x})"
-            )
+        verify_embedded_shim(shim, len(payload))
         if unpacked[len(shim) :] != fd + payload:
             raise SystemExit("kernel payload is not shim + FD + embedded FAT image")
         ramdisk = payload
@@ -315,6 +366,7 @@ def main() -> None:
     fat_name = verify_ramdisk(
         ramdisk, args.kind, args.expect_kernel_bytes, args.expect_kernel_sha256,
         args.xnu_title,
+        args.expect_timeout, args.expect_default,
     )
 
     entry = {

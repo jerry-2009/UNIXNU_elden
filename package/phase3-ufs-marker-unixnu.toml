@@ -1,0 +1,37 @@
+version = 1
+
+[boot]
+timeout = -1
+fallback_timeout = 600
+default = "reset"
+
+[kits]
+autoload = false
+
+[ui]
+scale = 4
+
+[[entry]]
+id = "marker"
+title = "TOML-OK-MARKER"
+type = "action"
+action = "reset"
+
+[[entry]]
+id = "xnu"
+title = "ELDEN 3 UFS PROBE"
+type = "xnu"
+path = "Payloads/kernel.macho"
+args = "-v serial=3 debug=0x14e armcpu-diagnostics=1 -no_slto_panic security-mode-change-enable=1 amfi_get_out_of_my_way=1 native-ufs-probe=2 native-ufs-diagnostics=1"
+
+[[entry]]
+id = "reset"
+title = "Restart"
+type = "action"
+action = "reset"
+
+[[entry]]
+id = "shutdown"
+title = "Power off"
+type = "action"
+action = "shutdown"
