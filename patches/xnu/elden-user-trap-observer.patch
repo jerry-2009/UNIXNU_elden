@@ -1,0 +1,25 @@
+--- a/bsd/dev/arm/systemcalls.c
++++ b/bsd/dev/arm/systemcalls.c
+@@ -40,6 +40,10 @@
+ extern int32_t dtrace_systrace_syscall(struct proc *, void *, int *);
+ extern void dtrace_systrace_syscall_return(unsigned short, int, int *);
+ #endif  /* CONFIG_DTRACE */
++
++#if DEVELOPMENT || DEBUG
++extern void elden_note_user_trap(int) __attribute__((weak));
++#endif
+ 
+ extern void
+ unix_syscall(struct arm_saved_state * regs, thread_t thread_act, struct proc * proc);
+@@ -149,6 +153,11 @@
+ 	}
+ #endif
+ 	pid = proc_pid(proc);
++#if DEVELOPMENT || DEBUG
++	if (pid == 1 && is_saved_state64(state) && (saved_state64(state)->cpsr & 0xf) == 0 && elden_note_user_trap) {
++		elden_note_user_trap(pid);
++	}
++#endif
+ 
+ #ifdef CONFIG_IOCOUNT_TRACE
+ 	uthread->uu_iocount = 0;

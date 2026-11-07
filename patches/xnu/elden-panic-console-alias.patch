@@ -1,0 +1,16 @@
+--- a/osfmk/kern/printf.c
++++ b/osfmk/kern/printf.c
+@@ -923,3 +923,5 @@
+-	if (!console_is_serial() && !disable_serial_output) {
++	/* A redirected kprintf sink may be the console we just wrote. */
++	if (!console_is_serial() && !disable_serial_output &&
++	    PE_kputc != console_write_unbuffered) {
+ 		PE_kputc(c);
+ 	}
+@@ -935,3 +937,5 @@
+-	if (!console_is_serial() && !disable_serial_output) {
++	/* Preserve independent serial sinks without duplicating GOP output. */
++	if (!console_is_serial() && !disable_serial_output &&
++	    PE_kputc != console_write_unbuffered) {
+ 		PE_kputc(c);
+ 	}

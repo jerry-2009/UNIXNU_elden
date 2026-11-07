@@ -1,0 +1,46 @@
+--- a/osfmk/console/serial_console.c
++++ b/osfmk/console/serial_console.c
+@@ -249,6 +249,8 @@
+  * @param poll Whether or not this call should poll instead of going to sleep
+  *             waiting for an interrupt when the hardware device isn't ready
+  */
++extern void elden_usb_log_putc(char) __attribute__((weak));
++
+ static inline void
+ _cnputc(char c, bool poll)
+ {
+@@ -262,6 +264,7 @@
+ 		_cnputc('\r', poll);
+ 	}
+ 
++	if (elden_usb_log_putc) elden_usb_log_putc(c);
+ 	cons_ops[idx].putc(c, poll);
+ }
+ 
+--- a/osfmk/kern/printf.c
++++ b/osfmk/kern/printf.c
+@@ -913,6 +913,8 @@
+ 	return vprintf_internal(fmt, ap, __builtin_return_address(0));
+ }
+ 
++extern void elden_usb_panic_drain(void) __attribute__((weak));
++
+ void
+ consdebug_putc(char c)
+ {
+@@ -925,6 +927,7 @@
+ 	    PE_kputc != console_write_unbuffered) {
+ 		PE_kputc(c);
+ 	}
++	if (c == '\n' && elden_usb_panic_drain) elden_usb_panic_drain();
+ }
+ 
+ void
+@@ -939,6 +942,7 @@
+ 	    PE_kputc != console_write_unbuffered) {
+ 		PE_kputc(c);
+ 	}
++	if (c == '\n' && elden_usb_panic_drain) elden_usb_panic_drain();
+ }
+ 
+ void

@@ -1,0 +1,40 @@
+--- a/bsd/kern/kern_exec.c
++++ b/bsd/kern/kern_exec.c
+@@ -7174,6 +7174,7 @@
+ #endif
+ 	native_owner_cache_authorized = cache_authorized;
+ 	native_owner_cache_status = error;
++	printf("ELDEN_BOOT SystemOS stage=%d status=%d readonly=%d authorized=%d\n", native_owner_cache_stage, error, native_owner_cache_readonly, cache_authorized);
+ 	native_owner_cache_checkpoint(error, cache_authorized);
+ 	return error;
+ }
+@@ -7884,8 +7885,13 @@
+ done:
+ 	if (data_root) vnode_put(data_root);
+ 	native_owner_data_status = error;
++	printf("ELDEN_BOOT RAM Data stage=%d status=%d readonly=%d bytes=%llu\n", native_owner_data_stage, error, native_owner_data_readonly, (unsigned long long)native_owner_data_seed_size);
+ 	return error;
+ }
++#endif
++
++#if defined(XNU_OWNER_CACHE_STARTUP) && XNU_OWNER_CACHE_STARTUP
++volatile int elden_init_exec_accepted = 0;
+ #endif
+ 
+ static int
+@@ -7971,7 +7977,14 @@
+ 	 */
+ 	set_security_token(p, proc_ucred_unsafe(p));
+ 
+-	return execve(p, &init_exec_args, retval);
++	error = execve(p, &init_exec_args, retval);
++#if defined(XNU_OWNER_CACHE_STARTUP) && XNU_OWNER_CACHE_STARTUP
++	if (!error) {
++		elden_init_exec_accepted = 1;
++		printf("ELDEN_BOOT init exec accepted: %s\n", path);
++	}
++#endif
++	return error;
+ }
+ 
+ static const char * init_programs[] = {

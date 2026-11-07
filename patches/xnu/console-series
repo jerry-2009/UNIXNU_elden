@@ -1,0 +1,8 @@
+# Apply after the OS's boot-progress hooks have been assembled.
+elden-gop-console.patch
+pmap-cs-optional-trustcache.patch
+elden-panic-console-alias.patch
+elden-usb-console-hook.patch
+elden-owner-startup-log.patch
+elden-mdev-data-no-gpu-addon.patch
+elden-user-trap-observer.patch

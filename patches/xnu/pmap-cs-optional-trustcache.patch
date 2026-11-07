@@ -1,0 +1,14 @@
+--- a/osfmk/vm/pmap_cs.h
++++ b/osfmk/vm/pmap_cs.h
+@@ -60,7 +60,11 @@
+ #include <vm/pmap.h>
+ #include <kern/lock_rw.h>
+ #include <libkern/image4/dlxk.h>
++/* The non-PPL BCM2837 port does not use the private TrustCache monitor API.
++ * Preserve this dependency for all platforms that select that monitor. */
++#if PMAP_CS || CONFIG_SPTM || XNU_MONITOR
+ #include <TrustCache/API.h>
++#endif
+ 
+ 
+ #if PMAP_CS

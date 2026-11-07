@@ -60,12 +60,18 @@ _Entry:
 	/* x1 still holds the decompressed image base; the payload follows the FD. */
 	add		x2, x1, #UEFI_SIZE
 	ldr		x3, =EMBEDDED_PAYLOAD_SIZE
+#ifdef ENTRY_FDT_MAILBOX_OFFSET
+	/* Record the live ABL FDT in the reserved RAM FAT slot; no pointer read. */
+	str		x0, [x2, #ENTRY_FDT_MAILBOX_OFFSET]
+#endif
 #endif
 	br		x5
 
+#ifndef ENTRY_FDT_MAILBOX_OFFSET
 _Dead:
 	/* We should never get here */
 	b		_Dead
+#endif
 
 #ifdef EMBEDDED_PAYLOAD_SIZE
 .align 3
