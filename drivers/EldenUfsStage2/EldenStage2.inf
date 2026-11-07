@@ -1,0 +1,37 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenStage2
+  FILE_GUID = 13f4d83c-c8b7-4dc0-bdd7-fcaa708ce3a1
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+[Sources]
+  EldenStage2.c
+  EldenUfsHardware.c
+  EldenUfsHardware.h
+  EfiCompat.h
+  EldenRamVolume.c
+  Generated/EldenBundle.c
+  Generated/EldenUfsSession.c
+  Generated/storage_ufs.c
+  Generated/storage_block.c
+  Generated/EldenFdtHandoff.c
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DevicePathLib
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiDevicePathProtocolGuid
+[Guids]
+  gFdtTableGuid

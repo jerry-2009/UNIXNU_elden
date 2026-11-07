@@ -1,0 +1,29 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenBootMetadataTest
+  FILE_GUID = 7e5984c6-dadf-4232-996a-e677a2af8c99
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+[Sources]
+  EldenBootMetadataTest.c
+  EldenFdtHandoff.c
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DevicePathLib
+  FdtLib
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiLoadFile2ProtocolGuid
+[Guids]
+  gFdtTableGuid

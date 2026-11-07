@@ -1,0 +1,42 @@
+--- a/scripts/build-xnu-4k-baseline.sh
++++ b/scripts/build-xnu-4k-baseline.sh
+@@ -262,6 +262,21 @@
+ fi
+ EXTRA_MAKE_ARGS+=("ubc_subr.o_CFLAGS_ADD=-DXNU_NATIVE_CS_HASH_CACHE=$CS_HASH_CACHE_MODE")
+ EXTRA_CFLAGS=${XNU_EXTRA_CFLAGS:--Wno-reserved-identifier -Wno-pre-c11-compat -Wno-missing-designated-field-initializers -Wno-suggest-override -Wno-unnecessary-virtual-specifier -Wno-suggest-destructor-override -Wno-ms-bitfield-padding}
++# The elden path authenticates whole pinned images before publication and then
++# verifies every block against protected derived hashes. It uses UFS, not Virtio.
++ELDEN_PINNED_ROOT=${XNU_ELDEN_UFS_PINNED_ROOT:-0}
++if [ "$ELDEN_PINNED_ROOT" = 1 ]; then
++  if [ "${XNU_NATIVE_UFS:-0}" != 1 ] || [ "${XNU_SOURCE_CORECRYPTO14:-0}" != 1 ]; then
++    echo 'elden owner mode requires the real read-only UFS and source crypto build' >&2
++    exit 1
++  fi
++  ELDEN_EXPORTS="$(xcrun nm -g -U "$ROOT/build/sheng-ufs/libShengUfs.a")"
++  for REQUIRED in native_verified_block_volume_device native_verified_block_root_authorized native_verified_block_manifest_sha384; do
++    grep -q "_$REQUIRED$" <<< "$ELDEN_EXPORTS" || {
++      echo "missing actual elden owner bridge: $REQUIRED" >&2; exit 1;
++    }
++  done
++fi
+ OWNER_ROOT_PROBE=${XNU_VERIFIED_ROOT_PROBE:-0}
+ if [ "$OWNER_ROOT_PROBE" != 0 ] && [ "$OWNER_ROOT_PROBE" != 1 ]; then
+   echo 'XNU_VERIFIED_ROOT_PROBE must be 0 or 1' >&2
+@@ -276,7 +291,7 @@
+   echo 'XNU_OWNER_ROOT_AUDIT must be 0 or 1' >&2
+   exit 1
+ fi
+-if [ "$OWNER_ROOT_AUDIT" = 1 ] && [ "$OWNER_ROOT_PROBE" != 1 ]; then
++if [ "$OWNER_ROOT_AUDIT" = 1 ] && [ "$OWNER_ROOT_PROBE" != 1 ] && [ "$ELDEN_PINNED_ROOT" != 1 ]; then
+   echo 'The root-binding audit requires real owner-verified block crypto' >&2
+   exit 1
+ fi
+@@ -285,7 +300,7 @@
+   echo 'XNU_OWNER_ROOT_TRUST must be 0 or 1' >&2
+   exit 1
+ fi
+-if [ "$OWNER_ROOT_TRUST" = 1 ] && { [ "$OWNER_ROOT_AUDIT" != 1 ] || [ "${XNU_NATIVE_VIRTIO_BLOCK:-0}" != 1 ]; }; then
++if [ "$OWNER_ROOT_TRUST" = 1 ] && { [ "$OWNER_ROOT_AUDIT" != 1 ] || { [ "${XNU_NATIVE_VIRTIO_BLOCK:-0}" != 1 ] && [ "$ELDEN_PINNED_ROOT" != 1 ]; }; }; then
+   echo 'Owner root acceptance requires actual mounted-media binding and verified block storage' >&2
+   exit 1
+ fi

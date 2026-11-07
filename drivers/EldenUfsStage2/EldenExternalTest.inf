@@ -1,0 +1,32 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenExternalTest
+  FILE_GUID = aa59467a-dbed-418a-972d-5c19c4d210fa
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+[Sources]
+  EldenExternalTest.c
+  EfiCompat.h
+  EldenRamVolume.c
+  Generated/EldenBundle.c
+  Generated/storage_block.c
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DevicePathLib
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiDevicePathProtocolGuid
+[Guids]
+  gFdtTableGuid

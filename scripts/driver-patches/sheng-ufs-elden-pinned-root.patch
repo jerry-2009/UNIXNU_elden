@@ -1,0 +1,73 @@
+--- a/NativeUfs.cpp
++++ b/NativeUfs.cpp
+@@ -1383,6 +1383,8 @@
+   panic ("%s", gRootDiagnosticText);
+ }
+ 
++#include "EldenPinnedRootXnu.inc"
++
+ bool NativeUfsBlock::configure (const char *name, uint64_t absoluteOffset, uint64_t size)
+ {
+   if (!name || !ufsWindowGeometry (absoluteOffset, size)) {
+@@ -1573,6 +1575,8 @@
+     IOMemoryDescriptor *buffer;
+ #if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
+     const vr_view *view;
++#elif defined(ELDEN_PINNED_ROOT) && ELDEN_PINNED_ROOT
++    const EldenPinnedState *pin;
+ #endif
+     void lock () { IOLockLock (mutex); }
+     void unlock () { IOLockUnlock (mutex); }
+@@ -1595,6 +1599,11 @@
+       }
+       __atomic_fetch_add (&native_ufs_verified_blocks, 1, __ATOMIC_RELAXED);
+       if (boot_progress_poll) boot_progress_poll ();
++#elif defined(ELDEN_PINNED_ROOT) && ELDEN_PINNED_ROOT
++      if (!eldenPinnedRead(pin,index,data,length)) {
++        gRootDiagnostic.stage = "pinned block integrity";
++        return kIOReturnNotPrivileged;
++      }
+ #else
+       (void) index; (void) data; (void) length;
+ #endif
+@@ -1608,6 +1617,8 @@
+   } operations = { windowLock, buffer
+ #if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
+     , &verified
++#elif defined(ELDEN_PINNED_ROOT) && ELDEN_PINNED_ROOT
++    , eldenFindPinned(this)
+ #endif
+   };
+   UfsWindowResult outcome = ufsReadWindow (operations, absolute, bytes, block, count, bounce);
+@@ -1624,6 +1635,9 @@
+ 
+ void NativeUfsBlock::free ()
+ {
++#if defined(ELDEN_PINNED_ROOT) && ELDEN_PINNED_ROOT
++  eldenReleasePinned(this);
++#endif
+ #if defined(NATIVE_VERIFIED_BLOCK) && NATIVE_VERIFIED_BLOCK
+   if (verifiedStorage) {
+     kmem_free (kernel_map, verifiedStorage, verifiedStorageBytes);
+@@ -2054,6 +2068,15 @@
+         for (unsigned j = 0; j < i; ++j) if (!strcmp (gPendingUuid[i], gPendingUuid[j])) return false;
+       }
+       return true;
++#elif defined(ELDEN_PINNED_ROOT) && ELDEN_PINNED_ROOT
++      for (unsigned i = 0; i < gPending; ++i) {
++        gRootDiagnostic.publicationWindow = i;
++        uint64_t absolute = layout->userdataFirst * 4096ULL + layout->window[i].offset;
++        if (!eldenPinRootWindow(gPendingDevice[i],layout->window[i].name,
++                                absolute,layout->window[i].size,gPendingUuid[i])) return false;
++        for (unsigned j = 0; j < i; ++j) if (!strcmp(gPendingUuid[i],gPendingUuid[j])) return false;
++      }
++      return true;
+ #else
+       return false; // Root publication requires owner verification in every build.
+ #endif
+@@ -2098,3 +2121,5 @@
+   fMap.reset ();
+   IOService::stop (provider);
+ }
++
++#include "EldenPinnedRootBridge.inc"

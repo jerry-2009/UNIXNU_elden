@@ -1,0 +1,26 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenRecoveryTest
+  FILE_GUID = 51337ee8-4344-4024-91bb-bff8f5e30d3c
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+[Sources]
+  EldenRecoveryTest.c
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  BaseMemoryLib
+  BaseLib
+  DevicePathLib
+  MemoryAllocationLib
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiLoadFile2ProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+[Guids]
+  gFdtTableGuid

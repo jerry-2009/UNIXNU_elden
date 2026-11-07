@@ -1,0 +1,46 @@
+--- a/NativeUfs.cpp
++++ b/NativeUfs.cpp
+@@ -3,6 +3,7 @@
+ // native-ufs-probe=1 is present. This is a register probe, not a storage driver.
+ #include <IOKit/IOService.h>
+ #include "EldenUfsIdentity.h"
++#include <libkern/c++/OSSymbol.h>
+ static unsigned gRootLun = 0;
+ #include <IOKit/IOPlatformExpert.h>
+ #if !defined(NATIVE_UFS_PROBE_ONLY) || !NATIVE_UFS_PROBE_ONLY
+@@ -1324,6 +1325,24 @@
+ };
+ OSDefineMetaClassAndStructors (NativeUfsBlock, IOBlockStorageDevice)
+ 
++
++static_assert(sizeof(IOBlockStorageDevice) == 0x90, "original storage class ABI changed");
++static_assert(sizeof(IOService) == 0x88, "source IOService ABI changed");
++
++// Source constructors can hold the original metaclass address before its
++// owning kext has initialized it. Check actual runtime registration before
++// touching UFS or allocating a block-device instance.
++extern "C" __attribute__((noinline)) bool elden_ufs_storage_class_ready(void)
++{
++  const OSSymbol *name = OSSymbol::withCStringNoCopy("IOBlockStorageDevice");
++  if (!name) return false;
++  const OSMetaClass *registered = OSMetaClass::getMetaClassWithName(name);
++  name->release();
++  const OSMetaClass *parent = NativeUfsBlock::metaClass->getSuperClass();
++  return registered && registered == parent && parent->getClassSize() == 0x90 &&
++    parent->getSuperClass() == IOService::metaClass && IOService::metaClass->getClassSize() == 0x88;
++}
++
+ extern "C" {
+ volatile uint32_t native_ufs_blocks_published = 0;
+ volatile uint64_t native_ufs_block_reads = 0;
+@@ -1839,6 +1858,10 @@
+ #endif
+ #if defined(NATIVE_UFS_PROBE_ONLY) && NATIVE_UFS_PROBE_ONLY
+   if (rootMode || !probe || probe == 12) panic ("NATIVE_UFS: this image only probes storage; root publication is not built");
++#endif
++#if defined(ELDEN_INHERITED_UFS_DMA) && ELDEN_INHERITED_UFS_DMA
++  if ((rootMode || probe >= 10) && !elden_ufs_storage_class_ready())
++    panic("NATIVE_UFS: original storage class is not initialized or registered");
+ #endif
+   unsigned diagnostic = 0;
+   PE_parse_boot_argn ("native-ufs-diagnostics", &diagnostic, sizeof (diagnostic));

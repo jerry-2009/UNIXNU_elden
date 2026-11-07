@@ -1,0 +1,32 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenUfsProbe
+  FILE_GUID = 904f0c89-c08e-4f35-975f-3432257bdcbb
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+[Sources]
+  EldenUfsProbe.c
+  EldenUfsHardware.c
+  EldenUfsHardware.h
+  EfiCompat.h
+  Generated/EldenUfsSession.c
+  Generated/storage_ufs.c
+  Generated/storage_block.c
+  Generated/EldenFdtHandoff.c
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiBlockIoProtocolGuid
+[Guids]
+  gFdtTableGuid

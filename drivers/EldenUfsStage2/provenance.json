@@ -1,0 +1,52 @@
+{
+  "source": "existing /root/kshimc exported work tree",
+  "git_revision": null,
+  "license": "GPL-3.0-only",
+  "files": {
+    "Core/storage_ufs.c": {
+      "source": "src/drivers/storage_ufs.c",
+      "bytes": 22826,
+      "sha256": "3c0a5f6cccdb17f2467194c5ba32a6aa3d80d2d0b663ce75f44637778323a36b"
+    },
+    "Core/storage_block.c": {
+      "source": "src/core/storage_block.c",
+      "bytes": 7084,
+      "sha256": "d47aaf518b5a755d63b8280b9925fa369cff4f17a0c75fca3747055fbc5b234d"
+    },
+    "Core/storage_ufs.h": {
+      "source": "src/include/storage_ufs.h",
+      "bytes": 5105,
+      "sha256": "6d49825112bdd046082c51094c55eeb3608ef49fbcb24ea4af8e4f15879a65bb"
+    },
+    "Core/storage_block.h": {
+      "source": "src/include/storage_block.h",
+      "bytes": 1735,
+      "sha256": "1a0f3e5f4f41e7d8820407e9e64f6df5259ef727f19d6f984a446db31402a15a"
+    },
+    "COPYING": {
+      "source": "LICENSE",
+      "bytes": 35823,
+      "sha256": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+    },
+    "Tests/original_storage_ufs_test.c": {
+      "source": "tests/storage_ufs_test.c",
+      "bytes": 10388,
+      "sha256": "bc7d4970e2d6c08005f8e562d81d20528b51b44cc181ce26d2beb86e22c92a63"
+    },
+    "Tests/original_storage_ufs_link_test.c": {
+      "source": "tests/storage_ufs_link_test.c",
+      "bytes": 22986,
+      "sha256": "1412fe2ca07dbdb78a3da8f31e4cb144f5cd963e29b0593e15ce64d80bd49a55"
+    },
+    "Tests/original_storage_ufs_power_test.c": {
+      "source": "tests/storage_ufs_power_test.c",
+      "bytes": 41254,
+      "sha256": "2a5b4810e3d3c87b116bd6e851367444f481fb983c81a98f91e9f3dde2788224"
+    },
+    "Tests/original_storage_block_test.c": {
+      "source": "tests/storage_block_test.c",
+      "bytes": 6484,
+      "sha256": "53a903d319c82cd6f5557bc75e9be3da7f4fcb8f679c29e17f201580f58c1ed0"
+    }
+  }
+}

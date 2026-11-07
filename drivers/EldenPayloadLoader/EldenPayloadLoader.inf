@@ -1,0 +1,43 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenPayloadLoader
+  FILE_GUID = d90e69d1-6e59-4eaa-92e7-ec0121a027a4
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+
+[Sources]
+  EldenPayloadLoader.c
+  EldenFdtHandoff.c
+  EldenFdtHandoff.h
+  EldenBootProperties.c
+  EldenBootProperties.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  UniXNUPkg/UniXNUPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  MemoryAllocationLib
+  ExtractGuidedSectionLib
+
+[Guids]
+  gEfiFileInfoGuid
+  gFdtTableGuid
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEfiLoadFile2ProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gUniXNULoaderProtocolGuid

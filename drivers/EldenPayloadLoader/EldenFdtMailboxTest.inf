@@ -1,0 +1,27 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenFdtMailboxTest
+  FILE_GUID = c5e5089e-10db-4f70-946b-98c968f2d73f
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+[Sources]
+  EldenFdtMailboxTest.c
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  MemoryAllocationLib
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiLoadFile2ProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+[Guids]
+  gFdtTableGuid

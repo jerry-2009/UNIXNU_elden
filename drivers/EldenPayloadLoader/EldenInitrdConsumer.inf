@@ -1,0 +1,25 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenInitrdConsumer
+  FILE_GUID = 6e1ac9c6-c17c-423b-9ca1-dbb5b0c07ad1
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+[Sources]
+  EldenInitrdConsumer.c
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  MemoryAllocationLib
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiLoadFile2ProtocolGuid
+[Guids]
+  gFdtTableGuid

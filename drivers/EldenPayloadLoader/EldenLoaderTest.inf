@@ -1,0 +1,19 @@
+[Defines]
+  INF_VERSION = 0x0001001B
+  BASE_NAME = EldenLoaderTest
+  FILE_GUID = fd42d297-36e9-4890-8c0b-6b7fbff61c3b
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  ENTRY_POINT = UefiMain
+[Sources]
+  EldenLoaderTest.c
+[Packages]
+  MdePkg/MdePkg.dec
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  DevicePathLib
+  MemoryAllocationLib
+[Protocols]
+  gEfiLoadedImageProtocolGuid

@@ -1,0 +1,20 @@
+--- a/NativeUfs.cpp
++++ b/NativeUfs.cpp
+@@ -1384,6 +1384,7 @@
+ }
+ 
+ #include "EldenPinnedRootXnu.inc"
++#include "EldenUsbDebugXnu.inc"
+ 
+ bool NativeUfsBlock::configure (const char *name, uint64_t absoluteOffset, uint64_t size)
+ {
+@@ -1860,6 +1861,9 @@
+ 
+ bool NativeUfs::start (IOService *provider)
+ {
++#if defined(ELDEN_USB_DEBUG) && ELDEN_USB_DEBUG
++  eldenStartUsbDebug();
++#endif
+   unsigned probe = 0, rootMode = 0;
+   PE_parse_boot_argn("native-ufs-lun", &gRootLun, sizeof(gRootLun));
+   if (gRootLun != 0 && gRootLun != 4) panic("NATIVE_UFS: elden root LUN must be 0 or 4");

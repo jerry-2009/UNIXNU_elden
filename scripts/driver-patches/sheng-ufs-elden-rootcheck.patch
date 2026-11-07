@@ -1,0 +1,184 @@
+--- a/NativeUfs.cpp
++++ b/NativeUfs.cpp
+@@ -2,6 +2,8 @@
+ // Native sheng SM8550 UFS bring-up. Default-off: no MMIO is touched unless
+ // native-ufs-probe=1 is present. This is a register probe, not a storage driver.
+ #include <IOKit/IOService.h>
++#include "EldenUfsIdentity.h"
++static unsigned gRootLun = 0;
+ #include <IOKit/IOPlatformExpert.h>
+ #if !defined(NATIVE_UFS_PROBE_ONLY) || !NATIVE_UFS_PROBE_ONLY
+ #include <IOKit/storage/IOBlockStorageDevice.h>
+@@ -294,6 +296,21 @@
+   if (!smmu) {
+     panic ("NATIVE_UFS smmu: map failed");
+   }
++#if defined(ELDEN_INHERITED_UFS_DMA) && ELDEN_INHERITED_UFS_DMA
++  auto inherited = eldenUfsIdentity(stream, dma, bytes,
++    [smmu](unsigned offset) { return read32(smmu, offset); });
++  gRootDiagnostic.smmuId1 = inherited.id1; gRootDiagnostic.smmuId2 = inherited.id2;
++  gRootDiagnostic.smmuSlot = inherited.slot;
++  gRootDiagnostic.smr = inherited.smr; gRootDiagnostic.s2cr = inherited.s2cr;
++  gRootDiagnostic.cbar = inherited.cbar; gRootDiagnostic.cba2r = inherited.cba2r;
++  gRootDiagnostic.sctlr = inherited.sctlr;
++  if (inherited.error) panic("NATIVE_UFS inherited DMA refused slot=%u smr=%x s2cr=%x cbar=%x sctlr=%x",
++    inherited.slot, inherited.smr, inherited.s2cr, inherited.cbar, inherited.sctlr);
++  report[0] = inherited.slot | (inherited.bank << 16);
++  report[1] = inherited.cbar; report[2] = inherited.sctlr;
++  IOLog("NativeUfs: inherited SID60 identity slot=%u CB=%u; no SMMU writes\n", inherited.slot, inherited.bank);
++  return;
++#endif
+   UfsSmmuPlan plan = planUfsSmmu (stream, dma, bytes, [smmu](unsigned offset) { return read32 (smmu, offset); });
+   gRootDiagnostic.smmuId1 = read32 (smmu, 0x24);
+   gRootDiagnostic.smmuId2 = read32 (smmu, 0x28);
+@@ -1014,11 +1031,12 @@
+   for (unsigned attempt = 0; attempt < 20; attempt++) {
+     uint8_t tur[6] = { 0, 0, 0, 0, 0, 0 };
+     uint32_t scsi = 0;
+-    if (hostScsi (0, tur, 6, false, 0, 200000, &scsi) == kIOReturnSuccess) {
++    if (hostScsi (gRootLun, tur, 6, false, 0, 200000, &scsi) == kIOReturnSuccess) {
+ #if defined(NATIVE_UFS_SM8750) && NATIVE_UFS_SM8750
+       gRootDiagnostic.stage = "LUN capacity discovery";
+       if (!hostDiscoverLuns (why)) return false;
+-      gRootLunLast = gLuns[0].last;
++      if (gLuns[gRootLun].blockBytes != 4096) { *why = "selected LUN capacity unavailable"; return false; }
++      gRootLunLast = gLuns[gRootLun].last;
+       size_t used = 0;
+       for (unsigned lun = 0; lun < 8; ++lun) {
+         if (gLuns[lun].blockBytes) used += snprintf (gLunReport + used, sizeof (gLunReport) - used,
+@@ -1033,7 +1051,7 @@
+     IOSleep (10);
+   }
+   gHost.ready = false;
+-  *why = "LUN 0 not ready";
++  *why = "selected LUN not ready";
+   return false;
+ }
+ }
+@@ -1135,7 +1153,7 @@
+   if (!gStoreRegionBlocks || !dst || !blocks || rel >= gStoreRegionBlocks || blocks > gStoreRegionBlocks - rel) return 0;
+   while (blocks) {
+     uint32_t chunk = blocks > kDataMax / 4096 ? static_cast<uint32_t> (kDataMax / 4096) : blocks;
+-    if (hostRead4k (0, gStoreRegionFirst + rel, chunk, dst) != kIOReturnSuccess) return 0;
++    if (hostRead4k (gRootLun, gStoreRegionFirst + rel, chunk, dst) != kIOReturnSuccess) return 0;
+     dst = static_cast<uint8_t *> (dst) + chunk * 4096ULL;
+     rel += chunk;
+     blocks -= chunk;
+@@ -1247,13 +1265,13 @@
+ {
+   if (!gStoreGeometry.valid || !gHost.ready) return 1;
+   static uint8_t block[4096];
+-  if (hostRead4k (0, 1, 1, block) != kIOReturnSuccess) return 2;
++  if (hostRead4k (gRootLun, 1, 1, block) != kIOReturnSuccess) return 2;
+   uint32_t headerBytes = le32 (block + 12);
+   if (headerBytes < 92 || headerBytes > 4096 || rootCrc32 (block, headerBytes, true) != le32 (block + 16) ||
+       le32 (block + 16) != gStoreGeometry.headerCrc) return 3;
+   uint32_t blocks = (gStoreGeometry.entryCount * 128 + 4095) / 4096;
+   static uint8_t entries[4096 * 4];
+-  if (blocks > 4 || hostRead4k (0, gStoreGeometry.entriesLba, blocks, entries) != kIOReturnSuccess) return 4;
++  if (blocks > 4 || hostRead4k (gRootLun, gStoreGeometry.entriesLba, blocks, entries) != kIOReturnSuccess) return 4;
+   return rootCrc32 (entries, gStoreGeometry.entryCount * 128) == gStoreGeometry.entriesCrc ? 0 : 5;
+ }
+ 
+@@ -1504,6 +1522,14 @@
+   return true;
+ }
+ 
++#if !defined(NATIVE_VERIFIED_BLOCK) || !NATIVE_VERIFIED_BLOCK
++volatile uint64_t native_ufs_read_ticks = 0;
++static inline uint64_t timerTicks(void) {
++  uint64_t ticks;
++  __asm__ volatile("isb\n\tmrs %0, cntpct_el0" : "=r" (ticks));
++  return ticks;
++}
++#endif
+ IOReturn NativeUfsBlock::doAsyncReadWrite (IOMemoryDescriptor *buffer, UInt64 block, UInt64 count,
+                                            IOStorageAttributes *, IOStorageCompletion *completion)
+ {
+@@ -1527,7 +1553,7 @@
+     void unlock () { IOLockUnlock (mutex); }
+     IOReturn read (uint64_t lba, uint32_t blocks, void *out) {
+       uint64_t t0 = timerTicks ();
+-      IOReturn r = hostRead4k (0, lba, blocks, out);
++      IOReturn r = hostRead4k (gRootLun, lba, blocks, out);
+       __atomic_fetch_add (&native_ufs_read_ticks, timerTicks () - t0, __ATOMIC_RELAXED);
+       return r;
+     }
+@@ -1796,6 +1822,8 @@
+ bool NativeUfs::start (IOService *provider)
+ {
+   unsigned probe = 0, rootMode = 0;
++  PE_parse_boot_argn("native-ufs-lun", &gRootLun, sizeof(gRootLun));
++  if (gRootLun != 0 && gRootLun != 4) panic("NATIVE_UFS: elden root LUN must be 0 or 4");
+   PE_parse_boot_argn ("native-ufs-probe", &probe, sizeof (probe));
+   PE_parse_boot_argn ("native-ufs-root", &rootMode, sizeof (rootMode));
+   native_ufs_probe_requested = probe != 0;
+@@ -1840,7 +1868,7 @@
+     }
+     panic ("NATIVE_UFS root check\n"
+            "partition=%s first=%llx last=%llx\n"
+-           "LUN0 last=%llx block=4096 (all values hex unless stated)\n"
++           "selected LUN last=%llx block=4096 (all values hex unless stated)\n"
+            "block0 magic %08x %08x ext4magic=%04x ext4blocks=%u\n"
+            "manifest status=%u windows=%u\n%s",
+            UFS_ROOT_PARTITION, layout->userdataFirst, layout->userdataLast, gRootLunLast, layout->magic0, layout->magic1,
+@@ -1861,7 +1889,7 @@
+     uint32_t seen[4] = {};
+     for (uint32_t index = 0; index < layout->windows && index < 4; index++) {
+       uint64_t absolute = layout->userdataFirst * 4096ULL + layout->window[index].offset;
+-      if (hostRead4k (0, absolute / 4096, 1, gScratch) == kIOReturnSuccess) {
++      if (hostRead4k (gRootLun, absolute / 4096, 1, gScratch) == kIOReturnSuccess) {
+         seen[index] = 1;
+         sig[index][0] = le32 (gScratch + 512);
+         sig[index][1] = le32 (gScratch + 516);
+--- a/RootLayout.h
++++ b/RootLayout.h
+@@ -66,7 +66,7 @@
+     *why = "invalid root partition name";
+     return false;
+   }
+-  if (hostRead4k (0, 1, 1, gScratch) != kIOReturnSuccess) {
++  if (hostRead4k (gRootLun, 1, 1, gScratch) != kIOReturnSuccess) {
+     *why = "GPT header read";
+     return false;
+   }
+@@ -101,7 +101,7 @@
+     return false;
+   }
+   gRootDiagnostic.stage = "GPT entries";
+-  if (hostRead4k (0, entriesLba, blocks, gScratch) != kIOReturnSuccess) {
++  if (hostRead4k (gRootLun, entriesLba, blocks, gScratch) != kIOReturnSuccess) {
+     *why = "GPT entries read";
+     return false;
+   }
+@@ -150,7 +150,7 @@
+   gRootDiagnostic.last = layout->userdataLast;
+   gRootDiagnostic.stage = "root manifest";
+   // First block of the partition: manifest if the root image was flashed, ext4 otherwise.
+-  if (hostRead4k (0, layout->userdataFirst, 1, gScratch) != kIOReturnSuccess) {
++  if (hostRead4k (gRootLun, layout->userdataFirst, 1, gScratch) != kIOReturnSuccess) {
+     *why = "root partition first block read";
+     return false;
+   }
+--- a/GccUfs.h
++++ b/GccUfs.h
+@@ -23,7 +23,9 @@
+ #define GCC_UFS_PHY_PHY_AUX_ENABLE    0x770bc
+ #define GCC_UFS_PHY_RX_SYMBOL1_ENABLE 0x770d8
+ #define GCC_AGGRE_UFS_PHY_AXI_ENABLE  0x770f0
++#ifndef UFS_ROOT_PARTITION
+ #define UFS_ROOT_PARTITION            "unixnu"
++#endif
+ #else
+ #define GCC_UFS_PHY_AHB_ENABLE        0x77024
+ #define GCC_UFS_PHY_TX_SYMBOL0_ENABLE 0x77028
+@@ -34,7 +36,9 @@
+ #define GCC_UFS_PHY_RX_SYMBOL1_ENABLE 0x770cc
+ // bus_aggr_clk in the board DT: gcc_aggre_ufs_phy_axi_clk, halt/enable 0x770e4, HW clock gating bit1
+ #define GCC_AGGRE_UFS_PHY_AXI_ENABLE  0x770e4
++#ifndef UFS_ROOT_PARTITION
+ #define UFS_ROOT_PARTITION            "userdata"
++#endif
+ #endif
+ 
+ static inline bool ufsBusClocksOn(unsigned gdsc, unsigned axi, unsigned ahb, unsigned aggre)
