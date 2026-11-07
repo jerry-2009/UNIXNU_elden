@@ -1,5 +1,9 @@
 # UniXNU-elden
 
+本地11-07进度：6GiB高地址XNU、LUN0/ipados根卷头读取和panic字符去重已经实机确认。
+新的挂根、SystemOS/RAM Data与USB CDC候选仅完成离线构建/校验，待实机。
+详见[启动与USB候选](docs/STARTUP-USB-CANDIDATE-20261107.md)；下文保留原阶段交接背景。
+
 Lenovo Legion Y700 四代（TB322FC / `elden`，SM8750P）的设备仓。目录布局
 已迁移到 UniXNU 设备格式 2：共享 ARM64 与 iPadOS profile、SM8750 SoC
 描述、设备 DTS、组件选择、固定源码、载荷配置和构建脚本分别管理。
