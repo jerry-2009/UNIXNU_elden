@@ -1,0 +1,23 @@
+{
+  "trial": "v137-delayed-host",
+  "host_delay_seconds": 90,
+  "bytes": 291012,
+  "raw_sha256": "a23fffc31673eeee85cc7c766bdb972be71a83d039966fb9727ff343d52b97c2",
+  "dropped": 24,
+  "discontinuities": [],
+  "recovery_complete": true,
+  "explicit_sync_return": true,
+  "stock_full_sha_restored": true,
+  "android_root_green_boot_completed": true,
+  "sleep_requested": true,
+  "key_lines": [
+    "ELDEN_WCN prepare=-19 stage=1 epoch=1",
+    "ELDEN_BT_ADDRESS_WAIT pid=79 sleeps=1200 state=6; original address lookup follows",
+    "ELDEN_BT_STDERR pid=79 line=9 iov=0 bytes=29 copied=29 error=0 text=No bluetooth on this device.",
+    "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+  ],
+  "bootstrap_wait_succeeded": false,
+  "discovery_exercised": false,
+  "power_write_admission_relaxed": false,
+  "interpretation": "Power preparation refused with -19 at stage1; sysctl wait exhausted1200 sleeps with no valid version/size/state response. The exact sysctl error was not captured; do not label it a sandbox denial without proof."
+}

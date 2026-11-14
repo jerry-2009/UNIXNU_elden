@@ -1,0 +1,103 @@
+{
+  "v137": {
+    "trial": "v137-delayed-host",
+    "host_delay_seconds": 90,
+    "bytes": 291012,
+    "raw_sha256": "a23fffc31673eeee85cc7c766bdb972be71a83d039966fb9727ff343d52b97c2",
+    "dropped": 24,
+    "discontinuities": [],
+    "recovery_complete": true,
+    "explicit_sync_return": true,
+    "stock_full_sha_restored": true,
+    "android_root_green_boot_completed": true,
+    "sleep_requested": true,
+    "key_lines": [
+      "ELDEN_WCN prepare=-19 stage=1 epoch=1",
+      "ELDEN_BT_ADDRESS_WAIT pid=79 sleeps=1200 state=6; original address lookup follows",
+      "ELDEN_BT_STDERR pid=79 line=9 iov=0 bytes=29 copied=29 error=0 text=No bluetooth on this device.",
+      "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+    ],
+    "bootstrap_wait_succeeded": false,
+    "discovery_exercised": false,
+    "power_write_admission_relaxed": false,
+    "interpretation": "Power preparation refused with -19 at stage1; sysctl wait exhausted1200 sleeps with no valid version/size/state response. The exact sysctl error was not captured; do not label it a sandbox denial without proof."
+  },
+  "v138": {
+    "trial": "v138-delayed-host",
+    "host_delay_seconds": 90,
+    "image_sha256": "f724a60364450519b2e11622fc4b36dfdd23d6c81f23758ab3a8d522e5f5fb43",
+    "session": "de5fd09ac1e05851",
+    "raw_log": "edl_work/live-address-v138-20261115/usb/20261114-230104.bin",
+    "bytes": 299260,
+    "raw_sha256": "771e65c9f94e43670f4218b714361b8be955aa077d10e2f9bb30494bd4490f4a",
+    "dropped": 47,
+    "discontinuities": [],
+    "recovery_complete": true,
+    "explicit_sync_return": true,
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "android_root_green_boot_completed": true,
+    "sleep_requested": true,
+    "key_lines": [
+      "ELDEN_WCN prepare=0 stage=6 epoch=1",
+      "ELDEN_BT_ADDRESS_PROPERTY pid=79 sleeps=57 present=1; original address validation follows",
+      "ELDEN_BT_NATIVE_INIT pid=79 result=0 accepted=1",
+      "[bt] controller refused opcode=0x2007 status=0xc",
+      "ELDEN_BT_HOST live client=1 ready=1 out=66 up=227 bad=0 pending=0",
+      "ELDEN_BT_DISCOVERY tx=0/0/0/6/11 replies=0/0/0/6/11 status=ffffffff/ffffffff/ffffffff/0/0 inquiry-events=0 le=0 ext=161 incomplete=0 malformed=0",
+      "ELDEN_BT_HOST live client=1 ready=1 out=69 up=364 bad=0 pending=0",
+      "ELDEN_BT_DISCOVERY tx=0/0/0/7/13 replies=0/0/0/7/13 status=ffffffff/ffffffff/ffffffff/0/0 inquiry-events=0 le=0 ext=295 incomplete=0 malformed=0",
+      "ELDEN_RPC ACK_COMMITTED; preparing filesystem shutdown",
+      "ELDEN_BT_DISCOVERY tx=0/0/0/7/13 replies=0/0/0/7/13 status=ffffffff/ffffffff/ffffffff/0/0 inquiry-events=0 le=0 ext=349 incomplete=0 malformed=0",
+      "ELDEN_BT_HOST withdrawn guard=1 out=69 up=418 dropped=0",
+      "ELDEN_ICON_EXIT pid=79 rv=9 ns=2 code=9 text=none",
+      "ELDEN_WCN stop=0 uart-close=0 state=4 boot-shared-votes-retained=1",
+      "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+    ],
+    "address_wait_sleeps": 57,
+    "address_wait_sleep_us": 500000,
+    "extended_parameters_sent_and_replied": 7,
+    "extended_enable_sent_and_replied": 13,
+    "last_extended_statuses": [
+      0,
+      0
+    ],
+    "complete_extended_reports_delivered_to_native_socket": 349,
+    "incomplete_reports": 0,
+    "malformed_discovery_frames": 0,
+    "all_observed_bt_exits_follow_requested_shutdown": true,
+    "native_device_list_verified": false,
+    "pairing_verified": false,
+    "persistent_keys_verified": false,
+    "all_usb_and_power_configurations_verified": false,
+    "v137_power_refusal_explained": false
+  },
+  "instruction_tests": {
+    "bootstrap_wait": 22,
+    "property_wait": 16
+  },
+  "discovery_parser": {
+    "passed": true,
+    "actual_body_sha256": "bd837fb655470853083c387893bac8d56a47b5c9e6377825153da8eed486a183",
+    "asan_ubsan": true,
+    "transport_integration_not_modeled": true
+  },
+  "parser_capacity": {
+    "passed": true,
+    "asan_ubsan": true,
+    "records": [
+      {
+        "variant": "original",
+        "capacity": 32,
+        "actual_body_sha256": "b0cdbdf8ac3f8dfaf368701a49afb4959e276b4762460df8a838a5df4553cc16",
+        "passed": true
+      },
+      {
+        "variant": "address",
+        "capacity": 64,
+        "actual_body_sha256": "53e684db1d41a62b75139dc9df856cda24f60a331d0f25f5a71a40d0e6686d0a",
+        "passed": true
+      }
+    ]
+  },
+  "full_goal_complete": false
+}

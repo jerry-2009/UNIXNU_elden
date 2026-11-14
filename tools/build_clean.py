@@ -26,6 +26,8 @@ def main():
     p.add_argument('--bt-registry',action='store_true',help='Publish matching Bluetooth DeviceTree/platform-service properties')
     p.add_argument('--bt-helper-trace',action='store_true',help='Observe typed script/result/reply stages in the owned BlueTool')
     p.add_argument('--bt-process-lifetime',action='store_true',help='Keep H4 process references local to each callback')
+    p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
+    p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
     p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')
     p.add_argument('--bt-scan-observe17',action='store_true',help='Read native supported commands and scan flags at initialization completion')
     p.add_argument('--bt-scan-ready17',action='store_true',help='Republish supported extended scan flags after HCI completion; includes scan17')
@@ -50,6 +52,8 @@ def main():
     if a.bt_scan_ready17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17):raise ValueError('--bt-scan-ready17 requires --bt-process-lifetime without other native17 options')
     if a.bt_scan_observe17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17):raise ValueError('--bt-scan-observe17 requires --bt-process-lifetime without other native17 options')
     if a.bt_scan_roles17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17):raise ValueError('--bt-scan-roles17 requires --bt-process-lifetime without other native17 options')
+    if a.bt_discovery17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17):raise ValueError('--bt-discovery17 requires --bt-process-lifetime without other native17 options')
+    if a.bt_address17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17 or a.bt_discovery17):raise ValueError('--bt-address17 requires --bt-process-lifetime without other native17 options')
     if sys.platform!='darwin':raise SystemExit('Native build requires macOS with Xcode/iPhoneOS SDK. Windows/WSL can inspect sources and flash separately.')
     config=a.inputs.resolve();data=read(config);out=a.output.resolve()
     def input_path(name):
@@ -84,6 +88,8 @@ def main():
     identity['bt_scan_ready17']=a.bt_scan_ready17
     identity['bt_scan_observe17']=a.bt_scan_observe17
     identity['bt_scan_roles17']=a.bt_scan_roles17
+    identity['bt_discovery17']=a.bt_discovery17
+    identity['bt_address17']=a.bt_address17
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
         if not a.resume or not journal.exists():raise ValueError('Use a new output, or explicitly resume this run')
@@ -180,6 +186,14 @@ def main():
         stage('bt-scan-roles-runtime',script('prepare_bt_scan_roles17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-scan-roles-runtime'),'bt-scan-roles-runtime/result.json')
         stage('bt-scan-roles17',script('build_bt_scan_roles17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-scan-roles-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-scan-roles17'),'bt-scan-roles17/result.json')
         kernel_folder=out/'bt-scan-roles17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_discovery17:
+        stage('bt-discovery-runtime',script('prepare_bt_discovery17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-discovery-runtime'),'bt-discovery-runtime/result.json')
+        stage('bt-discovery17',script('build_bt_discovery17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-discovery-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-discovery17'),'bt-discovery17/result.json')
+        kernel_folder=out/'bt-discovery17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_address17:
+        stage('bt-address-runtime',script('prepare_bt_address17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-address-runtime'),'bt-address-runtime/result.json')
+        stage('bt-address17',script('build_bt_address17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-address-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-address17'),'bt-address17/result.json')
+        kernel_folder=out/'bt-address17';runtime_folder=kernel_folder/'runtime'
     if a.target=='boot':
         stage('firmware',script('build_v91_firmware.py','--mu-root',inputs['mu_repository'],'--unixnu-root',inputs['unixnu_repository'],'--crypto-path',inputs['crypto'],'--llvm',inputs['llvm'],'--output',out/'firmware','--jobs',a.jobs),'firmware/result.json')
         stage('loader',script('build_v91_payload_loader.py','--mu-root',out/'firmware/project/third_party/mu_wide_platforms','--unixnu-root',out/'firmware/project/third_party/UniXNU','--llvm',inputs['llvm'],'--output',out/'loader'),'loader/result.json')
