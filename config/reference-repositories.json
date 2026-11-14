@@ -172,6 +172,11 @@
       "observed_head": "48cf00a7a97f3a2db10c84c39cf21701a867784e"
     },
     {
+      "name": "UniXNU-gts7xlwifi",
+      "url": "https://github.com/rui12366B/UniXNU-gts7xlwifi.git",
+      "observed_head": "88b34f97100a01aab4ea6b86dc9c748b2114c382"
+    },
+    {
       "name": "UniXNU-hummer",
       "url": "https://github.com/2426120557/UniXNU-hummer",
       "observed_head": "596d9dcdf59b06a2b139c12a1c69c2f216a55c90"

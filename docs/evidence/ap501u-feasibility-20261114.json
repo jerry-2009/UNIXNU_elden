@@ -1,0 +1,422 @@
+{
+  "date": "2026-11-14 Asia/Shanghai",
+  "scope": "AP501U feasibility only; no XNU modification, flashing or pen configuration writes. Read-only Android input observers; screen wake twice.",
+  "device_model": "TB322FC",
+  "pen_model_user_reported": "AP501U",
+  "bt_device_name_observed": "Lenovo Tab Pen Plus",
+  "bt_vid_pid": "17ef:617f",
+  "android_pen": {
+    "name": "NVTCapacitivePen",
+    "bus": "001c",
+    "path_at_inventory": "event6",
+    "driver": "NVT-ts / nvt_36xxx.ko",
+    "axes": {
+      "ABS_X": {
+        "value": 0,
+        "min": 0,
+        "max": 19040,
+        "fuzz": 0,
+        "flat": 0,
+        "resolution": 0
+      },
+      "ABS_Y": {
+        "value": 0,
+        "min": 0,
+        "max": 30400,
+        "fuzz": 0,
+        "flat": 0,
+        "resolution": 0
+      },
+      "ABS_PRESSURE": {
+        "value": 0,
+        "min": 0,
+        "max": 4095,
+        "fuzz": 0,
+        "flat": 0,
+        "resolution": 0
+      },
+      "ABS_DISTANCE": {
+        "value": 0,
+        "min": 0,
+        "max": 1,
+        "fuzz": 0,
+        "flat": 0,
+        "resolution": 0
+      },
+      "ABS_TILT_X": {
+        "value": 0,
+        "min": -60,
+        "max": 60,
+        "fuzz": 0,
+        "flat": 0,
+        "resolution": 0
+      },
+      "ABS_TILT_Y": {
+        "value": 0,
+        "min": -60,
+        "max": 60,
+        "fuzz": 0,
+        "flat": 0,
+        "resolution": 0
+      }
+    },
+    "keys": [
+      "BTN_TOOL_PEN (getevent labels BTN_DIGI)",
+      "BTN_TOUCH",
+      "BTN_STYLUS",
+      "BTN_STYLUS2"
+    ],
+    "INPUT_PROP_DIRECT": true
+  },
+  "bluetooth_inputs": [
+    {
+      "name": "Lenovo Tab Pen Plus Mouse",
+      "source": "Bluetooth UHID",
+      "capabilities": [
+        "relative X/Y",
+        "wheel",
+        "left/right/middle button"
+      ]
+    },
+    {
+      "name": "Lenovo Tab Pen Plus Consumer Control",
+      "source": "Bluetooth UHID",
+      "capabilities": [
+        "KEY_UNKNOWN",
+        "MSC_SCAN"
+      ]
+    }
+  ],
+  "driver": {
+    "path": "/vendor/lib/modules/nvt_36xxx.ko",
+    "bytes": 604536,
+    "sha256": "a3c9fce96b453bd18ab4b44fec67db4504c65b1d5f8fc6218a19f2089be9f2a4",
+    "dt_path": "/soc/qcom,qupv3_1_geni_se@ac0000/spi@a90000/novatek@0",
+    "dt_pen_support_present": true,
+    "anchors": {
+      "0x3dfc..0x3e04": "point_data=sp+0x40, CTP_SPI_READ length109",
+      "0x4038..0x4064": "sum bytes1..64; compare negative byte-sum with byte65; excludes pen66..79",
+      "0x4318..0x4344": "format p66, be16 coordinates p67:68/p69:70",
+      "0x45ac..0x45f0": "be16 pressure p71:72, signed tilt p73/74 (LDRSB), distance p75:76, flags p77, battery p78",
+      "0x45f4..0x46dc": "input_event X/Y/pressure/touch/tilt/distance/tool/buttons",
+      "0x4830..0x48e4": "format0xf0 copies6-byte ID p67..72, change uevent",
+      "0x48e8": "additional format0xf1 branch; not yet decoded",
+      "0x22c8..0x2350": "pressure reconfig selects8191 for selector1 otherwise4095 and re-registers device"
+    },
+    "live_packet_verified": false
+  },
+  "source_inputs": {
+    "tb322fc-linux-kernel:drivers/input/touchscreen/novatek-nvt36xxx-spi.c": {
+      "revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+      "sha256": "67295bfd775d8eafdd09e07db9d70c690054dec72dcae0c922345944dd1b1a66",
+      "bytes": 23231
+    },
+    "tb322fc-linux-kernel:arch/arm64/boot/dts/qcom/sm8750-lenovo-elden.dts": {
+      "revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+      "sha256": "0a4361f3f2225befd954dd5420216f357bfa8a68294c28c895ec2478ebea3ba3",
+      "bytes": 54331
+    },
+    "armadaos-freedom:devices/lenovo-tb322fc/README.md": {
+      "revision": "885fd1fdaa373f266b9a3207997b91c67aa22e6d",
+      "sha256": "534d1b4e079ba0eeaaf63b14f4e9c1ff2c8b8a4dce107bb3e24dfce368d9e899",
+      "bytes": 6422
+    },
+    "armadaos-freedom:packages/kernel/patches/0164-Input-touchscreen-import-NT36536-host-download-SPI-d.patch": {
+      "revision": "885fd1fdaa373f266b9a3207997b91c67aa22e6d",
+      "sha256": "b5aaa9031e3c009c07ab0b9e57332df75ade2c75a672bb624a290dd3e9014f10",
+      "bytes": 114396
+    },
+    "armadaos-freedom:packages/kernel/patches/0166-input-nt36536-fixes-for-tb323fu.patch": {
+      "revision": "885fd1fdaa373f266b9a3207997b91c67aa22e6d",
+      "sha256": "c61cbc974e5b1c8bd32db264dcb8f10e1d8d77eb66c0e6a8edb6e36bfbf19992",
+      "bytes": 4624
+    },
+    "armadaos-freedom:packages/kernel/patches/0167-input-nt36536-make-the-pen-a-tablet-libinput-accepts.patch": {
+      "revision": "885fd1fdaa373f266b9a3207997b91c67aa22e6d",
+      "sha256": "eb96100ff7ed366671e643929e466b7a02f2064c9f5c6fceb07521e7923dd72c",
+      "bytes": 4281
+    },
+    "armadaos-freedom:system_files/usr/libexec/armada/armada-pen-touch.py": {
+      "revision": "885fd1fdaa373f266b9a3207997b91c67aa22e6d",
+      "sha256": "22aa2ac31398263d88ae7d7654d11e311afaa52863bb8f20ed8232bb69e4245c",
+      "bytes": 15269
+    },
+    "armadaos-freedom:system_files/usr/lib/armada/devices/lenovo-tb322fc.conf": {
+      "revision": "885fd1fdaa373f266b9a3207997b91c67aa22e6d",
+      "sha256": "dd32eeeca9f104a79f8cceaf133ccb63d90e9b4166b8b75f82c527ebffb637bb",
+      "bytes": 514
+    },
+    "UniXNU-gts7xlwifi:README.md": {
+      "revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+      "sha256": "a789a3c2f886ac5b18fb849612b370fcfe1230a4c687602182771e18e9c3fe06",
+      "bytes": 7525
+    },
+    "UniXNU-gts7xlwifi:docs/spen-notes.md": {
+      "revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+      "sha256": "63f9a5726b5e8374b692098008f90950a0da778c82973a150983d9126f3748bf",
+      "bytes": 12252
+    },
+    "UniXNU-gts7xlwifi:drivers/ShengHidInput/NativeHidInput.cpp": {
+      "revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+      "sha256": "46a470b0ad9ecee9374862f160a6b1bd25df656ee96346d834c723a7b076ce04",
+      "bytes": 61353
+    },
+    "UniXNU-gts7xlwifi:package/HidInputProbe.cpp": {
+      "revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+      "sha256": "2bc7042b2acdc3c8733617625c0698dff9898374312815029305584d01a22f7a",
+      "bytes": 14079
+    },
+    "UniXNU-gts7xlwifi:package/T970Pen.cpp": {
+      "revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+      "sha256": "0ae54c6c08705c5ca6605fa25f169dca4bf7c183212beea774f337acc33a0854",
+      "bytes": 24803
+    },
+    "UniXNU-gts7xlwifi:porting.toml": {
+      "revision": "88b34f97100a01aab4ea6b86dc9c748b2114c382",
+      "sha256": "1b77d5c9e970b712e067efa9a1be53cb48524fbb8c43a927456270385c4b4327",
+      "bytes": 38109
+    }
+  },
+  "current_owned_sources": {
+    "drivers/EldenNvt36536/PointReport.c": "6588e579847642b151f32c009327461b9818aac54214700356e907e697f19680",
+    "drivers/EldenNvt36536/PointReport.h": "be500aa9bf04e8770900a67cc07ac83051d2613d8e2d25a122f1aa895f6e1a95",
+    "drivers/EldenNvt36536/Protocol.c": "3cd51121d24c2c9296c8c8fb41052b25e773503dcc428901b1694cb8aac4e277",
+    "drivers/EldenNvt36536/Runtime.cpp": "2d9f97ce84fc24d693974d4d0e6c362c44d7a5bff8255fc850a17c3c427ed92b",
+    "drivers/EldenHidDelivery/SourcePatch.py": "1d2fac09fa70f5b1bf1e3c473f5474a42db24c95d9ac69fec7a84aa630b613dc",
+    "tools/device/read_y700_pen.c": "23f3672e0d09699bf6732bdf98b56aa875633b45571bf7403158d7e9aeddc77a"
+  },
+  "captures": [
+    {
+      "metadata": {
+        "started": "2026-11-14T19:02:11.162383",
+        "seconds": 50,
+        "devices": [
+          [
+            "NVTCapacitivePen",
+            "event6"
+          ],
+          [
+            "Lenovo Tab Pen Plus Mouse",
+            "event10"
+          ],
+          [
+            "Lenovo Tab Pen Plus Consumer Control",
+            "event11"
+          ]
+        ],
+        "readonly": true,
+        "finished": "2026-11-14T19:03:01.549243"
+      },
+      "files": {
+        "event10-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "event11-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "event6-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "event_lines": 0
+    },
+    {
+      "metadata": {
+        "started": "2026-11-14T19:19:52.206381",
+        "seconds": 90,
+        "devices": [
+          [
+            "NVTCapacitivePen",
+            "event6"
+          ],
+          [
+            "Lenovo Tab Pen Plus Mouse",
+            "event10"
+          ],
+          [
+            "Lenovo Tab Pen Plus Consumer Control",
+            "event11"
+          ]
+        ],
+        "readonly": true,
+        "finished": "2026-11-14T19:20:48.027240"
+      },
+      "files": {
+        "event10-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "event11-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "event6-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "event_lines": 0
+    },
+    {
+      "metadata": {
+        "started": "2026-11-14T20:05:24.672645",
+        "seconds": 120,
+        "devices": [
+          [
+            "NVTCapacitivePen",
+            "event6"
+          ],
+          [
+            "Lenovo Tab Pen Plus Mouse",
+            "event10"
+          ],
+          [
+            "Lenovo Tab Pen Plus Consumer Control",
+            "event11"
+          ]
+        ],
+        "readonly": true,
+        "finished": "2026-11-14T20:07:24.953997"
+      },
+      "files": {
+        "event10-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "event11-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "event6-events.txt": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "event_lines": 0
+    }
+  ],
+  "native_capture": {
+    "path": "edl_work/pen-feasibility-20261114/live-native.txt",
+    "bytes": 4725,
+    "sha256": "17f7526e529ad5e16945eb2428658455dc71760eec8144912f2a13e185160d51",
+    "event_lines": 0,
+    "last_heartbeat": "HEARTBEAT elapsed=35.3 events=0",
+    "end_marker": false,
+    "result": "ADB ended during other test/reboot; two Bluetooth HUPs. No dynamic samples captured."
+  },
+  "rejected_descriptor": {
+    "path": "edl_work/pen-feasibility-20261114/bluetooth-hid-descriptor.bin",
+    "sha256": "0159afcd6bc3b180afabf7c916a4b0ab1811a48eaf7b37ae18da1832869135a4",
+    "bytes": 91,
+    "valid_hid_descriptor": false,
+    "reason": "Contains cat ENOENT text despite prior wrapper rc0. Do not use as HID descriptor."
+  },
+  "capture_limitations": [
+    "Initial getevent runs empty; one observed screen Dozing, second exits255, third times out124. Exact contribution of timing, driver re-registration or buffering not established.",
+    "Native reader flushes lines and recorded capabilities/heartbeats, but not any input events; descriptor IDs/static maxima are not measured dynamic pen ranges.",
+    "Initial reader printed zero-range undeclared axes because EVIOCGABS accepted them; final source now filters EVIOCGBIT(EV_ABS), compiled but not deployed during other task.",
+    "Other task started tablet reboot; no further device access performed afterward.",
+    "Earlier capture limitations retained above are historical. The final live-222640 capture ended normally; absence of SYN_DROPPED is not proof of zero hardware sampling loss."
+  ],
+  "user_report": "User wrote with AP501U in Android Notes/便签 and saw normal ink; final synchronized capture records those dynamic input fields. User then left for a run; no tablet access after capture.",
+  "feasibility": {
+    "basic_stylus": "high, not implemented; current SPI read includes candidate pen region",
+    "pressure": "high for basic pressure drawing: dynamic0..4095 captured and same21H461 donor reports Notes pressure; exact Y700 iOS ABI integration still pending",
+    "tilt": "moderate; raw signed axis exists, iOS polar orientation adaptation pending",
+    "hover": "conditional; raw in-range is distinct from Pencil hover UI and model support",
+    "palm_rejection": "separate work; current dumpsys palm rejection flags off, not proof firmware lacks it",
+    "bluetooth_shortcuts_battery": "separate protocol and core Bluetooth dependency, unmeasured",
+    "full_Apple_Pencil_identity_features": "not promised; AP501U does not gain missing hardware/features or Apple accessory protocol by HID publication"
+  },
+  "successful_android_capture": {
+    "source": "edl_work\\pen-feasibility-20261114\\live-222640\\events.txt",
+    "sha256": "55c71eb6e53474fa0a781f53d99f15b27c3d2d8d721ae19c541f3aa17d1adccf",
+    "bytes": 797019,
+    "event_count": 12321,
+    "devices": {
+      "/dev/input/event11": {
+        "events": 30,
+        "span_seconds": 10.5,
+        "syn_reports": 12,
+        "axes": {},
+        "keys": {
+          "240": {
+            "1": 6,
+            "0": 6
+          }
+        }
+      },
+      "/dev/input/event6": {
+        "events": 12291,
+        "span_seconds": 110.644,
+        "syn_reports": 3510,
+        "axes": {
+          "0": {
+            "min": 0,
+            "max": 17779,
+            "updates": 3152
+          },
+          "1": {
+            "min": 0,
+            "max": 26514,
+            "updates": 3167
+          },
+          "24": {
+            "min": 0,
+            "max": 4095,
+            "updates": 1567
+          },
+          "25": {
+            "min": 0,
+            "max": 1,
+            "updates": 110
+          },
+          "26": {
+            "min": -30,
+            "max": 14,
+            "updates": 375
+          },
+          "27": {
+            "min": 0,
+            "max": 46,
+            "updates": 300
+          }
+        },
+        "keys": {
+          "320": {
+            "1": 12,
+            "0": 12
+          },
+          "330": {
+            "1": 43,
+            "0": 43
+          }
+        }
+      }
+    },
+    "end": [
+      "END elapsed=300.0 events=12321 signal=0"
+    ],
+    "disconnects": [],
+    "syn_dropped": 0,
+    "frame_analysis": {
+      "frames": 3510,
+      "tip_down_frames": 1629,
+      "positive_pressure_distinct": 1226,
+      "hover_frames": 1869,
+      "final_tool_in_range": 0,
+      "final_tip_down": 0,
+      "positive_inter_frame_under100ms_count": 3498,
+      "positive_inter_frame_under100ms_median_ms": 4.173994064331055,
+      "note": "evdev change events/syncs only; intervals are observed delivery timing, not guaranteed raw controller sample rate or end-to-end latency.",
+      "bt_msc_scan_values": [
+        787968,
+        787969
+      ]
+    }
+  },
+  "current_conclusion": "Successful final capture supersedes earlier missing-live-evidence limitation: 12321 events, real pressure0..4095/tilt/hover/tip and separate BT consumer button changes. No raw SPI packets, BT report descriptor, or XNU stylus integration tested."
+}
