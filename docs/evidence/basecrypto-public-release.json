@@ -1,0 +1,18 @@
+{
+  "verified_date": "2026-11-15 Asia/Shanghai",
+  "repository": "https://github.com/microsoft/mu_crypto_release",
+  "tag": "v1.1.3",
+  "asset": "Mu_CryptoBin_v1_1_3.zip",
+  "url": "https://github.com/microsoft/mu_crypto_release/releases/download/v1.1.3/Mu_CryptoBin_v1_1_3.zip",
+  "downloaded_bytes": 255451552,
+  "downloaded_sha256": "2136c410dc44135830e2e33062243563d642e0be868d6affc2930c6b0854f5cf",
+  "matches_previously_retained_archive": true,
+  "archive_files": 994,
+  "uncompressed_bytes": 1268157053,
+  "verified_files_against_firmware_plan": 994,
+  "extra_or_missing_archive_files": 0,
+  "host": "Windows / Python 3.12",
+  "fetch_tool_extraction_and_verification_passed": true,
+  "firmware_inputs_changed": false,
+  "device_operations": false
+}
