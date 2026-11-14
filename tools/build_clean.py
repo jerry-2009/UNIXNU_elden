@@ -26,6 +26,8 @@ def main():
     p.add_argument('--bt-registry',action='store_true',help='Publish matching Bluetooth DeviceTree/platform-service properties')
     p.add_argument('--bt-helper-trace',action='store_true',help='Observe typed script/result/reply stages in the owned BlueTool')
     p.add_argument('--bt-process-lifetime',action='store_true',help='Keep H4 process references local to each callback')
+    p.add_argument('--bt-complete17',action='store_true',help='Use real HCI support bits and the native completion result; includes optional17 callbacks')
+    p.add_argument('--bt-optional17',action='store_true',help='Allow native17 initialization without three optional HCI features')
     p.add_argument('--jobs',type=int,choices=range(1,9),default=4)
     p.add_argument('--resume',action='store_true',help='Resume completed stages of this exact source/input run')
     a=p.parse_args()
@@ -38,6 +40,8 @@ def main():
     if a.bt_registry and not a.bluetool_lifecycle:raise ValueError('--bt-registry requires --bluetool-lifecycle')
     if a.bt_helper_trace and not a.bt_registry:raise ValueError('--bt-helper-trace requires --bt-registry')
     if a.bt_process_lifetime and not a.bt_helper_trace:raise ValueError('--bt-process-lifetime requires --bt-helper-trace')
+    if a.bt_optional17 and not a.bt_process_lifetime:raise ValueError('--bt-optional17 requires --bt-process-lifetime')
+    if a.bt_complete17 and (not a.bt_process_lifetime or a.bt_optional17):raise ValueError('--bt-complete17 requires --bt-process-lifetime without --bt-optional17')
     if sys.platform!='darwin':raise SystemExit('Native build requires macOS with Xcode/iPhoneOS SDK. Windows/WSL can inspect sources and flash separately.')
     config=a.inputs.resolve();data=read(config);out=a.output.resolve()
     def input_path(name):
@@ -66,6 +70,8 @@ def main():
     identity['bt_registry']=a.bt_registry
     identity['bt_helper_trace']=a.bt_helper_trace
     identity['bt_process_lifetime']=a.bt_process_lifetime
+    identity['bt_optional17']=a.bt_optional17
+    identity['bt_complete17']=a.bt_complete17
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
         if not a.resume or not journal.exists():raise ValueError('Use a new output, or explicitly resume this run')
@@ -138,6 +144,14 @@ def main():
     if a.bt_process_lifetime:
         stage('bt-process-lifetime',script('build_bt_process_lifetime.py','--clean-build',out,'--helper-trace-build',out/'bt-helper-trace','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-process-lifetime'),'bt-process-lifetime/result.json')
         kernel_folder=out/'bt-process-lifetime';runtime_folder=kernel_folder/'runtime'
+    if a.bt_optional17:
+        stage('bt-optional-runtime',script('prepare_bt_optional17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-optional-runtime'),'bt-optional-runtime/result.json')
+        stage('bt-optional17',script('build_bt_optional17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--optional-runtime',out/'bt-optional-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-optional17'),'bt-optional17/result.json')
+        kernel_folder=out/'bt-optional17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_complete17:
+        stage('bt-complete-runtime',script('prepare_bt_complete17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-complete-runtime'),'bt-complete-runtime/result.json')
+        stage('bt-complete17',script('build_bt_complete17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--complete-runtime',out/'bt-complete-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-complete17'),'bt-complete17/result.json')
+        kernel_folder=out/'bt-complete17';runtime_folder=kernel_folder/'runtime'
     if a.target=='boot':
         stage('firmware',script('build_v91_firmware.py','--mu-root',inputs['mu_repository'],'--unixnu-root',inputs['unixnu_repository'],'--crypto-path',inputs['crypto'],'--llvm',inputs['llvm'],'--output',out/'firmware','--jobs',a.jobs),'firmware/result.json')
         stage('loader',script('build_v91_payload_loader.py','--mu-root',out/'firmware/project/third_party/mu_wide_platforms','--unixnu-root',out/'firmware/project/third_party/UniXNU','--llvm',inputs['llvm'],'--output',out/'loader'),'loader/result.json')

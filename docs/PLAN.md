@@ -1,5 +1,12 @@
 # 下一阶段顺序
 
+当前v132已实测原生HCI completion0并发布On，但daemon之后退出；先按准确17版
+新栈定位post-On失败，不重测已通过的上电/固件/BlueTool回复。推断slide0x480000
+得到0x100107bd4/0x100520250/0x100058904，尚须确认具体错误条件；禁止全局关LC。
+下一修订同时保留原stack_ready的failed_starts清零语义，仅真实completion接受时清。
+v132原像/日志和v131失败结果已保留；两轮均同步回程、全SHA恢复Android。
+充电双口净供电/完整保护周期、Wi-Fi和休眠仍未完成，GPU最后、声音先讨论。
+
 v130已修复跨syscall持有proc_find引用造成的内核panic；真实H4 out26/up25、串口
 持续和同步回程恢复。下一步原daemon完成25轮交互后的新退出栈/host-flow初始化；
 扫描、配对仍欠，保留真实错误，不关闭全局LC掩盖后续重启拒绝。

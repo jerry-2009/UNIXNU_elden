@@ -1,5 +1,12 @@
 # 当前状态 · 2026-11-14
 
+v132（11月15日）实机已跨过原生HCI初始化：真实完成回调result0/accepted1，
+bluetoothd发布On，H4 out50/up49；随后在另一调用栈退出，扫描/配对仍未通过。
+准确17版支持位控制可选0c5b步骤，完整失败/身份/超时保护保留。新4单元整核、
+32规则/Apple30/entry/AVB均核验，日志1172960B/drop31无断点；同步回程、完整
+stock8b8e72da恢复、Android/root/green/boot完成并熄屏。全部设备任务结束。
+下一步定位post-On退出，详profiles/bt-complete17；充电双口/保护周期及Wi-Fi仍欠。
+
 v130（11月15日）已修复明确的内核panic：H4 connect不再把proc_find引用留出系统
 调用，改存PID/uniqueid/unit并按回调配平引用。原代码host复现refcount1，新代码
 ASan/UBSan、原生构建和实机通过；首次H4 out26/up25，原panic未记录，日志继续，

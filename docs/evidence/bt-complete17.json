@@ -1,0 +1,75 @@
+{
+  "instruction_cases": 24,
+  "optional_callback_cases": 144,
+  "host": {
+    "passed": true,
+    "actual_function_sha256": "7d97f7b351a001f081f3d4d3f482a05fa8e7f72681fa140f7447fb25ef28c99c",
+    "actual_marker_sha256": "33825d354bdb0696dd575d2d9b08feb4118339ead7900f22e5265ceb136ad4f4",
+    "asan_ubsan": true
+  },
+  "lf_rebuild": {
+    "source_line_endings": "LF",
+    "same_loaded_native_contract": true,
+    "kernel_identical": false,
+    "original_kernel_sha256": "3e795f63189868f2abe3af236206eeed792acd9e73a910b391126d3066c56cad",
+    "new_kernel_sha256": "3b37d985ea9e0263d31dd0e281b5ee204a7e624d42f389b2416735a66fd1cad7",
+    "no_additional_hardware_trial": true
+  },
+  "hardware": {
+    "trial": "complete-v132",
+    "raw_log": "edl_work/live-complete-v132-20261115/usb/20261114-204641.bin",
+    "bytes": 1172960,
+    "sha256": "9dc14398b956511de4a41245fae5f1ed95d4584c50710b8d447884868ac3180f",
+    "dropped": 31,
+    "discontinuities": [],
+    "recovery_complete": true,
+    "explicit_sync_return": true,
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "android_root_green_boot_completed": true,
+    "sleep_requested": true,
+    "native_completion": [
+      "ELDEN_BT_NATIVE_INIT pid=79 result=0 accepted=1"
+    ],
+    "host_states": [
+      "ELDEN_BT_HOST live client=0 ready=1 out=50 up=49 bad=0 pending=0",
+      "ELDEN_BT_HOST live client=0 ready=1 out=50 up=49 bad=0 pending=0"
+    ],
+    "exit_frames": [
+      "ELDEN_BT_EXIT_STACK pid=79 pc=1d9c3e5f0 lr=100587bd4 fp=16fa036b0 syscall=1",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=0 return=1009a0250",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=1 return=1004d8904",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=2 return=19da61c9c",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=3 return=19da62cc0",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=4 return=19da3e8f8",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=5 return=19da3f374",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=6 return=19da48a34",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=7 return=19da48338"
+    ],
+    "stderr": [
+      "ELDEN_BT_STDERR pid=79 line=1 iov=0 bytes=67 copied=67 error=0 text=com.apple.server.bluetooth: Bluetooth Super Server Robot Destroyer",
+      "ELDEN_BT_STDERR pid=79 line=2 iov=0 bytes=46 copied=46 error=0 text=could not find BT_DEVICE_ADDRESS env variable",
+      "ELDEN_BT_STDERR pid=79 line=3 iov=0 bytes=62 copied=62 error=0 text=marconi-bt: Unable to match bluetooth service in device tree.",
+      "ELDEN_BT_STDERR pid=79 line=4 iov=0 bytes=47 copied=47 error=0 text=marconi-bt: Not a valid MAC address (all 00s).",
+      "ELDEN_BT_STDERR pid=79 line=5 iov=0 bytes=52 copied=52 error=0 text=bluetooth: Got local-mac-address: 81:7d:ee:dc:0c:26",
+      "ELDEN_BT_STDERR pid=79 line=6 iov=0 bytes=54 copied=54 error=0 text=FindLocalMacAddress Deleting local address from plist",
+      "ELDEN_BT_STDERR pid=79 line=7 iov=0 bytes=66 copied=66 error=0 text=com.apple.server.bluetooth: Server attached, going into msg loop.",
+      "ELDEN_BT_STDERR pid=79 line=9 iov=0 bytes=43 copied=43 error=0 text=Update Dynamic Store with state On\t value 1"
+    ],
+    "kernel_ref_panic_recorded": false,
+    "pairing_verified": false,
+    "wifi_working": false,
+    "complete_peripheral_goal": false,
+    "source_only_hci_followup_needed": true,
+    "native_initialization_passed": true,
+    "daemon_later_exits": true,
+    "next_exit_slide_candidate": "0x480000",
+    "next_exit_normalized_frames": [
+      "0x100107bd4",
+      "0x100520250",
+      "0x100058904"
+    ],
+    "slide_basis": "Unique original BL to imported __exit with matching low return-PC bits; first two parent BL targets also match. Inferred, not a captured mapping."
+  },
+  "empty_combined_clean_command_repeated": false,
+  "individual_source_stages_executed": true
+}
