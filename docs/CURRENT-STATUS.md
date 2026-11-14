@@ -1,5 +1,11 @@
 # 当前状态 · 2026-11-14
 
+v128补齐Bluetooth DT节点与platform-service发布，实机确认encoding1/speed8M和双侧
+发布成功；之后仍USB停顿，H4未观察到。已自动实fastboot/完整stock/Android恢复。
+静态查明marconi-bt警告只是先尝试该名字失败，后续bluetooth地址查询已成功；不能
+靠造marconi别名解决。下一步确认自有BlueTool的真实script/result/reply完成，现有
+bootstrap Ready/0不等于用户态回复成功。详profiles/bt-registry。Goal仍active。
+
 v127已将BlueTool四字段缓存、签名和新信任项完整接入。实机两轮cache stage5/status0，
 925323B完整回读和runtime prepared1；之后仍停顿。第一轮114763B/drop23后写查询超时；
 同像纯接收对照110710B后也不再增长，监听器保持到设备复位，说明PC周期查询不是

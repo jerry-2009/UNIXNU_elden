@@ -1,0 +1,36 @@
+{
+  "candidate": "v128",
+  "image_sha256": "9138b45d1b63e4c57b041f63e9538f6376d81a5bda6b1e2066e36c92c18f430b",
+  "session": "7a3381cb4c5d2ad7",
+  "bytes": 109584,
+  "raw_sha256": "b12cee382b2fe7c15a05e4702e78c77dd8a6121e77c7b895c78e12e82b02c627",
+  "max_reported_drop": 0,
+  "discontinuities": [
+    {
+      "offset": 109584,
+      "utc": "2026-11-14T14:51:40.470877+00:00",
+      "error": "Write timeout",
+      "partial_line_chars": 0
+    }
+  ],
+  "registry_published": true,
+  "lines": [
+    "ELDEN_BT_REGISTRY device-tree=1 platform-service=1 encoding=1 speed=8000000",
+    "ELDEN_BT_STDERR pid=79 line=3 iov=0 bytes=62 copied=62 error=0 text=marconi-bt: Unable to match bluetooth service in device tree.",
+    "ELDEN_BT_STDERR pid=79 line=4 iov=0 bytes=47 copied=47 error=0 text=marconi-bt: Not a valid MAC address (all 00s).",
+    "ELDEN_BT_STDERR pid=79 line=5 iov=0 bytes=52 copied=52 error=0 text=bluetooth: Got local-mac-address: 81:7d:ee:dc:0c:26",
+    "ELDEN_BT_PHASE bootstrap-enter call=1 write=0",
+    "ELDEN_BT_PHASE bootstrap-snapshot call=1 state=2",
+    "ELDEN_BT_PHASE bootstrap-return call=1 result=0",
+    "ELDEN_BT_PHASE bootstrap-enter call=2 write=0",
+    "ELDEN_BT_PHASE bootstrap-snapshot call=2 state=2",
+    "ELDEN_BT_PHASE bootstrap-return call=2 result=0"
+  ],
+  "h4_connected_observed": false,
+  "bluetooth_accepted": false,
+  "explicit_sync_return": false,
+  "fastboot_observed": true,
+  "reset_cause_unknown": true,
+  "recovery_complete": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890"
+}
