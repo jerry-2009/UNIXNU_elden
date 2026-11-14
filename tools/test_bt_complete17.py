@@ -57,8 +57,11 @@ def instructions(original):
             rows.append({'kind':'support','slide':slide,'byte18':support,'submitted':bool(support&8)})
     return rows
 
-def host_tests(cxx,out):
-    function=host().decode().split('extern "C" int elden_bt_native_init_result',1)[1]
+def host_tests(cxx,out,scan=False):
+    derive=host
+    if scan:
+        from ScanInitSource import host as derive
+    function=derive().decode().split('extern "C" int elden_bt_native_init_result',1)[1]
     function='extern "C" int elden_bt_native_init_result'+function
     marker=(ROOT/'drivers/EldenBluetooth/diagnostics/NativeInitMarker.inc').read_text()
     text=r'''
@@ -70,7 +73,7 @@ struct Proc{int pid;uint64_t unique;const char *name;bool hash;};using proc_t=Pr
 int proc_pid(proc_t p){return p->pid;} uint64_t proc_uniqueid(proc_t p){return p->unique;}
 const char *proc_best_name(proc_t p){return p->name;}
 int proc_getcdhash(proc_t p,unsigned char *out){const unsigned char h[]={0xfe,0x7b,0xc1,0x82,0x38,0x6a,0x27,0x66,0xc7,0x57,0x4f,0x8b,0x48,0x41,0x2f,0xf9,0xdf,0x11,0x35,0x64};memcpy(out,h,20);out[0]^=!p->hash;return 0;}
-enum {PbLinkUp=2};struct Bridge{uint32_t unit,client;int pid,link;bool pending,own_reset,ready,ready_noted;};
+enum {PbLinkUp=2};struct Bridge{uint32_t unit,client;int pid,link;bool pending,own_reset,ready,ready_noted;unsigned failed_starts;};
 struct Host{int client_pid;uint64_t client_uniqueid;uint32_t client_unit;Bridge bridge;int *lock;bool withdrawing;};
 Host *gEldenBtHost;int lock_depth;bool stopping;
 void IOLockLock(int*){assert(lock_depth==0);++lock_depth;}void IOLockUnlock(int*){assert(lock_depth==1);--lock_depth;}
@@ -81,7 +84,7 @@ void marker(proc_t p,uint32_t code,uint64_t status,uint64_t mode,uint64_t versio
 }
 int main(){
  Proc p{79,1234,"bluetoothd",true};Host h{};
- auto reset=[&]{h={79,1234,1,{1,1,79,PbLinkUp,false,false,false,false},nullptr,false};gEldenBtHost=&h;stopping=false;};
+ auto reset=[&]{h={79,1234,1,{1,1,79,PbLinkUp,false,false,false,false,17},nullptr,false};gEldenBtHost=&h;stopping=false;};
  for(int fault=0;fault<12;++fault){reset();uint32_t result=0;
   switch(fault){case 1:h.client_pid++;break;case 2:h.client_uniqueid++;break;case 3:h.client_unit++;break;case 4:h.bridge.client=0;break;case 5:h.bridge.pid++;break;case 6:h.bridge.link=0;break;case 7:h.bridge.pending=true;break;case 8:h.bridge.own_reset=true;break;case 9:stopping=true;break;case 10:h.withdrawing=true;break;case 11:result=0x274;break;}
   assert(elden_bt_native_init_result(&p,result)==(fault==0));assert(h.bridge.ready==(fault==0));assert(h.bridge.ready_noted==(fault==0));assert(lock_depth==0);
@@ -98,16 +101,20 @@ int main(){
  assert(lock_depth==0);puts("PASS actual completion and marker guards");
 }
 '''
+    if scan:
+        anchor='assert(h.bridge.ready_noted==(fault==0));'
+        assert text.count(anchor)==1
+        text=text.replace(anchor,anchor+'assert(h.bridge.failed_starts==(fault==0?0:17));')
     source=out/'native-init-test.cpp';source.write_text(text);exe=out/'native-init-test'
     subprocess.run([cxx,'-std=c++17','-O1','-g','-fsanitize=address,undefined','-fno-omit-frame-pointer',str(source),'-o',str(exe)],check=True)
     r=subprocess.run([str(exe)],capture_output=True);(out/'host.log').write_bytes(r.stdout+r.stderr);r.check_returncode()
     return {'passed':True,'actual_function_sha256':hashlib.sha256(function.encode()).hexdigest(),'actual_marker_sha256':hashlib.sha256(marker.encode()).hexdigest(),'asan_ubsan':True}
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--original',type=Path);p.add_argument('--cxx');p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--original',type=Path);p.add_argument('--cxx');p.add_argument('--scan',action='store_true');p.add_argument('--output',type=Path,required=True);a=p.parse_args()
     a.output.mkdir(parents=True,exist_ok=False);r={}
     if a.original:r['instructions']=instructions(a.original)
-    if a.cxx:r['host']=host_tests(a.cxx,a.output)
+    if a.cxx:r['host']=host_tests(a.cxx,a.output,a.scan)
     assert r;r['passed']=True
     (a.output/'result.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps({'passed':True,'instruction_cases':len(r.get('instructions',[])),'host':bool(a.cxx)}))
 if __name__=='__main__':main()
