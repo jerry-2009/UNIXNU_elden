@@ -1,0 +1,71 @@
+{
+  "hardware": {
+    "trial": "v139",
+    "image_sha256": "880ffd6b6bcadd08f9218084182a23a5b35fd7a48c2c7840777e4a2abc5719a8",
+    "session": "749dba0f0bad0011",
+    "raw_log": "edl_work/live-charge-verify-v139-20261115/usb/20261114-234558.bin",
+    "bytes": 1204986,
+    "sha256": "7caacc3f9c38e4f9acdf959e2708a319cac1cb93280f5e6de6260465ba50e5eb",
+    "dropped": 6,
+    "discontinuities": [],
+    "charge_sequence": [
+      {
+        "event": "sent",
+        "mode": "bypass",
+        "before_generation": 0,
+        "elapsed": 47.43799999996554
+      },
+      {
+        "event": "applied",
+        "mode": "bypass",
+        "generation": 1,
+        "elapsed": 53.68799999996554
+      },
+      {
+        "event": "sent",
+        "mode": "stock",
+        "before_generation": 1,
+        "elapsed": 63.04700000002049
+      },
+      {
+        "event": "applied",
+        "mode": "stock",
+        "generation": 2,
+        "elapsed": 72.39099999994505
+      }
+    ],
+    "charge_errors": [],
+    "charge_sequence_complete": true,
+    "stock_restore_verified_in_xnu": true,
+    "android_charge_settings_before": "1\r\n095100\r\n095100",
+    "android_charge_settings_after": "1\r\n095100\r\n095100",
+    "android_settings_equal": true,
+    "stock_full_sha_restored": true,
+    "explicit_sync_return": true,
+    "android_root_green_boot_completed": true,
+    "sleep_requested": true,
+    "key_lines": [
+      "ELDEN_CHARGE applied mode=2 window=95100 EU-window=95100 enabled=0 firmware-held=0 cycle=17",
+      "ELDEN_CHARGE applied mode=1 window=95100 EU-window=95100 enabled=1 firmware-held=0 cycle=24",
+      "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+    ],
+    "fault_paths_host_tested_only": true,
+    "dual_port_net_charging_accepted": false,
+    "full_protection_cycles_accepted": false
+  },
+  "host": {
+    "passed": true,
+    "old_wait_timeout_gap_reproduced": true,
+    "asan_ubsan": true,
+    "results": [
+      "PASS 2 policy verification groups",
+      "PASS 12 policy verification groups",
+      "ChargePolicy: 146 checks passed"
+    ],
+    "policy_sha256": "5f9691921c1545f315aee0ef50ac390630034c26c7ae9b3878cf5fc949727ea9",
+    "client_sha256": "5242cc51c521a459eac646c755f27b03cb5090fc4be36bd9c943bcfa35b83673",
+    "hardware_tested": false
+  },
+  "historical_client_draft_not_reintroduced": true,
+  "full_goal_complete": false
+}

@@ -1,0 +1,86 @@
+"""Rebuild the charging verification pair over the source-built address baseline."""
+from pathlib import Path
+import argparse,hashlib,io,json,os,re,shutil,subprocess,sys,tarfile
+from replay_xnu_objects import global_symbols,sections
+from link_v91_kernel import native_identity,verify_original_executables
+from audit_entry_relocation import entry
+ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'drivers/EldenPmicGlink'))
+from VerificationSource import policy,client,POLICY,CLIENT,CLIENT_PATH
+
+def read(p):return json.loads(p.read_text())
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def write(p,v):p.write_text(json.dumps(v,indent=2)+'\n')
+def exports(p):return {k for k,v in global_symbols(p).items() if v[0]&0x0e}
+
+def main():
+    if sys.flags.optimize:raise ValueError('Assertions required')
+    p=argparse.ArgumentParser(description=__doc__)
+    for n in ('clean-build','parent-build','original-kernelcache','llvm','output'):p.add_argument('--'+n,type=Path,required=True)
+    a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
+    if out.exists():raise ValueError('Fresh output required')
+    c=read(ROOT/'profiles/bt-address17/native-contract.json')
+    assert native_identity(parent/'native.macho')==(c['sections'],c['commands'],c['symbols'])
+    parent_report=read(parent/'result.json');assert sha(parent/'kernel.macho')==parent_report['kernel_sha256']
+    rows=read(base/'native/build/results.json');capture=read(base/'native/capture.json')
+    virtual_root=read(ROOT/'profiles/v91/native-build/plan.json')['virtual_root'].rstrip('/')
+    out.mkdir(parents=True);(out/'source').mkdir();records={};objects={};inherited={}
+    for unit,name,derive,expected in [('PmicClient','PmicClient.cpp',client,CLIENT),('ChargePolicy','ChargePolicy.c',policy,POLICY)]:
+        matches=[r for r in rows.values() if Path(r['source']).name==name];assert len(matches)==1;row=matches[0]
+        old=Path(row['output']);assert row['accepted'] and sha(old)==row['sha256']
+        assert not row.get('postprocess') and not row.get('objcopy')
+        jobs=[j for j in capture['jobs'] if j['file']==row['source']];assert len(jobs)==1
+        directory=jobs[0]['directory'];assert directory.startswith(virtual_root+'/')
+        relative=directory[len(virtual_root)+1:]
+        if relative.startswith('research/'):relative='records/'+relative[len('research/'):]
+        cwd=(base/'native/build/project'/relative).resolve();assert cwd.is_relative_to((base/'native/build/project').resolve()) and cwd.is_dir()
+        source=out/'source'/name;source.write_bytes(derive());cmd=list(row['command']);overlay=read(Path(cmd[cmd.index('-ivfsoverlay')+1]));assert overlay['fallthrough'] is False
+        bindings=[];extra=[]
+        for item in overlay['roots']:
+            f=Path(item['external-contents']);inherited[str(f)]=sha(f)
+            if item['name'].endswith('/'+name):
+                assert sha(f)==expected;item['external-contents']=str(source);bindings.append(item['name'])
+                if unit=='PmicClient':extra.append({'type':'file','name':str(Path(item['name']).parent/'ChargeVerification.h'),'external-contents':str(ROOT/'drivers/EldenPmicGlink/ChargeVerification.h')})
+        assert bindings;known={x['name'] for x in overlay['roots']}
+        for item in extra:
+            if item['name'] not in known:overlay['roots'].append(item);known.add(item['name'])
+        vfs=out/(unit+'.overlay.json');write(vfs,overlay);cmd[cmd.index('-ivfsoverlay')+1]=str(vfs)
+        obj=out/(unit+'.o');cmd[cmd.index('-o')+1]=str(obj)
+        result=subprocess.run(cmd,cwd=cwd,capture_output=True);(out/(unit+'.log')).write_bytes(result.stdout+result.stderr);result.check_returncode()
+        assert exports(obj)==exports(old) and not any(k.endswith('/__mod_init_func') for k in sections(obj))
+        asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',obj],text=True);(out/(unit+'.asm')).write_text(asm)
+        assert not re.search(r'^\s*[0-9a-f]+:\s+[0-9a-f]{8}\s+.*\b[qvdshb]\d+(?:\b|\.)',asm,re.M)
+        records[unit]={'source_sha256':sha(source),'object_sha256':sha(obj),'command':cmd,'cwd':str(cwd),'bindings':bindings};objects[unit+'.o']=obj
+    link=read(parent/'link-command.json');ars=[v.split(',')[-1] for v in link if v.endswith('/libEldenPmicClient.a')];assert len(ars)==1;oldar=Path(ars[0])
+    folder=out/'pmic';folder.mkdir();names=[n for n in subprocess.check_output(['ar','t',oldar],text=True).splitlines() if not n.startswith('__.SYMDEF')];assert set(objects)<=set(names);members={}
+    for name in names:
+        data=objects[name].read_bytes() if name in objects else subprocess.check_output(['ar','p',oldar,name]);(folder/name).write_bytes(data);members[name]=hashlib.sha256(data).hexdigest()
+    archive=folder/oldar.name;subprocess.run(['ar','rcs',archive,*names],cwd=folder,env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
+    for name in names:
+        data=subprocess.check_output(['ar','p',archive,name]);expected=(folder/name).read_bytes()
+        assert data==expected or data==expected+b'\n'*((-len(expected))%8)
+    inputs={str(parent/'link.filelist'):sha(parent/'link.filelist')}
+    for f in (parent/'link.filelist').read_text().splitlines():inputs[f]=sha(Path(f))
+    for arg in link:
+        f=arg.split(',',2)[2] if arg.startswith('-Wl,-force_load,') else arg
+        if Path(f).is_file() and f.endswith(('.a','.o')):inputs[f]=sha(Path(f))
+    fl=[x.split(',')[-1] for x in link if x.endswith('link.filelist')];assert len(fl)==1
+    (out/'link.filelist').write_bytes((parent/'link.filelist').read_bytes())
+    cmd=[x.replace(str(parent/'native.macho'),str(out/'native.macho')).replace(str(oldar),str(archive)).replace(fl[0],str(out/'link.filelist')) for x in link];write(out/'link-command.json',cmd)
+    env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
+    with (out/'link.log').open('x') as f:subprocess.run(cmd,cwd=out,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
+    assert exports(out/'native.macho')==exports(parent/'native.macho')
+    for f,h in {**inputs,**inherited}.items():assert sha(Path(f))==h
+    pre=read(ROOT/'profiles/v91/image-build/plan.json')['prelink'];assert sha(a.original_kernelcache)==pre['original_kernelcache_sha256'];kit=out/'prelink-tool';kit.mkdir()
+    with tarfile.open(fileobj=io.BytesIO(subprocess.check_output(['git','-C',str(base/'dependencies/XnuPrelink'),'archive',pre['commit']]))) as t:t.extractall(kit,filter='data')
+    cmd=[sys.executable,str(kit/'emit_prelink.py'),'--kernel',str(out/'native.macho'),'--prelinked',str(a.original_kernelcache.resolve()),'--slide='+pre['slide'],'--output',str(out/'kernel.macho')]
+    for v in pre['roots']:cmd+=['--root',v]
+    for v in pre['early_security_initializers']:cmd+=['--early-security-init',v]
+    with (out/'prelink.log').open('x') as f:subprocess.run(cmd,cwd=out,stdout=f,stderr=subprocess.STDOUT,check=True)
+    assert verify_original_executables(out/'kernel.macho',read(out/'kernel.json'),pre['original_executable_sha256'])==30
+    before=entry((parent/'kernel.macho').read_bytes());after=entry((out/'kernel.macho').read_bytes());assert before[2]==after[2] and before[1]-before[0]==after[1]-after[0]==7124
+    files=[Path(__file__).resolve(),ROOT/'drivers/EldenPmicGlink/VerificationSource.py',ROOT/'drivers/EldenPmicGlink/ChargeVerification.h',ROOT/'drivers/EldenPmicGlink/ChargePolicy.c',ROOT/'drivers/EldenPmicGlink/ChargePolicy.h',CLIENT_PATH]
+    sources={**parent_report['source_inputs'],**{str(f.relative_to(ROOT)):sha(f) for f in files}}
+    report={'profile':'charge-verification','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),'changed_core_objects':0,'changed_native_objects':2,'native_objects':records,'archive_members':members,'core_filelist_unchanged':True,'scalar':True,'optional_runtime':parent_report['optional_runtime'],'source_inputs':sources,'inherited_inputs':inputs,'inherited_sources':inherited,'entry_return_target':hex(after[1]),'parent_kernel_sha256':parent_report['kernel_sha256'],'original_apple_executables_hashed':30,'hardware':False}
+    write(out/'result.json',report);shutil.copytree(parent/'runtime',out/'runtime');print(json.dumps({'kernel_sha256':report['kernel_sha256'],'changed_objects':2}))
+if __name__=='__main__':main()

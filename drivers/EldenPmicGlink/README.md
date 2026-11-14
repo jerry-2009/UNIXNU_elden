@@ -1,12 +1,16 @@
 # Elden PMIC GLINK board adapter
 
-Current status and the offline battery-UI candidate are in
-[CHARGING-STATUS.md](../../docs/CHARGING-STATUS.md). UCSI init2/DA65, the five-step
-charge-mode sequence and stock restore have hardware evidence. Short-port-only
-PD input reached about15W in the owner's meter test; full charging, dual-port
-arbitration and complete protection cycles remain unqualified. The v94 GUI
-diagnostic menu disables battery UI; v96 restores its existing scalar contract
-without changing any driver or charger control. v96 is signed but unflashed.
+Current implementation, evidence and remaining acceptance are consolidated in
+[CHARGING-STATUS.md](../../docs/CHARGING-STATUS.md). UCSI init2/DA65, charge modes,
+stock restore and battery UI have hardware evidence. Short-port-only PD input
+reached about15W in the owner's meter test. Dual-port arbitration, sustained net
+charging and complete protection cycles remain unqualified; firmware ownership
+and the PC's permitted USB budget are preserved.
+
+`VerificationSource.py` derives the fresh-readback/finite-wait fix from the actual
+frozen build source, which excludes the retired direct-DC experiment. It must
+not be rebuilt from that broader historical working draft. The variant is
+documented in [charge-verification](../../profiles/charge-verification/README.md).
 
 The OEM USB-online report is priority-selected across both inputs: input1 can
 populate it while input0 is offline. It is not exclusively the PC connector.
