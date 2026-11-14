@@ -198,18 +198,14 @@ def main():
     report['candidate_session']=a.expect_session
     meta.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print('Opening verified '+selected.device+'; configuring CDC and DTR...',flush=True)
-    for attempt in range(3):
-        try:s.open();break
-        except (serial.SerialException,OSError) as error:
-            report.setdefault('open_errors',[]).append(str(error))
-            report['bound_startup_milestone_observed']=False
-            meta.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-            # Windows can publish the PnP node before the COM path survives enumeration.
-            # Retry only this pre-I/O missing-path case, with fresh identity checks.
-            if attempt==2 or 'FileNotFoundError(2' not in str(error):raise
-            s.close();time.sleep(.5)
-            fresh=[p for p in list_ports.comports() if p.device==selected.device and p.location==selected.location and admitted(p)]
-            if len(fresh)!=1:raise
+    from cdc_open import open_verified
+    def open_error(error):
+        report.setdefault('open_errors',[]).append(str(error))
+        report['bound_startup_milestone_observed']=False
+        meta.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    selected,attempts=open_verified(s,selected,list_ports.comports,admitted,(serial.SerialException,OSError),open_error)
+    report['open_attempts']=attempts
+    report['verified_pnp_instance']=getattr(selected,'elden_verified_instance',None)
     started=time.monotonic();report['opened_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat()
     tracker=Milestone(a.expect_session);lines=ConsoleLines();next_status=started+.5;report['statuses']=[]
     reboot_sent=False;home_sent=False;home_release_ok=False;swipe_release_ok=False;homes_sent=0;last_home_sent=0;hid_ready=False;gui_at=None;received_hash=hashlib.sha256()

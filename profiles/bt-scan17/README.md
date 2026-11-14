@@ -1,5 +1,10 @@
 # v133 standard extended scanning on iPadOS17
 
+Correction from v135/v136: the lower flag roles below were reversed. Actual
+native senders show0x93c32e selects standard extended commands and0x93c32d
+enables vendor callbacks. This profile is retained as a failed experiment;
+use [bt-scan-roles17](../bt-scan-roles17/README.md) for the corrected mapping.
+
 Hardware result: this candidate still sent0x200b/status0xc and then exited,
 with H4 out50/up49. It is not a successful scanning baseline. The subsequent
 [scan-ready17](../bt-scan-ready17/README.md) profile refreshes the dynamic

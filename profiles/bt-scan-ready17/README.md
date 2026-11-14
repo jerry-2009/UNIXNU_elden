@@ -1,5 +1,9 @@
 # v134 publish scan capabilities after discovery
 
+Superseded: v135 observed populated capabilities and applied instructions;
+actual native send-path analysis then proved the two lower roles reversed.
+See [bt-scan-roles17](../bt-scan-roles17/README.md). Do not reuse the old labels.
+
 Hardware still sends0x200b/status0xc and exits with out50/up49, despite native
 completion0/accepted1. The ordering fix alone did not resolve the observed
 failure. Do not promote this as a scanning baseline or force capability bits.
