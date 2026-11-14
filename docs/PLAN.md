@@ -1,5 +1,13 @@
 # 下一阶段顺序
 
+v130已修复跨syscall持有proc_find引用造成的内核panic；真实H4 out26/up25、串口
+持续和同步回程恢复。下一步原daemon完成25轮交互后的新退出栈/host-flow初始化；
+扫描、配对仍欠，保留真实错误，不关闭全局LC掩盖后续重启拒绝。
+
+11月15日v129已确认助手boot/init的完整回复流程返回0，H4 connect回调也真实返回0。
+下步分析connect之后的kernel-control/termios/首包路径；命令流量与配对仍欠。
+不再重复助手Ready、缓存、设备树或固件上电测试，不添加未证实需要的睡眠成功绕过。
+
 v128配对的DT/platform-service已实机发布，但停顿未解。marconi警告已定位为正常
 名字回退的一部分，不再为消除此警告修改设备身份。下步明确自有BlueTool正在处理
 的脚本、决定的结果和XPC回复完成边界；不能仅凭内核bootstrap返回0判断回复成功。

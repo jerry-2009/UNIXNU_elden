@@ -107,3 +107,15 @@ v125追加 `--bt-transport-trace`，记录有上限的bootstrap与H4回调阶段
 v127在此链上添加 `--bluetool-lifecycle`，从声明的原OS镜像生成四字段修改的
 签名缓存，并编译进RAM挂载阶段。不要同时选择更细的 `--bt-syscall-trace`。
 缓存挂载与完整回读已实机通过，后续蓝牙/USB停顿仍待修复。
+
+当前蓝牙实验v130还包含registry、助手阶段记录和进程引用修复，可从同一源码入口生成：
+
+```sh
+python3 tools/build_clean.py --variant bluetooth --bt-exit-stack \
+  --software-keystore --bluetool-launch --bt-transport-trace \
+  --bluetool-lifecycle --bt-registry --bt-helper-trace --bt-process-lifetime \
+  --inputs inputs.json --output NEW --target boot --jobs 4
+```
+
+完整基础构建与这些后续阶段均已执行并生成实测像；这一组完整选项尚未重新从空
+输出跑一遍。v130修复了H4连接时的内核引用panic，已有真实收发，但尚未完成配对。

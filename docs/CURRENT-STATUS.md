@@ -1,5 +1,20 @@
 # 当前状态 · 2026-11-14
 
+v130（11月15日）已修复明确的内核panic：H4 connect不再把proc_find引用留出系统
+调用，改存PID/uniqueid/unit并按回调配平引用。原代码host复现refcount1，新代码
+ASan/UBSan、原生构建和实机通过；首次H4 out26/up25，原panic未记录，日志继续，
+同步RPC回fastboot及完整stock/Android恢复重新正常。daemon之后另有初始化退出，
+尚未stack-ready/配对；下一步按新退出栈查0x0c33/0x0c31附近流程。
+
+BaseCrypto获取缺口已关闭：Microsoft mu_crypto_release v1.1.3官方附件重新下载，
+ZIP和994件输入全部匹配；新增tools/fetch_basecrypto.py及公开锁，见CLEAN-INPUTS.md。
+
+v129（11月15日）实机首次完整确认：BlueTool的boot/init均完成8阶段、result0，
+随后H4 client connected pid79/unit1、connect-result0。仍未证实后续命令流量/配对，
+USB之后中断；自动实fastboot/全SHA恢复Android成功，无同步复位证明。下一步定位
+连接成功之后的控制路径，不再怀疑已返回成功的boot/init或假放行deepsleep。
+实际助手SVC发送器64例通过，整像首次查出旧未消费头替换错误后已修正再包；详profiles/bt-helper-trace。
+
 v128补齐Bluetooth DT节点与platform-service发布，实机确认encoding1/speed8M和双侧
 发布成功；之后仍USB停顿，H4未观察到。已自动实fastboot/完整stock/Android恢复。
 静态查明marconi-bt警告只是先尝试该名字失败，后续bluetooth地址查询已成功；不能
