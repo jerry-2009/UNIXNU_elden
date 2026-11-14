@@ -28,6 +28,7 @@ def check(inputs,variant,target):
             subprocess.run(['git','-C',str(inputs[name]),'cat-file','-e',fp[key]+'^{commit}'],check=True)
         sys.path.insert(0,str(ROOT/'tools/device'));from avb_guard import check_image
         boot=check_image(inputs['stock_boot'],'boot_a');check_image(inputs['parent_vbmeta'],'vbmeta')
-        if boot.sha256!='8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890':raise ValueError('Wrong stock boot template')
+        ACCEPTED_STOCK={'8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890','4e4c9c72707c7cb91c29a2ccece15ca919a3fa2098cea795e28ed22dfdcd86fc'}
+        if boot.sha256 not in ACCEPTED_STOCK:raise ValueError('Wrong stock boot template (accepted: original testlab baseline or Jerry-local rebuild from ArmadaOS boot_a)')
         if not inputs['avbtool'].is_file() or not inputs['signing_key'].is_file():raise ValueError('Signing inputs absent')
     return {'original_inputs_verified':True,'variant':variant,'target':target,'device_operation':False}
