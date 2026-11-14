@@ -1,6 +1,6 @@
 """Explicit v99/v101 runtime boot contracts; no device operations."""
 from pathlib import Path
-import copy,hashlib,json,tomllib
+import copy,hashlib,json,tomllib,struct,sys
 from fbwc_boot import template as framebuffer_template
 from battery_boot import template as battery_template,arguments
 from audit_entry_relocation import entry as inspect_entry
@@ -11,6 +11,9 @@ def qualify(report_path,entry_path,runtime):
     if not report_path or not entry_path or not runtime:raise ValueError('Complete v99 build, entry and runtime inputs required')
     report=json.loads(Path(report_path).read_text());entry=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     name=report.get('profile')
+    if name=='bluetool-lifecycle':
+        from bluetool_lifecycle_boot import qualify as qualify_lifecycle
+        return qualify_lifecycle(report_path,entry_path,runtime)
     if name=='bt-syscall-trace':
         from bt_syscall_trace_boot import qualify as qualify_syscalls
         return qualify_syscalls(report_path,entry_path,runtime)
@@ -70,7 +73,7 @@ def menu(qualification=None):
     expected=arguments(original)
     for key in removed:expected.pop(key)
     expected['elden-wcn-power']='4'
-    if qualification and qualification.get('profile') in ('elden-software-keystore','bluetool-owner-launch','bt-transport-trace','bt-syscall-trace'):
+    if qualification and qualification.get('profile') in ('elden-software-keystore','bluetool-owner-launch','bt-transport-trace','bt-syscall-trace','bluetool-lifecycle'):
         slots=[i for i,t in enumerate(result) if t.partition('=')[0]=='elden-key-state']
         if len(slots)!=1 or expected.get('elden-key-state')!='1':raise ValueError('Expected old state mode1')
         result[slots[0]]='elden-key-state=2'
@@ -93,8 +96,21 @@ def adt(base,qualification=None):
     old=bytes.fromhex(found[0]['hex'])
     if not old.endswith(b'\0') or b'bluetoothd,' in old:raise ValueError('Prior Bluetooth fixup is not allowed')
     updated=old+FIXUP
-    if qualification and qualification['profile'] in ('v118-native17','v119-bt-exit','v120-bt-xpc','v121-bt-stderr','current-source','bt-exit-stack','elden-software-keystore','bluetool-owner-launch','bt-transport-trace','bt-syscall-trace'):
+    if qualification and qualification['profile'] in ('v118-native17','v119-bt-exit','v120-bt-xpc','v121-bt-stderr','current-source','bt-exit-stack','elden-software-keystore','bluetool-owner-launch','bt-transport-trace','bt-syscall-trace','bluetool-lifecycle'):
         updated=bytes.fromhex(qualification['text_fixups_hex'])
         if not updated.startswith(old+FIXUP) or len([x for x in updated.split(b'\0') if x])!=(31 if qualification['profile']=='v120-bt-xpc' else 22):raise ValueError('Native17 table contract differs')
     found[0]['hex']=updated.hex();result.pop('sha256',None)
+    return result
+def augment_trust(original,qualification):
+    if qualification.get('profile')!='bluetool-lifecycle':return original
+    if hashlib.sha256(original).hexdigest()!=qualification['cache_input_trust_sha256']:raise ValueError('Unexpected trust before cache')
+    sys.path.insert(0,str(ROOT/'tools/legacy-workbench'))
+    from icon_cpu_trust import parts
+    old=parts(original);digest=bytes.fromhex(qualification['cache_cdhash'])
+    if len(digest)!=20 or any(p[i:i+20]==digest for p in old for i in range(24,len(p),24)):raise ValueError('Duplicate/invalid cache hash')
+    module=struct.pack('<I16sI',2,hashlib.sha256(original+digest).digest()[:16],1)+digest+bytes([2,0,0,0])
+    values=old+[module];position=4*(len(values)+1);offsets=[]
+    for value in values:offsets.append(position);position+=len(value)
+    result=struct.pack('<I',len(values))+struct.pack('<'+'I'*len(offsets),*offsets)+b''.join(values)
+    if parts(result)[:-1]!=old or hashlib.sha256(result).hexdigest()!=qualification['trust_sha256']:raise ValueError('Cache trust mismatch')
     return result

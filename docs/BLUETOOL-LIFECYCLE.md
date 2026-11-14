@@ -1,5 +1,11 @@
 # BlueTool lifecycle integration
 
+Update: v127 now embeds and mounts this cache/signature before launchd. Two real
+trials pass cache stage5/status0 and full readback; the later log stall remains.
+Receive-only capture of the same image also stalls, so periodic PC queries are
+not necessary for it. See profiles/bluetool-lifecycle. The preparation-only
+description below records the preceding component step, not the latest state.
+
 The original21H461 job and its cached copy are identical, hashes
 e6a3c88d… and f1b99c4e…. The current runtime had retained that job deliberately.
 Sheng's successful native integration applies four overrides through official

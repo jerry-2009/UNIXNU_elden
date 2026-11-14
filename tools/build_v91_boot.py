@@ -85,6 +85,7 @@ def main():
     if hashlib.sha256(trust).hexdigest()!=tc['expected_v91_sha256']:raise RuntimeError('Trustcache is not the v91 contract')
     if bt:
         trust,_=append_trust(trust,(a.bt_runtime/'BlueTool').read_bytes())
+        trust=bt_runtime_boot.augment_trust(trust,bt)
         if hashlib.sha256(trust).hexdigest()!=bt['trust_sha256']:raise ValueError('Runtime trust cache differs')
     (payloads/'kernel.macho.trustcache').write_bytes(trust)
     for source,dest in [(a.kernel,payloads/'kernel.macho'),(a.data,payloads/'data.packed'),(a.loader,assets/'EldenPayloadLoader.efi')]:shutil.copyfile(source,dest)

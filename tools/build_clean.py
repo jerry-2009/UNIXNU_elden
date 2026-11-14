@@ -22,6 +22,7 @@ def main():
     p.add_argument('--bluetool-launch',action='store_true',help='Qualify the exact owned BlueTool on its RAM overlay')
     p.add_argument('--bt-transport-trace',action='store_true',help='Bounded bootstrap sysctl and H4 callback phase logs')
     p.add_argument('--bt-syscall-trace',action='store_true',help='Bounded original-bluetoothd socket and controller-query phases')
+    p.add_argument('--bluetool-lifecycle',action='store_true',help='Build and stage the signed BlueTool launchd lifecycle cache')
     p.add_argument('--jobs',type=int,choices=range(1,9),default=4)
     p.add_argument('--resume',action='store_true',help='Resume completed stages of this exact source/input run')
     a=p.parse_args()
@@ -30,6 +31,7 @@ def main():
     if a.bluetool_launch and not a.software_keystore:raise ValueError('--bluetool-launch requires --software-keystore')
     if a.bt_transport_trace and not a.bluetool_launch:raise ValueError('--bt-transport-trace requires --bluetool-launch')
     if a.bt_syscall_trace and not a.bt_transport_trace:raise ValueError('--bt-syscall-trace requires --bt-transport-trace')
+    if a.bluetool_lifecycle and (not a.bt_transport_trace or a.bt_syscall_trace):raise ValueError('--bluetool-lifecycle requires transport trace without syscall trace')
     if sys.platform!='darwin':raise SystemExit('Native build requires macOS with Xcode/iPhoneOS SDK. Windows/WSL can inspect sources and flash separately.')
     config=a.inputs.resolve();data=read(config);out=a.output.resolve()
     def input_path(name):
@@ -37,6 +39,7 @@ def main():
     needed=['llvm','original_agent','nvt_firmware','original_kernelcache']
     if a.variant=='bluetooth':needed+=['wcn_firmware']
     if a.target=='boot':needed+=['os_image','crypto','mu_repository','unixnu_repository','stock_boot','parent_vbmeta','avbtool','signing_key']
+    elif a.bluetool_lifecycle:needed+=['os_image']
     missing=[name for name in needed if name not in data]
     if missing:raise SystemExit('Missing declared inputs: '+', '.join(missing))
     inputs={name:input_path(name) for name in needed}
@@ -53,6 +56,7 @@ def main():
     identity['bluetool_launch']=a.bluetool_launch
     identity['bt_transport_trace']=a.bt_transport_trace
     identity['bt_syscall_trace']=a.bt_syscall_trace
+    identity['bluetool_lifecycle']=a.bluetool_lifecycle
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
         if not a.resume or not journal.exists():raise ValueError('Use a new output, or explicitly resume this run')
@@ -95,6 +99,7 @@ def main():
     stage('current-units',script('build_current_units.py','--variant',a.variant,'--xnu-source',out/'source/xnu','--dependencies',deps,'--icon-header',out/'agent/EldenIconCpuPayload.h','--nvt-header',out/'nvt/EldenNvtFirmware.h',*generated_args,'--llvm',inputs['llvm'],'--output',out/'units','--jobs',a.jobs),'units/result.json')
     stage('link',script('link_current_kernel.py','--variant',a.variant,'--xnu-objects',out/'xnu/build','--native-archives',out/'native/archives','--units',out/'units','--prelink-repository',deps/'XnuPrelink','--original-kernelcache',inputs['original_kernelcache'],'--output',out/'linked'),'linked/result.json')
     kernel_folder=out/'linked'
+    runtime_folder=out/'generated/runtime'
     if a.bt_exit_stack:
         stage('bt-exit-stack',script('build_bt_exit_stack.py','--clean-build',out,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'exit-stack'),'exit-stack/result.json')
         kernel_folder=out/'exit-stack'
@@ -110,13 +115,17 @@ def main():
     if a.bt_syscall_trace:
         stage('bt-syscall-trace',script('build_bt_syscall_trace.py','--clean-build',out,'--transport-build',out/'bt-transport-trace','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-syscall-trace'),'bt-syscall-trace/result.json')
         kernel_folder=out/'bt-syscall-trace'
+    if a.bluetool_lifecycle:
+        stage('bluetool-cache',script('build_bluetool_job_cache.py','--os-image',inputs['os_image'],'--trust-cache',runtime_folder/'runtime.trustcache','--output',out/'bluetool-cache'),'bluetool-cache/result.json')
+        stage('bluetool-lifecycle',script('build_bluetool_lifecycle.py','--clean-build',out,'--transport-build',out/'bt-transport-trace','--cache-build',out/'bluetool-cache','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bluetool-lifecycle'),'bluetool-lifecycle/result.json')
+        kernel_folder=out/'bluetool-lifecycle';runtime_folder=kernel_folder/'runtime'
     if a.target=='boot':
         stage('firmware',script('build_v91_firmware.py','--mu-root',inputs['mu_repository'],'--unixnu-root',inputs['unixnu_repository'],'--crypto-path',inputs['crypto'],'--llvm',inputs['llvm'],'--output',out/'firmware','--jobs',a.jobs),'firmware/result.json')
         stage('loader',script('build_v91_payload_loader.py','--mu-root',out/'firmware/project/third_party/mu_wide_platforms','--unixnu-root',out/'firmware/project/third_party/UniXNU','--llvm',inputs['llvm'],'--output',out/'loader'),'loader/result.json')
         stage('data',script('build_v91_data_seed.py','--os-image',inputs['os_image'],'--output',out/'data'),'data/result.json')
         ep={'candidate_sha256':read(kernel_folder/'result.json')['kernel_sha256'],'original_executable_sha256':read(ROOT/'profiles/v91/image-build/plan.json')['prelink']['original_executable_sha256']};(out/'entry-plan.json').write_text(json.dumps(ep,indent=2)+'\n')
         stage('entry',script('prepare_v91_entry.py','--kernel',kernel_folder/'kernel.macho','--plan',out/'entry-plan.json','--clang',inputs['llvm']/'clang','--output',out/'entry'),'entry/result.json')
-        variant_args=['--wcn-report',kernel_folder/'result.json','--bt-runtime',out/'generated/runtime'] if a.variant=='bluetooth' else ['--hid-report',kernel_folder/'result.json']
+        variant_args=['--wcn-report',kernel_folder/'result.json','--bt-runtime',runtime_folder] if a.variant=='bluetooth' else ['--hid-report',kernel_folder/'result.json']
         stage('boot',script('build_v91_boot.py','--portable-fat','--kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--fd',out/'firmware/UEFI.fd','--loader',out/'loader/EldenPayloadLoader.efi','--data',out/'data/data.packed','--data-report',out/'data/result.json','--library',out/'icon/EldenIconCpuMode.dylib','--agent',out/'agent/iconservicesagent','--stock-boot',inputs['stock_boot'],'--avbtool',inputs['avbtool'],'--key',inputs['signing_key'],'--clang',inputs['llvm']/'clang',*variant_args,'--output',out/'boot'),'boot/result.json')
         stage('boot-audit',script('audit_v91_boot.py','--image',out/'boot/boot-signed.img','--entry-kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--stock-boot',inputs['stock_boot'],'--parent-vbmeta',inputs['parent_vbmeta'],'--data-report',out/'data/result.json',*variant_args,'--output',out/'boot/audit.json'),'boot/audit.json')
     state['complete']=True;save();print('Completed '+a.target+'; no device operation performed',flush=True)

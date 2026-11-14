@@ -1,5 +1,12 @@
 # 当前状态 · 2026-11-14
 
+v127已将BlueTool四字段缓存、签名和新信任项完整接入。实机两轮cache stage5/status0，
+925323B完整回读和runtime prepared1；之后仍停顿。第一轮114763B/drop23后写查询超时；
+同像纯接收对照110710B后也不再增长，监听器保持到设备复位，说明PC周期查询不是
+必要触发条件。两轮自动实fastboot/全SHA恢复stock、Android/root/green通过，无同步
+回程证明，已熄屏。仍不能称H4连通或判定内核死锁。下步静态核对XPC完成/native17
+启动路径，避免更多盲目内核探针；sysent97/98/54已核实指向正确函数。
+
 v126仍只捕获bootstrap两次Ready/0，socket/ioctl/connect记录未到USB断点前出现。
 110923B/drop0后Write timeout，自动fastboot/完整stock恢复成功，非同步RPC证明。
 已转向补齐实际运行配置：原BlueTool仍为mobile/pressed-exit，缺少sheng的四项

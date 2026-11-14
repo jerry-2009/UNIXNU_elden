@@ -1,0 +1,65 @@
+{
+  "candidate": "v127",
+  "cache_mount_and_full_readback_passed": true,
+  "bluetooth_accepted": false,
+  "status_queries_not_necessary_for_log_stall": true,
+  "receive_only_has_no_runtime_drop_counter": true,
+  "runs": [
+    {
+      "run": "live-lifecycle-v127-20261114",
+      "receive_only": false,
+      "image_sha256": "0b964a78b778652e74cd1788388325a92951b0c395eb2f0cec0432a381f5ff09",
+      "session": "a44777f0fc54bba3",
+      "bytes": 114763,
+      "raw_sha256": "9ac6c2e81abcfda0b7759c5db2dd3c0fad64b33a7ec7725416674cd474f03cf6",
+      "max_reported_drop": 23,
+      "discontinuities": [
+        {
+          "offset": 114763,
+          "utc": "2026-11-14T12:46:04.711582+00:00",
+          "error": "Write timeout",
+          "partial_line_chars": 0
+        }
+      ],
+      "ended_by": "Bounded USB reconnect expired; no controls repeated",
+      "receiver_closed_before_reset": true,
+      "phase_lines": [
+        "ELDEN_BT_CACHE stage=5 status=0 bytes=925323 signed-cache=1",
+        "ELDEN_BT_RUNTIME prepared=1 error=0 mount-stage=5 job-cache-required=1",
+        "ELDEN_BT_PHASE bootstrap-enter call=1 write=0",
+        "ELDEN_BT_PHASE bootstrap-snapshot call=1 state=2",
+        "ELDEN_BT_PHASE bootstrap-return call=1 result=0"
+      ],
+      "explicit_sync_return": false,
+      "fastboot_observed": true,
+      "reset_cause_unproven": true,
+      "recovery_complete": true,
+      "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890"
+    },
+    {
+      "run": "live-lifecycle-v127-rxonly-20261114",
+      "receive_only": true,
+      "image_sha256": "0b964a78b778652e74cd1788388325a92951b0c395eb2f0cec0432a381f5ff09",
+      "session": "a44777f0fc54bba3",
+      "bytes": 110710,
+      "raw_sha256": "61f25eac66a98d48cee156a07e459ec08d4d8982bdeaea4af9c1503426abcd9f",
+      "max_reported_drop": null,
+      "discontinuities": [],
+      "ended_by": "ClearCommError failed (PermissionError(13, '\u8bbe\u5907\u4e0d\u8bc6\u522b\u6b64\u547d\u4ee4\u3002', None, 22))",
+      "receiver_closed_before_reset": false,
+      "phase_lines": [
+        "ELDEN_BT_CACHE stage=5 status=0 bytes=925323 signed-cache=1",
+        "ELDEN_BT_RUNTIME prepared=1 error=0 mount-stage=5 job-cache-required=1",
+        "ELDEN_BT_PHASE bootstrap-enter call=1 write=0",
+        "ELDEN_BT_PHASE bootstrap-snapshot call=1 state=2",
+        "ELDEN_BT_PHASE bootstrap-return call=1 result=0"
+      ],
+      "explicit_sync_return": false,
+      "fastboot_observed": true,
+      "reset_cause_unproven": true,
+      "recovery_complete": true,
+      "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890"
+    }
+  ],
+  "next": "Static XPC/client startup review; the missing lifecycle configuration is now integrated but did not remove the stall. Do not claim H4 connected or kernel deadlock proved."
+}
