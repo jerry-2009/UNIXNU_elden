@@ -1,0 +1,82 @@
+{
+  "stage": "v153 source/native core only",
+  "host": {
+    "passed": true,
+    "result": "PASS 8276 queue/PRDT cases; 3200 concurrent leases; 4096 differential PRDT plans",
+    "asan_ubsan": true,
+    "actual_core": true,
+    "upstream_prdt_differential": true,
+    "pool_mutex_and_hardware_modeled": true,
+    "whole_kernel": false,
+    "hardware": false,
+    "header_sha256": "ea48f483239321dcfa54636a0ce770101815d13de350c19172d159dca46e81e9",
+    "source_inputs": {
+      "drivers/EldenUfsQueue/DmaPlan.cpp": "119e8aebb99dbf8c0911b18acb6964afc1dd70fed2fff7c2ab9eda4746e02190",
+      "drivers/EldenUfsQueue/DmaPlan.h": "8b7d6954d38469cb0916d25966fd3d7c50e0ea7fef96a3007e2530e6d751a8ef",
+      "drivers/EldenUfsQueue/PrdtSource.py": "7f1e225fa763a6565164f5d27295b46c16c9d448d36479bd4897c7fe83b5e1c2",
+      "drivers/EldenUfsQueue/QueueCore.cpp": "4968a53627ceac08b4a17b212a1648736f2d8c62b277cf38cb3d0c18428e0d2b",
+      "drivers/EldenUfsQueue/QueueCore.h": "d9da09279a47dfc3ada2efb32098307f6661e257e5b2b8543af5f04aa3a415e1",
+      "drivers/EldenUfsQueue/TestQueue.cpp": "286fd1cb9e5c2abcb9c434c186987bc7e26b29d416044c3f78aa5b95a9820eeb",
+      "drivers/EldenUfsQueue/upstream/RootCommands.h": "1d90996f5cc7e94ddbb0f78b8ea5151aca7f24f50d09d7438e6825d8fa8b95e6",
+      "drivers/EldenUfsQueue/upstream/RootTransportLayout.h": "5f52df07f7db0c47feccd9234ddc2cfad0057c3ce54cc4e2746a01fb05f44d5c",
+      "drivers/EldenUfsQueue/upstream/source.json": "912c0d6e4f6d21e4052146897626023791afe1cd8cf7c1571100226a819eb1b2",
+      "tools/test_ufs_queue.py": "26144e7c58c0a4cdd5c2af262610b22181f0fab615cdb333c399021e1b16c201"
+    }
+  },
+  "native": {
+    "passed": true,
+    "target": "arm64-apple-ios17.0",
+    "scalar": true,
+    "automatic_initializers": false,
+    "header_sha256": "ea48f483239321dcfa54636a0ce770101815d13de350c19172d159dca46e81e9",
+    "reference_native_sha256": "761d03886c1c8b15456b3fda2dfb54c03233a6d632e902ba1074d2e6dd5b1ac0",
+    "source_inputs": {
+      "drivers/EldenUfsQueue/DmaPlan.cpp": "119e8aebb99dbf8c0911b18acb6964afc1dd70fed2fff7c2ab9eda4746e02190",
+      "drivers/EldenUfsQueue/TestQueue.cpp": "286fd1cb9e5c2abcb9c434c186987bc7e26b29d416044c3f78aa5b95a9820eeb",
+      "drivers/EldenUfsQueue/DmaPlan.h": "8b7d6954d38469cb0916d25966fd3d7c50e0ea7fef96a3007e2530e6d751a8ef",
+      "drivers/EldenUfsQueue/PrdtSource.py": "7f1e225fa763a6565164f5d27295b46c16c9d448d36479bd4897c7fe83b5e1c2",
+      "drivers/EldenUfsQueue/QueueCore.h": "d9da09279a47dfc3ada2efb32098307f6661e257e5b2b8543af5f04aa3a415e1",
+      "drivers/EldenUfsQueue/QueueCore.cpp": "4968a53627ceac08b4a17b212a1648736f2d8c62b277cf38cb3d0c18428e0d2b",
+      "drivers/EldenUfsQueue/upstream/RootCommands.h": "1d90996f5cc7e94ddbb0f78b8ea5151aca7f24f50d09d7438e6825d8fa8b95e6",
+      "drivers/EldenUfsQueue/upstream/LICENSE": "d3cdce3b19df47f2e4dcafdfd54909eb9bc64ac722645ceb1feae58695c97b09",
+      "drivers/EldenUfsQueue/upstream/source.json": "912c0d6e4f6d21e4052146897626023791afe1cd8cf7c1571100226a819eb1b2",
+      "drivers/EldenUfsQueue/upstream/RootTransportLayout.h": "5f52df07f7db0c47feccd9234ddc2cfad0057c3ce54cc4e2746a01fb05f44d5c",
+      "tools/build_ufs_queue_core.py": "6e1c5cf5f9528f5ff434dd942756177c7f60a0020938197e3ebdec72233db8c0"
+    },
+    "native_adapter": false,
+    "whole_kernel": false,
+    "hardware": false
+  },
+  "objects": {
+    "QueueCore": {
+      "object_sha256": "32dce56ebcf0fdf30c0e1a6936f411230f24f23fde5bf0f9efa036c09c945e45",
+      "exports": [
+        "_elden_ufs_pool_cancel",
+        "_elden_ufs_pool_complete",
+        "_elden_ufs_pool_enqueue",
+        "_elden_ufs_pool_init",
+        "_elden_ufs_pool_issue",
+        "_elden_ufs_pool_release",
+        "_elden_ufs_pool_stop",
+        "_elden_ufs_pool_take"
+      ],
+      "imports": [],
+      "warnings": 0
+    },
+    "DmaPlan": {
+      "object_sha256": "58e1f4ca6292f9affe1764793484e3f5bb5ddbbc0b81efcbb651c08109178465",
+      "exports": [
+        "_elden_ufs_dma_limit",
+        "_elden_ufs_prdt_build"
+      ],
+      "imports": [
+        "_bzero"
+      ],
+      "warnings": 0
+    }
+  },
+  "limits": "No native allocation/wait adapter, kernel linkage, boot artifact or hardware test. Caller must retain DMA memory; planner/metadata core alone cannot enforce lifetime.",
+  "final_host": "host-2; aligned real virtual buffer, physical pages modeled",
+  "final_native": "isolated/ufs-queue-core-v153-final",
+  "native_objects_identical_to_first_build": true
+}

@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/UniXNU/ShengUfs",
+  "revision": "b6fe07b307eeddc5e258c9d5d4387b968a55e4e9",
+  "files": {
+    "RootCommands.h": "1d90996f5cc7e94ddbb0f78b8ea5151aca7f24f50d09d7438e6825d8fa8b95e6",
+    "RootTransportLayout.h": "5f52df07f7db0c47feccd9234ddc2cfad0057c3ce54cc4e2746a01fb05f44d5c",
+    "LICENSE": "d3cdce3b19df47f2e4dcafdfd54909eb9bc64ac722645ceb1feae58695c97b09"
+  },
+  "use": "Slot geometry, FIFO handoff and PRDT algorithm; local timeout/ownership adaptation required"
+}
