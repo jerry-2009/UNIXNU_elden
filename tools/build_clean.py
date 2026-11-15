@@ -28,6 +28,7 @@ def main():
     p.add_argument('--bt-process-lifetime',action='store_true',help='Keep H4 process references local to each callback')
     p.add_argument('--charge-verification',action='store_true',help='Require fresh charging readback and bound verification waits on the current address baseline')
     p.add_argument('--charge-window-handoff',action='store_true',help='Include verification and return from bypass to OEM automatic charging windows')
+    p.add_argument('--spmi-translation-survey',action='store_true',help='Include window handoff and compare SPMI page read/write translation without FIFO access')
     p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
     p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
     p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')
@@ -56,6 +57,7 @@ def main():
     if a.bt_scan_roles17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17):raise ValueError('--bt-scan-roles17 requires --bt-process-lifetime without other native17 options')
     if a.bt_discovery17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17):raise ValueError('--bt-discovery17 requires --bt-process-lifetime without other native17 options')
     if a.bt_address17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17 or a.bt_discovery17):raise ValueError('--bt-address17 requires --bt-process-lifetime without other native17 options')
+    if a.spmi_translation_survey:a.charge_window_handoff=True
     if a.charge_window_handoff:a.charge_verification=True
     if a.charge_verification and not a.bt_address17:raise ValueError('--charge-verification currently requires the qualified --bt-address17 baseline')
     if sys.platform!='darwin':raise SystemExit('Native build requires macOS with Xcode/iPhoneOS SDK. Windows/WSL can inspect sources and flash separately.')
@@ -95,6 +97,7 @@ def main():
     identity['bt_discovery17']=a.bt_discovery17
     identity['bt_address17']=a.bt_address17
     identity['charge_window_handoff']=a.charge_window_handoff
+    identity['spmi_translation_survey']=a.spmi_translation_survey
     identity['charge_verification']=a.charge_verification
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
@@ -203,6 +206,7 @@ def main():
     if a.charge_verification:
         charge_name='charge-window-handoff' if a.charge_window_handoff else 'charge-verification'
         charge_args=['--window-handoff'] if a.charge_window_handoff else []
+        if a.spmi_translation_survey:charge_name='spmi-translation-survey';charge_args+=['--translation-survey']
         stage(charge_name,script('build_charge_verification.py','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/charge_name,*charge_args),charge_name+'/result.json')
         kernel_folder=out/charge_name;runtime_folder=kernel_folder/'runtime'
     if a.target=='boot':

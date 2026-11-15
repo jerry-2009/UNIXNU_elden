@@ -12,11 +12,13 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def qualify(report_path,entry_path,runtime):
     folder=Path(report_path).parent;r=json.loads(Path(report_path).read_text());e=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     profile=r.get('profile')
-    if profile not in ('charge-verification','charge-window-handoff') or r['changed_core_objects']!=0 or r['changed_native_objects']!=2 or set(r['native_objects'])!={'PmicClient','ChargePolicy'} or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
-    if profile=='charge-window-handoff':
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey') or r['changed_core_objects']!=0 or r['changed_native_objects']!=2 or set(r['native_objects'])!={'PmicClient','ChargePolicy'} or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile in ('charge-window-handoff','spmi-translation-survey'):
         sys.path.insert(0,str(ROOT/'drivers/EldenPmicGlink'))
         from WindowSource import policy
         from VerificationSource import client
+        if profile=='spmi-translation-survey':
+            from TranslationSource import client
         for unit,data in [('ChargePolicy',policy()),('PmicClient',client())]:
             if hashlib.sha256(data).hexdigest()!=r['native_objects'][unit]['source_sha256']:raise ValueError('Window source differs from declared derivation')
     trace=json.loads((runtime/'trace-runtime.json').read_text())

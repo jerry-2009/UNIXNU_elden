@@ -18,11 +18,17 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ('clean-build','parent-build','original-kernelcache','llvm','output'):p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--window-handoff',action='store_true',help='Release explicit bypass when returning to firmware-managed windows')
+    p.add_argument('--translation-survey',action='store_true',help='Window variant plus one SPMI page translation survey; no FIFO access')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
     policy_derive=policy
     if a.window_handoff:
         from WindowSource import policy as window_policy
         policy_derive=window_policy
+    client_derive=client
+    if a.translation_survey:
+        if not a.window_handoff:raise ValueError('Translation survey requires --window-handoff')
+        from TranslationSource import client as translation_client
+        client_derive=translation_client
     if out.exists():raise ValueError('Fresh output required')
     c=read(ROOT/'profiles/bt-address17/native-contract.json')
     assert native_identity(parent/'native.macho')==(c['sections'],c['commands'],c['symbols'])
@@ -30,7 +36,7 @@ def main():
     rows=read(base/'native/build/results.json');capture=read(base/'native/capture.json')
     virtual_root=read(ROOT/'profiles/v91/native-build/plan.json')['virtual_root'].rstrip('/')
     out.mkdir(parents=True);(out/'source').mkdir();records={};objects={};inherited={}
-    for unit,name,derive,expected in [('PmicClient','PmicClient.cpp',client,CLIENT),('ChargePolicy','ChargePolicy.c',policy_derive,POLICY)]:
+    for unit,name,derive,expected in [('PmicClient','PmicClient.cpp',client_derive,CLIENT),('ChargePolicy','ChargePolicy.c',policy_derive,POLICY)]:
         matches=[r for r in rows.values() if Path(r['source']).name==name];assert len(matches)==1;row=matches[0]
         old=Path(row['output']);assert row['accepted'] and sha(old)==row['sha256']
         assert not row.get('postprocess') and not row.get('objcopy')
@@ -46,6 +52,7 @@ def main():
             if item['name'].endswith('/'+name):
                 assert sha(f)==expected;item['external-contents']=str(source);bindings.append(item['name'])
                 if unit=='PmicClient':extra.append({'type':'file','name':str(Path(item['name']).parent/'ChargeVerification.h'),'external-contents':str(ROOT/'drivers/EldenPmicGlink/ChargeVerification.h')})
+                if unit=='PmicClient' and a.translation_survey:extra.append({'type':'file','name':str(Path(item['name']).parent/'TranslationSurvey.h'),'external-contents':str(ROOT/'drivers/EldenUsbThermal/TranslationSurvey.h')})
         assert bindings;known={x['name'] for x in overlay['roots']}
         for item in extra:
             if item['name'] not in known:overlay['roots'].append(item);known.add(item['name'])
@@ -86,8 +93,10 @@ def main():
     before=entry((parent/'kernel.macho').read_bytes());after=entry((out/'kernel.macho').read_bytes());assert before[2]==after[2] and before[1]-before[0]==after[1]-after[0]==7124
     files=[Path(__file__).resolve(),ROOT/'drivers/EldenPmicGlink/VerificationSource.py',ROOT/'drivers/EldenPmicGlink/ChargeVerification.h',ROOT/'drivers/EldenPmicGlink/ChargePolicy.c',ROOT/'drivers/EldenPmicGlink/ChargePolicy.h',CLIENT_PATH]
     if a.window_handoff:files.append(ROOT/'drivers/EldenPmicGlink/WindowSource.py')
+    if a.translation_survey:files += [ROOT/'drivers/EldenPmicGlink/TranslationSource.py',ROOT/'drivers/EldenUsbThermal/TranslationSurvey.h']
     sources={**parent_report['source_inputs'],**{str(f.relative_to(ROOT)):sha(f) for f in files}}
     report={'profile':'charge-verification','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),'changed_core_objects':0,'changed_native_objects':2,'native_objects':records,'archive_members':members,'core_filelist_unchanged':True,'scalar':True,'optional_runtime':parent_report['optional_runtime'],'source_inputs':sources,'inherited_inputs':inputs,'inherited_sources':inherited,'entry_return_target':hex(after[1]),'parent_kernel_sha256':parent_report['kernel_sha256'],'original_apple_executables_hashed':30,'hardware':False}
     if a.window_handoff:report['profile']='charge-window-handoff'
+    if a.translation_survey:report['profile']='spmi-translation-survey'
     write(out/'result.json',report);shutil.copytree(parent/'runtime',out/'runtime');print(json.dumps({'kernel_sha256':report['kernel_sha256'],'changed_objects':2}))
 if __name__=='__main__':main()

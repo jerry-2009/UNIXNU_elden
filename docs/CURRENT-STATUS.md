@@ -1,5 +1,10 @@
 # 当前状态 · 2026-11-14
 
+v141（11月15日）只读AT检查：SDAM/ADC/DC读写翻译均匹配预期PA，DC为0xc7c1010，
+PAR属性一致。无FIFO访问，不能证明总线写可用，旧异常尚未精确定因；第二SID7是GLINK
+debug proxy。171487B/drop1，同步回fastboot/全SHA恢复stock及Android设置一致并熄屏。
+详profiles/spmi-translation-survey；诊断不是日用默认，后续仍用v140，充电缺口保持。
+
 11月15日补充更正：v140原测试模型把普通/EU窗口标签反置，现已按setter/原字符串确认
 普通29优先、续充比例31仅影响EU分支、SOC截断整数；59处核对及新18/原146检查通过。
 实际v140两驱动源未变，无新镜像或刷机，原实机交接记录保留。详CHARGING-STATUS.md。
