@@ -26,6 +26,7 @@ def main():
     p.add_argument('--cpu-governor',action='store_true',help='Compile the bounded governor and current UFS recovery hook over v146')
     p.add_argument('--storage-medium',action='store_true',help='Publish nonrotating UFS/RAM media over the read-only CPU observation baseline')
     p.add_argument('--early-storage-guard',action='store_true',help='Arm the existing watchdog before UFS and adopt it at normal SMP admission')
+    p.add_argument('--ufs-wait-trial',action='store_true',help='Pair SPI/UFS IRQ waiting and a pinned-block read comparison over the early guard')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
     if a.backlight_power_trial and not a.backlight_service:raise ValueError('Power trial requires --backlight-service')
     if a.backlight_service and (a.window_handoff or a.translation_survey):raise ValueError('Backlight uses an already qualified window parent')
@@ -34,6 +35,7 @@ def main():
     if a.cpu_governor and any((a.cpu_power_observation,a.pd_power_trial,a.backlight_service,a.backlight_power_trial,a.window_handoff,a.translation_survey)):raise ValueError('Governor uses an already qualified CPU observation parent')
     if a.storage_medium and any((a.cpu_governor,a.cpu_power_observation,a.pd_power_trial,a.backlight_service,a.backlight_power_trial,a.window_handoff,a.translation_survey)):raise ValueError('Storage medium uses an already qualified observation parent')
     if a.early_storage_guard and any((a.storage_medium,a.cpu_governor,a.cpu_power_observation,a.pd_power_trial,a.backlight_service,a.backlight_power_trial,a.window_handoff,a.translation_survey)):raise ValueError('Early guard uses the qualified storage-medium parent')
+    if a.ufs_wait_trial and any((a.early_storage_guard,a.storage_medium,a.cpu_governor,a.cpu_power_observation,a.pd_power_trial,a.backlight_service,a.backlight_power_trial,a.window_handoff,a.translation_survey)):raise ValueError('UFS trial requires its own qualified early-guard parent')
     policy_derive=policy
     if a.window_handoff:
         from WindowSource import policy as window_policy
@@ -49,6 +51,7 @@ def main():
     if a.cpu_governor:contract='profiles/cpu-power-observation/native-contract.json'
     if a.storage_medium:contract='profiles/cpu-power-observation/native-contract.json'
     if a.early_storage_guard:contract='profiles/storage-medium/native-contract.json'
+    if a.ufs_wait_trial:contract='profiles/early-storage-guard/native-contract.json'
     c=read(ROOT/contract)
     assert native_identity(parent/'native.macho')==(c['sections'],c['commands'],c['symbols'])
     parent_report=read(parent/'result.json');assert sha(parent/'kernel.macho')==parent_report['kernel_sha256']
@@ -74,7 +77,7 @@ def main():
             from GovernorSource import policy as governor_policy
             (out/'source/EldenCpuFreqPolicy.h').write_bytes(governor_policy())
         units=[('CpuPerfSurvey','CpuPerfSurvey.cpp',cpu_source,CPU_SOURCE_SHA)]
-    if a.storage_medium or a.early_storage_guard:units=[]
+    if a.storage_medium or a.early_storage_guard or a.ufs_wait_trial:units=[]
     for unit,name,derive,expected in units:
         matches=[r for r in rows.values() if Path(r['source']).name==name];assert len(matches)==1;row=matches[0]
         old=Path(row['output']);assert row['accepted'] and sha(old)==row['sha256']
@@ -137,12 +140,18 @@ def main():
     if a.storage_medium or a.early_storage_guard:
         from storage_medium_build import compile_units
         objects,records,object_archives,prior_inputs=compile_units(base,parent,out,a.llvm,early=a.early_storage_guard);inherited.update(prior_inputs)
+    if a.ufs_wait_trial:
+        from build_ufs_wait_objects import compile_units
+        objects,records,object_archives,prior_inputs=compile_units(base,parent,out,a.llvm,trial=True);inherited.update(prior_inputs)
     link=read(parent/'link-command.json');replacements={};groups={}
     for archive_name in dict.fromkeys(object_archives.values()):
         selected={n:p for n,p in objects.items() if object_archives[n]==archive_name}
         ars=[v.split(',')[-1] for v in link if v.endswith('/'+archive_name)];assert len(ars)==1;oldar=Path(ars[0])
         folder=out/('backlight' if archive_name=='libEldenBacklight.a' else 'ufs' if archive_name=='libShengUfs.a' else 'ram' if archive_name=='libRamBlock.a' else 'pmic');folder.mkdir()
         names=[n for n in subprocess.check_output(['ar','t',oldar],text=True).splitlines() if not n.startswith('__.SYMDEF')];assert set(selected)<=set(names);members={}
+        if a.ufs_wait_trial and archive_name=='libArmCpu.a':
+            actual=subprocess.check_output(['ar','p',oldar,'ArmCpu.o']);prior=Path(records['ArmCpu']['prior_object']).read_bytes()
+            assert actual==prior or actual==prior+b'\n'*((-len(prior))%8),'Parent ArmCpu differs from captured baseline'
         for name in names:
             data=selected[name].read_bytes() if name in selected else subprocess.check_output(['ar','p',oldar,name]);(folder/name).write_bytes(data);members[name]=hashlib.sha256(data).hexdigest()
         archive=folder/oldar.name;subprocess.run(['ar','rcs',archive,*names],cwd=folder,env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
@@ -164,6 +173,7 @@ def main():
     env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as f:subprocess.run(cmd,cwd=out,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
     added_exports={'_elden_pd_power_observation'} if a.pd_power_trial else {'_elden_cpu_governor_request_stop'} if a.cpu_governor else set()
+    if a.ufs_wait_trial:added_exports={'_armcpu_spi_mask','_elden_ufs_wait_shutdown'}
     assert exports(out/'native.macho')==exports(parent/'native.macho')|added_exports
     for f,h in {**inputs,**inherited}.items():assert sha(Path(f))==h
     pre=read(ROOT/'profiles/v91/image-build/plan.json')['prelink'];assert sha(a.original_kernelcache)==pre['original_kernelcache_sha256'];kit=out/'prelink-tool';kit.mkdir()
@@ -186,6 +196,9 @@ def main():
         from storage_medium_build import INPUTS
         files += [ROOT/'drivers/EldenStorageMedium/EldenStorageMedium.h',ROOT/'drivers/EldenStorageMedium/MediumSource.py',ROOT/'tools/storage_medium_build.py',ROOT/'profiles/current-build/plan.json']+[ROOT/path for path,digest in INPUTS.values()]
     if a.early_storage_guard:files += [ROOT/'drivers/EldenCpuActivation/EarlyStorageSource.py',ROOT/'profiles/v97-wcn/EldenSdamRecovery.inc']
+    if a.ufs_wait_trial:
+        files += [ROOT/'drivers/EldenUfsWait'/n for n in ('Source.py','TrialSource.py','EldenUfsCompletion.inc','EldenUfsReadTrial.inc','UfsReadTrial.h')]
+        files += [ROOT/'tools/build_ufs_wait_objects.py',ROOT/'profiles/v91/sources/cpu/ArmCpu.cpp']
     sources={**parent_report['source_inputs'],**{str(f.relative_to(ROOT)):sha(f) for f in files}}
     report={'profile':'charge-verification','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),'changed_core_objects':0,'changed_native_objects':2,'native_objects':records,'archive_members':members,'core_filelist_unchanged':True,'scalar':True,'optional_runtime':parent_report['optional_runtime'],'source_inputs':sources,'inherited_inputs':inputs,'inherited_sources':inherited,'entry_return_target':hex(after[1]),'parent_kernel_sha256':parent_report['kernel_sha256'],'original_apple_executables_hashed':30,'hardware':False}
     if a.window_handoff:report['profile']='charge-window-handoff'
@@ -197,6 +210,7 @@ def main():
     if a.cpu_governor:report['profile']='cpu-governor';report['generated_policy_sha256']=sha(out/'source/EldenCpuFreqPolicy.h')
     if a.storage_medium:report['profile']='storage-medium'
     if a.early_storage_guard:report['profile']='early-storage-guard';report['changed_native_objects']=1
+    if a.ufs_wait_trial:report['profile']='ufs-wait-trial'
     if a.cpu_governor:
         from cpu_governor_build import audit_stop_link
         report['stop_hook']=audit_stop_link(out/'native.macho',out/'kernel.macho')

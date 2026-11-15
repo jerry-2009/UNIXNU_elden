@@ -1,0 +1,83 @@
+{
+  "profile": "ufs-wait-trial",
+  "host": {
+    "passed": true,
+    "outputs": {
+      "Completion": "PASS 37 actual completion/submit cases",
+      "Spi": "PASS 14 actual SPI cases (two 16-thread races)",
+      "ReadTrial": "PASS 279 actual read-trial loop cases"
+    },
+    "asan_ubsan": true,
+    "actual_transformed_functions": true,
+    "hardware_and_scheduler_modeled": true,
+    "native_build": false,
+    "hardware": false,
+    "trial": true,
+    "sha256": {
+      "ufs": "40133ef42d9e9899d92d5ddcc1f0c1f1d81b2e358cfc5b34916c573e463e11ae",
+      "commands": "e6d2adb5bd07f9787c56ea7b030a3d75ecc0160cff82dab5138d02c09b6fb069",
+      "cpu": "99074ff162630bb77086c3d1c276d7e7a98e6b6df08dec1195f64f25cd6cfd56",
+      "recovery": "9d9b2438ebba3f97ec3f002d220f25ebec2d6ffbb790120a6a5c8f276d6b001f",
+      "completion": "e00eee15f5ef7b686ed278eb1cd4d01e169dca5877a36ca589d334810cea6ee4",
+      "transfer_poll_unchanged": "30ec996e2f0bfa858aff5129ba382ae38deb923604ac47716bffd13100e072ea"
+    }
+  },
+  "native": {
+    "ArmCpu": {
+      "source_sha256": "99074ff162630bb77086c3d1c276d7e7a98e6b6df08dec1195f64f25cd6cfd56",
+      "object_sha256": "140f22f9545ecb3f8fd7352fa1c61b4717ee045866625549e9b359c9a8a8cb48",
+      "initializers_preserved": true,
+      "new_exports": [
+        "_armcpu_spi_mask"
+      ],
+      "new_imports": [
+        "_IOLockAlloc",
+        "_IOLockFree",
+        "_lck_mtx_lock",
+        "_lck_mtx_unlock"
+      ],
+      "warnings": 2
+    },
+    "ShengUfs": {
+      "source_sha256": "40133ef42d9e9899d92d5ddcc1f0c1f1d81b2e358cfc5b34916c573e463e11ae",
+      "object_sha256": "8636d13703b4b358fe4cc23a3df9a52257cbcd5cdd4b85d313923fcf984887e2",
+      "initializers_preserved": true,
+      "new_exports": [
+        "_elden_ufs_wait_shutdown"
+      ],
+      "new_imports": [
+        "__ZN12OSDictionary14withDictionaryEPKS_j",
+        "__ZN12OSDictionary9metaClassE",
+        "_absolutetime_to_nanoseconds",
+        "_armcpu_spi_attach",
+        "_armcpu_spi_mask",
+        "_assert_wait_timeout",
+        "_clear_wait",
+        "_nanoseconds_to_absolutetime",
+        "_panic_active",
+        "_preemption_enabled",
+        "_thread_wakeup_prim"
+      ],
+      "warnings": 26
+    }
+  },
+  "kernel_sha256": "cb915feb8ce1ff70aef33da0a6d9758f1a5ef60ec0f57cde0d16895311697fbf",
+  "native_sha256": "761d03886c1c8b15456b3fda2dfb54c03233a6d632e902ba1074d2e6dd5b1ac0",
+  "changed_core_objects": 0,
+  "original_apple_executables_hashed": 30,
+  "entry_return_target": "0xfffffff0075b205c",
+  "ufs_warnings_match_v150": true,
+  "menu_arguments_identical_to_v150": true,
+  "menu_bytes": 1023,
+  "combined_empty_directory_command_repeated": false,
+  "source_inputs": {
+    "tools/build_charge_verification.py": "f5134c9af49819788ed3366a32c20a470770025ab637e4f694abadfe27b9d4ab",
+    "drivers/EldenUfsWait/Source.py": "f2c9207aabf1924fcd8deccac7f92a2dc9f8ee85624bbf02a8f7bbc0a0f79ba1",
+    "drivers/EldenUfsWait/TrialSource.py": "9966f93d2b1c5c0b748989d29b167d7953c6080b7c6aace5932c05e6856a1996",
+    "drivers/EldenUfsWait/EldenUfsCompletion.inc": "ed9e94a50ee0918309bc0edb1bf76b2c6f32a499dfc1cda51aaf259978c9f216",
+    "drivers/EldenUfsWait/EldenUfsReadTrial.inc": "d497352fc3626881bbe063f18effaed4f9ed967330588c0f39b50eadcde19479",
+    "drivers/EldenUfsWait/UfsReadTrial.h": "0f9e2015f4428fe4d54b693d4e1c44ac862b1be7d5347e8fd4033ac10b0e8d5c",
+    "tools/build_ufs_wait_objects.py": "0489d0f61c14cf9ff3c4f4621454b9201b627a42a2dcade5ddc99a4a18c33801"
+  },
+  "limits": "Individual full stages and hardware passed. No multi-slot/direct DMA, hardware CPU-utilization or speedup claim."
+}

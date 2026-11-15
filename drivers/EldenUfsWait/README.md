@@ -1,7 +1,9 @@
 # UFS completion IRQ and bounded hybrid waiting
 
-Status: **component tests and ARM64/iPadOS17 compilation passed; no whole kernel,
-boot image or device trial yet.** This is the first transport delta over the
+The v151 component stage below has now been integrated and tested on hardware in
+[v152](../../profiles/ufs-wait-trial/README.md), with actual IRQ wakes and matched
+read hashes. The standalone component build still does not produce a boot image.
+This is the first transport delta over the
 v150 normal early-watchdog path. It retains v149 storage properties. UFS still
 uses slot0, one serialized DMA buffer and the existing read/write gates.
 
@@ -96,13 +98,13 @@ one host fixture declaration error; a checker that mistakenly required existing
 Apple prelink imports in the native nlist; and two new same-TU weak-reference
 warnings corrected by the direct shutdown call.
 
-## Next useful hardware window
+## Integration window (completed in v152)
 
-First integrate the pair into a distinct full profile over v150 normal, checking
+The original acceptance plan was to integrate the pair into a distinct full profile over v150 normal, checking
 the actual parent ArmCpu member, other archive/core members, Apple30 execution
 regions, entry and AVB. Add a bounded read-only comparison using the same known
 4K/128KiB blocks and full data hashes, measuring polling versus IRQ-wait timing
-under matched conditions. These measurements are **not implemented yet**.
+under matched conditions. The v152 profile now implements and records this window.
 Require actual IRQ delivery/wake evidence rather than a configured message,
 then typed fastboot return and full stock restoration. No reason to repeat the
 already completed watchdog-stall experiment for this component alone.

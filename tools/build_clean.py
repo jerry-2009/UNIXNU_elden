@@ -37,6 +37,7 @@ def main():
     p.add_argument('--cpu-governor',action='store_true',help='Bounded governor plus recovery hook over the CPU observation/PD baseline')
     p.add_argument('--storage-medium',action='store_true',help='UFS/RAM solid-state properties over the unchanged observation/PD baseline')
     p.add_argument('--early-storage-guard',action='store_true',help='Move qualified watchdog arming ahead of UFS while retaining later SMP admission')
+    p.add_argument('--ufs-wait-trial',action='store_true',help='Guarded UFS IRQ waiting plus bounded pinned-block polling/hybrid comparison')
     p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
     p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
     p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')
@@ -65,6 +66,7 @@ def main():
     if a.bt_scan_roles17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17):raise ValueError('--bt-scan-roles17 requires --bt-process-lifetime without other native17 options')
     if a.bt_discovery17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17):raise ValueError('--bt-discovery17 requires --bt-process-lifetime without other native17 options')
     if a.bt_address17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17 or a.bt_discovery17):raise ValueError('--bt-address17 requires --bt-process-lifetime without other native17 options')
+    if a.ufs_wait_trial:a.early_storage_guard=True
     if a.early_storage_guard:a.storage_medium=True
     if a.storage_medium and (a.cpu_governor or a.cpu_power_observation or a.pd_gui):raise ValueError('Storage medium uses its own observation/PD chain')
     if a.storage_medium:a.cpu_power_observation=True
@@ -124,6 +126,7 @@ def main():
     identity['cpu_governor']=a.cpu_governor
     identity['storage_medium']=a.storage_medium
     identity['early_storage_guard']=a.early_storage_guard
+    identity['ufs_wait_trial']=a.ufs_wait_trial
     identity['charge_verification']=a.charge_verification
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
@@ -255,6 +258,9 @@ def main():
     if a.early_storage_guard:
         stage('early-storage-guard',script('build_charge_verification.py','--early-storage-guard','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'early-storage-guard'),'early-storage-guard/result.json')
         kernel_folder=out/'early-storage-guard';runtime_folder=kernel_folder/'runtime'
+    if a.ufs_wait_trial:
+        stage('ufs-wait-trial',script('build_charge_verification.py','--ufs-wait-trial','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'ufs-wait-trial'),'ufs-wait-trial/result.json')
+        kernel_folder=out/'ufs-wait-trial';runtime_folder=kernel_folder/'runtime'
     if a.target=='boot':
         stage('firmware',script('build_v91_firmware.py','--mu-root',inputs['mu_repository'],'--unixnu-root',inputs['unixnu_repository'],'--crypto-path',inputs['crypto'],'--llvm',inputs['llvm'],'--output',out/'firmware','--jobs',a.jobs),'firmware/result.json')
         stage('loader',script('build_v91_payload_loader.py','--mu-root',out/'firmware/project/third_party/mu_wide_platforms','--unixnu-root',out/'firmware/project/third_party/UniXNU','--llvm',inputs['llvm'],'--output',out/'loader'),'loader/result.json')

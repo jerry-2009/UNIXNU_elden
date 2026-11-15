@@ -18,7 +18,15 @@ def qualify(report_path,entry_path,runtime):
     if profile=='cpu-governor':units={'CpuPerfSurvey','ShengUfs'}
     if profile=='storage-medium':units={'ShengUfs','NativeRamBlock'}
     if profile=='early-storage-guard':units={'ShengUfs'}
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='ufs-wait-trial':units={'ArmCpu','ShengUfs'}
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','ufs-wait-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='ufs-wait-trial':
+        sys.path.insert(0,str(ROOT/'drivers/EldenUfsWait'))
+        from TrialSource import source,recovery,commands,cpu_source,completion
+        row=r['native_objects']['ShengUfs']
+        for field,data in [('source_sha256',source()),('recovery_sha256',recovery()),('commands_sha256',commands()),('completion_sha256',completion())]:
+            if hashlib.sha256(data).hexdigest()!=row[field]:raise ValueError('UFS trial input differs: '+field)
+        if hashlib.sha256(cpu_source()).hexdigest()!=r['native_objects']['ArmCpu']['source_sha256'] or not all(r['native_objects'][u]['initializers_preserved'] for u in units):raise ValueError('UFS trial CPU/initializer differs')
     if profile=='early-storage-guard':
         sys.path.insert(0,str(ROOT/'drivers/EldenCpuActivation'))
         from EarlyStorageSource import source,recovery

@@ -32,7 +32,7 @@ def exports(p):
     return {k for k, v in global_symbols(p).items() if v[0] & 0x0e}
 
 
-def compile_units(base, parent, out, llvm):
+def compile_units(base, parent, out, llvm, trial=False):
     objects, records, archives, inherited, new_imports = {}, {}, {}, {}, {}
     native = read(base / 'native/build/results.json')
     capture = read(base / 'native/capture.json')
@@ -40,7 +40,11 @@ def compile_units(base, parent, out, llvm):
     plan = read(ROOT / 'profiles/current-build/plan.json')
     if not current['complete'] or current['profile_sha256'] != sha(ROOT / 'profiles/current-build/plan.json'):
         raise ValueError('Current units changed')
-    for name, data in {'NativeUfs.cpp': source(), 'ArmCpu.cpp': cpu_source(),
+    derive=source
+    if trial:
+        from TrialSource import source as derive, completion
+        (out/'source/EldenUfsCompletion.inc').write_bytes(completion())
+    for name, data in {'NativeUfs.cpp': derive(), 'ArmCpu.cpp': cpu_source(),
                        'RootCommands.h': commands(), 'EldenSdamRecovery.inc': recovery()}.items():
         (out / 'source' / name).write_bytes(data)
     for unit in ('ArmCpu', 'ShengUfs'):
@@ -104,7 +108,11 @@ def compile_units(base, parent, out, llvm):
                 for folder, header in [('EldenStorageMedium', 'EldenStorageMedium.h'),
                                        ('EldenUfsWait', 'EldenUfsCompletion.inc')]:
                     extra.append({'type': 'file', 'name': str(Path(item['name']).parent / header),
-                                  'external-contents': str(ROOT / 'drivers' / folder / header)})
+                                  'external-contents': str(out/'source'/header if trial and header=='EldenUfsCompletion.inc' else ROOT / 'drivers' / folder / header)})
+                if trial:
+                    for header in ('EldenUfsReadTrial.inc','UfsReadTrial.h'):
+                        extra.append({'type':'file','name':str(Path(item['name']).parent/header),
+                                      'external-contents':str(ROOT/'drivers/EldenUfsWait'/header)})
         if not all(bindings.values()):
             raise ValueError('Derived input not bound: ' + repr(bindings))
         known = {r['name'] for r in overlay['roots']}
@@ -148,7 +156,11 @@ def compile_units(base, parent, out, llvm):
                          'source_sha256': sha(out / 'source' / ('ArmCpu.cpp' if unit == 'ArmCpu' else 'NativeUfs.cpp')),
                          'bindings': bindings, 'initializers_preserved': True,
                          'new_exports': sorted(added), 'new_imports': sorted(new_imports[member]),
-                         'prior_object_sha256': sha(old), 'warnings': r.stderr.count(b'warning:')}
+                         'prior_object_sha256': sha(old), 'prior_object':str(old), 'warnings': r.stderr.count(b'warning:')}
+        if unit=='ShengUfs':
+            records[unit].update(recovery_sha256=sha(out/'source/EldenSdamRecovery.inc'),
+                                 commands_sha256=sha(out/'source/RootCommands.h'),
+                                 completion_sha256=sha(out/'source/EldenUfsCompletion.inc') if trial else sha(ROOT/'drivers/EldenUfsWait/EldenUfsCompletion.inc'))
     available = exports(parent / 'native.macho')
     for obj in objects.values():
         available |= exports(obj)

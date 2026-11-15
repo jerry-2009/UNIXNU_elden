@@ -86,10 +86,16 @@ static void reset(bool start=true) {
     eldenUfsIrqState=eldenUfsIrqAttached=eldenUfsGen=0;eldenUfsIrqHc=0;eldenUfsSpinTicks=0;
     eldenUfsIrqs=eldenUfsSleeps=eldenUfsWakes=eldenUfsWaitTimeouts=0;
     eldenUfsWaitOther=eldenUfsIrqSpurious=eldenUfsWaitTicks=eldenUfsCommands=0;
+#if ELDEN_UFS_WAIT_TRIAL
+    eldenUfsForcePoll=0;
+#endif
     if(start)eldenUfsIrqStart();
 }
 static bool wait(uint32_t seen=0,uint64_t started=0,uint64_t deadline=1000000000){return eldenUfsCompletionWait(seen,started,deadline);}
 int main(){ unsigned cases=0;
+#if ELDEN_UFS_WAIT_TRIAL
+    reset();eldenUfsForcePoll=1;assert(!wait()&&!blocks&&!asserts);cases++;
+#endif
     reset();assert(ie==1&&!masked&&eldenUfsIrqRunning());eldenUfsIrqStart();assert(attaches==1);cases++;
     reset(false);attachResult=1;eldenUfsIrqStart();assert(!ie&&masked&&!masks&&!eldenUfsIrqRunning());cases++;
     for(unsigned rb:{0xa002u,0xa001u,0xa007u,0xb003u}){reset(false);attachReadback=rb;eldenUfsIrqStart();assert(!ie&&masked&&!eldenUfsIrqRunning());cases++;}
