@@ -17,7 +17,13 @@ def qualify(report_path,entry_path,runtime):
     if profile=='cpu-power-observation':units={'CpuPerfSurvey'}
     if profile=='cpu-governor':units={'CpuPerfSurvey','ShengUfs'}
     if profile=='storage-medium':units={'ShengUfs','NativeRamBlock'}
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='early-storage-guard':units={'ShengUfs'}
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='early-storage-guard':
+        sys.path.insert(0,str(ROOT/'drivers/EldenCpuActivation'))
+        from EarlyStorageSource import source,recovery
+        row=r['native_objects']['ShengUfs']
+        if hashlib.sha256(source()).hexdigest()!=row['source_sha256'] or hashlib.sha256(recovery()).hexdigest()!=row['recovery_sha256'] or not row['initializers_preserved']:raise ValueError('Early guard source/recovery differs')
     if profile=='storage-medium':
         sys.path.insert(0,str(ROOT/'drivers/EldenStorageMedium'))
         from MediumSource import source

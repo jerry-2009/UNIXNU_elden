@@ -8,12 +8,16 @@ from MediumSource import source,INPUTS
 def read(p):return json.loads(p.read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def exports(p):return {k for k,v in global_symbols(p).items() if v[0]&0x0e}
-def compile_units(base,parent,out,llvm):
+def compile_units(base,parent,out,llvm,early=False):
     objects={};records={};archives={};inherited={}
     native=read(base/'native/build/results.json');capture=read(base/'native/capture.json')
     current=read(base/'units/result.json');plan=read(ROOT/'profiles/current-build/plan.json')
     if not current['complete'] or current['profile_sha256']!=sha(ROOT/'profiles/current-build/plan.json'):raise ValueError('Current units changed')
-    for unit in ('ShengUfs','NativeRamBlock'):
+    if early:
+        sys.path.insert(0,str(ROOT/'drivers/EldenCpuActivation'))
+        from EarlyStorageSource import source as early_source,recovery as early_recovery,RECOVERY_SHA
+        recovery_path=out/'source/EldenSdamRecovery.inc';recovery_path.write_bytes(early_recovery())
+    for unit in (('ShengUfs',) if early else ('ShengUfs','NativeRamBlock')):
         if unit=='ShengUfs':
             row=current['units'][unit];old=Path(row['object']);command=list(row['command']);cwd=base/'units/working'/unit;member='ShengUfs.o'
             if not row['accepted'] or not row['closed_overlay'] or sha(old)!=row['sha256']:raise ValueError('Current UFS object changed')
@@ -30,15 +34,19 @@ def compile_units(base,parent,out,llvm):
             cwd=base/'native/build/project'/rel;member=Path(job['original_object']).name
             if member!='NativeRamBlock.o':raise ValueError('Unexpected RAM archive member')
         at=command.index('-ivfsoverlay')+1;overlay=read(Path(command[at]));assert overlay['fallthrough'] is False
-        path,digest=INPUTS[unit];name=Path(path).name;derived=out/'source'/name;derived.write_bytes(source(unit));bindings=[];extra=[]
+        path,digest=INPUTS[unit];name=Path(path).name;derived=out/'source'/name;derived.write_bytes(early_source() if early else source(unit));bindings=[];extra=[];recovery_bindings=[]
         for item in overlay['roots']:
             f=Path(item['external-contents']);inherited[str(f)]=sha(f)
             if unit=='ShengUfs' and (f.resolve().parent!=(base/'units/source').resolve() or f.name not in plan['providers'] or sha(f)!=f.name):raise ValueError('UFS source provider changed')
+            if early and item['name'].endswith('/EldenSdamRecovery.inc'):
+                if sha(f)!=RECOVERY_SHA:raise ValueError('Early guard recovery parent differs')
+                item['external-contents']=str(recovery_path);recovery_bindings.append(item['name'])
             if item['name'].endswith('/'+name):
                 if sha(f)!=digest:raise ValueError('Wrong consumed storage source')
                 item['external-contents']=str(derived);bindings.append(item['name'])
                 extra.append({'type':'file','name':str(Path(item['name']).parent/'EldenStorageMedium.h'),'external-contents':str(ROOT/'drivers/EldenStorageMedium/EldenStorageMedium.h')})
         if not bindings:raise ValueError('Storage source not bound')
+        if early and not recovery_bindings:raise ValueError('Early guard recovery not bound')
         known={r['name'] for r in overlay['roots']}
         for item in extra:
             if item['name'] in known:raise ValueError('Storage helper path collision')
@@ -64,4 +72,5 @@ def compile_units(base,parent,out,llvm):
         if not added<=exports(parent/'native.macho'):raise ValueError('New storage dependency unavailable: '+repr(added-exports(parent/'native.macho')))
         objects[member]=obj;archives[member]='libShengUfs.a' if unit=='ShengUfs' else 'libRamBlock.a'
         records[unit]={'source_sha256':sha(derived),'object_sha256':sha(obj),'command':command,'cwd':str(cwd),'bindings':bindings,'initializers_preserved':True,'new_imports':sorted(added),'warnings':r.stderr.decode().count('warning:')}
+        if early:records[unit].update(recovery_sha256=sha(recovery_path),recovery_bindings=recovery_bindings)
     return objects,records,archives,inherited
