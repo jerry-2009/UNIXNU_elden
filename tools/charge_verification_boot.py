@@ -13,7 +13,14 @@ def qualify(report_path,entry_path,runtime):
     folder=Path(report_path).parent;r=json.loads(Path(report_path).read_text());e=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     profile=r.get('profile')
     units={'BacklightRuntime'} if profile in ('backlight-service','backlight-power-trial') else {'PmicClient','ChargePolicy'}
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='pd-power-trial':units={'PmicClient','BacklightRuntime'}
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='pd-power-trial':
+        sys.path[:0]=[str(ROOT/'drivers/EldenPmicGlink'),str(ROOT/'drivers/EldenBacklight')]
+        from PdStartupSource import client
+        from PdPowerSource import source
+        for unit,data in [('PmicClient',client()),('BacklightRuntime',source())]:
+            if hashlib.sha256(data).hexdigest()!=r['native_objects'][unit]['source_sha256']:raise ValueError('PD integration source differs')
     if profile in ('backlight-service','backlight-power-trial'):
         sys.path.insert(0,str(ROOT/'drivers/EldenBacklight'))
         from BootSource import source

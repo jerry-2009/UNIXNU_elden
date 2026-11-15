@@ -60,6 +60,7 @@ FAT16由仓库自己的写入器产生，已用独立fsck.fat核验，不依赖m
 当前充电旁路退出修订的完整选项链见
 [charge-window-handoff](../profiles/charge-window-handoff/README.md#build)。
 恢复系统亮度服务时再加 `--backlight-service`，见[该配置的实机记录](../profiles/backlight-service/README.md)。
+PD确认后进行功耗试验使用 `--pd-power-trial`，见[独立试验配置](../profiles/pd-power-trial/README.md)；它不是普通GUI日用配置。
 下方不加额外选项的命令仍构建冻结基础版本，不自动等同于最新实验功能。
 
 ```sh

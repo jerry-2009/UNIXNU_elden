@@ -1,0 +1,118 @@
+{
+  "image_sha256": "bc508d2a14afbb539b8908f6864236a8ae41166c4917f4cbaac1d5f15946c8f5",
+  "session": "52ceaafdeb92e958",
+  "raw_log": "edl_work\\live-pd-power-v144-20261115\\usb\\20261115-030237.bin",
+  "raw_sha256": "29bb583dc339635ada1503eaa1835d5072840ddd0f8a37b0717f6b3951ed2291",
+  "bytes": 1281918,
+  "dropped": 26,
+  "discontinuities": [],
+  "reconnections": [],
+  "pd_controller_completed": true,
+  "pulse": [
+    [
+      "0",
+      "101011",
+      "0"
+    ]
+  ],
+  "zero_cycles": [
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "pd_ready_before_sampling": true,
+  "pd_observation_lost_during_sampling": false,
+  "phases": [
+    {
+      "phase": "baseline",
+      "time_us": 114783066,
+      "level": 1597,
+      "hold_ms": 45000
+    },
+    {
+      "phase": "dim",
+      "time_us": 159824573,
+      "level": 798,
+      "hold_ms": 45000
+    },
+    {
+      "phase": "restored",
+      "time_us": 204851808,
+      "level": 1597,
+      "hold_ms": 45000
+    }
+  ],
+  "groups": {
+    "baseline": {
+      "total_samples": 15,
+      "after_six_cycles": 9,
+      "median_current_ua": 0,
+      "mean_current_ua": 0,
+      "range_current_ua": [
+        0,
+        0
+      ],
+      "all_coherent_net_charge": false
+    },
+    "dim": {
+      "total_samples": 15,
+      "after_six_cycles": 9,
+      "median_current_ua": -190000,
+      "mean_current_ua": -185666.66666666666,
+      "range_current_ua": [
+        -191000,
+        -174000
+      ],
+      "all_coherent_net_charge": true
+    },
+    "restored": {
+      "total_samples": 15,
+      "after_six_cycles": 9,
+      "median_current_ua": 0,
+      "mean_current_ua": 0,
+      "range_current_ua": [
+        0,
+        0
+      ],
+      "all_coherent_net_charge": false
+    }
+  },
+  "normalized_median_battery_ma": {
+    "baseline": 0.0,
+    "dim": 190.0,
+    "restored": 0.0
+  },
+  "dim_publisher_net_charge_cycles": [
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65
+  ],
+  "short_window_net_charging_observed": true,
+  "brightness_restored": true,
+  "pd_stopped_cleanly": true,
+  "synchronized_return": true,
+  "full_stock_restored": true,
+  "android_root_green_boot_completed": true,
+  "android_before": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "android_after": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "sleep_requested": true,
+  "scope": "One current dual-connected mode5 backend trial at99/100 percent SOC. No individual-port wattage, peak fast-charge, long-term maintenance, full charge cycle, GUI-slider or broad cable acceptance. Observer state3 after completion is stop withdrawal, with controller phase6/error0."
+}
