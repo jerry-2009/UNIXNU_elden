@@ -23,11 +23,13 @@ def main():
     p.add_argument('--backlight-power-trial',action='store_true',help='Use the existing dim/restore path with bounded observation timing')
     p.add_argument('--pd-power-trial',action='store_true',help='Observe confirmed PD handoff before the brightness power trial')
     p.add_argument('--cpu-power-observation',action='store_true',help='One read-only load/PERF observer over the qualified PD kernel')
+    p.add_argument('--cpu-governor',action='store_true',help='Compile the bounded governor and current UFS recovery hook over v146')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
     if a.backlight_power_trial and not a.backlight_service:raise ValueError('Power trial requires --backlight-service')
     if a.backlight_service and (a.window_handoff or a.translation_survey):raise ValueError('Backlight uses an already qualified window parent')
     if a.pd_power_trial and (a.backlight_service or a.backlight_power_trial or a.window_handoff or a.translation_survey):raise ValueError('PD power uses an already qualified backlight power parent')
     if a.cpu_power_observation and (a.pd_power_trial or a.backlight_service or a.backlight_power_trial or a.window_handoff or a.translation_survey):raise ValueError('CPU observation uses the qualified PD parent')
+    if a.cpu_governor and any((a.cpu_power_observation,a.pd_power_trial,a.backlight_service,a.backlight_power_trial,a.window_handoff,a.translation_survey)):raise ValueError('Governor uses an already qualified CPU observation parent')
     policy_derive=policy
     if a.window_handoff:
         from WindowSource import policy as window_policy
@@ -40,6 +42,7 @@ def main():
     if out.exists():raise ValueError('Fresh output required')
     contract='profiles/backlight-power-trial/native-contract.json' if a.pd_power_trial else 'profiles/charge-window-handoff/native-contract.json' if a.backlight_service else 'profiles/bt-address17/native-contract.json'
     if a.cpu_power_observation:contract='profiles/pd-power-trial/native-contract.json'
+    if a.cpu_governor:contract='profiles/cpu-power-observation/native-contract.json'
     c=read(ROOT/contract)
     assert native_identity(parent/'native.macho')==(c['sections'],c['commands'],c['symbols'])
     parent_report=read(parent/'result.json');assert sha(parent/'kernel.macho')==parent_report['kernel_sha256']
@@ -57,9 +60,13 @@ def main():
             from PdStartupSource import client as pd_client
             from PdPowerSource import source as pd_backlight
             units=[('PmicClient','PmicClient.cpp',pd_client,CLIENT),('BacklightRuntime','BacklightRuntime.cpp',pd_backlight,SOURCE_SHA)]
-    if a.cpu_power_observation:
+    if a.cpu_power_observation or a.cpu_governor:
         sys.path.insert(0,str(ROOT/'drivers/EldenCpuPower'))
         from SurveySource import source as cpu_source,SOURCE_SHA as CPU_SOURCE_SHA
+        if a.cpu_governor:
+            from RuntimeSource import source as cpu_source
+            from GovernorSource import policy as governor_policy
+            (out/'source/EldenCpuFreqPolicy.h').write_bytes(governor_policy())
         units=[('CpuPerfSurvey','CpuPerfSurvey.cpp',cpu_source,CPU_SOURCE_SHA)]
     for unit,name,derive,expected in units:
         matches=[r for r in rows.values() if Path(r['source']).name==name];assert len(matches)==1;row=matches[0]
@@ -76,6 +83,8 @@ def main():
         bindings=[];extra=[]
         for item in overlay['roots']:
             f=Path(item['external-contents']);inherited[str(f)]=sha(f)
+            if a.cpu_governor and Path(item['name']).name in ('EldenScmiPerf.h','CpuPerfAccess.h'):
+                assert sha(f)==sha(ROOT/'profiles/v91/sources/power'/Path(item['name']).name),'CPU protocol header differs from frozen provider'
             if item['name'].endswith('/'+name):
                 assert sha(f)==expected;item['external-contents']=str(source);bindings.append(item['name'])
                 if unit=='PmicClient':extra.append({'type':'file','name':str(Path(item['name']).parent/'ChargeVerification.h'),'external-contents':str(ROOT/'drivers/EldenPmicGlink/ChargeVerification.h')})
@@ -83,28 +92,46 @@ def main():
                 if a.pd_power_trial:
                     headers=['PdObservation.h','PdCompletion.h'] if unit=='PmicClient' else ['PdObservation.h']
                     for header in headers:extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenPmicGlink'/header)})
-                if a.cpu_power_observation:
+                if a.cpu_power_observation or a.cpu_governor:
                     for folder,header in [('EldenCpuPower','CpuLoad.h'),('EldenPmicGlink','PdObservation.h')]:
                         extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers'/folder/header)})
+                    if a.cpu_governor:
+                        extra += [{'type':'file','name':str(Path(item['name']).parent/'GovernorControl.h'),'external-contents':str(ROOT/'drivers/EldenCpuPower/GovernorControl.h')},
+                                  {'type':'file','name':str(Path(item['name']).parent/'EldenCpuFreqPolicy.h'),'external-contents':str(out/'source/EldenCpuFreqPolicy.h')}]
         assert bindings;known={x['name'] for x in overlay['roots']}
         for item in extra:
+            if item['name'] in known and a.cpu_governor:
+                prior=[v for v in overlay['roots'] if v['name']==item['name']]
+                if any(sha(Path(v['external-contents']))!=sha(Path(item['external-contents'])) for v in prior):raise ValueError('Governor header collides with an existing source: '+item['name'])
             if item['name'] not in known:overlay['roots'].append(item);known.add(item['name'])
         vfs=out/(unit+'.overlay.json');write(vfs,overlay);cmd[cmd.index('-ivfsoverlay')+1]=str(vfs)
         obj=out/(unit+'.o');cmd[cmd.index('-o')+1]=str(obj)
+        if a.cpu_governor:
+            assert '-cc1' in cmd,'Expected captured kernel frontend command'
+            cmd+=['-target-feature','-neon','-target-feature','-fp-armv8']
         result=subprocess.run(cmd,cwd=cwd,capture_output=True);(out/(unit+'.log')).write_bytes(result.stdout+result.stderr);result.check_returncode()
         if expected_objcopy:
             late=out/(unit+'.late.o');subprocess.run([str(a.llvm/'llvm-objcopy'),*expected_objcopy,str(obj),str(late)],check=True);obj=late
         added={'_elden_pd_power_observation'} if a.pd_power_trial and unit=='PmicClient' else set()
+        if a.cpu_governor:added={'_elden_cpu_governor_request_stop'}
         assert exports(obj)==exports(old)|added and not any(k.endswith('/__mod_init_func') for k in sections(obj))
+        if a.cpu_governor:
+            imports=lambda p:{k for k,v in global_symbols(p).items() if not v[0]&0x0e}
+            added_imports=imports(obj)-imports(old)
+            assert added_imports<=exports(parent/'native.macho'),added_imports-exports(parent/'native.macho')
         asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',obj],text=True);(out/(unit+'.asm')).write_text(asm)
         assert not re.search(r'^\s*[0-9a-f]+:\s+[0-9a-f]{8}\s+.*\b[qvdshb]\d+(?:\b|\.)',asm,re.M)
         records[unit]={'source_sha256':sha(source),'object_sha256':sha(obj),'command':cmd,'cwd':str(cwd),'bindings':bindings,'objcopy':expected_objcopy};objects[obj.name]=obj
         object_archives[obj.name]='libEldenBacklight.a' if unit=='BacklightRuntime' else 'libEldenPmicClient.a'
+    if a.cpu_governor:
+        from cpu_governor_build import compile_recovery
+        obj,record,prior_inputs=compile_recovery(base,out,a.llvm)
+        objects[obj.name]=obj;object_archives[obj.name]='libShengUfs.a';records['ShengUfs']=record;inherited.update(prior_inputs)
     link=read(parent/'link-command.json');replacements={};groups={}
     for archive_name in dict.fromkeys(object_archives.values()):
         selected={n:p for n,p in objects.items() if object_archives[n]==archive_name}
         ars=[v.split(',')[-1] for v in link if v.endswith('/'+archive_name)];assert len(ars)==1;oldar=Path(ars[0])
-        folder=out/('backlight' if archive_name=='libEldenBacklight.a' else 'pmic');folder.mkdir()
+        folder=out/('backlight' if archive_name=='libEldenBacklight.a' else 'ufs' if archive_name=='libShengUfs.a' else 'pmic');folder.mkdir()
         names=[n for n in subprocess.check_output(['ar','t',oldar],text=True).splitlines() if not n.startswith('__.SYMDEF')];assert set(selected)<=set(names);members={}
         for name in names:
             data=selected[name].read_bytes() if name in selected else subprocess.check_output(['ar','p',oldar,name]);(folder/name).write_bytes(data);members[name]=hashlib.sha256(data).hexdigest()
@@ -126,7 +153,8 @@ def main():
     write(out/'link-command.json',cmd)
     env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as f:subprocess.run(cmd,cwd=out,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
-    assert exports(out/'native.macho')==exports(parent/'native.macho')|({'_elden_pd_power_observation'} if a.pd_power_trial else set())
+    added_exports={'_elden_pd_power_observation'} if a.pd_power_trial else {'_elden_cpu_governor_request_stop'} if a.cpu_governor else set()
+    assert exports(out/'native.macho')==exports(parent/'native.macho')|added_exports
     for f,h in {**inputs,**inherited}.items():assert sha(Path(f))==h
     pre=read(ROOT/'profiles/v91/image-build/plan.json')['prelink'];assert sha(a.original_kernelcache)==pre['original_kernelcache_sha256'];kit=out/'prelink-tool';kit.mkdir()
     with tarfile.open(fileobj=io.BytesIO(subprocess.check_output(['git','-C',str(base/'dependencies/XnuPrelink'),'archive',pre['commit']]))) as t:t.extractall(kit,filter='data')
@@ -143,6 +171,7 @@ def main():
     if a.backlight_power_trial:files.append(ROOT/'drivers/EldenBacklight/PowerTrialSource.py')
     if a.pd_power_trial:files += [ROOT/'drivers/EldenPmicGlink'/n for n in ('PdObservation.h','PdCompletion.h','PdStartupSource.py')]+[ROOT/'drivers/EldenBacklight/PdPowerSource.py']
     if a.cpu_power_observation:files += [ROOT/'drivers/EldenCpuPower'/n for n in ('SurveySource.py','Survey.inc','CpuLoad.h')]+[ROOT/'drivers/EldenPmicGlink/PdObservation.h',ROOT/'profiles/v91/sources/power/CpuPerfSurvey.cpp']
+    if a.cpu_governor:files += [ROOT/'drivers/EldenCpuPower'/n for n in ('RuntimeSource.py','Runtime.inc','SurveySource.py','Survey.inc','CpuLoad.h','GovernorControl.h','GovernorSource.py','upstream/CpuFreqGovernor.h','upstream/source.json','upstream/LICENSE')]+[ROOT/'drivers/EldenPmicGlink/PdObservation.h',ROOT/'profiles/v91/sources/power/CpuPerfSurvey.cpp',ROOT/'profiles/v91/sources/power/EldenScmiPerf.h',ROOT/'profiles/v91/sources/power/CpuPerfAccess.h',ROOT/'profiles/current-build/plan.json',ROOT/'profiles/v97-wcn/EldenSdamRecovery.inc',ROOT/'tools/cpu_governor_build.py']
     sources={**parent_report['source_inputs'],**{str(f.relative_to(ROOT)):sha(f) for f in files}}
     report={'profile':'charge-verification','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),'changed_core_objects':0,'changed_native_objects':2,'native_objects':records,'archive_members':members,'core_filelist_unchanged':True,'scalar':True,'optional_runtime':parent_report['optional_runtime'],'source_inputs':sources,'inherited_inputs':inputs,'inherited_sources':inherited,'entry_return_target':hex(after[1]),'parent_kernel_sha256':parent_report['kernel_sha256'],'original_apple_executables_hashed':30,'hardware':False}
     if a.window_handoff:report['profile']='charge-window-handoff'
@@ -151,5 +180,9 @@ def main():
     if a.backlight_power_trial:report['profile']='backlight-power-trial'
     if a.pd_power_trial:report['profile']='pd-power-trial'
     if a.cpu_power_observation:report['profile']='cpu-power-observation';report['changed_native_objects']=1
+    if a.cpu_governor:report['profile']='cpu-governor';report['generated_policy_sha256']=sha(out/'source/EldenCpuFreqPolicy.h')
+    if a.cpu_governor:
+        from cpu_governor_build import audit_stop_link
+        report['stop_hook']=audit_stop_link(out/'native.macho',out/'kernel.macho')
     write(out/'result.json',report);shutil.copytree(parent/'runtime',out/'runtime');print(json.dumps({'kernel_sha256':report['kernel_sha256'],'changed_objects':report['changed_native_objects']}))
 if __name__=='__main__':main()

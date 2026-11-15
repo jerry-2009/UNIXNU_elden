@@ -15,7 +15,16 @@ def qualify(report_path,entry_path,runtime):
     units={'BacklightRuntime'} if profile in ('backlight-service','backlight-power-trial') else {'PmicClient','ChargePolicy'}
     if profile=='pd-power-trial':units={'PmicClient','BacklightRuntime'}
     if profile=='cpu-power-observation':units={'CpuPerfSurvey'}
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='cpu-governor':units={'CpuPerfSurvey','ShengUfs'}
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='cpu-governor':
+        sys.path.insert(0,str(ROOT/'drivers/EldenCpuPower'))
+        from RuntimeSource import source,recovery
+        from GovernorSource import policy
+        from cpu_governor_build import audit_stop_link
+        if hashlib.sha256(source()).hexdigest()!=r['native_objects']['CpuPerfSurvey']['source_sha256'] or hashlib.sha256(recovery()).hexdigest()!=r['native_objects']['ShengUfs']['source_sha256']:raise ValueError('Governor source/recovery differs')
+        if hashlib.sha256(policy()).hexdigest()!=r['generated_policy_sha256'] or not r['native_objects']['ShengUfs'].get('initializers_preserved'):raise ValueError('Governor policy/initializer contract differs')
+        if audit_stop_link(folder/'native.macho',folder/'kernel.macho')!=r['stop_hook']:raise ValueError('Governor stop linkage differs')
     if profile=='cpu-power-observation':
         sys.path.insert(0,str(ROOT/'drivers/EldenCpuPower'))
         from SurveySource import source

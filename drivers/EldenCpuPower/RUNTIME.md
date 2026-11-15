@@ -1,15 +1,20 @@
-# Governor runtime integration draft — 2026-11-15
+# Governor runtime integration — 2026-11-15
 
-The mode3 worker and recovery source transformation are prepared and have passed
-16 ASan/UBSan host scenarios. They are **not native compiled, kernel linked,
-packaged or tested on hardware**. The user has another task maintaining macOS;
-its maintenance marker is preserved. Windows/WSL testing did not touch the Mac
-build trees or tablet. The v146 boot remains unchanged.
+Current result: [v148](../../profiles/cpu-governor/README.md) completed native
+integration and one bounded hardware lifecycle after maintenance ended. Active
+RPC interruption and power savings remain unaccepted; current evidence is in
+that profile.
+
+The mode3 worker and recovery transformation passed16 ASan/UBSan host scenarios,
+then native linking, packaging and the bounded v148 trial. Initial Windows/WSL
+work respected the other task's macOS maintenance marker; Mac/device work began
+only after that task archived the marker. The older v146 image is preserved.
 
 `RuntimeSource.py` derives from the exact v146 observer SHA253d6075, leaving the
 mode1/2 source bodies and their query-only message callback intact. Explicit
-`elden-cpu-survey=3`/`ecp=3` dispatches the governor worker. This selection is not
-yet wired into the packer or clean-build entrypoint.
+`elden-cpu-survey=3`/`ecp=3` dispatches the governor worker. The explicit
+[build/pack/audit route](../../profiles/cpu-governor/README.md) includes source-routing
+tests, the verified native contract and hardware evidence.
 
 ## Runtime behavior
 
@@ -58,11 +63,11 @@ addition. Its SHA is
 `3db3456277d362281f702a0c3d0dd3340fb87e82bd4a095d9d66c9b4dc76c088`.
 No UFS transfer, DMA, root extent, write permission or SPMI restart code is changed.
 
-Next, after maintenance: use the current-units ShengUfs command/closed VFS and
+The builder uses the current-units ShengUfs command/closed VFS and
 the CpuPerfSurvey command to compile both affected objects, binding only the new
-headers/source. Preserve the UFS initializer and all other archive/core members,
-check the new stop provider/consumer, full native/prelink/Apple30/entry/AVB, then
-select a distinct candidate. Do not use an old object as a build prerequisite or
+headers/source. It preserves the UFS initializer and all other archive/core members,
+checks the new stop provider/consumer and full native/prelink/Apple30/entry/AVB,
+then qualifies a distinct candidate. Do not use an old object as a build prerequisite or
 overwrite current-build's frozen source manifest to make the delta pass.
 
 ## Host evidence

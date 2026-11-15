@@ -1,5 +1,10 @@
 # CPU load and firmware-level observation
 
+Current result: [v148 bounded governor](../../profiles/cpu-governor/README.md)
+confirmed191 transitions and restoration on hardware. It did not establish net
+charging or a power saving; the next focus is storage. Earlier component/draft
+boundaries below remain as historical links.
+
 The subsequent [load-aware governor component](GOVERNOR.md) is implemented and
 host/native compiled, but not linked into a boot candidate or tested on hardware.
 The observer and its v146 image below remain unchanged.

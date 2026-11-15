@@ -7,7 +7,7 @@ from GovernorSource import policy
 from RuntimeSource import source,recovery,RECOVERY
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--cxx',required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
-    out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);(out/'Policy.h').write_bytes(policy())
+    out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);(out/'EldenCpuFreqPolicy.h').write_bytes(policy())
     fixture=(ROOT/'drivers/EldenCpuPower/TestGovernor.cpp').read_text(encoding='utf-8').split('int main(){',1)[0]
     fixture=fixture.replace('#include "GovernorControl.h"','#include "GovernorControl.h"\n#include "CpuLoad.h"\n#include <string>\n#include <cstdarg>\nstatic elden_cpufreq::Control governorControl;')
     fixture=fixture.replace('elden_cpufreq::Control control={};','elden_cpufreq::Control &control;').replace('Firmware(){','Firmware():control(governorControl){')

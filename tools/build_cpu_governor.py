@@ -9,7 +9,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
     if sys.flags.optimize:raise ValueError('Assertions required')
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--llvm',type=Path,required=True);p.add_argument('--reference-native',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
-    out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);header=out/'Policy.h';header.write_bytes(policy())
+    out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);header=out/'EldenCpuFreqPolicy.h';header.write_bytes(policy())
     clang=a.llvm/'clang++';resource=subprocess.check_output([str(clang),'-print-resource-dir'],text=True).strip()
     obj=out/'GovernorApi.o';source=ROOT/'drivers/EldenCpuPower/GovernorApi.cpp'
     cmd=[str(clang),'-target','arm64-apple-ios17.0','-std=c++17','-O2','-Wall','-Wextra','-ffreestanding','-fno-exceptions','-fno-rtti','-fno-stack-protector','-fno-threadsafe-statics','-fno-builtin','-mgeneral-regs-only','-nostdinc','-isystem',str(Path(resource)/'include'),'-I',str(out),'-I',str(source.parent),'-I',str(ROOT/'profiles/v91/sources/power'),'-c',str(source),'-o',str(obj)]
