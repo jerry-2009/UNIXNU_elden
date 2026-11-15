@@ -13,6 +13,7 @@ def main():
     if sys.flags.optimize:raise ValueError('Assertions required')
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['clean-build','parent-build','native-build','wlan-build','root-build','power-build','wcn-build','original-kernelcache','llvm','output']:p.add_argument('--'+n,type=Path,required=True)
+    p.add_argument('--endpoint-build',type=Path,help='Add the explicitly built BAR/Peach transaction')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
     contract=read(ROOT/'profiles/ufs-idle-trial/native-contract.json');assert native_identity(parent/'native.macho')==(contract['sections'],contract['commands'],contract['symbols'])
     previous=read(parent/'result.json');assert previous['profile']=='ufs-idle-trial' and sha(parent/'kernel.macho')==previous['kernel_sha256']
@@ -22,12 +23,19 @@ def main():
     assert set(changed)=={'ShengUfs.o'}
     nr=read(a.native_build/'result.json');wr=read(a.wlan_build/'result.json');rr=read(a.root_build/'result.json');pr=read(a.power_build/'result.json');cr=read(a.wcn_build/'result.json')
     assert nr['native_root_worker_bound'] and wr['root_worker_hooks'] and wr['root_power_provider']
+    assert bool(nr.get('endpoint_worker_bound'))==bool(a.endpoint_build)
     supplied={'Native.o':(a.native_build/'Native.o',nr['object_sha256']),
               'Root.o':(a.root_build/'Root.o',rr['objects']['Root']['object_sha256']),
               'Phy.o':(a.root_build/'Phy.o',rr['objects']['Phy']['object_sha256']),
               'Power.o':(a.power_build/'Power.o',pr['plan_object_sha256']),
               'WcnPowerNative.o':(a.wlan_build/'WcnPowerNative.o',wr['object_sha256']),
               'WcnPower.o':(a.wcn_build/'WcnPower.o',cr['objects']['WcnPower']['object_sha256'])}
+    endpoint_sources={}
+    if a.endpoint_build:
+        er=read(a.endpoint_build/'result.json')
+        supplied['Endpoint.o']=(a.endpoint_build/'Endpoint.o',er['object_sha256'])
+        endpoint_sources={'drivers/EldenPcie/'+n:h for n,h in er['source_sha256'].items()}
+        for name,h in endpoint_sources.items():assert sha(ROOT/name)==h,name
     for file,h in supplied.values():assert sha(file)==h,file
     for report,key,prefix in [(nr,'source_inputs',ROOT),(wr,'source_inputs',ROOT),(rr,'source_sha256',ROOT/'drivers/EldenPcie'),(pr,'source_sha256',ROOT)]:
         for file,h in report[key].items():assert sha(prefix/file)==h,file
@@ -51,7 +59,8 @@ def main():
             actual=subprocess.check_output(['ar','p',str(target),name]);expected=(folder/name).read_bytes()
             assert actual==expected or actual==expected+b'\n'*((-len(expected))%8)
         replacements[str(old)]=str(target);member_hashes[archive_name]=members
-    pcie=out/'libEldenPcie.a';subprocess.run(['ar','rcs',str(pcie),*[str(supplied[n][0]) for n in ['Native.o','Root.o','Phy.o','Power.o']]],env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
+    pcie_members=['Native.o','Root.o','Phy.o','Power.o']+(['Endpoint.o'] if a.endpoint_build else [])
+    pcie=out/'libEldenPcie.a';subprocess.run(['ar','rcs',str(pcie),*[str(supplied[n][0]) for n in pcie_members]],env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
     inherited_inputs={str(parent/'link.filelist'):sha(parent/'link.filelist')}
     for file in (parent/'link.filelist').read_text().splitlines():inherited_inputs[file]=sha(Path(file))
     for arg in link:
@@ -79,14 +88,16 @@ def main():
     before=entry((parent/'kernel.macho').read_bytes());after=entry((out/'kernel.macho').read_bytes())
     assert before[2]==after[2] and before[1]-before[0]==after[1]-after[0]==7124
     shutil.copytree(parent/'runtime',out/'runtime')
-    own={**nr['source_inputs'],**wr['source_inputs'],**{'drivers/EldenPcie/'+n:h for n,h in rr['source_sha256'].items()},**pr['source_sha256'],**shared_sources}
+    own={**nr['source_inputs'],**wr['source_inputs'],**{'drivers/EldenPcie/'+n:h for n,h in rr['source_sha256'].items()},**pr['source_sha256'],**shared_sources,**endpoint_sources}
     for path in ['tools/build_pcie_root_kernel.py','tools/build_ufs_wait_objects.py','drivers/EldenUfsIdle/IdleSource.py']:own[path]=sha(ROOT/path)
     sources={**previous['source_inputs'],**own}
-    report={'profile':'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
+    report={'profile':'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
             'source_inputs':sources,'optional_runtime':previous['optional_runtime'],'core_filelist_unchanged':True,'changed_core_objects':0,'scalar':True,
-            'changed_native_objects':3,'added_native_objects':4,'native_objects':records,'archive_members':member_hashes,
+            'changed_native_objects':3,'added_native_objects':len(pcie_members),'native_objects':records,'archive_members':member_hashes,
             'component_objects':{n:{'path':str(p),'sha256':h} for n,(p,h) in supplied.items()},
             'parent_kernel_sha256':previous['kernel_sha256'],'original_apple_executables_hashed':30,'entry_return_target':hex(after[1]),
-            'ufs_diagnostic_removed':True,'ufs_ah8_retained':True,'root_worker_bound':True,'boot_packaged':False,'hardware_tested':False}
+            'ufs_diagnostic_removed':True,'ufs_ah8_retained':True,'root_worker_bound':True,
+            'endpoint_worker_bound':bool(a.endpoint_build),'endpoint_generated_sources':nr.get('generated_sources',{}),
+            'boot_packaged':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['profile','kernel_sha256','changed_native_objects','added_native_objects','original_apple_executables_hashed','boot_packaged']}))
 if __name__=='__main__':main()

@@ -5,8 +5,11 @@ outbound memory routing and a real chip-version read. The component passed
 295 host scenarios/45259 checks with ASan/UBSan and compiles as ARM64/iOS17
 object `91695536406cb5d9e90e286c4f2d7f71eb721c4fd639eb08b264c759015ab921`.
 It has one export, no imports/FP/SIMD/initializers and zero warnings.
-**Native BAR mapping, worker integration, complete kernel and hardware testing
-of this component remain pending.** v157 root-only remains the hardware baseline.
+Native BAR mapping, worker integration and complete kernel are now verified in
+[v158](../../profiles/pcie-endpoint-trial/README.md). Hardware returned chip0x40210200,
+major2/minor0, MEM-only command2 and confirmed native power identity. SMMU/DMA/MSI/
+MHI/firmware/network remain pending. The standalone component checks below retain
+their original scope; v158 supplies the additional hardware evidence.
 
 ## Sources and board differences
 
@@ -77,10 +80,10 @@ busy region, stale epoch, lost assignments, malformed masks, stalled clocks,
 wrong/allFF versions, command W1C handling and remap restoration. They do not
 prove physical register access or native scheduling/quiescence.
 
-Next connect native BAR mapping and read/write callbacks to the root worker,
-keep the cold no-DMA stop contract, extend terminal status and wire real epoch
-confirmation. Rebuild/review the full candidate before one root+BAR+identity
-trial. DMA/MSI/MHI need their separate ownership and drain implementation.
+Native mapping/read/write callbacks, terminal status and real epoch confirmation
+are connected by EndpointNativeSource and passed v158 including cold no-DMA stop.
+Next DMA/MSI/MHI need their separate ownership and drain implementation; do not
+repeat the successful root+BAR+identity trial.
 
 [Evidence](../../docs/evidence/pcie-endpoint-20261116.json). Workbench records:
 `lab/records/pcie-endpoint-20261116/{host3,source-audit2}` and

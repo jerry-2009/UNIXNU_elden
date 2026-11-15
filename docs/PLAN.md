@@ -22,16 +22,16 @@ WLAN/NoC原生提供者与worker已实跑，128对象QMI链接仍属离线结果
 
 接下来的顺序固定为：
 
-1. 按本机地址窗口发现BAR尺寸、配置映射，实读Peach major；不能拿Android缓存代替。
+1. 已完成：v158按本机窗口实测BAR/映射、Peach major2及原生epoch确认，完整恢复Android。
 2. 确立SMMU/DMA内存所有权和MSI路由，补真实排空与停止，再允许端点bus-master。
 3. 接入已编译的MHI/Peach/QMI栈和真实WLAN consumer，验证固件/扫描/关联/联网。
 
-第一项的[BAR/Peach事务组件](../drivers/EldenPcie/ENDPOINT.md)已通过295场景与ARM64编译，
-按stock更窄的61MiB窗口配置、保持bus-master关闭。尚缺原生map/worker/状态与epoch确认接线，
-未整核/上机；下一步完成这些后合并一次root+BAR+身份试验。
+第一项的[完整v158证据](../profiles/pcie-endpoint-trial/README.md)包括原生worker30场景、
+整核/签包和真实40210200/major2、BAR0/2、禁BM、同步回程。采用stock更窄61MiB窗口。
+下一步执行第二项，MHI启动前必须有真实DMA所有权和排空；不重复已通过的身份诊断。
 
-不重复v157根链路诊断，也不复制其它设备未保留的低地址DMA内存。芯片major确认前，
-现有power_ready/CPR/QMI门保持关闭。更详细的边界见[原生worker](../drivers/EldenPcie/NATIVE.md)。
+不重复v157/v158诊断，也不复制其它设备未保留的低地址DMA内存。power_ready/CPR/QMI仍必须
+核对当前确认代际，不能沿用历史实机结果。更详细的边界见[原生worker](../drivers/EldenPcie/NATIVE.md)。
 
 v156已经补齐一项可执行电源缺口：[UFS自动Hibern8](../profiles/ufs-idle-trial/README.md)。
 32次真实空闲进入/退出、数据验证与配置恢复通过，并恢复Android；5000µs取自本机原厂。

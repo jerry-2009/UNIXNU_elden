@@ -6,7 +6,9 @@ shutdown handling. These pieces are linked into a complete derivative of v156.
 The signed v157 root-only trial passed on TB322FC: **Gen3 ×2**, root17cb:011c,
 endpoint17cb:110e, endpoint I/O/MEM/bus-master disabled. Sync return and complete
 stock restoration passed. [Hardware evidence](../../profiles/pcie-root-trial/HARDWARE.md).
-BAR/DMA/MSI/MHI and Wi-Fi networking remain unfinished. Never flash the raw kernel.
+The optional [v158 extension](../../profiles/pcie-endpoint-trial/README.md) now
+passes BAR mapping and real Peach identity too. DMA/MSI/MHI and Wi-Fi networking
+remain unfinished. Never flash the raw kernel.
 
 ## Admission, mapping and lifetime
 
@@ -103,5 +105,5 @@ are archive build-directory strings in LINKEDIT and the derived PrelinkKCID.
 Entry conversion, signed boot, complete asset/floor audit and one bounded hardware
 trial have now passed. The device was restored to stock Android with original
 charging/radio/scan settings. Do not repeat the root-only trial; next establish
-BAR sizing/mapping, a real Peach-major read and DMA/MSI ownership before MHI.
+DMA/MSI ownership before MHI; v158 has since completed BAR/Peach identification.
 Charging and the complete peripheral Goal remain open.

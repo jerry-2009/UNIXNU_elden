@@ -1,5 +1,9 @@
 # 当前状态 · 2026-11-16
 
+v158已经在真机读到Peach40210200/major2，BAR0/2尺寸与映射、禁BM和原生身份确认均通过。
+同步回程及完整stock/Android/充电无线设置恢复通过；日志drop21，必需记录齐，不冒称完整无丢字。
+[本轮完整证据](../profiles/pcie-endpoint-trial/README.md)。下一步SMMU/DMA/MSI与MHI；Wi-Fi尚未联网。
+
 v157 PCIe根链路已实机通过：Gen3 ×2、正确root/endpoint、127项PHY写入及禁DMA状态。
 同步返回fastboot并完整恢复Android和原设置。[结果与边界](../profiles/pcie-root-trial/HARDWARE.md)。
 Wi-Fi下一步是BAR/芯片major确认、SMMU/DMA/MSI和MHI；目前仍不能联网。

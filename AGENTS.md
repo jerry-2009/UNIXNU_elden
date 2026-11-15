@@ -1,5 +1,22 @@
 # UniXNU elden — authoritative source repository
 
+Latest v158-hardware20261116: optional EndpointNativeSource preserves v157 base sources; real IOKit BAR map,
+scalar read/remap-only write, terminal endpoint status, actual confirm_endpoint+power_ready and stop withdrawal.
+epe1 explicit, primary1015B/all guards/8s/fallbacks preserved.30actual worker/root/endpoint/PHY model scenarios5519
+ASan/UBSan checks (incl20root regressions); first test-only indentation compile error fixed and retained.
+Native62cbbdf5/binding8bfe0389 no SIMD/init/warnings; full kernel1278eb40 (3old replacements+5new objects),
+core/filelist/other archive/UFS init/Apple30/entry7124 preserved. Six direct start/stop/root/power/identify/confirm
+branches preserved after prelink. Signed1990cca4/sessiona6f4850f8a2715a7/floor1738713600/0/3.
+Hardware: Gen3x2, BAR0=40400000/200000 BAR2=40600000/8000, chip40210200 major2/minor0,
+command0002 (MEM/no IO/BM), remap-restored1/confirmed1,28endpoint writes. No DMA/MSI/MHI/firmware/network.
+164526B/raw55d54150/drop21/no reconnect; required lines complete, not whole stream. PD early-return restored1,
+storage errors only after reset marker. Sync/PERST-low/physical fastboot/full stock8b8e72da/Android root green boot1,
+original charging/radios/scans and sleep restored.21rehashed capture negatives pass. All jobs terminal/device stock.
+profiles/pcie-endpoint-trial/README.md and docs/evidence/pcie-endpoint-hardware-20261116.json current.
+Mac endpoint-native/native1, endpoint-kernel-v158/build1, endpoint-boot-v158/package1 under lab with20261116 suffix;
+matching workbench edl/lab. Next owned SMMU/DMA/MSI and actual drain, then MHI/Peach/QMI; no identity rerun.
+Full Goal active, charging dualport/net/cycles/persistence incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest endpoint-component20261116: Endpoint.c sizes/restores32/64-bit BARs, assigns BAR0/2,
 region1+root MEM routing, maps via mandatory callback, MEM-only/no BM, Peach3278 window/version1b00000 major2,
 restores remap/rechecks config+BARs. Native map/worker/epoch confirmation/full kernel/hardware NOT integrated.

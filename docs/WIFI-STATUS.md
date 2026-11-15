@@ -4,14 +4,14 @@ v157在TB322FC实机上训练到Gen3 ×2，读到root17cb:011c和endpoint17cb:11
 127项PHY与真实WLAN/NoC调用通过，端点IO/MEM/BM关闭。完整回程、stock Android及
 原充电/无线/后台扫描设置恢复通过。[硬件范围与原始证据](../profiles/pcie-root-trial/HARDWARE.md)。
 
-Wi-Fi仍不能开启联网：尚未验证BAR映射/Peach major2/SMMU/DMA/MSI/MHI/固件上传，
-更没有en0、扫描、关联或流量验收。128对象QMI可重定位链接尚未接入此候选。
-下一步先BAR与芯片身份，再有所有权的DMA/MSI及MHI；已通过的root诊断不重跑。
+v158随后通过[BAR/芯片身份实机](../profiles/pcie-endpoint-trial/README.md)：BAR0/2实测与映射，
+芯片40210200/major2/minor0、MEM-only/禁BM，真实WLAN epoch确认、同步回程及完整Android恢复。
+Wi-Fi仍不能联网：SMMU/DMA/MSI/MHI/固件上传、en0、扫描、关联和流量均未验收。
+128对象QMI可重定位链接尚未接入此候选。下一步有所有权的DMA/MSI及MHI，已通过的身份诊断不重跑。
 显式full-on预算不是日用电源策略，日用净充及完整保护周期仍欠。
 
-[BAR/Peach事务组件](../drivers/EldenPcie/ENDPOINT.md)现已离线测试及ARM64编译完成，
-原生映射、worker接入和实机身份读取仍未完成。stock61MiB与Linux573MiB窗口差异已核，
-采用较窄交集；不能以组件的模拟身份值解除真实QMI准入门。
+[BAR/Peach事务](../drivers/EldenPcie/ENDPOINT.md)采用stock61MiB与Linux573MiB窗口的较窄交集。
+组件模拟测试与上述实机验收分别归档；后续QMI仍须绑定实际消费者、相同有效epoch，不用模拟身份值准入。
 
 已具备的源码链为[共享WCN](WCN-SHARED-POWER.md)→[原生WLAN](WLAN-POWER-NATIVE.md)
 →[本机PHY/root](../drivers/EldenPcie/README.md)→[原生worker](../drivers/EldenPcie/NATIVE.md)。

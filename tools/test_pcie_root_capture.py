@@ -15,8 +15,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('run', 'audit', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--endpoint', action='store_true')
     args = parser.parse_args()
-    baseline = assess(args.run, args.audit)
+    baseline = assess(args.run, args.audit, args.endpoint)
     args.output.mkdir(parents=True, exist_ok=False)
     capture, = (args.run / 'usb').glob('*.bin')
     raw = capture.read_bytes()
@@ -48,6 +49,17 @@ def main():
         ('scan-not-restored', raw, ('supervisor.json', 'scan_settings_after', ['0', '0'])),
         ('wrong-floor', raw, ('audit.json', 'rollback_index', 1738713601)),
     ]
+    if args.endpoint:
+        chip = ('chip=' + f"{int(baseline['chip_version'], 16):08x}").encode()
+        cases += [
+            ('wrong-chip-major', replace(b'major=2 minor=', b'major=3 minor='), None),
+            ('allff-chip', replace(chip, b'chip=ffffffff'), None),
+            ('unconfirmed-power', replace(b'confirmed=1 writes=', b'confirmed=0 writes='), None),
+            ('endpoint-dma-enabled', replace(b'command=0002 mapped=', b'command=0006 mapped='), None),
+            ('missing-chip-stage', replace(b'ELDEN_PCIE_EP stage=7 ', b'OMITTED_PCIE_EP stage=7 '), None),
+            ('wrong-bar-size', replace(b'bar2=40600000/8000 ', b'bar2=40600000/10000 '), None),
+            ('window-not-restored', replace(b'remap-restored=1 confirmed=', b'remap-restored=0 confirmed='), None),
+        ]
     rejected = []
     for name, mutated, edit in cases:
         folder = args.output / name
@@ -63,7 +75,7 @@ def main():
             destination.write_text(json.dumps(doc, indent=2) + '\n', encoding='utf-8')
         (folder / 'usb/capture.bin').write_bytes(mutated)
         try:
-            assess(folder, folder / 'audit.json')
+            assess(folder, folder / 'audit.json', args.endpoint)
         except AssertionError:
             rejected.append(name)
         else:

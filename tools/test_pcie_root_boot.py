@@ -18,5 +18,14 @@ def main():
         except ValueError:pass
         else:raise AssertionError('Invalid intent accepted')
     assert bt_runtime_boot.menu(q)==menu(q)
-    print(json.dumps({'passed':True,'bytes':1011,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':4}))
+    ep=dict(q,profile='pcie-endpoint-trial',endpoint_trial=True)
+    epmenu=tomllib.loads(bt_runtime_boot.menu(ep));ep_args=arguments(epmenu['entry'][0]['args'])
+    assert ep_args.pop('epe')=='1' and ep_args==after
+    assert len(epmenu['entry'][0]['args'].replace('@SESSION@','0'*16).encode())==1015
+    assert epmenu['entry'][1:]==actual['entry'][1:] and epmenu['boot']==actual['boot']
+    for bad in [dict(ep,mode=4),dict(ep,root_trial=False),dict(ep,endpoint_trial=False)]:
+        try:menu(bad)
+        except ValueError:pass
+        else:raise AssertionError('Invalid endpoint intent accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':7}))
 if __name__=='__main__':main()

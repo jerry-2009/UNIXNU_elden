@@ -3,7 +3,7 @@ import argparse,hashlib,json,re
 from pathlib import Path
 STOCK='8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890'
 def read(p):return json.loads(p.read_text(encoding='utf-8'))
-def assess(run,audit):
+def assess(run,audit,endpoint=False):
     run=Path(run);audit=read(Path(audit));files=list((run/'usb').glob('*.bin'));assert len(files)==1
     raw=files[0].read_bytes();meta=read(files[0].with_suffix('.json'));text=raw.decode('ascii',errors='replace')
     assert len(raw)==meta['bytes'] and hashlib.sha256(raw).hexdigest()==meta['raw_sha256']
@@ -12,8 +12,8 @@ def assess(run,audit):
     statuses=meta['statuses'];assert statuses and all(s['session']==audit['session'] and s['boot']==meta['boot_nonce'] for s in statuses)
     assert any(s.get('fastboot')=='ready' and s.get('charge_control')=='1' for s in statuses)
     assert audit['accepted_static'] and (audit['rollback_index'],audit['footer_location'],audit['parent_boot_chain_location'])==(1738713600,0,3)
-    assert audit['bluetooth_runtime']['profile']=='pcie-root-trial' and audit['bluetooth_runtime']['mode']==0
-    stage=[int(v) for v in re.findall(r'ELDEN_PCIE stage=(\d+) ',text)];assert stage==list(range(1,11))
+    assert audit['bluetooth_runtime']['profile']==('pcie-endpoint-trial' if endpoint else 'pcie-root-trial') and audit['bluetooth_runtime']['mode']==0
+    stage=[int(v) for v in re.findall(r'ELDEN_PCIE stage=(\d+) ',text)];assert stage==list(range(1,12 if endpoint else 11))
     pattern=r'ELDEN_PCIE end rc=(-?\d+) state=(\d+) stage=(\d+) root=([0-9a-f]+) ep=([0-9a-f]+) link=([0-9a-f]+) last=(\d+):([0-9a-f]+)=([0-9a-f]+) writes=(\d+) phy=(\d+) gcc-held=(\d+)'
     rows=re.findall(pattern,text);assert len(rows)==1
     row=rows[0];rc,state,laststage=map(int,row[:3]);root,ep,link=map(lambda s:int(s,16),row[3:6])
@@ -47,7 +47,7 @@ def assess(run,audit):
     assert any(e['event']=='physical-fastboot-observed' for e in supervisor['events'])
     final=next(e for e in supervisor['events'] if e['event']=='stock-android-restored')
     assert final['root'] and final['green'] and final['settings_equal'] and final['radios_restored'] and final['sleep_requested']
-    return {'root_trial_passed':True,'pcie_gen':gen,'lanes':width,'root_id':hex(root),'endpoint_id':hex(ep),'endpoint_command':hex(int(row[8],16)&0xffff),
+    result={'root_trial_passed':True,'pcie_gen':gen,'lanes':width,'root_id':hex(root),'endpoint_id':hex(ep),'endpoint_command':hex(int(row[8],16)&0xffff),
             'phy_writes':127,'controller_writes':int(row[9]),'gcc_released':True,'quiesce_and_sync_return':True,'stock_full_sha_restored':True,
             'arc_requests':{'mx_index':p[3],'mx_level':p[4],'cx_index':p[5],'cx_level':p[6]},'sn4_requested':p[7],'sn4_calculated_minimum':p[8],
             'ldo_readback_mv':[int(x[2]) for x in rails],'capture_bytes':len(raw),'capture_sha256':meta['raw_sha256'],
@@ -56,8 +56,27 @@ def assess(run,audit):
             'session':audit['session'],'image_sha256':audit['image_sha256'],'boot_nonce':meta['boot_nonce'],
             'scope':'PCIe root/PHY/config only; no BAR allocation, DMA, MSI, MHI, firmware, network or daily-power acceptance',
             'gate_scope':'Reported drop counters and critical lines complete; no final post-disconnect counter is available'}
+    if result['reported_drop_max']:
+        result['gate_scope']='Required lines present; whole stream incomplete due to reported drops; no final post-disconnect counter available'
+    if endpoint:
+        rows=re.findall(r'ELDEN_PCIE_EP end rc=(-?\d+) state=(\d+) stage=(\d+) chip=([0-9a-f]+) major=(\d+) minor=(\d+) command=([0-9a-f]+) mapped=(\d+) remap-restored=(\d+) confirmed=(\d+) writes=(\d+) last=(\d+):([0-9a-f]+)=([0-9a-f]+)',text)
+        assert len(rows)==1;e=rows[0]
+        assert tuple(map(int,e[:3]))==(0,2,8) and int(e[4])==2 and ((int(e[3],16)>>8)&15)==2
+        assert ((int(e[3],16)>>4)&15)==int(e[5]) and int(e[6],16)&7==2
+        assert tuple(map(int,e[7:10]))==(1,1,1) and int(e[10])>0
+        assert [int(v) for v in re.findall(r'ELDEN_PCIE_EP stage=(\d+) ',text)]==list(range(1,8))
+        bars=re.findall(r'ELDEN_PCIE_EP bars bar0=([0-9a-f]+)/([0-9a-f]+) bar2=([0-9a-f]+)/([0-9a-f]+) epoch=(\d+) dma=0',text)
+        assert len(bars)==1 and tuple(int(v,16) for v in bars[0][:4])==(0x40400000,0x200000,0x40600000,0x8000)
+        assert int(bars[0][4])>0 and end<text.find('ELDEN_PCIE_EP end ')<text.find('ELDEN_PCIE_EP bars ')<ack
+        assert 'ELDEN_PCIE_EP mapped pa=40400000 bytes=200000 cache=inhibit' in text
+        result.update(endpoint_trial_passed=True,chip_version=hex(int(e[3],16)),chip_major=2,chip_minor=int(e[5]),
+                      endpoint_command_after_mapping=hex(int(e[6],16)),bar0=0x40400000,bar0_bytes=0x200000,
+                      bar2=0x40600000,bar2_bytes=0x8000,endpoint_writes=int(e[10]),wlan_identity_confirmed=True,
+                      scope='Root/BAR/Peach-major/confirmed power epoch only; no DMA/MSI/MHI/firmware/network or daily-power acceptance')
+    return result
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['run','audit','output']:p.add_argument('--'+n,type=Path,required=True)
-    a=p.parse_args();result=assess(a.run,a.audit);a.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8');print(json.dumps(result))
+    p.add_argument('--endpoint',action='store_true')
+    a=p.parse_args();result=assess(a.run,a.audit,a.endpoint);a.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8');print(json.dumps(result))
 if __name__=='__main__':main()
