@@ -1,5 +1,22 @@
 # UniXNU elden — authoritative source repository
 
+Latest SMMU-coexist20261116 offline: actual original touch DmaRoute rejects a modeled valid Wi-Fi route because it
+checks all132slots/83CBAR-CBA2R against boot values. New EldenSmmu BootRoute + TouchSource admits only one exact
+early SID1401 slot>=8/bank>=7 route; preserve slots0..7/banks0..6/CB0 and all unknown changes. Reserve->observed commit
+->touch seal; no late install/replacement. Partial failure poisoned; mapping must remain immutable to reset.
+This is registry bookkeeping, NOT real bank/ASID/RAM/fault/translation proof; native producer missing. Must initialize
+before UFS/Data publication/touch startup, not late v158 worker.122actual old/derived scenarios11494 ASan/UBSan checks
+pass incl100reserve/seal races. ARM64BootRoute98fa93ae/DmaRoute58380437/bindingf86a4733 no imports/SIMD/init/warnings.
+Fixed ArmSmmu83969cd8 uses new CBAR1f300, inherited CB01f000 stays; fixed Linux6f97250e PCI streaming+coherent masks36,
+historical ID25111 widths36; actual stock FDT113IRQ entries does not mean113banks. Qualcomm FAULT/BYPASS quirks noted.
+See drivers/EldenSmmu/README.md and evidence; Mac lab/smmu-boot-route-20261116/native1; workbench matching edl/lab host2.
+No full kernel/boot or device access this round. All tasks terminal; last restored stock/v158 retained, Goal active.
+Reference sync20261115-200229:65repos/43current/5FF/12fixed/3dirty/2existing missing refs, all heads/ref reports checked.
+ArmCpu owned-SGI fix is new and upstream hardware-unqualified; Elden already fixes Darwin assembly but still has all-SGI
+probe source, review selective guard before long diagnostics. Ath12k main change is sparse-path preparation; Sheng build
+pins/host evidence and official build/Data/IRQ guide updated. New Qca trace branch archived; no candidate input swap.
+Details workbench lab/reference-reviews/20261115-200229. Charging/whole Goal incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v158-hardware20261116: optional EndpointNativeSource preserves v157 base sources; real IOKit BAR map,
 scalar read/remap-only write, terminal endpoint status, actual confirm_endpoint+power_ready and stop withdrawal.
 epe1 explicit, primary1015B/all guards/8s/fallbacks preserved.30actual worker/root/endpoint/PHY model scenarios5519

@@ -13,6 +13,10 @@ Wi-Fi仍不能联网：SMMU/DMA/MSI/MHI/固件上传、en0、扫描、关联和�
 [BAR/Peach事务](../drivers/EldenPcie/ENDPOINT.md)采用stock61MiB与Linux573MiB窗口的较窄交集。
 组件模拟测试与上述实机验收分别归档；后续QMI仍须绑定实际消费者、相同有效epoch，不用模拟身份值准入。
 
+下一层[SMMU共存准备](../drivers/EldenSmmu/README.md)已用原触控源码复现新增Wi-Fi路由被拒，
+修复后的注册/封存与精确检查完成host及ARM64组件验证。它尚未配置SMMU；早期真实bank/ASID/
+内存页/IRQ及翻译提供者仍须实现，完整候选保持v158。固定本机Linux的PCI DMA掩码为36位。
+
 已具备的源码链为[共享WCN](WCN-SHARED-POWER.md)→[原生WLAN](WLAN-POWER-NATIVE.md)
 →[本机PHY/root](../drivers/EldenPcie/README.md)→[原生worker](../drivers/EldenPcie/NATIVE.md)。
 [QMI桥接](../drivers/EldenWifi/QMI-POWER.md)要求实读端点+major确认后的epoch，不能伪造成功。
