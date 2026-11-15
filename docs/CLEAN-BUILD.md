@@ -57,6 +57,10 @@ FAT16由仓库自己的写入器产生，已用独立fsck.fat核验，不依赖m
 
 ## 命令
 
+当前充电旁路退出修订的完整选项链见
+[charge-window-handoff](../profiles/charge-window-handoff/README.md#build)。
+下方不加额外选项的命令仍构建冻结基础版本，不自动等同于最新实验功能。
+
 ```sh
 git clone https://github.com/zenkernelsam/UniXNU_elden.git
 cd UniXNU_elden
