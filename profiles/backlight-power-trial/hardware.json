@@ -1,0 +1,89 @@
+{
+  "image_sha256": "963cd36c4a3e5d725b8d0c37faf772aad5cba751280ada5cc3f48480b01ed959",
+  "session": "4609b7091cd04ad5",
+  "raw_log": "edl_work\\live-backlight-power-v143-20261115\\usb\\20261115-021346.bin",
+  "raw_sha256": "d6c6f0f6506ee9b053a1f77f4321408e58cf8690f4a8d2c3227a8babb5c2a3a0",
+  "bytes": 1228466,
+  "dropped": 0,
+  "phases": [
+    {
+      "phase": "baseline",
+      "time_us": 83819159,
+      "level": 1597,
+      "hold_ms": 45000
+    },
+    {
+      "phase": "dim",
+      "time_us": 128863098,
+      "level": 798,
+      "hold_ms": 45000
+    },
+    {
+      "phase": "restored",
+      "time_us": 173905501,
+      "level": 1597,
+      "hold_ms": 45000
+    }
+  ],
+  "groups": {
+    "baseline": {
+      "total_samples": 16,
+      "after_six_cycles": 10,
+      "median_current_ua": 480500.0,
+      "mean_current_ua": 522800,
+      "range_current_ua": [
+        385000,
+        808000
+      ],
+      "all_coherent_net_charge": false
+    },
+    "dim": {
+      "total_samples": 15,
+      "after_six_cycles": 9,
+      "median_current_ua": 212000,
+      "mean_current_ua": 212222.22222222222,
+      "range_current_ua": [
+        211000,
+        213000
+      ],
+      "all_coherent_net_charge": false
+    },
+    "restored": {
+      "total_samples": 16,
+      "after_six_cycles": 10,
+      "median_current_ua": 368500.0,
+      "mean_current_ua": 368000,
+      "range_current_ua": [
+        365000,
+        369000
+      ],
+      "all_coherent_net_charge": false
+    }
+  },
+  "normalized_median_battery_ma": {
+    "baseline": -480.5,
+    "dim": -212.0,
+    "restored": -368.5
+  },
+  "pd_contracts": [
+    "ELDEN_PD_CONTRACT port=2 result=0 position=1 type=0 range-mv=5000/5000 exact-v=1 requested-mv=5000 requested-ma=3000 requested-mw=15000; contract-only, not metering"
+  ],
+  "short_port_actual_watts_proven": false,
+  "net_charging_passed": false,
+  "brightness_restored": true,
+  "finish_triggered_synchronized_return": true,
+  "full_stock_restored": true,
+  "android_root_green_boot_completed": true,
+  "android_before": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "android_after": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "sleep_requested": true,
+  "limits": "100/99 percent SOC; brightness-mode5 backend test, not GUI slider use. Baseline load drift is visible. Unweighted samples, no peak/input-wattage/full-cycle acceptance."
+}
