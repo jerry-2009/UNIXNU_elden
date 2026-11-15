@@ -1,5 +1,24 @@
 # UniXNU elden — authoritative source repository
 
+Latest DMA-memory20261116 offline: real IOKit DmaMemory allocator prepares130MiB contiguous/mapper-none backing
+for aligned128MiB data plus66table pages; every4K PA/PAR r/w checked, WB primaries cleaned, data NC alias44 verified,
+no cached-alias reuse/fixed RAM. Same-owner/epoch release proof after claim; failed complete retains all refs and forbids
+retry until reset. Pinned ArmSmmu83969cd8 builder/context/program/audit/table-memory vendored with only symbol/file/guard
+prefixes changed; original MIT license retained and exact re-export verified. Full128MiB/32768leaf tables and physical graph
+walk, output36 from known IDs, no execution permissions.14table cases plus13actual allocator-method model cases232501
+checks ASan/UBSan pass; IOKit/cache/PAR mocked. Native allocator9ecb8671, seven-object binding6bed3912, all9kernel imports
+found in v158; no warnings/SIMD/init. Established IOKit slots/PAR/cache codegen checked, not new hardware proof.
+Read-only Select checks all132slots/83banks, CB0 bypass, enabled known contexts' TTBR ASIDs and free/faultless bank>=7;
+1815actual-function model scenarios1645092checks pass, native9d725424 no imports/warnings/SIMD/init. No native allocator
+execution, hardware SMMU/IRQ/context/ATOS or full kernel/boot yet. Next exclusive early wrapper+fault IRQs+context/ATOS
+then immutable route publish before touch seals; later DMA drain/MSI/MHI. See drivers/EldenSmmu/MEMORY.md.
+Mac lab/wifi-dma-memory-20261116/{host1,native1,selection1}, workbench matching edl/lab. First WSL host attempt lacked
+clang (no compile); successful host run on Mac, original failure retained. All stage jobs terminal, no device access;
+Manifest EOL mismatch caught before commit: source.json now has explicit CRLF generation and local -text/cr-at-eol
+attributes. Fresh Windows export, Mac serialization and Git index all retain reviewed37c36c6a; code/object inputs unchanged.
+v158/last restored stock retained. Full Goal/charging remain incomplete; pending owned-SGI guard review before long
+diagnostics and GPU/QRTR/AnyRouter separation retained. No new reference sync needed after previous65-repo run.
+
 Latest SMMU-coexist20261116 offline: actual original touch DmaRoute rejects a modeled valid Wi-Fi route because it
 checks all132slots/83CBAR-CBA2R against boot values. New EldenSmmu BootRoute + TouchSource admits only one exact
 early SID1401 slot>=8/bank>=7 route; preserve slots0..7/banks0..6/CB0 and all unknown changes. Reserve->observed commit

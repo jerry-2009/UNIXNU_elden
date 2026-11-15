@@ -1,0 +1,62 @@
+{
+  "repository": "https://github.com/UniXNU/ArmSmmu4K",
+  "revision": "83969cd874503e65997ff7639f7dcf3d0a92cd17",
+  "transformation": "Replace ArmSmmu4K and ARM_SMMU_4K identifier/file/guard prefixes only; algorithms and original LICENSE unchanged",
+  "files": {
+    "ArmSmmu4K.c": {
+      "original_sha256": "0adb19b483e56e723014ed6cfe2c29f9d9735ae2770f62cf0057b22937dbd157",
+      "output": "EldenWifiSmmu4K.c",
+      "output_sha256": "b5b71541fa5a1de50e4dd993036e01a7ac5e8e54eaa20929c2ea2827fb923602"
+    },
+    "ArmSmmu4K.h": {
+      "original_sha256": "e25063b9134afc7eb79e7c030bc2858608cf0ade5da714d5dfd600fee5007e8e",
+      "output": "EldenWifiSmmu4K.h",
+      "output_sha256": "8bc2931f419f7fe4538e073bb61f799fce35a3bc7472b67ad054a6c5166a2554"
+    },
+    "ArmSmmu4KContext.c": {
+      "original_sha256": "fb993f53ef899b9969a71311b61b5dbe9446c515d7a6e6ad7d4840796eb1b6a3",
+      "output": "EldenWifiSmmu4KContext.c",
+      "output_sha256": "0f2c726760f4a7c9fd5d8c85b970dd199a7c61d6fbe28e8e08d17e03716515bf"
+    },
+    "ArmSmmu4KContext.h": {
+      "original_sha256": "34070b4739dd6c5b59159b9c2ed66e966ff659994db66b8677655273a1f02647",
+      "output": "EldenWifiSmmu4KContext.h",
+      "output_sha256": "bb0ba67290d345e1dec8480847ab828de94c255fe075d03bba00a8991b972b96"
+    },
+    "ArmSmmu4KProgram.c": {
+      "original_sha256": "93df000cefafd06cc46a24f0079a08dda312a74c7f35f901f255efc74e6919ee",
+      "output": "EldenWifiSmmu4KProgram.c",
+      "output_sha256": "d7cc79be2b1fb99003badbcce6d4aeef595f4d89524651cbc4709568f27e2a51"
+    },
+    "ArmSmmu4KProgram.h": {
+      "original_sha256": "76b3b06f4ee63f24e7ac39d1f046c0edb9a1739584aece9108a31ae9f618f46d",
+      "output": "EldenWifiSmmu4KProgram.h",
+      "output_sha256": "f4e33f8ea0ff94ca716e18f5a2c12e4ca500efdf5b498f90499849ba74511ace"
+    },
+    "ArmSmmu4KAudit.c": {
+      "original_sha256": "594739cebc43926b1cb0a0e965867bcf1edfb90fab9c51465b65fa47be3755c1",
+      "output": "EldenWifiSmmu4KAudit.c",
+      "output_sha256": "339200a21ddd8daeadbb64d24b45ecaae33e3b5d4f2061ed9d76bb00c8b01b65"
+    },
+    "ArmSmmu4KAudit.h": {
+      "original_sha256": "1f313acd46db3dfecc115b8c885c5c43f7d23f73690a6157f900dfc77b2c9f6a",
+      "output": "EldenWifiSmmu4KAudit.h",
+      "output_sha256": "693c387950e8740a66748398941e67e7329f4f7c1619b6d905ff397b4d4298eb"
+    },
+    "ArmSmmu4KTableMemory.c": {
+      "original_sha256": "b39d3d4fc292b921672c089e930986345637aa029b422821867c72e7203feb92",
+      "output": "EldenWifiSmmu4KTableMemory.c",
+      "output_sha256": "6391e4b8cc0147666bf55fe41596bc326b9d54d125f5bcfb03df8ff76de9797e"
+    },
+    "ArmSmmu4KTableMemory.h": {
+      "original_sha256": "316b85ee835686744feb7777b4216917578833e3ff510aeecc4bbe8325568f86",
+      "output": "EldenWifiSmmu4KTableMemory.h",
+      "output_sha256": "b851879a3e2cf2994fdcc7da05ef9cfb78d3d674408d5b3f869651dc82da3d7f"
+    },
+    "LICENSE": {
+      "original_sha256": "7a730b868c1ff986cdfc210a7b140ab4e0a31bf7db1d15db901427973efaa70f",
+      "output": "LICENSE",
+      "output_sha256": "7a730b868c1ff986cdfc210a7b140ab4e0a31bf7db1d15db901427973efaa70f"
+    }
+  }
+}

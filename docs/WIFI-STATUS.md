@@ -17,6 +17,9 @@ Wi-Fi仍不能联网：SMMU/DMA/MSI/MHI/固件上传、en0、扫描、关联和�
 修复后的注册/封存与精确检查完成host及ARM64组件验证。它尚未配置SMMU；早期真实bank/ASID/
 内存页/IRQ及翻译提供者仍须实现，完整候选保持v158。固定本机Linux的PCI DMA掩码为36位。
 
+[真实API内存分配与选择组件](../drivers/EldenSmmu/MEMORY.md)随后已编译：自有128MiB、4KiB页表/
+独立遍历与逐页PA/cache核验、bank/ASID只读选择；host模型通过，尚未原生执行或建立实际SMMU映射。
+
 已具备的源码链为[共享WCN](WCN-SHARED-POWER.md)→[原生WLAN](WLAN-POWER-NATIVE.md)
 →[本机PHY/root](../drivers/EldenPcie/README.md)→[原生worker](../drivers/EldenPcie/NATIVE.md)。
 [QMI桥接](../drivers/EldenWifi/QMI-POWER.md)要求实读端点+major确认后的epoch，不能伪造成功。

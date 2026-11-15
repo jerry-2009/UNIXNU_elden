@@ -35,6 +35,10 @@ WLAN/NoC原生提供者与worker已实跑，128对象QMI链接仍属离线结果
 ARM64组件通过，但尚无真实早期分配器/bank-ASID/fault处理/页表/翻译提供者，未整核上机。
 下一步必须在UFS/Data发布前完成这些，再允许touch封存；不能在v158晚期worker中随意加路由。
 
+[内存/页表与bank-ASID组件](../drivers/EldenSmmu/MEMORY.md)现已编译：真实IOKit申请/保持128MiB、
+4KiB页表、逐页CPU PA/cache检查、独立遍历和只读选择器。host故障模型通过，仍未在真机执行。
+下一步接早期wrapper、故障IRQ、真实context/ATOS与注册发布，再进入MHI；当前候选保持v158。
+
 不重复v157/v158诊断，也不复制其它设备未保留的低地址DMA内存。power_ready/CPR/QMI仍必须
 核对当前确认代际，不能沿用历史实机结果。更详细的边界见[原生worker](../drivers/EldenPcie/NATIVE.md)。
 

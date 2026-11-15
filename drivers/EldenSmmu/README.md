@@ -18,6 +18,11 @@ write hardware, build tables or prove translation/DMA. Those steps must precede
 publication by the future early native provider. No new kernel/boot or device
 trial was produced for this component.
 
+Follow-up [owned memory and selection components](MEMORY.md) now compile with
+the real IOKit APIs and pinned table code. Native execution, the early wrapper,
+fault IRQs and actual context/translation still remain; registry publication
+must wait for those real checks.
+
 ## Required ordering
 
 1. During early UFS initialization, before Data/PID1 can start touch, the native
