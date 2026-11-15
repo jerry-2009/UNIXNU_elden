@@ -15,6 +15,10 @@ ARM64/iOS17组件编译通过；原生Context/WLAN GPIO/QMI接入仍待完成，
 GPIO16输出与回读、真实CPR入口、停止前DMA quiesce契约。335核心场景及38原生/GPIO场景通过；
 Linux QMI消费者绑定、整核和实机尚未完成。当前没有新boot，也未启用WLAN。
 
+最新[QMI供电桥接](../drivers/EldenWifi/QMI-POWER.md)已提供准确Linux回调与consumer/provider/epoch
+绑定API；47组合host场景通过，128对象可重定位链接真实解析了原缺失符号。仍缺PCIe/MHI原生caller，
+未在候选中注册consumer，没有整核或硬件验收，不能据此宣布Wi-Fi已通。
+
 ## 已完成的前置项
 
 原modem_a七件主要Peach固件的只读文件访问已有实现，尺寸/SHA按原厂备份固定。

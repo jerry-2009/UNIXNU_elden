@@ -8,6 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(ELDEN_TEST_QMI)
+#include "QmiPowerBinding.h"
+extern "C" {
+#include <linux/pwrseq/qcom_wcn.h>
+}
+#endif
 static unsigned checks,scenarios;
 #define CHECK(x) do{checks++;if(!(x)){fprintf(stderr,"line%d: %s\n",__LINE__,#x);exit(1);}}while(0)
 static uint64_t clock_us;
@@ -16,6 +22,7 @@ static bool armed=true,map_ok=true;
 static unsigned boot_enable=1,creates,destroys;
 static int quiesce_result;
 static bool quiesce_late;
+static void (*qmp_hook)();
 static int elden_recovery_armed(){return armed;}
 static void IOSleep(unsigned n){clock_us+=n*1000ull;}
 static void PE_parse_boot_argn(const char *s,unsigned *v,size_t){CHECK(!strcmp(s,"elden-wlan-power"));*v=boot_enable;}
@@ -36,7 +43,8 @@ struct Context{
     Ignored spmi,rpmh,aoss_io,ipcc_io,qmp;
     EldenWcnSharedPower shared={};EldenWcnPower &power=shared.supply;
     EldenWlanGpio wlan_gpio={};uint64_t bt_epoch=0;unsigned bt_state=0;
-    EldenWcnRailState rails[6];bool bt=false;unsigned bt_writes=0,qmp_calls=0,quiesces=0;
+    EldenWcnRailState rails[6];bool bt=false;unsigned bt_writes=0,qmp_calls=0,quiesces=0,qmp_fail_at=0;
+    char qmp_messages[64][64]={};
     Context(){creates++;for(unsigned i=0;i<6;i++)rails[i]={elden_wcn_rail_specs[i].minimum,0x80,0x80,3};}
     ~Context(){destroys++;}
     bool map(){return map_ok;}
@@ -58,7 +66,12 @@ static void Sm8750AossQmpInit(Ignored *,Ignored *,unsigned,Ignored *){}
 static int preflight(void *){return 0;}
 static int rail_read(void *p,EldenWcnRail i,EldenWcnRailState *s){*s=static_cast<Context *>(p)->rails[i];return 0;}
 static int rail_vote(void *p,EldenWcnRail i,uint16_t mv,uint8_t mode,bool en){CHECK(en&&mode==7);static_cast<Context *>(p)->rails[i]={mv,0x80,0x80,mode};return 0;}
-static int qmp_send(void *p,const char *){static_cast<Context *>(p)->qmp_calls++;return 0;}
+static int qmp_send(void *p,const char *message){
+    auto c=static_cast<Context *>(p);CHECK(c->qmp_calls<64&&strlen(message)<64);
+    strcpy(c->qmp_messages[c->qmp_calls++],message);
+    if(qmp_hook)qmp_hook();
+    return c->qmp_calls==c->qmp_fail_at?-5:0;
+}
 static int bt_get(void *p,bool *v){*v=static_cast<Context *>(p)->bt;return 0;}
 static int bt_set(void *p,bool v){auto c=static_cast<Context *>(p);c->bt=v;c->bt_writes++;return 0;}
 static int wlan_get(void *p,bool *v){auto c=static_cast<Context *>(p);uint32_t io=c->wlan.read(4);if(io==UINT32_MAX)return -5;*v=io&1u;return 0;}
@@ -77,7 +90,7 @@ static void reset(){
     delete active;active=nullptr;clock_us=0;native_owner_data_status=0;elden_init_exec_accepted=1;
     armed=map_ok=true;boot_enable=1;quiesce_result=0;quiesce_late=false;
     platform_init_state=platform_io_busy=platform_stopping=wlan_api_busy=0;
-    wlan_provider=nullptr;wlan_quiesce=nullptr;wlan_epoch=wlan_next_epoch=0;creates=destroys=0;
+    wlan_provider=nullptr;wlan_quiesce=nullptr;wlan_epoch=wlan_next_epoch=0;creates=destroys=0;qmp_hook=nullptr;
 }
 static void native_cases(){
     for(unsigned first=0;first<2;first++){
@@ -151,4 +164,13 @@ static void gpio_cases(){
         if(at==read_count)break;
     }
 }
-int main(){native_cases();gpio_cases();reset();printf("%u native/WLAN GPIO scenarios, %u checks passed\n",scenarios,checks);}
+#if defined(ELDEN_TEST_QMI)
+#include "TestQmiPower.inc"
+#endif
+int main(){
+    native_cases();gpio_cases();
+#if defined(ELDEN_TEST_QMI)
+    qmi_cases();
+#endif
+    reset();printf("%u native/WLAN GPIO/QMI scenarios, %u checks passed\n",scenarios,checks);
+}

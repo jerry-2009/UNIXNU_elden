@@ -16,7 +16,8 @@ UFS本轮收尾后，先用已有记录区分高SOC停充/滞回、真实输入�
 
 当前离线工作已完成[WCN共享供电核心](WCN-SHARED-POWER.md)及ARM64组件编译；
 随后原生平台owner和WLAN GPIO已完成组件编译，见[原生接入](WLAN-POWER-NATIVE.md)。
-下一步真实Linux QMI消费者绑定及PCIe/DMA/MHI，再整核验证；不将原生API存在当WLAN已上电。
+Linux QMI桥接与128对象可重定位链接随后已通过，见[QMI接入](../drivers/EldenWifi/QMI-POWER.md)。
+下一步PCIe/DMA/MHI原生caller及真实consumer注册，再整核验证；不将原生API存在当WLAN已上电。
 还没有启动Wi-Fi射频或生成新候选，不把接口核心验过当作Wi-Fi供电已打通。
 
 v156已经补齐一项可执行电源缺口：[UFS自动Hibern8](../profiles/ufs-idle-trial/README.md)。

@@ -1,5 +1,8 @@
 # WLAN原生供电接入：组件已编译，尚未上机
 
+后续：准确Linux QMI回调桥接已完成，见[QMI供电接入](../drivers/EldenWifi/QMI-POWER.md)。
+与125个Wi-Fi对象及两供电对象的可重定位链接通过；实际PCIe/MHI caller、整核和硬件仍未完成。
+
 2026-11-15已把[共享WCN核心](WCN-SHARED-POWER.md)接到原生物理回调，新增独立WLAN
 取得/检查/CPR/停止入口，并把蓝牙入口迁移到同一平台owner。**本轮到ARM64组件编译，
 还没有整核链接、boot镜像、真实WLAN供电或联网验收。** 现有v156/stock候选不变。
