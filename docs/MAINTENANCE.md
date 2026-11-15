@@ -44,3 +44,24 @@ py -3.12 tools/maintenance/sync_reference_repos.py --workbench D:\Desktop\Git\Pa
 脚本在 `maintenance/IN_PROGRESS.json` 存在时直接跳过；`--inventory-only` 只做目录核验。
 只快进干净未分叉的跟踪分支；有本地修改或未跟踪文件的仓只 fetch，固定检出不换版本。
 报告写入 `maintenance/reference-sync`，不操作设备。
+
+## macOS 编译端的源码与产物
+
+macOS 主源码仓是 `~/Desktop/UniXNU_elden`。`lab/clean-build-20261114/isolated/UniXNU_elden`
+是另一个独立 Git 克隆；它有自己的 HEAD，不能把向其中复制几个脚本视为已经同步主仓。
+2026-11-15整理时，主仓还停在33b55083，隔离克隆停在cc7714d；两者均已在保存本地
+差异后快进到已发布v146源码8ceeb5f。449份旧文件来自三个Mac仓库的差异/同名未跟踪
+输入，保存于原生Trash快照中并按SHA核对；包含配套Lilac仓库，不把它们混进新源码提交。
+
+Windows每六小时的任务只更新工作台 `research/` 引用仓，不会同步Mac的项目主仓。
+每轮编译先核对Mac HEAD与拟使用的完整源码提交；从Git固定对象或带完整源指纹的
+显式输入构建。同步只做 `git fetch` 和 `git merge --ff-only <已核完整提交>`。
+遇到本地差异先保留内容及哈希、记录来源，不用强制reset把它们丢掉。历史构建和
+已有候选的源码/产物指纹不随主仓更新而改写；旧HEAD也不能单独证明此前某个内核
+没有使用已传送的修补，要看那一轮的实际编译输入记录。
+
+本轮Mac回收记录在工作台 `maintenance/cleanup-20261115-macos`，包括用户提供的两份
+结构分析报告、原路径、原生Trash返回路径、镜像SHA及目录文件身份清单。
+过时整包移走前另存其顶层结果和日志；原包仍可从Trash恢复。
+当前v146/PD/GUI构建依赖、原始OS/触控/WCN/Crypto、签名模板、恢复输入和实验原始
+记录保留。macOS Trash仍占磁盘；回收不等于已增加可用空间。
