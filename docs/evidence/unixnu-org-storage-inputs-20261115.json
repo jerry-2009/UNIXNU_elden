@@ -1,0 +1,63 @@
+{
+  "scope": "Current clean-build providers and v91 native source files; no device or binary execution",
+  "providers": [
+    {
+      "kind": "base-provider",
+      "profile": "native",
+      "key": "@VROOT@/research/cpu-guard-20261111/tree/build/ram-block/src/NativeRamBlock.cpp",
+      "sha256": "e2ace3522943df38806ef2006525371691beaf0199f971266bd849d4f5253391",
+      "bytes": 23637,
+      "local_source": "profiles/v91/native-build/extra/e2ace3522943/NativeRamBlock.cpp",
+      "actual_sha256": "e2ace3522943df38806ef2006525371691beaf0199f971266bd849d4f5253391"
+    },
+    {
+      "kind": "base-provider",
+      "profile": "native",
+      "key": "@VROOT@/research/icon-fault-trace-20261111/src/NativeUfs.cpp",
+      "sha256": "aaa89ac1f1502b55422783b4a7bf5bf01fcba24b35616e938cee3e45201a9955",
+      "bytes": 93803,
+      "local_source": "profiles/v91/native-build/extra/aaa89ac1f150/NativeUfs.cpp",
+      "actual_sha256": "aaa89ac1f1502b55422783b4a7bf5bf01fcba24b35616e938cee3e45201a9955"
+    },
+    {
+      "kind": "base-provider",
+      "profile": "native",
+      "key": "@VROOT@/research/icon-fault-trace-20261111/src/RootQueue.h",
+      "sha256": "3a22f86e432446a3cd7267078c195cfca5b8bb1c2bd55741e67d265de97c6447",
+      "bytes": 5480,
+      "local_source": "profiles/v91/native-build/extra/3a22f86e4324/RootQueue.h",
+      "actual_sha256": "3a22f86e432446a3cd7267078c195cfca5b8bb1c2bd55741e67d265de97c6447"
+    },
+    {
+      "kind": "base-provider",
+      "profile": "native",
+      "key": "@VROOT@/research/icon-fault-trace-20261111/src/RootCommands.h",
+      "sha256": "05dd92a331a20657b3773278011a913b74cf8c220b98fd3e96aebeea3190d8df",
+      "bytes": 15908,
+      "local_source": "profiles/v91/native-build/extra/05dd92a331a2/RootCommands.h",
+      "actual_sha256": "05dd92a331a20657b3773278011a913b74cf8c220b98fd3e96aebeea3190d8df"
+    }
+  ],
+  "current_features": {
+    "NativeUfs": "single request slot, interrupts masked, polled completion; exclusive IOLock; SM8750 takeover/link/cache patches retained",
+    "NativeRamBlock": "no Device Characteristics/Medium Type Solid State publication; packed seed not returned via IODTFreeLoaderInfo",
+    "both_ssd_property": "not found in matched frozen C++ or current board driver patches",
+    "scope_limit": "Later unrelated board objects are not inferred from historical upstream revision; current clean-build provider hashes matched separately"
+  },
+  "reverted_container_changes": [
+    {
+      "repository": "ShengUfs",
+      "base": "57f031c99d7f69ffa611626bebaeab0731e93254",
+      "review_commit": "b6fe07b307eeddc5e258c9d5d4387b968a55e4e9",
+      "tree": "66f8b7a686f1788c98e593b69ae464e5664cee43",
+      "identical_entire_tree": true
+    },
+    {
+      "repository": "RamBlock",
+      "base": "737f6dae119ef11990e77dc06bcead945098865e",
+      "review_commit": "00a6e5dd6bb1709e817e13daec7986308cfb6d0f",
+      "tree": "a31b8eba31fcb38a7579360b00ea9a4166e23e7f",
+      "identical_entire_tree": true
+    }
+  ]
+}
