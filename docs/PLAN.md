@@ -27,6 +27,10 @@ Linux QMI桥接与128对象可重定位链接随后已通过，见[QMI接入](..
 随后[根控制器事务](../drivers/EldenPcie/ROOT.md)已完成离线Root＋PHY组件：本机CFG_GDSCR完成位、
 12路时钟、PARF/SID/L0/配置访问及端点禁DMA；1840场景和ARM64链接通过。下一步把这些回调接到
 真实平台映射、PHY供电与NoC，再BAR/DMA/MSI/MHI；不能以host模型替代电源提供者或实机。
+
+原生[PCIe供电/NoC入口](../drivers/EldenPcie/POWER.md)随后已编译并绑定现有RPMh实现；本机只读确认
+L1F880mV/L3G1200mV，未执行新投票。未知启动投票暂用显式诊断full-on预算保护，默认关闭，不能当日用省电。
+下一步接映射/pins/GCC与worker/quiesce再整核；正常预算、共享投票与充电验收仍须继续完成。
 还没有启动Wi-Fi射频或生成新候选，不把接口核心验过当作Wi-Fi供电已打通。
 
 v156已经补齐一项可执行电源缺口：[UFS自动Hibern8](../profiles/ufs-idle-trial/README.md)。

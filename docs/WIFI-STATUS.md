@@ -27,6 +27,9 @@ QMI才可准入；新版47组合场景与128对象链接通过。root clocks/GDS
 Root clocks/GDSC/PARF/SID/L0/配置事务现已在[Root组件](../drivers/EldenPcie/ROOT.md)实现并离线编译验证；
 真正的平台映射/电源/NoC回调、整核与硬件尚缺，不能把该组件当作PCIe已经启动。
 
+最新[PCIe供电提供者](../drivers/EldenPcie/POWER.md)已接真实RPMh发送与LDO读回并完成原生编译；85个host场景通过。
+新投票未上机，显式full-on模式只是诊断预算；仍缺映射/pins/GCC及根worker，尚非可用Wi-Fi。
+
 ## 已完成的前置项
 
 原modem_a七件主要Peach固件的只读文件访问已有实现，尺寸/SHA按原厂备份固定。

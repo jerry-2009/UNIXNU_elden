@@ -1,5 +1,9 @@
 # PCIe0 root transaction — offline component
 
+Follow-up: [POWER.md](POWER.md) now provides the real native supply/NoC sender
+under an explicit diagnostic full-on policy. Native maps/pins/GCC/worker glue,
+whole-kernel integration and hardware validation remain pending.
+
 `Root.c` now drives the cold root sequence through the existing PHY component:
 PERST assertion → real power callback → GDSC/clocks/reset → PARF → PHY →
 BDF/SID → root configuration → timed PERST release → L0 → CFG0 mapping →

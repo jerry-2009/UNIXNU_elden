@@ -8,6 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if defined(ELDEN_TEST_ROOT_POWER)
+#include "Power.h"
+#include "TestPowerDb.h"
+#endif
 #if defined(ELDEN_TEST_QMI)
 #include "QmiPowerBinding.h"
 extern "C" {
@@ -19,16 +23,19 @@ static unsigned checks,scenarios;
 static uint64_t clock_us;
 static int native_owner_data_status,elden_init_exec_accepted=1;
 static bool armed=true,map_ok=true;
-static unsigned boot_enable=1,creates,destroys;
+static unsigned boot_enable=1,creates,destroys,full_on_enable;
 static int quiesce_result;
 static bool quiesce_late;
 static void (*qmp_hook)();
 static int elden_recovery_armed(){return armed;}
 static void IOSleep(unsigned n){clock_us+=n*1000ull;}
-static void PE_parse_boot_argn(const char *s,unsigned *v,size_t){CHECK(!strcmp(s,"elden-wlan-power"));*v=boot_enable;}
+static void PE_parse_boot_argn(const char *s,unsigned *v,size_t){
+    if(!strcmp(s,"elden-pcie-full-on")){*v=full_on_enable;return;}
+    CHECK(!strcmp(s,"elden-wlan-power"));*v=boot_enable;
+}
 static uint64_t now_us(void *){return clock_us;}
 static void delay(void *,unsigned n){clock_us+=n;}
-struct Ignored{template<typename... T>Ignored(T...){ } Ignored()=default;};
+struct Ignored{void *ctx=nullptr;template<typename... T>Ignored(void *p,T...):ctx(p){} Ignored()=default;};
 struct Region{
     uint32_t regs[3]={0,0,0};unsigned writes=0,calls=0,fail_at=0,read_calls=0,fail_read=0;bool stuck=false;
     uint32_t read(unsigned off){calls++;read_calls++;return calls==fail_at||read_calls==fail_read?UINT32_MAX:regs[off/4];}
@@ -40,12 +47,23 @@ struct Region{
 };
 struct Context{
     Region wlan;
-    Ignored spmi,rpmh,aoss_io,ipcc_io,qmp;
+    Ignored spmi,aoss_io,ipcc_io,qmp;
+#if defined(ELDEN_TEST_ROOT_POWER)
+    Sm8750CmdDb db={};Sm8750RpmhIo rpmh={};bool spmi_uncertain=false,rsc_uncertain=false;
+    EldenPcieRail root_rails[2]={{880,4,0xad,0x87,0x80,7},{1200,4,0xad,0x87,0x80,7}};
+    unsigned root_reads=0,root_fail_read=0,root_sends=0,root_fail_step=0;bool root_bad_after=false;
+#else
+    Ignored rpmh;
+#endif
     EldenWcnSharedPower shared={};EldenWcnPower &power=shared.supply;
     EldenWlanGpio wlan_gpio={};uint64_t bt_epoch=0;unsigned bt_state=0;
     EldenWcnRailState rails[6];bool bt=false;unsigned bt_writes=0,qmp_calls=0,quiesces=0,qmp_fail_at=0;
     char qmp_messages[64][64]={};
-    Context(){creates++;for(unsigned i=0;i<6;i++)rails[i]={elden_wcn_rail_specs[i].minimum,0x80,0x80,3};}
+    Context(){creates++;for(unsigned i=0;i<6;i++)rails[i]={elden_wcn_rail_specs[i].minimum,0x80,0x80,3};
+#if defined(ELDEN_TEST_ROOT_POWER)
+        test_power_db(&db);
+#endif
+    }
     ~Context(){destroys++;}
     bool map(){return map_ok;}
 };
@@ -78,6 +96,11 @@ static int wlan_get(void *p,bool *v){auto c=static_cast<Context *>(p);uint32_t i
 static int parents(void *,uint32_t *a,uint32_t *b){*a=600000000;*b=300000000;return 0;}
 #include "WlanPowerNative.inc"
 #include "WlanPowerExports.inc"
+#if defined(ELDEN_TEST_ROOT_POWER)
+#include "TestPowerNative.inc"
+#include "PowerNative.inc"
+#include "PowerExports.inc"
+#endif
 static int quiesce(const void *p,uint64_t epoch,uint64_t deadline){
     CHECK(active&&active->wlan.regs[1]&1u);
     CHECK(elden_wlan_power_check(p,epoch)==-11); /* revoked before callback */
@@ -91,6 +114,10 @@ static void reset(){
     armed=map_ok=true;boot_enable=1;quiesce_result=0;quiesce_late=false;
     platform_init_state=platform_io_busy=platform_stopping=wlan_api_busy=0;
     wlan_provider=nullptr;wlan_quiesce=nullptr;wlan_epoch=wlan_next_epoch=wlan_endpoint_epoch=0;creates=destroys=0;qmp_hook=nullptr;
+    full_on_enable=0;
+#if defined(ELDEN_TEST_ROOT_POWER)
+    root_power_epoch=0;root_power_held=false;root_power_plan={};fresh_fault=0;
+#endif
 }
 static void native_cases(){
     for(unsigned first=0;first<2;first++){
@@ -175,10 +202,16 @@ static void gpio_cases(){
 #if defined(ELDEN_TEST_QMI)
 #include "TestQmiPower.inc"
 #endif
+#if defined(ELDEN_TEST_ROOT_POWER)
+#include "TestPowerCases.inc"
+#endif
 int main(){
     native_cases();gpio_cases();
 #if defined(ELDEN_TEST_QMI)
     qmi_cases();
 #endif
-    reset();printf("%u native/WLAN GPIO/QMI scenarios, %u checks passed\n",scenarios,checks);
+#if defined(ELDEN_TEST_ROOT_POWER)
+    power_cases();
+#endif
+    reset();printf("%u native component scenarios, %u checks passed\n",scenarios,checks);
 }
