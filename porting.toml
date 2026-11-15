@@ -67,15 +67,15 @@ evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Re
 id = "storage"
 status = "implemented"
 components = ["ShengUfs"]
-paths = ["drivers/**", "patches/xnu/**", "scripts/**", "soc/sm8750/dts/**", "dts/**", "configs/**", "package/**", "docs/PHASE3-STORAGE.md", "docs/UFS-STAGE2-20261106.md"]
+paths = ["drivers/**", "patches/xnu/**", "scripts/**", "soc/sm8750/dts/**", "dts/**", "configs/**", "package/**", "docs/PHASE3-STORAGE.md", "docs/UFS-STAGE2-20261106.md", "drivers/EldenStorageMedium/**", "profiles/storage-medium/**", "tools/storage_medium_build.py", "tools/test_storage_medium.py", "tools/analysis/assess_storage_medium.py", "tools/analysis/audit_storage_medium.py"]
 inputs = ["SM8750 UFS host at 0x1d84000 (+0x3000) and QMP PHY at 0x1d80000 (+0x2000), both described by the same-device Linux tree sm8750-lenovo-elden.dts and sm8750.dtsi pinned at bf96c3d4048973298ede78487177c6f1b4f6bc0f.", "Controller resources: GIC_SPI 265 level-high, 8 GCC/RPMh clocks, GCC_UFS_PHY_BCR, GCC_UFS_PHY_GDSC, apps_smmu stream 0x60, lanes-per-direction 2, ICE crypto@1d88000.", "PHY resources: RPMH_CXO_CLK, GCC_UFS_PHY_PHY_AUX_CLK, TCSR_UFS_CLKREF_EN, GCC_UFS_MEM_PHY_GDSC.", "Board supplies and reset: PHY vreg_l1j_0p91 and vreg_l3g_1p2, host vreg_l17b_2p5 (1.3 A) and vreg_l1d_1p2 (1.2 A), reset GPIO tlmm 215 active-low.", "4 KiB logical-sector partition geometry and a root-volume UUID, both owner-supplied and read-only."]
 completion = ["Controller and PHY initialize.", "Read-only capacity, GPT and known-block checks match the device.", "The configured OS volume mounts and launchd starts."]
 configuration = ["Frozen v91 inputs and explicit experimental v92 separation; see docs/REPRODUCIBILITY.md."]
 procedure = ["Follow docs/PLAN.md and retain identity, fresh power, floor and full SHA admission."]
-findings = ["UFS-backed iPadOS root, RAM Data, launchd and Settings have run."]
+findings = ["UFS-backed iPadOS root, RAM Data, launchd and Settings have run.", "v149 declares the existing UFS windows and RAM Data nonrotating. The actual iPadOS17 ioctl path reports isssd=1 for all three BSD units; transport remains single-slot polling and RAM remains volatile."]
 limits = ["Persistent Data and UFS performance are not fully qualified."]
 next_action = ["Compare measured I/O with the pinned sheng success path; qualify persistence separately."]
-evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "UFS-backed iPadOS root, RAM Data, launchd and Settings have run. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }]
+evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "UFS-backed iPadOS root, RAM Data, launchd and Settings have run. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }, { kind = "device", reference = "profiles/storage-medium/hardware.json", command = "Run the v149 signed storage-medium candidate, retain existing spec_open SSD outcomes and property readbacks, then perform session-bound sync/reset and full-SHA stock Android restore.", revision = "8af7569707e0401fc24b2999e5edbbe37ab26609", result = "Three property readbacks and six ioctl outcomes passed; root and Android restoration passed. No throughput or energy-saving benchmark; drop132 and unconfirmed human touch source retained." }]
 
 [[area]]
 id = "display"
