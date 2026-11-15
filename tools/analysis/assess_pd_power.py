@@ -13,7 +13,9 @@ def assess(run):
     digest=sha(image);session=meta['candidate_session']
     if not flash['success'] or flash['full_readback_sha256']!=digest or build['image_sha256']!=digest or audit['image_sha256']!=digest or not audit['accepted_static']:
         raise ValueError('Image/readback/audit mismatch')
-    if build['session']!=session or audit['session']!=session or build['bluetooth_runtime']['profile']!='pd-power-trial':raise ValueError('Wrong candidate')
+    profile=build['bluetooth_runtime']['profile']
+    if build['session']!=session or audit['session']!=session or profile not in ('pd-power-trial','pd-gui'):raise ValueError('Wrong candidate')
+    if profile=='pd-gui' and (not build['bluetooth_runtime'].get('menu_only_gui') or build['bluetooth_runtime'].get('native_profile')!='pd-power-trial' or audit['bluetooth_runtime']['profile']!='pd-gui'):raise ValueError('Wrong GUI qualification')
     text=data.decode('utf-8',errors='replace').replace('\r','');lines=text.splitlines()
     if set(re.findall(r'ELDEN STATUS v1 session=([0-9a-f]{16})',text))!={session}:raise ValueError('Mixed session')
     boots=set(re.findall(r'ELDEN STATUS v1 session='+session+r' boot=([0-9a-f]{16})',text))
@@ -43,11 +45,12 @@ def assess(run):
     observed_loss=first_measurement is not None and finished is not None and any(o['state']!=2 and first_measurement<=o['line']<=finished for o in observations)
     contracts=list(dict.fromkeys(l for l in lines if l.startswith('ELDEN_PD_CONTRACT port=2 result=0 ')))
     nine=any('type=0 range-mv=9000/9000 exact-v=1 requested-mv=9000 ' in l for l in contracts)
-    return {'session':session,'boot_nonce':next(iter(boots)),'image_sha256':digest,'raw_sha256':sha(raw),'bytes':len(data),
+    return {'profile':profile,'session':session,'boot_nonce':next(iter(boots)),'image_sha256':digest,'raw_sha256':sha(raw),'bytes':len(data),
         'phases':phases,'zero_cycles':zeros,'zero_readback_interrupted':interrupted,'pulse_attempted':attempted,'pulse':pulses,'pulse_restored_or_unneeded':pulse_ok,
         'controller_completed':len(complete)==1 and len(zeros)>=2 and not interrupted and pulse_ok and nine,
-        'pd_contracts':contracts,'ready_before_measurement':ready_before,'observation_loss_during_measurement':observed_loss,
-        'backlight_trial_finished':finished is not None,'observations':observations,'stopped_cleanly':'ELDEN_PD_BOOT stop=1;' in text,
+        'pd_contracts':contracts,'pd_ready_observed':any(o['state']==2 for o in observations),
+        'ready_before_measurement':ready_before if profile=='pd-power-trial' else None,'observation_loss_during_measurement':observed_loss if profile=='pd-power-trial' else None,
+        'backlight_trial_finished':finished is not None if profile=='pd-power-trial' else None,'observations':observations,'stopped_cleanly':'ELDEN_PD_BOOT stop=1;' in text,
         'reset_after_sync':'ELDEN_RPC RESET_AFTER_SYNC' in text,'dropped':max(map(int,re.findall(r'\bdropped=(\d+)',text)),default=None),
         'discontinuities':meta.get('discontinuities',[]),'reconnections':meta.get('reconnections',[]),
         'limits':'Critical received markers and readbacks, not proof of every instant or individual-port watts. Character drops remain reported. Net charging is assessed separately from complete battery samples.'}

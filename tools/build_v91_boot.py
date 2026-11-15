@@ -39,6 +39,7 @@ def main():
     p.add_argument('--battery-ui',action='store_true',help='Restore qualified battery UI; compact existing numeric-one flags without dropping options')
     p.add_argument('--wcn-report',type=Path)
     p.add_argument('--bt-runtime',type=Path)
+    p.add_argument('--pd-gui',action='store_true',help='Use the existing GUI brightness branch of a qualified PD integration kernel')
     p.add_argument('--hid-report',type=Path,help='Explicit v100 result-bearing touch delivery build; retains the v94 menu')
     p.add_argument('--wait-sample',action='store_true',help='v106 only: enable existing bounded process-wait sampler')
     a=p.parse_args();out=a.output.resolve()
@@ -61,6 +62,7 @@ def main():
     entry=json.loads(a.entry_report.read_text())
     if bool(a.wcn_report)!=bool(a.bt_runtime) or (a.wcn_report and (a.fbwc_report or a.battery_ui or a.hid_report)) or (a.hid_report and (a.fbwc_report or a.battery_ui)):raise ValueError('Select one qualified kernel profile')
     bt=bt_runtime_boot.qualify(a.wcn_report,a.entry_report,a.bt_runtime) if a.wcn_report else None
+    if a.pd_gui:bt=bt_runtime_boot.pd_gui(bt)
     hid=hid_delivery_boot.qualify(a.hid_report,a.entry_report) if a.hid_report else None
     fbwc=qualify_fbwc(a.fbwc_report,a.entry_report) if a.fbwc_report else None
     if sha(a.kernel)!=entry['derivative_sha256'] or entry['stub_bytes']!=104:raise RuntimeError('Kernel entry-transform identity mismatch')

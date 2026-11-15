@@ -1,0 +1,136 @@
+{
+  "image_sha256": "442ff910af40b957dc539036e33607fd3bc382c5c44b89593d994368e55fee5a",
+  "session": "5b2c7a4c59047a95",
+  "raw_log": "edl_work\\live-pd-gui-v145-20261115\\usb\\20261115-035103.bin",
+  "raw_sha256": "9d04ee2dbd872d0571b0774003392db630f9ff3f239edadba55ba99bb7a2cf73",
+  "bytes": 3580790,
+  "dropped": 242,
+  "discontinuities": [],
+  "reconnections": [],
+  "pd_completed": true,
+  "normal_brightness_service_request": 2048,
+  "brightness_readback": 2048,
+  "original_brightness_restored": 1597,
+  "software_inputs": [
+    "home",
+    "fastboot"
+  ],
+  "desktop_frames": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "desktop_visual_review": "SpringBoard desktop, App Store/Settings icons and dock visible; white placeholder widgets and black background remain. Not a perfect rendering or physical-touch acceptance.",
+  "desktop_png_sha256": "9eb2a8cddbc2da44d2f9e7948ad354a9a6746cc6dfa7df5ee3aba282377d0b46",
+  "default_brightness_battery_tail": [
+    {
+      "cycle": 55,
+      "percent": 99,
+      "mv": 4451,
+      "ma": -152,
+      "temperature": 2950,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 56,
+      "percent": 99,
+      "mv": 4451,
+      "ma": -154,
+      "temperature": 2950,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 57,
+      "percent": 99,
+      "mv": 4451,
+      "ma": -163,
+      "temperature": 2950,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 58,
+      "percent": 99,
+      "mv": 4448,
+      "ma": -184,
+      "temperature": 2950,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 59,
+      "percent": 99,
+      "mv": 4450,
+      "ma": -195,
+      "temperature": 2970,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 60,
+      "percent": 99,
+      "mv": 4450,
+      "ma": -171,
+      "temperature": 2970,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 61,
+      "percent": 99,
+      "mv": 4451,
+      "ma": -194,
+      "temperature": 2970,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 62,
+      "percent": 99,
+      "mv": 4450,
+      "ma": -184,
+      "temperature": 2970,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 63,
+      "percent": 99,
+      "mv": 4450,
+      "ma": -191,
+      "temperature": 2970,
+      "external": 1,
+      "charging": 0
+    },
+    {
+      "cycle": 64,
+      "percent": 99,
+      "mv": 4452,
+      "ma": -167,
+      "temperature": 2970,
+      "external": 1,
+      "charging": 0
+    }
+  ],
+  "median_tail_ma": -177.5,
+  "net_charge_at_default_brightness_proven": false,
+  "no_automatic_dim_trial": true,
+  "kernel_recompiled": false,
+  "synchronized_return": true,
+  "full_stock_restored": true,
+  "android_root_green_boot_completed": true,
+  "android_before": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "android_after": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "sleep_requested": true
+}

@@ -32,6 +32,7 @@ def main():
     p.add_argument('--backlight-service',action='store_true',help='Enable the qualified native brightness service on the window-handoff baseline')
     p.add_argument('--backlight-power-trial',action='store_true',help='Bounded baseline/dim/restore power observation; separate from brightness service use')
     p.add_argument('--pd-power-trial',action='store_true',help='Require confirmed legacy PD handoff before the bounded brightness observation')
+    p.add_argument('--pd-gui',action='store_true',help='Build the same PD integration kernel but select the normal GUI brightness service')
     p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
     p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
     p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')
@@ -60,6 +61,7 @@ def main():
     if a.bt_scan_roles17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17):raise ValueError('--bt-scan-roles17 requires --bt-process-lifetime without other native17 options')
     if a.bt_discovery17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17):raise ValueError('--bt-discovery17 requires --bt-process-lifetime without other native17 options')
     if a.bt_address17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17 or a.bt_discovery17):raise ValueError('--bt-address17 requires --bt-process-lifetime without other native17 options')
+    if a.pd_gui:a.pd_power_trial=True
     if a.pd_power_trial:a.backlight_power_trial=True
     if a.backlight_power_trial:a.backlight_service=True
     if a.backlight_service and a.spmi_translation_survey:raise ValueError('Use separate backlight and translation variants')
@@ -107,6 +109,7 @@ def main():
     identity['backlight_service']=a.backlight_service
     identity['backlight_power_trial']=a.backlight_power_trial
     identity['pd_power_trial']=a.pd_power_trial
+    identity['pd_gui']=a.pd_gui
     identity['charge_verification']=a.charge_verification
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
@@ -233,6 +236,7 @@ def main():
         ep={'candidate_sha256':read(kernel_folder/'result.json')['kernel_sha256'],'original_executable_sha256':read(ROOT/'profiles/v91/image-build/plan.json')['prelink']['original_executable_sha256']};(out/'entry-plan.json').write_text(json.dumps(ep,indent=2)+'\n')
         stage('entry',script('prepare_v91_entry.py','--kernel',kernel_folder/'kernel.macho','--plan',out/'entry-plan.json','--clang',inputs['llvm']/'clang','--output',out/'entry'),'entry/result.json')
         variant_args=['--wcn-report',kernel_folder/'result.json','--bt-runtime',runtime_folder] if a.variant=='bluetooth' else ['--hid-report',kernel_folder/'result.json']
+        if a.pd_gui:variant_args+=['--pd-gui']
         stage('boot',script('build_v91_boot.py','--portable-fat','--kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--fd',out/'firmware/UEFI.fd','--loader',out/'loader/EldenPayloadLoader.efi','--data',out/'data/data.packed','--data-report',out/'data/result.json','--library',out/'icon/EldenIconCpuMode.dylib','--agent',out/'agent/iconservicesagent','--stock-boot',inputs['stock_boot'],'--avbtool',inputs['avbtool'],'--key',inputs['signing_key'],'--clang',inputs['llvm']/'clang',*variant_args,'--output',out/'boot'),'boot/result.json')
         stage('boot-audit',script('audit_v91_boot.py','--image',out/'boot/boot-signed.img','--entry-kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--stock-boot',inputs['stock_boot'],'--parent-vbmeta',inputs['parent_vbmeta'],'--data-report',out/'data/result.json',*variant_args,'--output',out/'boot/audit.json'),'boot/audit.json')
     state['complete']=True;save();print('Completed '+a.target+'; no device operation performed',flush=True)

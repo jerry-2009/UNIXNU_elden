@@ -1,0 +1,16 @@
+{
+  "native_inputs_unchanged": {
+    "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/pd-power-v144/kernel.macho": "84ac5a9376c9140ccf6249e5f2b493ad9e4eb73b20cf9baf6b90f27407351097",
+    "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/pd-power-v144/native.macho": "f21fc20d2ab2ab8002611eb6a8fd9755e5a77fcf7717558340b427d79d6d0e1e",
+    "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/pd-power-v144/result.json": "f10f9f50ba62ae798a29d117dc503921446514a60f9cc9df95c70a523760c4bb",
+    "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/pd-power-v144/entry/kernel.macho": "e1541439e6597b36ec030d73a1e52ad12021124a30b79ae4291b1a6564420395",
+    "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/pd-power-v144/entry/result.json": "a04664a37428ad1ba4f9e8ef0f7bbee53576a88caaaafb4ef8ced7e0c280cde9"
+  },
+  "entry_kernel_unchanged": true,
+  "external_assets_unchanged": true,
+  "changed_fat_members": [
+    "EFI/UniXNU/unixnu.toml"
+  ],
+  "image_sha256": "442ff910af40b957dc539036e33607fd3bc382c5c44b89593d994368e55fee5a",
+  "session": "5b2c7a4c59047a95"
+}

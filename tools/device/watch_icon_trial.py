@@ -37,7 +37,7 @@ def desktop(image,reference,box=(186,138,205,157),search=0):
  return False
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--workbench',type=Path,required=True);p.add_argument('--run',type=Path,required=True);p.add_argument('--session',required=True);p.add_argument('--desktop-settle-seconds',type=int,default=0);p.add_argument('--lock-settle-seconds',type=int,default=45);p.add_argument('--entry-gesture',choices=('swipe-up','home'),default='swipe-up');p.add_argument('--desktop-reference',type=Path,required=True);p.add_argument('--desktop-box',type=int,nargs=4,default=(186,138,205,157));p.add_argument('--desktop-search',type=int,default=0);p.add_argument('--finish-after-tap-seconds',type=int,default=180);a=p.parse_args();assert 0<=a.desktop_settle_seconds<=90 and 0<=a.desktop_search<=8 and 0<=a.lock_settle_seconds<=90 and 15<=a.finish_after_tap_seconds<=180
+ p=argparse.ArgumentParser();p.add_argument('--workbench',type=Path,required=True);p.add_argument('--run',type=Path,required=True);p.add_argument('--session',required=True);p.add_argument('--desktop-settle-seconds',type=int,default=0);p.add_argument('--lock-settle-seconds',type=int,default=45);p.add_argument('--entry-gesture',choices=('swipe-up','home'),default='swipe-up');p.add_argument('--desktop-reference',type=Path,required=True);p.add_argument('--desktop-box',type=int,nargs=4,default=(186,138,205,157));p.add_argument('--desktop-search',type=int,default=0);p.add_argument('--desktop-only',action='store_true',help='Observe the desktop after entry without requesting a Settings tap');p.add_argument('--wait-pd-ready',action='store_true',help='Defer entry until the latest PD observation is Ready');p.add_argument('--finish-after-tap-seconds',type=int,default=180,help='Observation seconds after tap, or after desktop in desktop-only mode');a=p.parse_args();assert 0<=a.desktop_settle_seconds<=90 and 0<=a.desktop_search<=8 and 0<=a.lock_settle_seconds<=90 and 15<=a.finish_after_tap_seconds<=180
  root=a.workbench.resolve(strict=True);run=a.run.resolve();assert run.is_relative_to(root/'edl_work')
  assert len(a.session)==16 and all(x in '0123456789abcdef' for x in a.session)
  run.mkdir(parents=True,exist_ok=True);out=run/'trial-frames';out.mkdir(exist_ok=True)
@@ -46,8 +46,9 @@ def main():
  assert 0<=a.desktop_box[0]<a.desktop_box[2]<=238 and 0<=a.desktop_box[1]<a.desktop_box[3]<=380
  control=run/'control.json';assert not control.exists()
  report={'session':a.session,'events':[],'device_result':'unproven'};start=time.monotonic();seen=set();lock_at=None;swipe_at=None;tap_at=None;request_frame=0;last_size=-1;tap_frame=0;finished=False
- desktop_at=None;desktop_frame=0;report['desktop_settle_seconds']=a.desktop_settle_seconds
+ desktop_at=None;desktop_frame=0;desktop_done_at=None;report['desktop_settle_seconds']=a.desktop_settle_seconds;report['desktop_only']=a.desktop_only
  report['lock_settle_seconds']=a.lock_settle_seconds
+ report['wait_pd_ready']=a.wait_pd_ready
  report['entry_gesture']=a.entry_gesture
  report['finish_after_tap_seconds']=a.finish_after_tap_seconds
  import hashlib
@@ -94,13 +95,22 @@ def main():
      if desktop_at is None:desktop_at=time.monotonic();event('desktop-settling',seconds=a.desktop_settle_seconds)
     elif swipe_at is not None and tap_at is None and ident>request_frame and not isdesk:
      desktop_at=None
+     if a.desktop_only:desktop_done_at=None
     if tap_at is not None and ident>tap_frame:image.save(out/f'after-tap-{ident}.png')
   if desktop_at is not None and tap_at is None and time.monotonic()-desktop_at>=a.desktop_settle_seconds:
-   command('icon-settings-once','tap-settings');tap_at=time.monotonic();tap_frame=desktop_frame
-  if lock_at is not None and swipe_at is None and time.monotonic()-lock_at>=a.lock_settle_seconds and 'ELDEN_ICON_CPU stage=ready' in text:
+   if a.desktop_only:
+    if desktop_done_at is None:desktop_done_at=time.monotonic();event('desktop-only-observed',frame=desktop_frame)
+   else:command('icon-settings-once','tap-settings');tap_at=time.monotonic();tap_frame=desktop_frame
+  pd_states=re.findall(r'ELDEN_PD_POWER state=(\d+) ',text)
+  pd_ready=not a.wait_pd_ready or (pd_states and pd_states[-1]=='2')
+  if lock_at is not None and swipe_at is None and time.monotonic()-lock_at>=a.lock_settle_seconds and 'ELDEN_ICON_CPU stage=ready' in text and pd_ready:
    request_frame=max(seen,default=0);command('icon-unlock-once',a.entry_gesture);swipe_at=time.monotonic()
   if tap_at is not None and not finished and time.monotonic()-tap_at>=a.finish_after_tap_seconds:
    command('icon-trial-finish','fastboot');finished=True
+  if a.desktop_only and desktop_done_at is not None and not finished and time.monotonic()-desktop_done_at>=a.finish_after_tap_seconds:
+   command('desktop-only-finish','fastboot');finished=True
+  if a.desktop_only and swipe_at is not None and desktop_done_at is None and not finished and time.monotonic()-swipe_at>=90:
+   event('desktop-not-observed-after-entry');command('desktop-only-unproven','fastboot');finished=True;break
   time.sleep(.5)
  else:event('watcher-timeout; console and target deadlines retained')
  report['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();(run/'trial.json').write_text(json.dumps(report,indent=2)+'\n')
