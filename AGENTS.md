@@ -1,22 +1,23 @@
 # UniXNU elden — authoritative source repository
 
-Latest DMA-native20261116 offline: real serialized arena callbacks appended by explicit DmaNativeSource;
-bind requires actual SMMU readiness and confirmed WLAN provider/epoch. IOLock, NC dsb, full-span checks,
-first-error latch, nonblocking stop and try-lock snapshots; zeroing-withdrawal never exposes new buffer.
-Keep metadata/mappings to reset; old buffers may sync/free during drain, live0 is NOT hardware-stopped proof.
-13actual callback scenarios98checks ASan/UBSan, including blocked mutex/stop and failures. Nativeccece9b8,
-12component binding84e5a00a, scalar/no init, all imports in v163;1old signedness warning. Initial native1
-checker wrongly expected guard absent from newer reference; failure retained. Finalsource3/host2/native3.
-Idle-status race fixed before final build. No worker caller/runtime/full kernel/new boot/device DMA yet.
-Old11component full-kernel recipe intentionally rejects this new binding pending a reviewed runtime profile.
-Stock+fixed6f97250e Linux default to ITS for SID1401; msi-map disables local iMSI. Same TB322FC DTS independently
-lists msi0..7 INTID173..180 (SPI141..148), DBI820..830/group32. Native iMSI differs from stock and is UNTESTED.
-Next actual PCIe callback bind + MSI/config errors + MHI/IRQ drain before BM; update old dma-started0/reset-only
-quiesce and fault-IRQ stop order before device DMA. No mapping-only repeat. Fresh readonly stock100%4467mV25.9C
-Full/current0/green/boot1/charging1/windows095100 unchanged; charging net/dualport/cycles/persistence unfinished.
-Mac lab/wifi-dma-native-20261116/{source3,host2,native3}; workbench matching edl/lab.
-drivers/EldenSmmu/DMA-NATIVE.md and docs/evidence/wifi-dma-native-20261116.json current; all jobs terminal.
-Prior arena b9b5a93b/4000Sheng comparisons remains valid. Main/GPU separation, QRTR/AnyRouter staging preserved.
+Latest MSI20261116 offline: receiver Msi.c prepare/arm/W1C/pending/stop core completed against fixed
+TB322FC group0/INTID173, no ITS or endpoint BM write. Real admit/quiesced/GIC/DBI/wake callbacks are mandatory;
+native callback provider still pending. Stop first requires actual MHI/DMA drain, then SC IRQ withdrawal/inflight
+wait and receiver disable; early stop keeps completions alive, uncertain state held to reset.45actual-core
+scenarios132checks ASan/UBSan; scalar/import-free/no init/warnings Msi7b31f720. Source constants independently bound.
+Frozen Ath12k MSI alloc/free reproduced ignored write failure,3-vs4 vectors and no hardware disable. PciMsiPatch
+now checks capability/count/32-64bit/data16/masks/all I/O/readbacks, only then publishes; failed free keeps metadata.
+29actual-entrypoint scenarios50checks ASan/UBSan. One nw_pci object52291af3 rebuilt;124others+all old inputs unchanged.
+125object ld-r dfdba164 has same imports, including real external pwrseq.24inherited unit warnings vs26old,
+0in repaired functions; earlier runtime1 extra conversions corrected and retained. Full runtime recipe/auditor
+updated, not rerun from empty. No native MSI provider, MHI caller/drain, full kernel/new boot or hardware proof yet.
+Next connect native DBI/GIC/config and DMA callbacks from confirmed PCIe owner, qualify actual drain, then MHI.
+Old reset-only/dma-started0/SMMU IRQ-stop ordering must change before BM. No mapping-only trial.
+Mac lab/pcie-msi-20261116/{source3,host1,native1,pci-host3,runtime2}; workbench corresponding edl/lab.
+drivers/EldenPcie/MSI.md and docs/evidence/pcie-msi-20261116.json current. DMA provider ccece9b8/84e5a00a remains
+qualified component with13scenarios98checks and actual IOLock/NC/epoch; not yet called by worker. Last hardware
+v163/stock restoration remains; this round no tablet or charge writes. Goal/charging incomplete, jobs terminal;
+GPU worktree/QRTR/AnyRouter preserved. Last full65-repo reference sync20261115-200229; no automatic pin swap.
 
 Latest v16320261116: owned128MiB NC mapping and early SMMU domain PASS hardware.
 v160 first64MiB descriptor segment was an IOPL boundary; v161 preserves every4KiB PA/PAR check,

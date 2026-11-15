@@ -1,7 +1,7 @@
 # Wi-Fi：PCIe根链路已通过，联网仍未验收
 
-[原生DMA回调](../drivers/EldenSmmu/DMA-NATIVE.md)已完成真实IOLock/所有权/NC barrier接入和ARM64绑定，
-尚未由PCIe运行栈调用；下一步MSI、配置错误传播和真实排空，再启动MHI。v163仍是实机基线。
+[MSI接收核心与配置修复](../drivers/EldenPcie/MSI.md)已完成故障验证及125对象运行栈绑定；
+下一步真实PCIe worker接DMA/DBI/GIC回调并完成MHI排空。尚未硬件MSI或联网，v163仍是实机基线。
 
 v157在TB322FC实机上训练到Gen3 ×2，读到root17cb:011c和endpoint17cb:110e；
 127项PHY与真实WLAN/NoC调用通过，端点IO/MEM/BM关闭。完整回程、stock Android及

@@ -70,6 +70,16 @@ def main():
         'derived_sha256':hashlib.sha256(after).hexdigest(),
         'patch_source_sha256':sha(ROOT/'drivers/EldenWifi/peach/MhiReadPatch.py'),
         'hardware_operations':False})
+    from PciMsiPatch import patch as patch_pci_msi
+    pci=module/'src/nw_pci.c';before=pci.read_bytes();after=patch_pci_msi(before)
+    original_pci=pci.with_name('nw_pci.before-msi-fix')
+    if original_pci.exists():raise ValueError('PCI original source already exists')
+    pci.rename(original_pci);pci.write_bytes(after)
+    write(out/'pci-msi-fix.json',{'original_sha256':hashlib.sha256(before).hexdigest(),
+        'derived_sha256':hashlib.sha256(after).hexdigest(),
+        'patch_source_sha256':sha(ROOT/'drivers/EldenWifi/peach/PciMsiPatch.py'),
+        'implementation_sha256':sha(ROOT/'drivers/EldenWifi/peach/PciMsi.inc'),
+        'hardware_operations':False})
     # The original prepare flow reads the already-qualified Linux+Peach layer;
     # its output may contain additional upstream OS/runtime transformations.
     subprocess.run([sys.executable,str(fetch),'--check'],env=env,check=True)
