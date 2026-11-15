@@ -179,15 +179,15 @@ evidence = [{ kind = "device", reference = "docs/CURRENT-STATUS.md", command = "
 id = "diagnostics"
 status = "device-verified"
 components = []
-paths = ["scripts/check-*", "scripts/verify_*", "scripts/phase2_1_audit.py", "docs/**", "out/build.json", "assets/**"]
+paths = ["scripts/check-*", "scripts/verify_*", "scripts/phase2_1_audit.py", "docs/**", "out/build.json", "assets/**", "drivers/EldenCpuActivation/EarlyStorageSource.py", "profiles/early-storage-guard/**", "tools/test_early_storage_guard.py", "tools/analysis/assess_early_storage_guard.py"]
 inputs = ["RAM-only owner-operated boot procedure.", "Build and artifact SHA-256 values.", "UEFI screen output and recovery path."]
 completion = ["Every claimed checkpoint has a reproducible command, image hash and visible result.", "Failures reach a diagnosable screen or log instead of a silent hang."]
 configuration = ["Frozen v91 inputs and explicit experimental v92 separation; see docs/REPRODUCIBILITY.md."]
 procedure = ["Follow docs/PLAN.md and retain identity, fresh power, floor and full SHA admission."]
-findings = ["USB kernel logs, frame readback, session-bound RPC and directed fastboot recovery work."]
+findings = ["USB kernel logs, frame readback, session-bound RPC and directed fastboot recovery work.", "v150 moves the existing Gunyah arming before kernel UFS work and adopts it at unchanged SMP readiness. Normal startup and an interrupt-masked pre-UFS stall both returned to fastboot and restored Android; firmware/earlier-kernel coverage is not claimed."]
 limits = ["v91 whole capture dropped 24 bytes; counted raster records and Settings frame CRC were retained."]
 next_action = ["Preserve the recovery path and measure rather than infer CPU/UFS stalls."]
-evidence = [{ kind = "device", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "USB kernel logs, frame readback, session-bound RPC and directed fastboot recovery work. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }]
+evidence = [{ kind = "device", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "USB kernel logs, frame readback, session-bound RPC and directed fastboot recovery work. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }, { kind = "device", reference = "profiles/early-storage-guard/hardware.json", command = "Run v150 normal mode and the same-kernel --early-stall candidate with passive PC capture; verify the exact stall marker, response before the120s fallback and full stock Android restoration.", revision = "e7bfb105e0af80eafe6c372da2d99857a89e372d", result = "EARLY_ARM/SMP_ADOPT and eight-core admission passed. Masked-stall marker to responsive fastboot46.583s includes bootloader/USB time; no software fallback or PC reset observed. Normal drop59; stall drop0 with final transport-timeout boundary." }]
 
 [[area]]
 id = "network-initialization"
