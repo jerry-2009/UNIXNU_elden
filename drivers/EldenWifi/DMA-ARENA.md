@@ -1,5 +1,9 @@
 # Owned Wi-Fi DMA arena — component ready, native integration pending
 
+The [native adapter](../EldenSmmu/DMA-NATIVE.md) now compiles with real kernel
+locks and the qualified SMMU memory provider. Its callbacks are not yet called
+by the PCIe/MHI worker; no new device DMA or full-kernel acceptance is implied.
+
 `DmaArena.c` adapts the split/coalesce allocator and size-based bus alignment
 from Sheng's `package/WifiProbe.cpp` at
 `e8937177309d88c93b305a57bad147fd5fac8a86`. Its complete BSD-2-Clause-Patent

@@ -1,17 +1,22 @@
 # UniXNU elden — authoritative source repository
 
-Latest DMA-arena20261116 offline: adapted pinned Sheng e8937177 split/coalesce/size alignment,
-reserved MSI page; complete live-allocation range validation, checked size/metadata, owner/epoch and stop.
-4000actual upstream allocation/free comparisons/1554917checks pass ASan/UBSan. Nativeb9b5a93b scalar,
-no init/warnings; six exports, real bzero/memmove imports resolve in v163. Initial native1 checker expected
-memset; rejection retained, actual Apple bzero lowering verified in native2. Host2 allows existing-buffer
-range validation/free during drain, rejects new map/alloc after stop. Full upstream license retained.
-Component only: caller serialization, live native memory/ABI callbacks, MSI ownership and actual drain
-NOT connected; live0 is not DMA-stopped proof. No new boot/device operation; v163 remains current hardware.
-Mac lab/wifi-dma-arena-20261116/{source2,host2,native2}; workbench matching edl/lab. See drivers/EldenWifi/DMA-ARENA.md.
-Next native arena binding plus TB322FC MSI (not Sheng SPI141), propagate ignored nw_pci config errors,
-then real MHI/IRQ/completion drain before bus-master. No repeated mapping-only trial. All jobs terminal,
-device last restored stock; Goal/charging incomplete, GPU/QRTR/AnyRouter preserved.
+Latest DMA-native20261116 offline: real serialized arena callbacks appended by explicit DmaNativeSource;
+bind requires actual SMMU readiness and confirmed WLAN provider/epoch. IOLock, NC dsb, full-span checks,
+first-error latch, nonblocking stop and try-lock snapshots; zeroing-withdrawal never exposes new buffer.
+Keep metadata/mappings to reset; old buffers may sync/free during drain, live0 is NOT hardware-stopped proof.
+13actual callback scenarios98checks ASan/UBSan, including blocked mutex/stop and failures. Nativeccece9b8,
+12component binding84e5a00a, scalar/no init, all imports in v163;1old signedness warning. Initial native1
+checker wrongly expected guard absent from newer reference; failure retained. Finalsource3/host2/native3.
+Idle-status race fixed before final build. No worker caller/runtime/full kernel/new boot/device DMA yet.
+Old11component full-kernel recipe intentionally rejects this new binding pending a reviewed runtime profile.
+Stock+fixed6f97250e Linux default to ITS for SID1401; msi-map disables local iMSI. Same TB322FC DTS independently
+lists msi0..7 INTID173..180 (SPI141..148), DBI820..830/group32. Native iMSI differs from stock and is UNTESTED.
+Next actual PCIe callback bind + MSI/config errors + MHI/IRQ drain before BM; update old dma-started0/reset-only
+quiesce and fault-IRQ stop order before device DMA. No mapping-only repeat. Fresh readonly stock100%4467mV25.9C
+Full/current0/green/boot1/charging1/windows095100 unchanged; charging net/dualport/cycles/persistence unfinished.
+Mac lab/wifi-dma-native-20261116/{source3,host2,native3}; workbench matching edl/lab.
+drivers/EldenSmmu/DMA-NATIVE.md and docs/evidence/wifi-dma-native-20261116.json current; all jobs terminal.
+Prior arena b9b5a93b/4000Sheng comparisons remains valid. Main/GPU separation, QRTR/AnyRouter staging preserved.
 
 Latest v16320261116: owned128MiB NC mapping and early SMMU domain PASS hardware.
 v160 first64MiB descriptor segment was an IOPL boundary; v161 preserves every4KiB PA/PAR check,
