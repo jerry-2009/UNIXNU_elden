@@ -33,7 +33,8 @@ def main():
     bt=bt_runtime_boot.qualify(a.wcn_report,a.entry_report,a.bt_runtime) if a.wcn_report else None
     if a.pd_gui:bt=bt_runtime_boot.pd_gui(bt)
     hid=hid_delivery_boot.qualify(a.hid_report,a.entry_report) if a.hid_report else None
-    if stock.sha256!='8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890':raise RuntimeError('Unknown stock contract')
+    ACCEPTED_STOCK={'8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890','4e4c9c72707c7cb91c29a2ccece15ca919a3fa2098cea795e28ed22dfdcd86fc'}
+    if stock.sha256 not in ACCEPTED_STOCK:raise RuntimeError('Unknown stock contract')
     if metadata(a.image)['props']!=metadata(a.stock_boot)['props']:raise RuntimeError('AVB properties changed')
     b=a.image.read_bytes()
     if b[:8]!=b'ANDROID!' or struct.unpack_from('<I',b,40)[0]!=4 or struct.unpack_from('<I',b,12)[0]!=0:raise RuntimeError('Unexpected Android header')

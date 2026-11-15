@@ -58,7 +58,8 @@ def main():
         data_contract=verify_packed_seed(a.data,a.data_report)
     if a.fd.stat().st_size!=4194304:raise RuntimeError('Firmware must be 4MiB')
     stock=check_image(a.stock_boot,'boot_a')
-    if stock.sha256!='8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890':raise RuntimeError('Wrong stock contract')
+    ACCEPTED_STOCK={'8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890','4e4c9c72707c7cb91c29a2ccece15ca919a3fa2098cea795e28ed22dfdcd86fc'}
+    if stock.sha256 not in ACCEPTED_STOCK:raise RuntimeError('Wrong stock contract')
     entry=json.loads(a.entry_report.read_text())
     if bool(a.wcn_report)!=bool(a.bt_runtime) or (a.wcn_report and (a.fbwc_report or a.battery_ui or a.hid_report)) or (a.hid_report and (a.fbwc_report or a.battery_ui)):raise ValueError('Select one qualified kernel profile')
     bt=bt_runtime_boot.qualify(a.wcn_report,a.entry_report,a.bt_runtime) if a.wcn_report else None
