@@ -11,6 +11,10 @@ CPR按两消费者最大值合并，单独停止不复位另一设备。330场�
 ARM64/iOS17组件编译通过；原生Context/WLAN GPIO/QMI接入仍待完成，不能说Wi-Fi已上电。
 采用同一WcnPower提供者，不使用BT acquire冒充WLAN，也不伪造缺失pwrseq回调的成功。
 
+随后已完成[原生WLAN供电适配器](WLAN-POWER-NATIVE.md)的源码和组件编译：平台持有Context，
+GPIO16输出与回读、真实CPR入口、停止前DMA quiesce契约。335核心场景及38原生/GPIO场景通过；
+Linux QMI消费者绑定、整核和实机尚未完成。当前没有新boot，也未启用WLAN。
+
 ## 已完成的前置项
 
 原modem_a七件主要Peach固件的只读文件访问已有实现，尺寸/SHA按原厂备份固定。

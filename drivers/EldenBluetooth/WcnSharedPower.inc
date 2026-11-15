@@ -10,6 +10,8 @@ static int shared_leave(EldenWcnSharedPower *s,int rc){
     __atomic_store_n(&s->busy,0,__ATOMIC_RELEASE);return rc;
 }
 static int shared_hold(EldenWcnSharedPower *s,int rc){
+    __atomic_store_n(&s->faulted,1,__ATOMIC_RELEASE);
+    __atomic_store_n(&s->live_mask,0,__ATOMIC_RELEASE);
     s->held=true;return fail(&s->supply,rc,true);
 }
 static bool shared_io_valid(const EldenWcnSharedPower *s){
@@ -71,12 +73,18 @@ static int shared_acquire_locked(EldenWcnSharedPower *s,unsigned consumer,uint64
         if((rc=p->io.wlan_get(p->io.context,&wlan)))return shared_hold(s,rc);
         if(wlan!=(s->state[EldenWcnWlan]==EldenWcnLeaseOn))return shared_hold(s,EldenWcnPowerIdentity);
         if(!wlan&&(rc=delay(p,100000)))return shared_hold(s,rc);
+    }else{
+        /* A joining WLAN consumer still needs its own output configured low;
+         * the first shared preparation may have belonged to Bluetooth. */
+        if((rc=shared_set(s,consumer,false)))return shared_hold(s,rc);
     }
     /* WCN7861 has no inter-GPIO delay, but both targets have post-enable50ms. */
     if((rc=rails(p))||(rc=shared_set(s,consumer,true))||(rc=delay(p,50000)))
         return shared_hold(s,rc);
     s->state[consumer]=EldenWcnLeaseOn;
     if((rc=shared_check_levels(s))||(rc=rails(p)))return shared_hold(s,rc);
+    __atomic_store_n(&s->live_epoch[consumer],epoch,__ATOMIC_RELEASE);
+    __atomic_fetch_or(&s->live_mask,1u<<consumer,__ATOMIC_RELEASE);
     return 0;
 }
 int elden_wcn_shared_acquire(EldenWcnSharedPower *s,unsigned consumer,uint64_t epoch){
@@ -93,6 +101,7 @@ int elden_wcn_shared_stop(EldenWcnSharedPower *s,unsigned consumer,uint64_t epoc
     int rc=shared_enter(s);if(rc)return rc;
     rc=shared_live(s,consumer,epoch);
     if(!rc){
+        __atomic_fetch_and(&s->live_mask,~(1u<<consumer),__ATOMIC_RELEASE);
         rc=shared_check_levels(s);
         if(!rc)rc=shared_set(s,consumer,false);
         if(!rc&&consumer==EldenWcnBluetooth)rc=delay(&s->supply,100000);
@@ -136,7 +145,7 @@ int elden_wcn_shared_cpr(EldenWcnSharedPower *s,unsigned consumer,uint64_t epoch
                 }
                 rc=cpr_send_votes(&s->supply,combined);
                 if(!rc)memcpy(s->cpr[consumer],own,sizeof(own));
-                if(s->supply.quarantined)s->held=true;
+                if(s->supply.quarantined)shared_hold(s,rc);
             }
         }
     }
@@ -151,4 +160,13 @@ int elden_wcn_shared_snapshot(EldenWcnSharedPower *s,EldenWcnSharedSnapshot *out
     v.prepared=s->prepared;v.held=s->held;v.error=s->supply.error;
     v.baseline_votes_retained=s->supply.baseline_votes_retained;
     *out=v;return shared_leave(s,0);
+}
+int elden_wcn_shared_check(const EldenWcnSharedPower *s,unsigned consumer,uint64_t epoch){
+    if(!s||consumer>=2||!epoch)return EldenWcnPowerArgument;
+    uint64_t before=__atomic_load_n(&s->live_epoch[consumer],__ATOMIC_ACQUIRE);
+    unsigned mask=__atomic_load_n(&s->live_mask,__ATOMIC_ACQUIRE);
+    uint64_t after=__atomic_load_n(&s->live_epoch[consumer],__ATOMIC_ACQUIRE);
+    if(__atomic_load_n(&s->faulted,__ATOMIC_ACQUIRE)||before!=epoch||after!=epoch||!(mask&(1u<<consumer)))
+        return EldenWcnPowerAgain;
+    return 0;
 }

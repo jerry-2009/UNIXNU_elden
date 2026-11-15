@@ -22,7 +22,7 @@ def main():
         symbols=global_symbols(target);imports=sorted(n for n,v in symbols.items() if not v[0]&0x0e)
         records[name]={'source_sha256':sha(source),'object_sha256':sha(target),'exports':sorted(exports(target)),'imports':imports,'scalar':True,'command':command}
     shared={'_elden_wcn_cpr_adjust','_elden_wcn_cpr_plan_details','_elden_wcn_cpr_rail_name','_elden_wcn_cpr_pdc_name'}
-    owners={'_elden_wcn_shared_acquire','_elden_wcn_shared_stop','_elden_wcn_shared_cpr','_elden_wcn_shared_snapshot'}
+    owners={'_elden_wcn_shared_acquire','_elden_wcn_shared_stop','_elden_wcn_shared_cpr','_elden_wcn_shared_snapshot','_elden_wcn_shared_check'}
     legacy={'_elden_wcn_rail_specs','_elden_wcn_power_acquire','_elden_wcn_power_stop','_elden_wcn_power_finish','_elden_wcn_power_check','_elden_wcn_parent_decode','_elden_wcn_cpr_plan','_elden_wcn_power_cpr'}
     if set(records['WcnPower']['exports'])!=shared|legacy|owners:raise ValueError('Provider exports changed unexpectedly')
     if set(records['OlCprPlan']['exports'])!={'_elden_olcpr_prepare','_elden_olcpr_adjust','_elden_olcpr_rail_name','_elden_olcpr_pdc_name'}:raise ValueError('Adapter exports changed')

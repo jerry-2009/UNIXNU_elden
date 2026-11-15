@@ -20,6 +20,8 @@ typedef struct {
     EldenWcnPdcVote cpr[EldenWcnConsumers][4];
     unsigned busy;
     bool prepared, held;
+    uint64_t live_epoch[EldenWcnConsumers];
+    unsigned live_mask, faulted;
 } EldenWcnSharedPower;
 
 typedef struct {
@@ -39,6 +41,10 @@ int elden_wcn_shared_stop(EldenWcnSharedPower *, unsigned consumer, uint64_t epo
 int elden_wcn_shared_cpr(EldenWcnSharedPower *, unsigned consumer, uint64_t epoch,
                        const EldenWcnPmuParam *, size_t);
 int elden_wcn_shared_snapshot(EldenWcnSharedPower *, EldenWcnSharedSnapshot *);
+/* Nonblocking atomic lease query. A peer's serialized power transaction does
+ * not revoke a live radio. Stop/uncertain failure withdraw before physical I/O.
+ * This is a lease observation, not a lifetime reference for a hardware request. */
+int elden_wcn_shared_check(const EldenWcnSharedPower *, unsigned consumer, uint64_t epoch);
 #ifdef __cplusplus
 }
 #endif

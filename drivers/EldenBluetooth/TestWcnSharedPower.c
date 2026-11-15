@@ -98,10 +98,12 @@ static void terminal(Model *m,EldenWcnSharedPower *s){
     CHECK(elden_wcn_shared_stop(s,0,1)<0&&elden_wcn_shared_stop(s,1,1)<0);
     CHECK(elden_wcn_shared_cpr(s,0,1,&pmu,1)<0&&elden_wcn_shared_cpr(s,1,1,&pmu,1)<0);
     CHECK(m->calls==n);
+    CHECK(elden_wcn_shared_check(s,0,1)==-11&&elden_wcn_shared_check(s,1,1)==-11);
 }
 static void lifecycle(unsigned first){
     Model m;EldenWcnSharedPower s;setup(&m,&s);m.reenter=1;
     CHECK(!elden_wcn_shared_acquire(&s,first,1));
+    CHECK(!elden_wcn_shared_check(&s,first,1)&&elden_wcn_shared_check(&s,1-first,1)==-11);
     CHECK(m.time==(first==0?200000:50000));
     CHECK(m.high[first]&&!m.high[1-first]&&m.sets[1-first]==0);
     unsigned peer_sets=m.sets[first],q=m.qmp,v=m.votes;uint64_t start=m.time;
@@ -117,6 +119,7 @@ static void lifecycle(unsigned first){
     CHECK(s.cpr[first][0].wake==914&&s.cpr[first][0].sleep==814);
     q=m.qmp;v=m.votes;peer_sets=m.sets[1-first];
     CHECK(!elden_wcn_shared_stop(&s,first,1));
+    CHECK(elden_wcn_shared_check(&s,first,1)==-11&&!elden_wcn_shared_check(&s,1-first,1));
     CHECK(m.high[1-first]&&!m.high[first]&&m.sets[1-first]==peer_sets);
     CHECK(m.qmp==q&&m.votes==v);
     unsigned calls=m.calls;
@@ -172,10 +175,10 @@ static void invalid(void){
     CHECK(!elden_wcn_shared_stop(&s,1,UINT64_MAX));
     CHECK(elden_wcn_shared_acquire(&s,1,UINT64_MAX)==-11);scenarios++;
 }
-typedef struct{EldenWcnSharedPower *s;int rc;} Thread;
-static void *acquire(void *p){Thread *t=p;t->rc=elden_wcn_shared_acquire(t->s,0,1);return NULL;}
+typedef struct{EldenWcnSharedPower *s;int rc;unsigned radio;} Thread;
+static void *acquire(void *p){Thread *t=p;t->rc=elden_wcn_shared_acquire(t->s,t->radio,1);return NULL;}
 static void concurrent(void){
-    Model m;EldenWcnSharedPower s;setup(&m,&s);m.park=1;Thread t={&s,-999};pthread_t worker;
+    Model m;EldenWcnSharedPower s;setup(&m,&s);m.park=1;Thread t={&s,-999,0};pthread_t worker;
     CHECK(!pthread_create(&worker,NULL,acquire,&t));
     while(!__atomic_load_n(&m.arrived,__ATOMIC_ACQUIRE)){}
     EldenWcnSharedSnapshot snap;memset(&snap,0xa5,sizeof(snap));EldenWcnSharedSnapshot saved=snap;
@@ -185,6 +188,15 @@ static void concurrent(void){
     CHECK(elden_wcn_shared_snapshot(&s,&snap)==-11&&!memcmp(&snap,&saved,sizeof(snap)));
     __atomic_store_n(&m.go,1,__ATOMIC_RELEASE);CHECK(!pthread_join(worker,NULL)&&!t.rc);
     CHECK(!elden_wcn_shared_acquire(&s,1,1));scenarios++;
+    setup(&m,&s);CHECK(!elden_wcn_shared_acquire(&s,0,1));m.park=1;t=(Thread){&s,-999,1};
+    CHECK(!pthread_create(&worker,NULL,acquire,&t));
+    while(!__atomic_load_n(&m.arrived,__ATOMIC_ACQUIRE)){}
+    for(unsigned n=0;n<1000;n++){
+        CHECK(!elden_wcn_shared_check(&s,0,1));
+        CHECK(elden_wcn_shared_check(&s,1,1)==-11);
+    }
+    __atomic_store_n(&m.go,1,__ATOMIC_RELEASE);CHECK(!pthread_join(worker,NULL)&&!t.rc);
+    CHECK(!elden_wcn_shared_check(&s,0,1)&&!elden_wcn_shared_check(&s,1,1));scenarios++;
 }
 int main(void){
     legacy_equivalence();lifecycle(0);lifecycle(1);invalid();concurrent();

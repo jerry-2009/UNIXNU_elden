@@ -1,5 +1,10 @@
 # WCN shared supply owner — offline component, 2026-11-15
 
+Follow-up: the [native WLAN adapter](WLAN-POWER-NATIVE.md) now compiles and
+uses this provider, including atomic live-lease queries. It is not yet integrated
+into a whole kernel or tested on hardware. The330-case record below describes
+the initial core version; follow the linked report for the current335-case build.
+
 Wi-Fi must not acquire a Bluetooth lease or require Bluetooth firmware to be
 running. `WcnSharedPower.h` now defines two independent consumer leases over one
 platform-lifetime supply/PDC executor. This is **host-tested and ARM64/iOS17

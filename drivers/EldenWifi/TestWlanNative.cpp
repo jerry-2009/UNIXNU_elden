@@ -1,0 +1,154 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+/* Production native helper/export bodies. Kernel/map/transport services below
+ * are deterministic host fixtures; no radio or physical MMIO is accessed. */
+#include "WlanPower.h"
+#include "WlanGpio.h"
+#include "WcnSharedPower.h"
+#include "EldenWifiResources.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+static unsigned checks,scenarios;
+#define CHECK(x) do{checks++;if(!(x)){fprintf(stderr,"line%d: %s\n",__LINE__,#x);exit(1);}}while(0)
+static uint64_t clock_us;
+static int native_owner_data_status,elden_init_exec_accepted=1;
+static bool armed=true,map_ok=true;
+static unsigned boot_enable=1,creates,destroys;
+static int quiesce_result;
+static bool quiesce_late;
+static int elden_recovery_armed(){return armed;}
+static void IOSleep(unsigned n){clock_us+=n*1000ull;}
+static void PE_parse_boot_argn(const char *s,unsigned *v,size_t){CHECK(!strcmp(s,"elden-wlan-power"));*v=boot_enable;}
+static uint64_t now_us(void *){return clock_us;}
+static void delay(void *,unsigned n){clock_us+=n;}
+struct Ignored{template<typename... T>Ignored(T...){ } Ignored()=default;};
+struct Region{
+    uint32_t regs[3]={0,0,0};unsigned writes=0,calls=0,fail_at=0,read_calls=0,fail_read=0;bool stuck=false;
+    uint32_t read(unsigned off){calls++;read_calls++;return calls==fail_at||read_calls==fail_read?UINT32_MAX:regs[off/4];}
+    void write(unsigned off,uint32_t v){
+        calls++;writes++;if(calls==fail_at)return;
+        regs[off/4]=v;
+        if(!stuck&&(regs[0]&0x200u))regs[1]=(regs[1]&~1u)|((regs[1]>>1)&1u);
+    }
+};
+struct Context{
+    Region wlan;
+    Ignored spmi,rpmh,aoss_io,ipcc_io,qmp;
+    EldenWcnSharedPower shared={};EldenWcnPower &power=shared.supply;
+    EldenWlanGpio wlan_gpio={};uint64_t bt_epoch=0;unsigned bt_state=0;
+    EldenWcnRailState rails[6];bool bt=false;unsigned bt_writes=0,qmp_calls=0,quiesces=0;
+    Context(){creates++;for(unsigned i=0;i<6;i++)rails[i]={elden_wcn_rail_specs[i].minimum,0x80,0x80,3};}
+    ~Context(){destroys++;}
+    bool map(){return map_ok;}
+};
+static Context *active;
+static uint32_t core_read(void *,uint32_t){return 0;}
+static uint32_t owner_read(void *,uint32_t){return 0;}
+static uint32_t obs_read(void *,uint32_t){return 0;}
+static void obs_write(void *,uint32_t,uint32_t){}
+static uint32_t chan_read(void *,unsigned,uint32_t){return 0;}
+static void chan_write(void *,unsigned,uint32_t,uint32_t){}
+static uint32_t rsc_read(void *,uint32_t){return 0;}
+static void rsc_write(void *,uint32_t,uint32_t){}
+static uint32_t aoss_read(void *,uint32_t){return 0;}
+static void aoss_write(void *,uint32_t,uint32_t){}
+static uint32_t ipcc_read(void *,uint32_t){return 0;}
+static void ipcc_write(void *,uint32_t,uint32_t){}
+static void Sm8750AossQmpInit(Ignored *,Ignored *,unsigned,Ignored *){}
+static int preflight(void *){return 0;}
+static int rail_read(void *p,EldenWcnRail i,EldenWcnRailState *s){*s=static_cast<Context *>(p)->rails[i];return 0;}
+static int rail_vote(void *p,EldenWcnRail i,uint16_t mv,uint8_t mode,bool en){CHECK(en&&mode==7);static_cast<Context *>(p)->rails[i]={mv,0x80,0x80,mode};return 0;}
+static int qmp_send(void *p,const char *){static_cast<Context *>(p)->qmp_calls++;return 0;}
+static int bt_get(void *p,bool *v){*v=static_cast<Context *>(p)->bt;return 0;}
+static int bt_set(void *p,bool v){auto c=static_cast<Context *>(p);c->bt=v;c->bt_writes++;return 0;}
+static int wlan_get(void *p,bool *v){auto c=static_cast<Context *>(p);uint32_t io=c->wlan.read(4);if(io==UINT32_MAX)return -5;*v=io&1u;return 0;}
+static int parents(void *,uint32_t *a,uint32_t *b){*a=600000000;*b=300000000;return 0;}
+#include "WlanPowerNative.inc"
+#include "WlanPowerExports.inc"
+static int quiesce(const void *p,uint64_t epoch,uint64_t deadline){
+    CHECK(active&&active->wlan.regs[1]&1u);
+    CHECK(elden_wlan_power_check(p,epoch)==-11); /* revoked before callback */
+    active->quiesces++;
+    if(quiesce_late)clock_us=deadline;
+    return quiesce_result;
+}
+static EldenWlanIdentity identity={(void *)0x1234,0x17cb,0x110e,0x100,0x1401,quiesce};
+static void reset(){
+    delete active;active=nullptr;clock_us=0;native_owner_data_status=0;elden_init_exec_accepted=1;
+    armed=map_ok=true;boot_enable=1;quiesce_result=0;quiesce_late=false;
+    platform_init_state=platform_io_busy=platform_stopping=wlan_api_busy=0;
+    wlan_provider=nullptr;wlan_quiesce=nullptr;wlan_epoch=wlan_next_epoch=0;creates=destroys=0;
+}
+static void native_cases(){
+    for(unsigned first=0;first<2;first++){
+        reset();uint64_t epoch=0;Context *c=nullptr;
+        if(!first){CHECK(!platform_get(&c));CHECK(!bt_power_acquire(c,1));}
+        CHECK(!elden_wlan_power_acquire(&identity,&epoch)&&epoch==1);c=active;
+        CHECK(c->wlan.regs[0]==0x3c3&&c->wlan.regs[1]==3&&creates==1&&destroys==0);
+        CHECK(!elden_wlan_power_check(identity.provider,epoch));
+        unsigned q=c->qmp_calls;
+        if(first)CHECK(!bt_power_acquire(c,1));
+        CHECK(c->qmp_calls==q&&c->bt);
+        CHECK(!elden_wcn_shared_check(&c->shared,0,1));
+        CHECK(!bt_power_stop(c,1)&&!bt_power_finish(c,1));
+        CHECK(!elden_wlan_power_check(identity.provider,epoch)&&c->wlan.regs[1]==3);
+        EldenWcnPmuParam pmu={"VDDD_AON_0P9",900,820,true,true};
+        CHECK(!elden_wlan_power_cpr(identity.provider,epoch,&pmu,1));
+        CHECK(c->qmp_calls==q+2);unsigned writes=c->wlan.writes;
+        CHECK(elden_wlan_power_stop((void *)0x9999,epoch)==-11&&c->wlan.writes==writes);
+        CHECK(!elden_wlan_power_stop(identity.provider,epoch)&&c->quiesces==1&&!(c->wlan.regs[1]&1u));
+        CHECK(creates==1&&destroys==0&&elden_wlan_power_check(identity.provider,epoch)==-11);
+        CHECK(!elden_wlan_power_acquire(&identity,&epoch)&&epoch==2&&c->qmp_calls==q+2);
+        __atomic_store_n(&platform_stopping,1,__ATOMIC_RELEASE);
+        CHECK(!wlan_shutdown(clock_us+9000000)&&c->quiesces==2);
+        CHECK(elden_wlan_power_acquire(&identity,&epoch)==-11);scenarios++;
+    }
+    for(unsigned kind=0;kind<8;kind++){
+        reset();auto id=identity;uint64_t epoch=0xbeef;
+        if(kind==0)id.vendor++;if(kind==1)id.device++;if(kind==2)id.rid++;
+        if(kind==3)id.sid++;if(kind==4)id.quiesce=nullptr;
+        if(kind==5)boot_enable=0;if(kind==6)armed=false;if(kind==7)native_owner_data_status=1;
+        CHECK(elden_wlan_power_acquire(&id,&epoch)<0&&epoch==0xbeef&&creates==0);scenarios++;
+    }
+    for(unsigned fail=0;fail<2;fail++){
+        reset();uint64_t epoch=0;CHECK(!elden_wlan_power_acquire(&identity,&epoch));
+        quiesce_result=fail?-5:0;quiesce_late=!fail;unsigned writes=active->wlan.writes;
+        CHECK(elden_wlan_power_stop(identity.provider,epoch)==(fail?-5:-110));
+        CHECK(active->wlan.writes==writes&&(active->wlan.regs[1]&1u)&&!wlan_epoch);
+        CHECK(wlan_shutdown(clock_us+9000000)<0&&destroys==0);scenarios++;
+    }
+    reset();uint64_t epoch=0;map_ok=false;CHECK(elden_wlan_power_acquire(&identity,&epoch)==-12&&creates==1&&destroys==1);scenarios++;
+}
+static void gpio_cases(){
+    for(unsigned kind=0;kind<7;kind++){
+        reset();Context c;c.wlan_gpio={&c,wlan_read,wlan_write,delay,false,false};
+        if(kind==0)c.wlan.regs[0]=4;if(kind==1)c.wlan.regs[0]=0x800;
+        if(kind==2)c.wlan.regs[1]=1;if(kind==3)c.wlan.regs[2]=1;
+        if(kind<4)CHECK(elden_wlan_gpio_set(&c.wlan_gpio,false)==-19&&c.wlan.writes==0);
+        else{
+            c.wlan.regs[0]=kind==4?0x1800:0x2000;
+            CHECK(!elden_wlan_gpio_set(&c.wlan_gpio,false));
+            CHECK((c.wlan.regs[0]&~0x3ffu)==(kind==4?0x1800u:0x2000u));
+            if(kind==5)c.wlan.stuck=true;
+            if(kind==6)c.wlan.regs[0]^=0x40;
+            CHECK(elden_wlan_gpio_set(&c.wlan_gpio,true)==(kind==5?-110:kind==6?-71:0));
+            if(kind>4){unsigned calls=c.wlan.calls;CHECK(elden_wlan_gpio_set(&c.wlan_gpio,false)==-71&&calls==c.wlan.calls);}
+        }
+        scenarios++;
+    }
+    unsigned read_count=0;
+    for(unsigned at=0;;at++){
+        reset();Context c;c.wlan_gpio={&c,wlan_read,wlan_write,delay,false,false};c.wlan.fail_read=at;
+        int rc=elden_wlan_gpio_set(&c.wlan_gpio,false);
+        if(!rc)rc=elden_wlan_gpio_set(&c.wlan_gpio,true);
+        if(!rc)rc=elden_wlan_gpio_set(&c.wlan_gpio,false);
+        if(!at){CHECK(!rc);read_count=c.wlan.read_calls;}
+        else{
+            CHECK(rc==-5);
+            if(c.wlan_gpio.held){unsigned writes=c.wlan.writes;CHECK(elden_wlan_gpio_set(&c.wlan_gpio,false)==-71&&writes==c.wlan.writes);}
+            scenarios++;
+        }
+        if(at==read_count)break;
+    }
+}
+int main(){native_cases();gpio_cases();reset();printf("%u native/WLAN GPIO scenarios, %u checks passed\n",scenarios,checks);}
