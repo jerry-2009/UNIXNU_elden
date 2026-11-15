@@ -49,6 +49,7 @@ class ConsoleLines:
 
 class ChargeSequence:
     MODES={'stock':1,'bypass':2,'80':3,'40-60':4}
+    MAX_GENERATION=0xffffffff
     def __init__(self,modes,delay,hold):
         self.modes=modes;self.delay=delay;self.hold=hold;self.index=0;self.pending=None
         self.sent_at=None;self.applied_at=None;self.before=None;self.done=not modes
@@ -56,10 +57,20 @@ class ChargeSequence:
     def update(self,status,elapsed):
         if self.done:return None
         raw=status.get('charge_generation','')
-        generation=int(raw) if re.fullmatch(r'\d{1,10}',raw) else None
+        generation=int(raw) if isinstance(raw,str) and re.fullmatch(r'\d{1,10}',raw) else None
+        if generation is not None and generation>self.MAX_GENERATION:generation=None
         mode=status.get('charge_mode')
+        available=status.get('charge_control')=='1'
         if self.pending:
-            if self.applied_at is None and generation is not None and generation!=self.before and mode==str(self.MODES[self.pending]):
+            # The kernel retains the last applied mode/generation after its
+            # telemetry becomes unavailable. Those historical values cannot
+            # confirm a new command or finish the observed hold interval.
+            in_time=self.applied_at is not None or elapsed-self.sent_at<45
+            confirmed=in_time and available and generation is not None and generation>self.before and mode==str(self.MODES[self.pending])
+            if not confirmed and self.applied_at is not None:
+                self.events.append(dict(event='confirmation-lost',mode=self.pending,elapsed=elapsed))
+                self.applied_at=None
+            if confirmed and self.applied_at is None:
                 self.applied_at=elapsed;self.events.append(dict(event='applied',mode=self.pending,generation=generation,elapsed=elapsed))
             if self.applied_at is not None and elapsed-self.applied_at>=self.hold:
                 self.index+=1;self.pending=None;self.applied_at=None
@@ -70,7 +81,9 @@ class ChargeSequence:
                 self.modes=['stock'];self.index=0;self.pending=None;self.recovering=True;self.recovery_deadline=elapsed+45
         if self.pending:return None
         if self.recovering and elapsed>=self.recovery_deadline:self.done=True;return None
-        if elapsed<self.delay or status.get('charge_control')!='1' or generation is None:return None
+        if elapsed<self.delay or not available or generation is None:return None
+        if generation==self.MAX_GENERATION:
+            self.errors.append('Charge generation exhausted; no further command sent');self.done=True;return None
         self.pending=self.modes[self.index];self.before=generation;self.sent_at=elapsed
         self.events.append(dict(event='sent',mode=self.pending,before_generation=generation,elapsed=elapsed))
         return self.pending
@@ -198,18 +211,14 @@ def main():
     report['candidate_session']=a.expect_session
     meta.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print('Opening verified '+selected.device+'; configuring CDC and DTR...',flush=True)
-    for attempt in range(3):
-        try:s.open();break
-        except (serial.SerialException,OSError) as error:
-            report.setdefault('open_errors',[]).append(str(error))
-            report['bound_startup_milestone_observed']=False
-            meta.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-            # Windows can publish the PnP node before the COM path survives enumeration.
-            # Retry only this pre-I/O missing-path case, with fresh identity checks.
-            if attempt==2 or 'FileNotFoundError(2' not in str(error):raise
-            s.close();time.sleep(.5)
-            fresh=[p for p in list_ports.comports() if p.device==selected.device and p.location==selected.location and admitted(p)]
-            if len(fresh)!=1:raise
+    from cdc_open import open_verified
+    def open_error(error):
+        report.setdefault('open_errors',[]).append(str(error))
+        report['bound_startup_milestone_observed']=False
+        meta.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    selected,attempts=open_verified(s,selected,list_ports.comports,admitted,(serial.SerialException,OSError),open_error)
+    report['open_attempts']=attempts
+    report['verified_pnp_instance']=getattr(selected,'elden_verified_instance',None)
     started=time.monotonic();report['opened_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat()
     tracker=Milestone(a.expect_session);lines=ConsoleLines();next_status=started+.5;report['statuses']=[]
     reboot_sent=False;home_sent=False;home_release_ok=False;swipe_release_ok=False;homes_sent=0;last_home_sent=0;hid_ready=False;gui_at=None;received_hash=hashlib.sha256()

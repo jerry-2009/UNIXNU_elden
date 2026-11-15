@@ -1,0 +1,108 @@
+{
+  "v133": {
+    "trial": "v133",
+    "bytes": 1172265,
+    "raw_sha256": "f6f8d7218fbf5686530a29325f8de3fb71509fc760beeee24812eb1115a4b355",
+    "raw_log": "edl_work/live-scan-v133-20261115/usb/20261114-213148.bin",
+    "dropped": 50,
+    "discontinuities": [],
+    "recovery_complete": true,
+    "explicit_sync_return": true,
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "android_root_green_boot_completed": true,
+    "sleep_requested": true,
+    "key_lines": [
+      "ELDEN_BT_NATIVE_INIT pid=79 result=0 accepted=1",
+      "[bt] controller refused opcode=0x2007 status=0xc",
+      "[bt] controller refused opcode=0x200b status=0xc",
+      "ELDEN_BT_EXIT_STACK pid=79 pc=1db2165f0 lr=100676bd4 fp=16faa66b0 syscall=1",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=0 return=100a8f250",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=1 return=1005c7904",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=2 return=19f039c9c",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=3 return=19f03acc0",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=4 return=19f0168f8",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=5 return=19f017374",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=6 return=19f020a34",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=7 return=19f020338",
+      "[bt] client gone ready=1 failed_starts=0",
+      "ELDEN_BT_HOST live client=0 ready=1 out=50 up=49 bad=0 pending=0",
+      "ELDEN_BT_HOST live client=0 ready=1 out=50 up=49 bad=0 pending=0"
+    ],
+    "scanning_verified": false,
+    "pairing_verified": false,
+    "scan_timing_hypothesis_pending": true
+  },
+  "v134": {
+    "trial": "v134",
+    "raw_log": "edl_work/live-scan-ready-v134-20261115/usb/20261114-214004.bin",
+    "bytes": 1168435,
+    "raw_sha256": "2689324949829999296a7aab8ed825a083b916ae995b7beb1d1417c42a1729dc",
+    "dropped": 0,
+    "discontinuities": [],
+    "recovery_complete": true,
+    "explicit_sync_return": true,
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "android_root_green_boot_completed": true,
+    "sleep_requested": true,
+    "key_lines": [
+      "ELDEN_BT_NATIVE_INIT pid=79 result=0 accepted=1",
+      "[bt] controller refused opcode=0x2007 status=0xc",
+      "[bt] controller refused opcode=0x200b status=0xc",
+      "ELDEN_BT_EXIT_STACK pid=79 pc=1d75ca5f0 lr=1007f5bd4 fp=16fd576b0 syscall=1",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=0 return=100c0e250",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=1 return=100746904",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=2 return=19b3edc9c",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=3 return=19b3eecc0",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=4 return=19b3ca8f8",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=5 return=19b3cb374",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=6 return=19b3d4a34",
+      "ELDEN_BT_EXIT_FRAME pid=79 index=7 return=19b3d4338",
+      "[bt] client gone ready=1 failed_starts=0",
+      "ELDEN_BT_HOST live client=0 ready=1 out=50 up=49 bad=0 pending=0",
+      "ELDEN_BT_HOST live client=0 ready=1 out=50 up=49 bad=0 pending=0"
+    ],
+    "scanning_verified": false,
+    "pairing_verified": false,
+    "native_support_byte_and_flags_not_captured": true,
+    "stock_snoop_log_directory_empty": true,
+    "next_step": "Capture native Supported Commands byte37 and cache/HCI/vendor flags at successful completion; distinguish absent native data, overwritten flag, or unexecuted route before another behavioral patch."
+  },
+  "instruction_test": {
+    "passed": true,
+    "cases": 1540,
+    "all_support_byte_values": true,
+    "slides": 2,
+    "actual_native_instructions": true,
+    "external_controller_not_emulated": true,
+    "source_sha256": "9f429761879903b23a3affefbc836d1c4c8619d471735b617ab096167f4c1526"
+  },
+  "parser_test": {
+    "passed": true,
+    "asan_ubsan": true,
+    "records": [
+      {
+        "variant": "original",
+        "capacity": 32,
+        "actual_body_sha256": "b0cdbdf8ac3f8dfaf368701a49afb4959e276b4762460df8a838a5df4553cc16",
+        "passed": true
+      },
+      {
+        "variant": "scan",
+        "capacity": 40,
+        "actual_body_sha256": "1386fbb365daad844451a14f3a2722b448a8be7ea2326586072f8ebabdca5e9d",
+        "passed": true
+      }
+    ]
+  },
+  "native_completion_test": {
+    "host": {
+      "passed": true,
+      "actual_function_sha256": "0dc91ea89cc5342c7a17e02f26261940574ca2c503bb82aff1dd9b286ef8e370",
+      "actual_marker_sha256": "33825d354bdb0696dd575d2d9b08feb4118339ead7900f22e5265ceb136ad4f4",
+      "asan_ubsan": true
+    },
+    "passed": true
+  },
+  "discovery_order_cases": 60,
+  "full_goal_complete": false
+}

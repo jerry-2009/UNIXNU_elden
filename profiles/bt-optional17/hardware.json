@@ -1,0 +1,43 @@
+{
+  "trial": "optional-v131",
+  "raw_log": "edl_work/live-optional-v131-20261115/usb/20261114-200900.bin",
+  "bytes": 1178090,
+  "sha256": "f2a59b73d66a9c8a647e9c49d1a2035fd9407ee4d086365ece741c5245a2b6e1",
+  "dropped": 25,
+  "discontinuities": [],
+  "recovery_complete": true,
+  "explicit_sync_return": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_boot_completed": true,
+  "sleep_requested": true,
+  "native_completion": [],
+  "host_states": [
+    "ELDEN_BT_HOST live client=0 ready=0 out=26 up=25 bad=0 pending=0",
+    "ELDEN_BT_HOST live client=0 ready=0 out=26 up=25 bad=0 pending=0"
+  ],
+  "exit_frames": [
+    "ELDEN_BT_EXIT_STACK pid=79 pc=1e6cc65f0 lr=100de9bd4 fp=16f3b93f0 syscall=1",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=0 return=100e4de88",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=1 return=100de1e78",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=2 return=10113c344",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=3 return=10113d66c",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=4 return=10111a048",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=5 return=101119b78",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=6 return=1aaae9c9c",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=7 return=1aaaeacc0"
+  ],
+  "stderr": [
+    "ELDEN_BT_STDERR pid=79 line=1 iov=0 bytes=67 copied=67 error=0 text=com.apple.server.bluetooth: Bluetooth Super Server Robot Destroyer",
+    "ELDEN_BT_STDERR pid=79 line=2 iov=0 bytes=46 copied=46 error=0 text=could not find BT_DEVICE_ADDRESS env variable",
+    "ELDEN_BT_STDERR pid=79 line=3 iov=0 bytes=62 copied=62 error=0 text=marconi-bt: Unable to match bluetooth service in device tree.",
+    "ELDEN_BT_STDERR pid=79 line=4 iov=0 bytes=47 copied=47 error=0 text=marconi-bt: Not a valid MAC address (all 00s).",
+    "ELDEN_BT_STDERR pid=79 line=5 iov=0 bytes=52 copied=52 error=0 text=bluetooth: Got local-mac-address: 81:7d:ee:dc:0c:26",
+    "ELDEN_BT_STDERR pid=79 line=6 iov=0 bytes=54 copied=54 error=0 text=FindLocalMacAddress Deleting local address from plist",
+    "ELDEN_BT_STDERR pid=79 line=7 iov=0 bytes=66 copied=66 error=0 text=com.apple.server.bluetooth: Server attached, going into msg loop."
+  ],
+  "kernel_ref_panic_recorded": false,
+  "pairing_verified": false,
+  "wifi_working": false,
+  "complete_peripheral_goal": false,
+  "source_only_hci_followup_needed": true
+}

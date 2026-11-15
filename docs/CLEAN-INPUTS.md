@@ -74,18 +74,42 @@ shasum -a 256 /path/to/new/OS.raw
 
 ## BaseCrypto
 
-需要固定原始 **预编译发布包** 的解压根目录，不是私钥或用户密钥，
-也不是corecrypto源码仓。目录中应包含 `ALL/`、`Driver/` 等完整包结构，
-包括 `Driver/Bin/CryptoDriver.inc.dsc`。填入JSON的 `crypto`。
+这里的BaseCrypto是 **Microsoft Project Mu CryptoBin v1.1.3** 的预编译UEFI加密组件包，
+供Mu固件构建使用。此前工作台把下载文件本地命名为 `basecrypto.zip`。
+它来自公开发布，不含我们的设备私钥或用户密钥；XNU的corecrypto源码是另一项依赖。
 
-已保留原始 `basecrypto.zip`：255451552字节，SHA256为
+- [官方发布页：v1.1.3](https://github.com/microsoft/mu_crypto_release/releases/tag/v1.1.3)
+- [准确下载：Mu_CryptoBin_v1_1_3.zip](https://github.com/microsoft/mu_crypto_release/releases/download/v1.1.3/Mu_CryptoBin_v1_1_3.zip)
+
+在仓库根目录运行即可下载、核验并解压到新目录（只需Python标准库）：
+
+```sh
+python3 tools/fetch_basecrypto.py --output ../inputs/basecrypto
+```
+
+Windows也可使用 `py -3.12 tools/fetch_basecrypto.py ...`。把命令最终输出的绝对
+`crypto` 路径复制到构建JSON。该路径应直接包含 `ALL/`、`Driver/` 等包结构，
+其中有 `Driver/Bin/CryptoDriver.inc.dsc`，保留随包的 `License.txt`。
+
+已有ZIP或已解压目录可分别使用：
+
+```sh
+python3 tools/fetch_basecrypto.py --archive /path/to/Mu_CryptoBin_v1_1_3.zip --output ../inputs/basecrypto
+python3 tools/fetch_basecrypto.py --check ../inputs/basecrypto
+```
+
+`--output`要求新目录，`--check`只读核验。工具会保留下载缓存和失败文件，不删除
+现有数据。默认ZIP缓存在系统临时目录的 `unixnu-elden-downloads` 下。
+
+准确ZIP为255451552字节（约244MiB），SHA256为
 `2136c410dc44135830e2e33062243563d642e0be868d6affc2930c6b0854f5cf`。
 解压后工具会检查 `profiles/v91/firmware-build/plan.json` 中全部994件文件，
-不能只复制AARCH64的一个EFI，也不能用任意新版包替代。
+合计约1.18GiB。固定版本与目录整体参与当前固件复现；不要换成最新OneCrypto包，
+也不要只取AARCH64的单个EFI。
 
-目前证据没有锁定该原始ZIP的可重复下载URL；可使用已校验的留存原始包。
-这是外部输入获取记录的限制，不能宣称仓库能自动下载全部依赖。
-2026-11-14留存ZIP与994件解压文件已重新校验通过。
+2026-11-15已从上述官方URL重新下载：ZIP与留存包SHA完全相同，994个文件全部匹配
+当前固件清单。[来源锁](../config/basecrypto.lock.json)及
+[核验记录](evidence/basecrypto-public-release.json)已归仓。此前文档未记录URL，现已补齐。
 
 ## 不必等待完整boot输入的目标
 

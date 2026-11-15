@@ -12,14 +12,29 @@
       "observed_head": "10ac0eaa0ad8f24426da85d3570026081dc50bc5"
     },
     {
+      "name": "AdrenoFirmware",
+      "url": "https://github.com/UniXNU/AdrenoFirmware.git",
+      "observed_head": "20ad3d7aca14bd46aecab6335c780f5413fa054b"
+    },
+    {
       "name": "AdrenoMetal-a830",
       "url": "https://github.com/IssacL04/AdrenoMetal.git",
       "observed_head": "831a9dcbd6ac7de89a11bdaf031e07b9aadfa3c8"
     },
     {
+      "name": "AdrenoMetal-official",
+      "url": "https://github.com/UniXNU/AdrenoMetal.git",
+      "observed_head": "73d582fd4d5772b1f5fa83581a25077a16f2b6cd"
+    },
+    {
       "name": "AdrenoPM4-night",
       "url": "https://github.com/UniXNU/AdrenoPM4.git",
       "observed_head": "282606b528b2595bc4274ea7490b62b323f35a5f"
+    },
+    {
+      "name": "AirNir",
+      "url": "https://github.com/UniXNU/AirNir.git",
+      "observed_head": "b356371a74cd158c2902f4886f373ebb0f833a36"
     },
     {
       "name": "AppleKeyStoreState",
@@ -37,6 +52,16 @@
       "observed_head": "885fd1fdaa373f266b9a3207997b91c67aa22e6d"
     },
     {
+      "name": "ArmCpu",
+      "url": "https://github.com/UniXNU/ArmCpu.git",
+      "observed_head": "d90e457b8392623853ec85c860feef546c767621"
+    },
+    {
+      "name": "ArmDTPlatform",
+      "url": "https://github.com/UniXNU/ArmDTPlatform.git",
+      "observed_head": "e8bd8d5de395c6cbc00d762c1bef57dbd15a448d"
+    },
+    {
       "name": "ArmSmmu4K-night",
       "url": "https://github.com/UniXNU/ArmSmmu4K.git",
       "observed_head": "83969cd874503e65997ff7639f7dcf3d0a92cd17"
@@ -45,6 +70,11 @@
       "name": "Ath12kWifi",
       "url": "https://github.com/UniXNU/Ath12kWifi.git",
       "observed_head": "5f7f5a8a9f02f7ab45ed10a2f226e348c519a838"
+    },
+    {
+      "name": "DarwinBoot",
+      "url": "https://github.com/UniXNU/DarwinBoot.git",
+      "observed_head": "5243c68ec332a227fe3680cd5da6d5a0e127035c"
     },
     {
       "name": "data-a-live",
@@ -112,14 +142,29 @@
       "observed_head": "22ff97f93416452335bb61badb14c762da653487"
     },
     {
+      "name": "QcomBaseband",
+      "url": "https://github.com/UniXNU/QcomBaseband.git",
+      "observed_head": "dd0199cf3300764ed52b23f4a47761f91fab21a2"
+    },
+    {
       "name": "QcomDwc3",
       "url": "https://github.com/UniXNU/QcomDwc3.git",
       "observed_head": "e4efe95c903a737e0f5955e5b50a8fb4d2a7d718"
     },
     {
+      "name": "QcomGeniSpi",
+      "url": "https://github.com/UniXNU/QcomGeniSpi.git",
+      "observed_head": "eac47baefe6a5d2368a70351e6ad1b6361bedbe2"
+    },
+    {
       "name": "qdlrs",
       "url": "https://github.com/qualcomm/qdlrs",
       "observed_head": "75fe2f7e42546a1d75969040378d4616419a9dcf"
+    },
+    {
+      "name": "RamBlock",
+      "url": "https://github.com/UniXNU/RamBlock.git",
+      "observed_head": "00a6e5dd6bb1709e817e13daec7986308cfb6d0f"
     },
     {
       "name": "ShengHidInput",
@@ -140,6 +185,11 @@
       "name": "ShengUfs",
       "url": "https://github.com/UniXNU/ShengUfs",
       "observed_head": "57f031c99d7f69ffa611626bebaeab0731e93254"
+    },
+    {
+      "name": "SoftwareAES",
+      "url": "https://github.com/UniXNU/SoftwareAES.git",
+      "observed_head": "da07dd5c7d62bbe960f5bd4fe7789574d3a49d8c"
     },
     {
       "name": "tb322fc-linux-kernel",
@@ -170,6 +220,11 @@
       "name": "UniXNU-erhai",
       "url": "https://github.com/wally001012-cyber/UniXNU-erhai",
       "observed_head": "48cf00a7a97f3a2db10c84c39cf21701a867784e"
+    },
+    {
+      "name": "UniXNU-gts7xlwifi",
+      "url": "https://github.com/rui12366B/UniXNU-gts7xlwifi.git",
+      "observed_head": "88b34f97100a01aab4ea6b86dc9c748b2114c382"
     },
     {
       "name": "UniXNU-hummer",
@@ -230,6 +285,26 @@
       "name": "UniXNU_Enc3l-night",
       "url": "https://github.com/IssacL04/UniXNU_Enc3l.git",
       "observed_head": "a6ff7768bba6b9f285ac4c3e5b2c5d4904a016a3"
+    },
+    {
+      "name": "VerifiedRoot",
+      "url": "https://github.com/UniXNU/VerifiedRoot.git",
+      "observed_head": "974f043d0c71ba2e60331483a41c6c6d35274ee3"
+    },
+    {
+      "name": "VirtioMmioBlock",
+      "url": "https://github.com/UniXNU/VirtioMmioBlock.git",
+      "observed_head": "4e1013eb8c45077b57f8d38d61b389fe899ea1c3"
+    },
+    {
+      "name": "VirtioMmioConsole",
+      "url": "https://github.com/UniXNU/VirtioMmioConsole.git",
+      "observed_head": "70253216890b2afcaa6333948726f896f84fc757"
+    },
+    {
+      "name": "XnuPrelink",
+      "url": "https://github.com/UniXNU/XnuPrelink.git",
+      "observed_head": "440589b0c31625f17edf363e24b3c82c51c70bb9"
     }
   ]
 }

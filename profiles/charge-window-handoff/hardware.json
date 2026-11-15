@@ -1,0 +1,102 @@
+{
+  "trial": "v140",
+  "image_sha256": "61afc81990d4f153fda838de0735aa74b85c95ef977ab406b55058c1079d664c",
+  "session": "6eca575bb9089559",
+  "raw_log": "edl_work\\live-charge-window-v140-20261115\\usb\\20261115-003006.bin",
+  "bytes": 1248051,
+  "raw_sha256": "077a0d6284d289d27221183378f2d8a3d4d0667a51b6a07f25ef87f81def780f",
+  "dropped": 28,
+  "discontinuities": [],
+  "charge_sequence": [
+    {
+      "event": "sent",
+      "mode": "bypass",
+      "before_generation": 0,
+      "elapsed": 37.39000000001397
+    },
+    {
+      "event": "applied",
+      "mode": "bypass",
+      "generation": 1,
+      "elapsed": 41.42200000002049
+    },
+    {
+      "event": "sent",
+      "mode": "80",
+      "before_generation": 1,
+      "elapsed": 51.51500000001397
+    },
+    {
+      "event": "applied",
+      "mode": "80",
+      "generation": 2,
+      "elapsed": 57.578000000095926
+    },
+    {
+      "event": "sent",
+      "mode": "bypass",
+      "before_generation": 2,
+      "elapsed": 67.68700000003446
+    },
+    {
+      "event": "applied",
+      "mode": "bypass",
+      "generation": 3,
+      "elapsed": 73.76500000001397
+    },
+    {
+      "event": "sent",
+      "mode": "40-60",
+      "before_generation": 3,
+      "elapsed": 83.90600000007544
+    },
+    {
+      "event": "applied",
+      "mode": "40-60",
+      "generation": 4,
+      "elapsed": 94.01500000001397
+    },
+    {
+      "event": "sent",
+      "mode": "stock",
+      "before_generation": 4,
+      "elapsed": 104.10900000005495
+    },
+    {
+      "event": "applied",
+      "mode": "stock",
+      "generation": 5,
+      "elapsed": 106.15600000007544
+    }
+  ],
+  "charge_errors": [],
+  "charge_sequence_complete": true,
+  "stock_restore_verified_in_xnu": true,
+  "android_before": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "android_after": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "stock_full_sha_restored": true,
+  "explicit_sync_return": true,
+  "android_root_green_boot_completed": true,
+  "sleep_requested": true,
+  "key_lines": [
+    "ELDEN_CHARGE request op=61 property=28 value=0 mode=2",
+    "ELDEN_CHARGE applied mode=2 window=95100 EU-window=95100 enabled=0 firmware-held=0 cycle=10",
+    "ELDEN_CHARGE request op=61 property=28 value=1 mode=3",
+    "ELDEN_CHARGE applied mode=3 window=176080 EU-window=95100 enabled=0 firmware-held=1 cycle=18",
+    "ELDEN_CHARGE request op=61 property=28 value=0 mode=2",
+    "ELDEN_CHARGE applied mode=2 window=176080 EU-window=95100 enabled=0 firmware-held=0 cycle=25",
+    "ELDEN_CHARGE request op=61 property=28 value=1 mode=4",
+    "ELDEN_CHARGE applied mode=4 window=140060 EU-window=95100 enabled=0 firmware-held=1 cycle=33",
+    "ELDEN_CHARGE applied mode=1 window=95100 EU-window=95100 enabled=1 firmware-held=0 cycle=38",
+    "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+  ],
+  "scope": "Single high-SOC hardware transition trial. Low-SOC resumption/full protection cycles remain model-only; no dual-port net-charge acceptance."
+}

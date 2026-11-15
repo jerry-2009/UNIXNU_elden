@@ -1,0 +1,972 @@
+{
+  "schema": 1,
+  "date": "2026-11-15",
+  "scope": "All 32 public UniXNU repositories visible in the saved GitHub API response; source and adoption review only",
+  "public_repositories": 32,
+  "existing_org_clones": 16,
+  "new_org_clones": 14,
+  "org_repos_with_local_clones": 30,
+  "research_roots_after": 61,
+  "remote_only": [
+    ".github",
+    "ArmVirtPlatform"
+  ],
+  "candidate_inputs_changed": false,
+  "device_access": false,
+  "build_or_device_validation": false,
+  "no_license_metadata_meaning": "null/NOASSERTION is unresolved metadata, not permission to relicense; preserve and review per-file LICENSE/NOTICE before copying",
+  "rows": [
+    {
+      "repository": "UniXNU/.github",
+      "url": "https://github.com/UniXNU/.github",
+      "priority": "参考",
+      "reviewed_commit": "e4b06b6feecdb51bf9237dd224df443cee33a35a",
+      "default_branch": "main",
+      "local_folder": null,
+      "local_checkout": null,
+      "catalog_revision": null,
+      "catalog_os_abi": [],
+      "catalog_hardware": [],
+      "catalog_verified_devices": [],
+      "license": null,
+      "historical_v91_commit": null,
+      "reuse": "组织入口和官方文档导航",
+      "elden_status": "无需内核运行集成；不克隆",
+      "boundary": "仅远端README/元数据",
+      "source_links": [
+        "https://github.com/UniXNU/.github/blob/e4b06b6feecdb51bf9237dd224df443cee33a35a/profile/README.md"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/Adreno740",
+      "url": "https://github.com/UniXNU/Adreno740",
+      "priority": "后期GPU",
+      "reviewed_commit": "54b41b8f59e90a167f6f75160739c5f825945fbc",
+      "default_branch": "main",
+      "local_folder": "Adreno740-ipados27",
+      "local_checkout": "10ac0eaa0ad8f24426da85d3570026081dc50bc5",
+      "catalog_revision": "6fa7bae2a5b3b523e790eb3e0348af4d98969e4d",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "Adreno 740",
+        "SM8550"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "MIT",
+      "historical_v91_commit": "b686b9054f57d393c80195b82568a09f8ca106a2",
+      "reuse": "A7xx队列、地址空间隔离、故障恢复、缓存与fence生命周期",
+      "elden_status": "历史构建已有GPU组件；Elden GUI仍CPU渲染，A830未验收",
+      "boundary": "主线A740/SM8550；不能把A740寄存器或固件直接用于A830",
+      "source_links": [
+        "https://github.com/UniXNU/Adreno740/blob/54b41b8f59e90a167f6f75160739c5f825945fbc/NativeAdrenoAccelerator.cpp",
+        "https://github.com/UniXNU/Adreno740/blob/54b41b8f59e90a167f6f75160739c5f825945fbc/NativeAdrenoClient.cpp"
+      ],
+      "historical_to_main_counts": "0\t149",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/AdrenoFirmware",
+      "url": "https://github.com/UniXNU/AdrenoFirmware",
+      "priority": "后期GPU",
+      "reviewed_commit": "20ad3d7aca14bd46aecab6335c780f5413fa054b",
+      "default_branch": "main",
+      "local_folder": "AdrenoFirmware",
+      "local_checkout": "20ad3d7aca14bd46aecab6335c780f5413fa054b",
+      "catalog_revision": "20ad3d7aca14bd46aecab6335c780f5413fa054b",
+      "catalog_os_abi": [],
+      "catalog_hardware": [
+        "Adreno A6xx/A7xx HFI"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "HFI消息、启动状态机、投票与故障退出",
+      "elden_status": "新增独立参考；当前消费版本需沿GPU固件输入进一步核定",
+      "boundary": "README报告sheng GMU/HFI实机成功；目录verified_devices为空，不等于任意版本已验",
+      "source_links": [
+        "https://github.com/UniXNU/AdrenoFirmware/blob/20ad3d7aca14bd46aecab6335c780f5413fa054b/AdrenoHfi.c",
+        "https://github.com/UniXNU/AdrenoFirmware/blob/20ad3d7aca14bd46aecab6335c780f5413fa054b/AdrenoHfiStartup.c",
+        "https://github.com/UniXNU/AdrenoFirmware/blob/20ad3d7aca14bd46aecab6335c780f5413fa054b/AdrenoHfiVotes.c"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/AdrenoMetal",
+      "url": "https://github.com/UniXNU/AdrenoMetal",
+      "priority": "后期GPU",
+      "reviewed_commit": "73d582fd4d5772b1f5fa83581a25077a16f2b6cd",
+      "default_branch": "main",
+      "local_folder": "AdrenoMetal-official",
+      "local_checkout": "73d582fd4d5772b1f5fa83581a25077a16f2b6cd",
+      "catalog_revision": "6d7f73437087c57ee54a41adceb1735daaea405e",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "Turnip Darwin backend",
+        "kernel GPU user-client ABI"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "MIT",
+      "historical_v91_commit": "c6d29caad6d880cc8204ebe3bc34d77479a3255d",
+      "reuse": "Metal/IOSurface资源生命周期、池化、压力回收、提交与等待",
+      "elden_status": "已有历史组件和A830参考fork；新增官方克隆补齐主线",
+      "boundary": "与GPU用户客户端、Turnip和OS ABI联动；27/macOS改动不能原样覆盖17",
+      "source_links": [
+        "https://github.com/UniXNU/AdrenoMetal/blob/73d582fd4d5772b1f5fa83581a25077a16f2b6cd/NativeAdrenoMetalPlugin.mm",
+        "https://github.com/UniXNU/AdrenoMetal/blob/73d582fd4d5772b1f5fa83581a25077a16f2b6cd/NativeBridgeMetalFrontend.mm",
+        "https://github.com/UniXNU/AdrenoMetal/blob/73d582fd4d5772b1f5fa83581a25077a16f2b6cd/bridge/NativeMetalBridge.rs"
+      ],
+      "historical_to_main_counts": "0\t270",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/AdrenoPM4",
+      "url": "https://github.com/UniXNU/AdrenoPM4",
+      "priority": "后期GPU",
+      "reviewed_commit": "282606b528b2595bc4274ea7490b62b323f35a5f",
+      "default_branch": "main",
+      "local_folder": "AdrenoPM4-night",
+      "local_checkout": "282606b528b2595bc4274ea7490b62b323f35a5f",
+      "catalog_revision": "282606b528b2595bc4274ea7490b62b323f35a5f",
+      "catalog_os_abi": [],
+      "catalog_hardware": [
+        "Adreno packet type 4 and 7",
+        "A740 command layouts"
+      ],
+      "catalog_verified_devices": [],
+      "license": "MIT",
+      "historical_v91_commit": null,
+      "reuse": "PM4编码与队列组织方法",
+      "elden_status": "已有独立参考；当前消费版本随GPU构建依赖核定",
+      "boundary": "包格式/寄存器随Adreno代际变化，A830须逐项核对",
+      "source_links": [
+        "https://github.com/UniXNU/AdrenoPM4/blob/282606b528b2595bc4274ea7490b62b323f35a5f/AdrenoPM4.c"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/AirNir",
+      "url": "https://github.com/UniXNU/AirNir",
+      "priority": "后期GPU",
+      "reviewed_commit": "b356371a74cd158c2902f4886f373ebb0f833a36",
+      "default_branch": "main",
+      "local_folder": "AirNir",
+      "local_checkout": "b356371a74cd158c2902f4886f373ebb0f833a36",
+      "catalog_revision": "b356371a74cd158c2902f4886f373ebb0f833a36",
+      "catalog_os_abi": [],
+      "catalog_hardware": [
+        "AIR and NIR interfaces"
+      ],
+      "catalog_verified_devices": [],
+      "license": "MIT",
+      "historical_v91_commit": null,
+      "reuse": "AIR到NIR/Turnip的shader翻译链",
+      "elden_status": "新增独立参考，按图形构建依赖审查",
+      "boundary": "README为离线UI shader编译；不等于Y700硬件渲染",
+      "source_links": [
+        "https://github.com/UniXNU/AirNir/blob/b356371a74cd158c2902f4886f373ebb0f833a36/Frontend.cpp",
+        "https://github.com/UniXNU/AirNir/blob/b356371a74cd158c2902f4886f373ebb0f833a36/MesaBackend.c",
+        "https://github.com/UniXNU/AirNir/blob/b356371a74cd158c2902f4886f373ebb0f833a36/BackendABI.h"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/AppleKeyStoreState",
+      "url": "https://github.com/UniXNU/AppleKeyStoreState",
+      "priority": "已复用",
+      "reviewed_commit": "6ff4f11d8fdf853351f8d98e1bbe1373fb8da2e6",
+      "default_branch": "main",
+      "local_folder": "AppleKeyStoreState",
+      "local_checkout": "6ff4f11d8fdf853351f8d98e1bbe1373fb8da2e6",
+      "catalog_revision": "8c70daf814aafdf4a3d35e40dde0322655fd0a83",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461",
+        "ipados-27.0.1-24A446"
+      ],
+      "catalog_hardware": [
+        "AppleKeyStore ABI"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "e59bac4ad1ac8825919ae94da8440a64d8ab90b3",
+      "reuse": "软件密钥服务、wrap/unwrap、用户态启动依赖",
+      "elden_status": "v123已采用6ff4f11d；bluetoothd越过readRootKeys",
+      "boundary": "仅临时RAM Data的软件状态，identity=1 fixture不提供硬件保护/持久配对",
+      "source_links": [
+        "https://github.com/UniXNU/AppleKeyStoreState/blob/6ff4f11d8fdf853351f8d98e1bbe1373fb8da2e6/NativeKeyStoreEvents.cpp"
+      ],
+      "historical_to_main_counts": "0\t5",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/ArmCpu",
+      "url": "https://github.com/UniXNU/ArmCpu",
+      "priority": "近期",
+      "reviewed_commit": "d90e457b8392623853ec85c860feef546c767621",
+      "default_branch": "main",
+      "local_folder": "ArmCpu",
+      "local_checkout": "d90e457b8392623853ec85c860feef546c767621",
+      "catalog_revision": "93a5030c5d983d0ef90f0fca93879d6e36ad1ba8",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "ARM GICv3",
+        "ARM generic timer"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "1951cc8444b340d7d8879e9418220cf29eb711d7",
+      "reuse": "共享level IRQ、计时器/IPI/idle统计、调度资格检查",
+      "elden_status": "八核在线已验证；保留Elden启动与回程修补",
+      "boundary": "ArmCpu不是板级DVFS驱动；WFI不等于深度PSCI suspend",
+      "source_links": [
+        "https://github.com/UniXNU/ArmCpu/blob/d90e457b8392623853ec85c860feef546c767621/ArmCpu.cpp"
+      ],
+      "historical_to_main_counts": "0\t10",
+      "candidate_commits": [
+        {
+          "commit": "ca5f76394a928e8055afa69af9ae5d183b77bda9",
+          "subject": "feat(irq): support shared level sources and direct SPI dispatch",
+          "url": "https://github.com/UniXNU/ArmCpu/commit/ca5f76394a928e8055afa69af9ae5d183b77bda9"
+        },
+        {
+          "commit": "93a5030c5d983d0ef90f0fca93879d6e36ad1ba8",
+          "subject": "fix(armcpu): gate the Edge matrix on armcpu-edge",
+          "url": "https://github.com/UniXNU/ArmCpu/commit/93a5030c5d983d0ef90f0fca93879d6e36ad1ba8"
+        },
+        {
+          "commit": "eb0f053d87cce95fecf59b18d75a3dbe2176dba1",
+          "subject": "fix(cpu): park a failed secondary in WFI, count long IRQ drains, clear the IPI pending bit",
+          "url": "https://github.com/UniXNU/ArmCpu/commit/eb0f053d87cce95fecf59b18d75a3dbe2176dba1"
+        }
+      ]
+    },
+    {
+      "repository": "UniXNU/ArmDTPlatform",
+      "url": "https://github.com/UniXNU/ArmDTPlatform",
+      "priority": "近期",
+      "reviewed_commit": "e8bd8d5de395c6cbc00d762c1bef57dbd15a448d",
+      "default_branch": "main",
+      "local_folder": "ArmDTPlatform",
+      "local_checkout": "e8bd8d5de395c6cbc00d762c1bef57dbd15a448d",
+      "catalog_revision": "417ff95d6a6e8607ddea9309ec45c3bfd4a67c60",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "ARM64"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "0d544705c2e89725caabc0542bb96bc8febd8c70",
+      "reuse": "平台服务注册、RTC缺失时避免无限等待、板级时钟接口",
+      "elden_status": "历史构建已有；需对照当前clock/RTC接入后选择差量",
+      "boundary": "上游新接口需板级provider；不能伪造RTC或ready",
+      "source_links": [
+        "https://github.com/UniXNU/ArmDTPlatform/blob/e8bd8d5de395c6cbc00d762c1bef57dbd15a448d/ArmDTPlatform.cpp"
+      ],
+      "historical_to_main_counts": "0\t5",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/ArmSmmu4K",
+      "url": "https://github.com/UniXNU/ArmSmmu4K",
+      "priority": "按依赖",
+      "reviewed_commit": "83969cd874503e65997ff7639f7dcf3d0a92cd17",
+      "default_branch": "main",
+      "local_folder": "ArmSmmu4K-night",
+      "local_checkout": "83969cd874503e65997ff7639f7dcf3d0a92cd17",
+      "catalog_revision": "83969cd874503e65997ff7639f7dcf3d0a92cd17",
+      "catalog_os_abi": [],
+      "catalog_hardware": [
+        "ARM SMMU",
+        "MMU-500"
+      ],
+      "catalog_verified_devices": [],
+      "license": "MIT",
+      "historical_v91_commit": null,
+      "reuse": "4K页表、IOVA映射及故障定位的共用算法",
+      "elden_status": "已有独立参考；当前消费版本随GPU/SMMU集成核定",
+      "boundary": "SM8750真实stream/CB/ASID/地址宽度必须由本机确定",
+      "source_links": [
+        "https://github.com/UniXNU/ArmSmmu4K/blob/83969cd874503e65997ff7639f7dcf3d0a92cd17/README.md"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/ArmVirtPlatform",
+      "url": "https://github.com/UniXNU/ArmVirtPlatform",
+      "priority": "不采用",
+      "reviewed_commit": "d1423a8bceac4be0478a93d9173587111c040084",
+      "default_branch": "main",
+      "local_folder": null,
+      "local_checkout": null,
+      "catalog_revision": "d1423a8bceac4be0478a93d9173587111c040084",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "QEMU virt ARM64"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "QEMU virt平台",
+      "elden_status": "不是Y700硬件平台；不克隆",
+      "boundary": "远端README/元数据；本项目不跑QEMU",
+      "source_links": [
+        "https://github.com/UniXNU/ArmVirtPlatform/blob/d1423a8bceac4be0478a93d9173587111c040084/README.md"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/Ath12kWifi",
+      "url": "https://github.com/UniXNU/Ath12kWifi",
+      "priority": "近期",
+      "reviewed_commit": "5f7f5a8a9f02f7ab45ed10a2f226e348c519a838",
+      "default_branch": "main",
+      "local_folder": "Ath12kWifi",
+      "local_checkout": "5f7f5a8a9f02f7ab45ed10a2f226e348c519a838",
+      "catalog_revision": "28de7b91d7a880682b777e0e3564245a99dbc3f5",
+      "catalog_os_abi": [
+        "nw_abi platform interface"
+      ],
+      "catalog_hardware": [
+        "ath12k PCI devices",
+        "qcc2072, qcn9274, and wcn7850 build inputs"
+      ],
+      "catalog_verified_devices": [],
+      "license": null,
+      "historical_v91_commit": null,
+      "reuse": "复用ath12k/MHI/QRTR/MAC及现成用户态链",
+      "elden_status": "125对象及Peach backport已构建；真实WLAN硬件回调未接通",
+      "boundary": "缺的是本机电源/PCIe/BAR/MSI/DMA/MHI边界；源码存在不是网络可用",
+      "source_links": [
+        "https://github.com/UniXNU/Ath12kWifi/blob/5f7f5a8a9f02f7ab45ed10a2f226e348c519a838/include/nw_abi.h"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/DarwinBoot",
+      "url": "https://github.com/UniXNU/DarwinBoot",
+      "priority": "按依赖",
+      "reviewed_commit": "5243c68ec332a227fe3680cd5da6d5a0e127035c",
+      "default_branch": "main",
+      "local_folder": "DarwinBoot",
+      "local_checkout": "5243c68ec332a227fe3680cd5da6d5a0e127035c",
+      "catalog_revision": "3c75734014cdab0acd9541e88057b7606ee7ae08",
+      "catalog_os_abi": [],
+      "catalog_hardware": [
+        "ARM64 UEFI"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "d099354d0eab34df5088ca1ba89c9c88bc3260bb",
+      "reuse": "保留内存区间与loader payload回收契约",
+      "elden_status": "当前已有板级loader和6GiB/独立8GiB分支",
+      "boundary": "最新回收/排除区README明确未实机；须配对XNU改动，不是16GiB开关",
+      "source_links": [
+        "https://github.com/UniXNU/DarwinBoot/blob/5243c68ec332a227fe3680cd5da6d5a0e127035c/README.md"
+      ],
+      "historical_to_main_counts": "0\t9",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/GopFramebuffer",
+      "url": "https://github.com/UniXNU/GopFramebuffer",
+      "priority": "近期",
+      "reviewed_commit": "b0d812d578efa2acb005b66f73168891719af09a",
+      "default_branch": "main",
+      "local_folder": "GopFramebuffer-official",
+      "local_checkout": "b0d812d578efa2acb005b66f73168891719af09a",
+      "catalog_revision": "e47c1b8de169cd2bd0b885c7d85e433010e3cdf2",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461",
+        "ipados-27.0.1-24A446"
+      ],
+      "catalog_hardware": [
+        "UEFI GOP framebuffer"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "8666a9950c9699b368931d18cac92c0fdb2ce9c0",
+      "reuse": "CPU显示拷贝、fence取消/快照、格式和帧耗时统计",
+      "elden_status": "已复用；v105/v106修好拷贝/映射，保留该分支修补",
+      "boundary": "macOS半浮点颜色路径与17白色占位不自动同因",
+      "source_links": [
+        "https://github.com/UniXNU/GopFramebuffer/blob/b0d812d578efa2acb005b66f73168891719af09a/NativeLegacyDisplay.cpp",
+        "https://github.com/UniXNU/GopFramebuffer/blob/b0d812d578efa2acb005b66f73168891719af09a/NativeMobileDisplay.cpp",
+        "https://github.com/UniXNU/GopFramebuffer/blob/b0d812d578efa2acb005b66f73168891719af09a/NativeLegacyRequest.h"
+      ],
+      "historical_to_main_counts": "0\t32",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/QcaBluetooth",
+      "url": "https://github.com/UniXNU/QcaBluetooth",
+      "priority": "近期",
+      "reviewed_commit": "986d6319d1d2819b27ed2c9786776f10bf63cc76",
+      "default_branch": "main",
+      "local_folder": "QcaBluetooth",
+      "local_checkout": "22ff97f93416452335bb61badb14c762da653487",
+      "catalog_revision": "22ff97f93416452335bb61badb14c762da653487",
+      "catalog_os_abi": [
+        "ipados-27.0.1-24A446"
+      ],
+      "catalog_hardware": [
+        "Qualcomm WCN7850 UART controller",
+        "Qualcomm GENI UART"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "原生HCI桥、BlueTool协议、扩展发现与生命周期",
+      "elden_status": "已移植为17/WCN7861路径；v138可持续投递LE扩展报告",
+      "boundary": "sheng27配对证据不可当Elden17验收；最新IBS时钟修补仅host验证",
+      "source_links": [
+        "https://github.com/UniXNU/QcaBluetooth/blob/986d6319d1d2819b27ed2c9786776f10bf63cc76/include/qbt.h",
+        "https://github.com/UniXNU/QcaBluetooth/blob/986d6319d1d2819b27ed2c9786776f10bf63cc76/include/qbt_geni.h",
+        "https://github.com/UniXNU/QcaBluetooth/blob/986d6319d1d2819b27ed2c9786776f10bf63cc76/include/qbt_transport.h",
+        "https://github.com/UniXNU/QcaBluetooth/blob/986d6319d1d2819b27ed2c9786776f10bf63cc76/native-ios27.md"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/QcomBaseband",
+      "url": "https://github.com/UniXNU/QcomBaseband",
+      "priority": "概念参考",
+      "reviewed_commit": "dd0199cf3300764ed52b23f4a47761f91fab21a2",
+      "default_branch": "main",
+      "local_folder": "QcomBaseband",
+      "local_checkout": "dd0199cf3300764ed52b23f4a47761f91fab21a2",
+      "catalog_revision": "dd0199cf3300764ed52b23f4a47761f91fab21a2",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461 AppleBaseband IOUserClient"
+      ],
+      "catalog_hardware": [
+        "Qualcomm QMI over QRTR",
+        "SC7180 IPA v4.2 reference"
+      ],
+      "catalog_verified_devices": [],
+      "license": "BSD-2-Clause",
+      "historical_v91_commit": null,
+      "reuse": "QMI/QRTR异步生命周期与用户客户端边界",
+      "elden_status": "新增独立参考；Y700无蜂窝目标，不接入基带驱动",
+      "boundary": "SC7180 IPA4.2与本机无线芯片/接口不同，禁止抄寄存器",
+      "source_links": [
+        "https://github.com/UniXNU/QcomBaseband/blob/dd0199cf3300764ed52b23f4a47761f91fab21a2/baseband/QcomBaseband.h",
+        "https://github.com/UniXNU/QcomBaseband/blob/dd0199cf3300764ed52b23f4a47761f91fab21a2/UPSTREAM.json"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/QcomDwc3",
+      "url": "https://github.com/UniXNU/QcomDwc3",
+      "priority": "按依赖",
+      "reviewed_commit": "0dd83827279ee070dca7ddb486c90365567cc99d",
+      "default_branch": "main",
+      "local_folder": "QcomDwc3",
+      "local_checkout": "e4efe95c903a737e0f5955e5b50a8fb4d2a7d718",
+      "catalog_revision": "e4efe95c903a737e0f5955e5b50a8fb4d2a7d718",
+      "catalog_os_abi": [
+        "ipados-27.0.1-24A446"
+      ],
+      "catalog_hardware": [
+        "Qualcomm DWC3 USB controller",
+        "Synopsys eUSB2 PHY and PM8550B repeater",
+        "QMP USB3/DP PHY",
+        "PS5169 retimer"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "Apple XDCI/XHCI服务、数据角色、USB收发与PHY初始化方法",
+      "elden_status": "已有参考；Elden的CDC调试/回程独立且已成功",
+      "boundary": "默认27 ABI、单板PHY/SMMU/UCSI；不包含Y700双口选电策略",
+      "source_links": [
+        "https://github.com/UniXNU/QcomDwc3/blob/0dd83827279ee070dca7ddb486c90365567cc99d/QcomDwc3.cpp",
+        "https://github.com/UniXNU/QcomDwc3/blob/0dd83827279ee070dca7ddb486c90365567cc99d/QcomUcsi.h",
+        "https://github.com/UniXNU/QcomDwc3/blob/0dd83827279ee070dca7ddb486c90365567cc99d/QcomEusb2Phy.h",
+        "https://github.com/UniXNU/QcomDwc3/blob/0dd83827279ee070dca7ddb486c90365567cc99d/QcomQmpUsb3.h"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/QcomGeniSpi",
+      "url": "https://github.com/UniXNU/QcomGeniSpi",
+      "priority": "已复用",
+      "reviewed_commit": "eac47baefe6a5d2368a70351e6ad1b6361bedbe2",
+      "default_branch": "main",
+      "local_folder": "QcomGeniSpi",
+      "local_checkout": "eac47baefe6a5d2368a70351e6ad1b6361bedbe2",
+      "catalog_revision": "eac47baefe6a5d2368a70351e6ad1b6361bedbe2",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "Qualcomm GENI SPI"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "b5399b5646c4d7415deec6d887fd51715a97a024",
+      "reuse": "GENI SPI传输与QUP DMA接口",
+      "elden_status": "已有历史组件/触控路径；此次补独立克隆",
+      "boundary": "本机GENI引擎、时钟、IRQ、CS和DMA绑定不可照搬",
+      "source_links": [
+        "https://github.com/UniXNU/QcomGeniSpi/blob/eac47baefe6a5d2368a70351e6ad1b6361bedbe2/GeniSpi.c"
+      ],
+      "historical_to_main_counts": "0\t1",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/RamBlock",
+      "url": "https://github.com/UniXNU/RamBlock",
+      "priority": "近期",
+      "reviewed_commit": "00a6e5dd6bb1709e817e13daec7986308cfb6d0f",
+      "default_branch": "main",
+      "local_folder": "RamBlock",
+      "local_checkout": "00a6e5dd6bb1709e817e13daec7986308cfb6d0f",
+      "catalog_revision": "4be2d7eb05ef5a98126c91e0302c149140c0e3e1",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "RAM block backing"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "d4d22d9819b0162eda49f6402235dddc2279410d",
+      "reuse": "补固态介质属性；后续审查seed回收和持久Data顺序保证",
+      "elden_status": "已用临时Data；匹配源码缺Solid State属性和seed释放",
+      "boundary": "8732b3e/737f6da提交明确未实机；自动格式化/持久布局不在此次范围",
+      "source_links": [
+        "https://github.com/UniXNU/RamBlock/blob/00a6e5dd6bb1709e817e13daec7986308cfb6d0f/NativeRamBlock.cpp",
+        "https://github.com/UniXNU/RamBlock/blob/00a6e5dd6bb1709e817e13daec7986308cfb6d0f/SparseDisk.h",
+        "https://github.com/UniXNU/RamBlock/blob/00a6e5dd6bb1709e817e13daec7986308cfb6d0f/PersistOverlay.h",
+        "https://github.com/UniXNU/RamBlock/blob/00a6e5dd6bb1709e817e13daec7986308cfb6d0f/DirectDisk.h"
+      ],
+      "historical_to_main_counts": "0\t12",
+      "candidate_commits": [
+        {
+          "commit": "8732b3e436a65132ffaa82e8ad3e402aab669e60",
+          "subject": "feat: report the device as solid state",
+          "url": "https://github.com/UniXNU/RamBlock/commit/8732b3e436a65132ffaa82e8ad3e402aab669e60"
+        },
+        {
+          "commit": "737f6dae119ef11990e77dc06bcead945098865e",
+          "subject": "feat: return the packed seed's memory after the import",
+          "url": "https://github.com/UniXNU/RamBlock/commit/737f6dae119ef11990e77dc06bcead945098865e"
+        }
+      ]
+    },
+    {
+      "repository": "UniXNU/ShengHidInput",
+      "url": "https://github.com/UniXNU/ShengHidInput",
+      "priority": "已复用",
+      "reviewed_commit": "114061452959a547aaa08f9ca5aa54033394ca2f",
+      "default_branch": "main",
+      "local_folder": "ShengHidInput",
+      "local_checkout": "114061452959a547aaa08f9ca5aa54033394ca2f",
+      "catalog_revision": "71a40e76daeae1bb4127546f96ffa7339c7a06ff",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "sheng touch event source"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "ba03e5d147452b2166aab7435d219fa10877672b",
+      "reuse": "独立digitizer、报告交付、edge事件及属性引用寿命",
+      "elden_status": "Elden独立digitizer/17 edge路径及v100抬指修复已用",
+      "boundary": "最新arm64e路径编译不等于17/本机验收；保留本机交付失败修复",
+      "source_links": [
+        "https://github.com/UniXNU/ShengHidInput/blob/114061452959a547aaa08f9ca5aa54033394ca2f/NativeHidInput.cpp"
+      ],
+      "historical_to_main_counts": "0\t6",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/ShengNovatekTouch",
+      "url": "https://github.com/UniXNU/ShengNovatekTouch",
+      "priority": "局部复用",
+      "reviewed_commit": "69fdd6223ed2572aa8bd8351e77c53a238276130",
+      "default_branch": "main",
+      "local_folder": "ShengNovatekTouch",
+      "local_checkout": "69fdd6223ed2572aa8bd8351e77c53a238276130",
+      "catalog_revision": "3b44b1b7603eaadae942ea44ddc51bdcc48ad060",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "Novatek NT36532/NT36532E"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "Apache-2.0",
+      "historical_v91_commit": null,
+      "reuse": "触控上报/中断/接触生命周期与故障退出",
+      "elden_status": "本机NT36536点包已工作，AP501U调研独立",
+      "boundary": "上游NT36532E矩阵tracker不同，不替换本机解包或笔通道",
+      "source_links": [
+        "https://github.com/UniXNU/ShengNovatekTouch/blob/69fdd6223ed2572aa8bd8351e77c53a238276130/NvtTouchCore.c"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/ShengPreflight",
+      "url": "https://github.com/UniXNU/ShengPreflight",
+      "priority": "局部复用",
+      "reviewed_commit": "9cfc8d2c8d77f2008ba228fa6eff83d2c7ab7fd2",
+      "default_branch": "main",
+      "local_folder": "ShengPreflight",
+      "local_checkout": "9cfc8d2c8d77f2008ba228fa6eff83d2c7ab7fd2",
+      "catalog_revision": "9cfc8d2c8d77f2008ba228fa6eff83d2c7ab7fd2",
+      "catalog_os_abi": [
+        "UEFI"
+      ],
+      "catalog_hardware": [
+        "Xiaomi Pad 6S Pro"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "UEFI前置资源检查与证据记录模式",
+      "elden_status": "本机已有EldenUfsStage2等资格检查",
+      "boundary": "Xiaomi Pad6S专用前置代码，不直接刷到Lenovo",
+      "source_links": [
+        "https://github.com/UniXNU/ShengPreflight/blob/9cfc8d2c8d77f2008ba228fa6eff83d2c7ab7fd2/ShengPreflight.c"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/ShengUfs",
+      "url": "https://github.com/UniXNU/ShengUfs",
+      "priority": "近期",
+      "reviewed_commit": "b6fe07b307eeddc5e258c9d5d4387b968a55e4e9",
+      "default_branch": "main",
+      "local_folder": "ShengUfs",
+      "local_checkout": "b6fe07b307eeddc5e258c9d5d4387b968a55e4e9",
+      "catalog_revision": "99d8bcd3e43dd24fc3c8437c67b5d4cc71ab94d0",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "SM8550 UFS controller"
+      ],
+      "catalog_verified_devices": [
+        "sheng"
+      ],
+      "license": "BSD-2-Clause",
+      "historical_v91_commit": "af785c1777161a62931425c2faaa536ce0bebd5b",
+      "reuse": "固态属性、IRQ/多槽/直接PRDT、完成等待和认证表缓存",
+      "elden_status": "当前匹配源码仍单槽轮询；主线优化存在真实差距",
+      "boundary": "性能必须本机同负载实测；保留SM8750接管、窗口、回程、写入门",
+      "source_links": [
+        "https://github.com/UniXNU/ShengUfs/blob/b6fe07b307eeddc5e258c9d5d4387b968a55e4e9/NativeUfs.cpp",
+        "https://github.com/UniXNU/ShengUfs/blob/b6fe07b307eeddc5e258c9d5d4387b968a55e4e9/RootQueue.h",
+        "https://github.com/UniXNU/ShengUfs/blob/b6fe07b307eeddc5e258c9d5d4387b968a55e4e9/RootCommands.h",
+        "https://github.com/UniXNU/ShengUfs/blob/b6fe07b307eeddc5e258c9d5d4387b968a55e4e9/RootTransportLayout.h",
+        "https://github.com/UniXNU/ShengUfs/blob/b6fe07b307eeddc5e258c9d5d4387b968a55e4e9/CompletionWait.h",
+        "https://github.com/UniXNU/ShengUfs/blob/b6fe07b307eeddc5e258c9d5d4387b968a55e4e9/VerifiedTableCache.h"
+      ],
+      "historical_to_main_counts": "0\t26",
+      "candidate_commits": [
+        {
+          "commit": "fd420df000f43213d9cd019725abff0849c98c72",
+          "subject": "perf(ufs): match Linux ufshcd queueing, completion and DMA",
+          "url": "https://github.com/UniXNU/ShengUfs/commit/fd420df000f43213d9cd019725abff0849c98c72"
+        },
+        {
+          "commit": "34ff541decbd018906a914aa53d0e732b2c1c3da",
+          "subject": "perf(ufs): spin through short completion waits, show commands in flight",
+          "url": "https://github.com/UniXNU/ShengUfs/commit/34ff541decbd018906a914aa53d0e732b2c1c3da"
+        },
+        {
+          "commit": "57f031c99d7f69ffa611626bebaeab0731e93254",
+          "subject": "perf(ufs): cache verified-root table pages instead of wiring whole tables",
+          "url": "https://github.com/UniXNU/ShengUfs/commit/57f031c99d7f69ffa611626bebaeab0731e93254"
+        },
+        {
+          "commit": "2f6c7b0d48a37ffd54943cf13d6709bf66564045",
+          "subject": "feat(ufs): report the window devices as solid state",
+          "url": "https://github.com/UniXNU/ShengUfs/commit/2f6c7b0d48a37ffd54943cf13d6709bf66564045"
+        },
+        {
+          "commit": "c1ec2b543901542cc7a6a55a51f856b16ed010df",
+          "subject": "perf(ufs): keep the data of a write in the cache after the command",
+          "url": "https://github.com/UniXNU/ShengUfs/commit/c1ec2b543901542cc7a6a55a51f856b16ed010df"
+        }
+      ]
+    },
+    {
+      "repository": "UniXNU/SoftwareAES",
+      "url": "https://github.com/UniXNU/SoftwareAES",
+      "priority": "已复用",
+      "reviewed_commit": "da07dd5c7d62bbe960f5bd4fe7789574d3a49d8c",
+      "default_branch": "main",
+      "local_folder": "SoftwareAES",
+      "local_checkout": "da07dd5c7d62bbe960f5bd4fe7789574d3a49d8c",
+      "catalog_revision": "4a45326da5c2cd6fe6813d79ee43db20805628af",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "XNU AES routines"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "a34964b8c2fec2e83c8e4f68fb7d6fb7e4b2227b",
+      "reuse": "IOAESAccelerator接口与软件AES服务",
+      "elden_status": "现有AES provider已有成功记录，避免重新实现",
+      "boundary": "Darwin26 nonce/ABI扩展不能整体覆盖17；不代表硬件AES",
+      "source_links": [
+        "https://github.com/UniXNU/SoftwareAES/blob/da07dd5c7d62bbe960f5bd4fe7789574d3a49d8c/NativeAES.cpp",
+        "https://github.com/UniXNU/SoftwareAES/blob/da07dd5c7d62bbe960f5bd4fe7789574d3a49d8c/OriginalAESABI.h"
+      ],
+      "historical_to_main_counts": "0\t3",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/uefi-sheng",
+      "url": "https://github.com/UniXNU/uefi-sheng",
+      "priority": "局部复用",
+      "reviewed_commit": "66421cb7bb5694843aec8de1ca3d1de4c20cca38",
+      "default_branch": "sheng",
+      "local_folder": "uefi-sheng",
+      "local_checkout": "66421cb7bb5694843aec8de1ca3d1de4c20cca38",
+      "catalog_revision": null,
+      "catalog_os_abi": [],
+      "catalog_hardware": [],
+      "catalog_verified_devices": [],
+      "license": "BSD-2-Clause",
+      "historical_v91_commit": null,
+      "reuse": "UEFI集成/显示handoff/固件打包方法",
+      "elden_status": "本机固件、签名与回滚floor独立",
+      "boundary": "SM8550设备固件，不是Y700可刷镜像",
+      "source_links": [
+        "https://github.com/UniXNU/uefi-sheng/blob/66421cb7bb5694843aec8de1ca3d1de4c20cca38/README.md"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/UniXNU",
+      "url": "https://github.com/UniXNU/UniXNU",
+      "priority": "总入口",
+      "reviewed_commit": "0c1bac3d51a3009dca1708b15a5198f4b43d057a",
+      "default_branch": "main",
+      "local_folder": "UniXNU-official",
+      "local_checkout": "0c1bac3d51a3009dca1708b15a5198f4b43d057a",
+      "catalog_revision": null,
+      "catalog_os_abi": [],
+      "catalog_hardware": [],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "73a793d20f7dd9d36f3dc05f63ecf6c30dd45c7c",
+      "reuse": "官方指南、component catalog、OS ABI、构建/补丁/发布规范",
+      "elden_status": "现有clean-build已独立重建；以当前正式输入为准",
+      "boundary": "目录revision、默认分支HEAD、Elden消费版本三者分开；指南不是所有driver的实机证明",
+      "source_links": [
+        "https://github.com/UniXNU/UniXNU/blob/0c1bac3d51a3009dca1708b15a5198f4b43d057a/components.toml",
+        "https://github.com/UniXNU/UniXNU/blob/0c1bac3d51a3009dca1708b15a5198f4b43d057a/docs/porting/steps.md",
+        "https://github.com/UniXNU/UniXNU/blob/0c1bac3d51a3009dca1708b15a5198f4b43d057a/docs/porting/drivers.md",
+        "https://github.com/UniXNU/UniXNU/blob/0c1bac3d51a3009dca1708b15a5198f4b43d057a/docs/porting/ufs.md"
+      ],
+      "historical_to_main_counts": "0\t633",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/UniXNU-sheng",
+      "url": "https://github.com/UniXNU/UniXNU-sheng",
+      "priority": "总入口",
+      "reviewed_commit": "5ae8b4876a378a5104330a5ae514ec9d6deae373",
+      "default_branch": "main",
+      "local_folder": "UniXNU-sheng",
+      "local_checkout": "5ae8b4876a378a5104330a5ae514ec9d6deae373",
+      "catalog_revision": null,
+      "catalog_os_abi": [],
+      "catalog_hardware": [],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "板级集成、CPU governor、时钟、HID、背光、UFS测试方法",
+      "elden_status": "已广泛复用；本轮继续核package内未拆独立仓的实现",
+      "boundary": "SM8550 EPSS/3域、充电/PMGR不直接套SM8750；PMGR若干方法仍主动拒绝",
+      "source_links": [
+        "https://github.com/UniXNU/UniXNU-sheng/blob/5ae8b4876a378a5104330a5ae514ec9d6deae373/package/CpuFreqProbe.cpp",
+        "https://github.com/UniXNU/UniXNU-sheng/blob/5ae8b4876a378a5104330a5ae514ec9d6deae373/package/BoardClock.cpp",
+        "https://github.com/UniXNU/UniXNU-sheng/blob/5ae8b4876a378a5104330a5ae514ec9d6deae373/package/HidInputProbe.cpp",
+        "https://github.com/UniXNU/UniXNU-sheng/blob/5ae8b4876a378a5104330a5ae514ec9d6deae373/package/ShengPlatformPower.cpp",
+        "https://github.com/UniXNU/UniXNU-sheng/blob/5ae8b4876a378a5104330a5ae514ec9d6deae373/scripts/compare-ufsbench.py"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": [
+        {
+          "commit": "1e3c3ae02aee4c6402a5f89cfaeb9cb139331c16",
+          "subject": "fix(input): Retain digitizer properties during concurrent updates",
+          "url": "https://github.com/UniXNU/UniXNU-sheng/commit/1e3c3ae02aee4c6402a5f89cfaeb9cb139331c16"
+        }
+      ]
+    },
+    {
+      "repository": "UniXNU/UniXNU-sm8550-common",
+      "url": "https://github.com/UniXNU/UniXNU-sm8550-common",
+      "priority": "局部复用",
+      "reviewed_commit": "2dc650ca76ae38715cd0712e60a44b14fe251745",
+      "default_branch": "main",
+      "local_folder": "UniXNU-sm8550-common",
+      "local_checkout": "2dc650ca76ae38715cd0712e60a44b14fe251745",
+      "catalog_revision": "a9f45dc60c035084b95463781538380f4c3606c9",
+      "catalog_os_abi": [],
+      "catalog_hardware": [
+        "Qualcomm SM8550"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "资源ownership、QUP/SMMU、GENI时钟与SoC分层结构",
+      "elden_status": "已有参考；为SM8750层提供接口设计模板",
+      "boundary": "明示SM8550/SM8550 DTS，不是本机寄存器事实来源",
+      "source_links": [
+        "https://github.com/UniXNU/UniXNU-sm8550-common/blob/2dc650ca76ae38715cd0712e60a44b14fe251745/soc.toml",
+        "https://github.com/UniXNU/UniXNU-sm8550-common/blob/2dc650ca76ae38715cd0712e60a44b14fe251745/README.md"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/VerifiedRoot",
+      "url": "https://github.com/UniXNU/VerifiedRoot",
+      "priority": "已复用",
+      "reviewed_commit": "974f043d0c71ba2e60331483a41c6c6d35274ee3",
+      "default_branch": "main",
+      "local_folder": "VerifiedRoot",
+      "local_checkout": "974f043d0c71ba2e60331483a41c6c6d35274ee3",
+      "catalog_revision": "974f043d0c71ba2e60331483a41c6c6d35274ee3",
+      "catalog_os_abi": [],
+      "catalog_hardware": [],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "认证块读取与根哈希/策略契约",
+      "elden_status": "根卷校验链已工作；与UFS表缓存一起核对",
+      "boundary": "优化不能跳过哈希或以未验证缓存冒充已认证数据",
+      "source_links": [
+        "https://github.com/UniXNU/VerifiedRoot/blob/974f043d0c71ba2e60331483a41c6c6d35274ee3/README.md"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/VirtioMmioBlock",
+      "url": "https://github.com/UniXNU/VirtioMmioBlock",
+      "priority": "不采用",
+      "reviewed_commit": "4e1013eb8c45077b57f8d38d61b389fe899ea1c3",
+      "default_branch": "main",
+      "local_folder": "VirtioMmioBlock",
+      "local_checkout": "4e1013eb8c45077b57f8d38d61b389fe899ea1c3",
+      "catalog_revision": "4e1013eb8c45077b57f8d38d61b389fe899ea1c3",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "VirtIO 1.2 modern MMIO split queues"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "98909eb9198a4360d7a43be831887cb8b74d814d",
+      "reuse": "虚拟只读块设备及协议结构参考",
+      "elden_status": "此次克隆只为完整审查，不进入Y700配置",
+      "boundary": "QEMU传输，不是物理UFS优化；无QEMU测试",
+      "source_links": [
+        "https://github.com/UniXNU/VirtioMmioBlock/blob/4e1013eb8c45077b57f8d38d61b389fe899ea1c3/NativeVirtioBlock.cpp"
+      ],
+      "historical_to_main_counts": "0\t2",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/VirtioMmioConsole",
+      "url": "https://github.com/UniXNU/VirtioMmioConsole",
+      "priority": "不采用",
+      "reviewed_commit": "70253216890b2afcaa6333948726f896f84fc757",
+      "default_branch": "main",
+      "local_folder": "VirtioMmioConsole",
+      "local_checkout": "70253216890b2afcaa6333948726f896f84fc757",
+      "catalog_revision": "70253216890b2afcaa6333948726f896f84fc757",
+      "catalog_os_abi": [
+        "ipados-17.7.11-21H461"
+      ],
+      "catalog_hardware": [
+        "VirtIO 1.2 modern MMIO split queues"
+      ],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": "066f9bded311233ed56824e13a5628077619efda",
+      "reuse": "虚拟控制台及协议结构参考",
+      "elden_status": "此次克隆只为完整审查，不进入Y700配置",
+      "boundary": "QEMU传输，不替代已验证USB CDC回程；无QEMU测试",
+      "source_links": [
+        "https://github.com/UniXNU/VirtioMmioConsole/blob/70253216890b2afcaa6333948726f896f84fc757/NativeVirtioConsole.cpp"
+      ],
+      "historical_to_main_counts": "0\t1",
+      "candidate_commits": []
+    },
+    {
+      "repository": "UniXNU/XnuPrelink",
+      "url": "https://github.com/UniXNU/XnuPrelink",
+      "priority": "工具复用",
+      "reviewed_commit": "440589b0c31625f17edf363e24b3c82c51c70bb9",
+      "default_branch": "main",
+      "local_folder": "XnuPrelink",
+      "local_checkout": "440589b0c31625f17edf363e24b3c82c51c70bb9",
+      "catalog_revision": "c645d76bb0ab8c506a76840ddf93a2276d419a0e",
+      "catalog_os_abi": [],
+      "catalog_hardware": [],
+      "catalog_verified_devices": [],
+      "license": "NOASSERTION",
+      "historical_v91_commit": null,
+      "reuse": "准确ABI匹配、原生/原厂符号绑定、fileset布局和碰撞拒绝",
+      "elden_status": "已有固定17 prelink输入；此次补独立克隆",
+      "boundary": "最新大量27/macOS fileset修补，不能拿缺失map强放行或换27地址",
+      "source_links": [
+        "https://github.com/UniXNU/XnuPrelink/blob/440589b0c31625f17edf363e24b3c82c51c70bb9/emit_prelink.py",
+        "https://github.com/UniXNU/XnuPrelink/blob/440589b0c31625f17edf363e24b3c82c51c70bb9/native_prelink.py"
+      ],
+      "historical_to_main_counts": null,
+      "candidate_commits": []
+    }
+  ]
+}

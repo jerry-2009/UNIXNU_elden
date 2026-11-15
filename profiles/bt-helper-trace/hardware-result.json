@@ -1,0 +1,165 @@
+{
+  "candidate": "v129",
+  "image_sha256": "bdbf8db59c6e741aaeaebb878c354f24566cd966e2a530f08bf1cdccde8db7ef",
+  "session": "fe9c51f948ea4aaa",
+  "bytes": 109448,
+  "raw_sha256": "4e4c097001e6cee336fb4172857be43e9c6512e1326a3421a3718d969b0ea40b",
+  "max_reported_drop": 0,
+  "discontinuities": [],
+  "helper_phases": [
+    {
+      "pid": 136,
+      "phase": 1,
+      "script": 1,
+      "result": 0,
+      "state": 0,
+      "identity": 0
+    },
+    {
+      "pid": 136,
+      "phase": 2,
+      "script": 1,
+      "result": 0,
+      "state": 2,
+      "identity": 0
+    },
+    {
+      "pid": 136,
+      "phase": 3,
+      "script": 1,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 4,
+      "script": 1,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 5,
+      "script": 1,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 6,
+      "script": 1,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 7,
+      "script": 1,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 8,
+      "script": 1,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 1,
+      "script": 2,
+      "result": 0,
+      "state": 0,
+      "identity": 0
+    },
+    {
+      "pid": 136,
+      "phase": 2,
+      "script": 2,
+      "result": 0,
+      "state": 2,
+      "identity": 0
+    },
+    {
+      "pid": 136,
+      "phase": 3,
+      "script": 2,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 4,
+      "script": 2,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 5,
+      "script": 2,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 6,
+      "script": 2,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 7,
+      "script": 2,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    },
+    {
+      "pid": 136,
+      "phase": 8,
+      "script": 2,
+      "result": 0,
+      "state": 2,
+      "identity": 1
+    }
+  ],
+  "native_lines": [
+    "ELDEN_BT_PHASE bootstrap-enter call=1 write=0",
+    "ELDEN_BT_PHASE bootstrap-snapshot call=1 state=2",
+    "ELDEN_BT_PHASE bootstrap-return call=1 result=0",
+    "ELDEN_BT_PHASE bootstrap-enter call=2 write=0",
+    "ELDEN_BT_PHASE bootstrap-snapshot call=2 state=2",
+    "ELDEN_BT_PHASE bootstrap-return call=2 result=0",
+    "ELDEN_BT_PHASE connect-enter call=1",
+    "ELDEN_BT_PHASE connect-identity call=1 pid=79",
+    "ELDEN_BT_PHASE connect-reference call=1",
+    "ELDEN_BT_PHASE connect-bridge call=1",
+    "[bt] client connected pid=79 unit=1",
+    "ELDEN_BT_PHASE connect-result call=1 result=0"
+  ],
+  "helper_boot_init_reply_calls_completed": true,
+  "h4_connect_callback_returned_zero": true,
+  "h4_command_traffic_verified": false,
+  "explicit_sync_return": false,
+  "fastboot_observed": true,
+  "reset_cause_unknown": false,
+  "recovery_complete": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "next": "Fix the persistent proc_find reference retained by NativeHost.connect; keep callback-local references and PID/uniqueid/unit identity.",
+  "panic": "Unexpected non zero uu_proc_refcount = 1 @kern_proc.c:500",
+  "panic_wait_seconds": 180,
+  "psci_reset_observed": true
+}

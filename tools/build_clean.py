@@ -23,6 +23,25 @@ def main():
     p.add_argument('--bt-transport-trace',action='store_true',help='Bounded bootstrap sysctl and H4 callback phase logs')
     p.add_argument('--bt-syscall-trace',action='store_true',help='Bounded original-bluetoothd socket and controller-query phases')
     p.add_argument('--bluetool-lifecycle',action='store_true',help='Build and stage the signed BlueTool launchd lifecycle cache')
+    p.add_argument('--bt-registry',action='store_true',help='Publish matching Bluetooth DeviceTree/platform-service properties')
+    p.add_argument('--bt-helper-trace',action='store_true',help='Observe typed script/result/reply stages in the owned BlueTool')
+    p.add_argument('--bt-process-lifetime',action='store_true',help='Keep H4 process references local to each callback')
+    p.add_argument('--charge-verification',action='store_true',help='Require fresh charging readback and bound verification waits on the current address baseline')
+    p.add_argument('--charge-window-handoff',action='store_true',help='Include verification and return from bypass to OEM automatic charging windows')
+    p.add_argument('--spmi-translation-survey',action='store_true',help='Include window handoff and compare SPMI page read/write translation without FIFO access')
+    p.add_argument('--backlight-service',action='store_true',help='Enable the qualified native brightness service on the window-handoff baseline')
+    p.add_argument('--backlight-power-trial',action='store_true',help='Bounded baseline/dim/restore power observation; separate from brightness service use')
+    p.add_argument('--pd-power-trial',action='store_true',help='Require confirmed legacy PD handoff before the bounded brightness observation')
+    p.add_argument('--pd-gui',action='store_true',help='Build the same PD integration kernel but select the normal GUI brightness service')
+    p.add_argument('--cpu-power-observation',action='store_true',help='Read-only eight-core load/PERF observation with normal GUI and confirmed PD')
+    p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
+    p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
+    p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')
+    p.add_argument('--bt-scan-observe17',action='store_true',help='Read native supported commands and scan flags at initialization completion')
+    p.add_argument('--bt-scan-ready17',action='store_true',help='Republish supported extended scan flags after HCI completion; includes scan17')
+    p.add_argument('--bt-scan17',action='store_true',help='Native17 standard extended scanning from real controller support; includes complete17')
+    p.add_argument('--bt-complete17',action='store_true',help='Use real HCI support bits and the native completion result; includes optional17 callbacks')
+    p.add_argument('--bt-optional17',action='store_true',help='Allow native17 initialization without three optional HCI features')
     p.add_argument('--jobs',type=int,choices=range(1,9),default=4)
     p.add_argument('--resume',action='store_true',help='Resume completed stages of this exact source/input run')
     a=p.parse_args()
@@ -32,6 +51,25 @@ def main():
     if a.bt_transport_trace and not a.bluetool_launch:raise ValueError('--bt-transport-trace requires --bluetool-launch')
     if a.bt_syscall_trace and not a.bt_transport_trace:raise ValueError('--bt-syscall-trace requires --bt-transport-trace')
     if a.bluetool_lifecycle and (not a.bt_transport_trace or a.bt_syscall_trace):raise ValueError('--bluetool-lifecycle requires transport trace without syscall trace')
+    if a.bt_registry and not a.bluetool_lifecycle:raise ValueError('--bt-registry requires --bluetool-lifecycle')
+    if a.bt_helper_trace and not a.bt_registry:raise ValueError('--bt-helper-trace requires --bt-registry')
+    if a.bt_process_lifetime and not a.bt_helper_trace:raise ValueError('--bt-process-lifetime requires --bt-helper-trace')
+    if a.bt_optional17 and not a.bt_process_lifetime:raise ValueError('--bt-optional17 requires --bt-process-lifetime')
+    if a.bt_complete17 and (not a.bt_process_lifetime or a.bt_optional17):raise ValueError('--bt-complete17 requires --bt-process-lifetime without --bt-optional17')
+    if a.bt_scan17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17):raise ValueError('--bt-scan17 requires --bt-process-lifetime without --bt-optional17/--bt-complete17')
+    if a.bt_scan_ready17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17):raise ValueError('--bt-scan-ready17 requires --bt-process-lifetime without other native17 options')
+    if a.bt_scan_observe17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17):raise ValueError('--bt-scan-observe17 requires --bt-process-lifetime without other native17 options')
+    if a.bt_scan_roles17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17):raise ValueError('--bt-scan-roles17 requires --bt-process-lifetime without other native17 options')
+    if a.bt_discovery17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17):raise ValueError('--bt-discovery17 requires --bt-process-lifetime without other native17 options')
+    if a.bt_address17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17 or a.bt_discovery17):raise ValueError('--bt-address17 requires --bt-process-lifetime without other native17 options')
+    if a.cpu_power_observation and a.pd_gui:raise ValueError('CPU observation already selects GUI; omit --pd-gui')
+    if a.pd_gui or a.cpu_power_observation:a.pd_power_trial=True
+    if a.pd_power_trial:a.backlight_power_trial=True
+    if a.backlight_power_trial:a.backlight_service=True
+    if a.backlight_service and a.spmi_translation_survey:raise ValueError('Use separate backlight and translation variants')
+    if a.spmi_translation_survey or a.backlight_service:a.charge_window_handoff=True
+    if a.charge_window_handoff:a.charge_verification=True
+    if a.charge_verification and not a.bt_address17:raise ValueError('--charge-verification currently requires the qualified --bt-address17 baseline')
     if sys.platform!='darwin':raise SystemExit('Native build requires macOS with Xcode/iPhoneOS SDK. Windows/WSL can inspect sources and flash separately.')
     config=a.inputs.resolve();data=read(config);out=a.output.resolve()
     def input_path(name):
@@ -57,6 +95,25 @@ def main():
     identity['bt_transport_trace']=a.bt_transport_trace
     identity['bt_syscall_trace']=a.bt_syscall_trace
     identity['bluetool_lifecycle']=a.bluetool_lifecycle
+    identity['bt_registry']=a.bt_registry
+    identity['bt_helper_trace']=a.bt_helper_trace
+    identity['bt_process_lifetime']=a.bt_process_lifetime
+    identity['bt_optional17']=a.bt_optional17
+    identity['bt_complete17']=a.bt_complete17
+    identity['bt_scan17']=a.bt_scan17
+    identity['bt_scan_ready17']=a.bt_scan_ready17
+    identity['bt_scan_observe17']=a.bt_scan_observe17
+    identity['bt_scan_roles17']=a.bt_scan_roles17
+    identity['bt_discovery17']=a.bt_discovery17
+    identity['bt_address17']=a.bt_address17
+    identity['charge_window_handoff']=a.charge_window_handoff
+    identity['spmi_translation_survey']=a.spmi_translation_survey
+    identity['backlight_service']=a.backlight_service
+    identity['backlight_power_trial']=a.backlight_power_trial
+    identity['pd_power_trial']=a.pd_power_trial
+    identity['pd_gui']=a.pd_gui
+    identity['cpu_power_observation']=a.cpu_power_observation
+    identity['charge_verification']=a.charge_verification
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
         if not a.resume or not journal.exists():raise ValueError('Use a new output, or explicitly resume this run')
@@ -119,6 +176,65 @@ def main():
         stage('bluetool-cache',script('build_bluetool_job_cache.py','--os-image',inputs['os_image'],'--trust-cache',runtime_folder/'runtime.trustcache','--output',out/'bluetool-cache'),'bluetool-cache/result.json')
         stage('bluetool-lifecycle',script('build_bluetool_lifecycle.py','--clean-build',out,'--transport-build',out/'bt-transport-trace','--cache-build',out/'bluetool-cache','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bluetool-lifecycle'),'bluetool-lifecycle/result.json')
         kernel_folder=out/'bluetool-lifecycle';runtime_folder=kernel_folder/'runtime'
+    if a.bt_registry:
+        stage('bt-registry',script('build_bt_registry.py','--clean-build',out,'--lifecycle-build',out/'bluetool-lifecycle','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-registry'),'bt-registry/result.json')
+        kernel_folder=out/'bt-registry';runtime_folder=kernel_folder/'runtime'
+    if a.bt_helper_trace:
+        stage('helper-userland',script('build_bluetool_trace.py','--output',out/'helper-userland'),'helper-userland/result.json')
+        stage('bt-helper-trace',script('build_bt_helper_trace.py','--clean-build',out,'--registry-build',out/'bt-registry','--helper-build',out/'helper-userland','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-helper-trace'),'bt-helper-trace/result.json')
+        kernel_folder=out/'bt-helper-trace';runtime_folder=kernel_folder/'runtime'
+    if a.bt_process_lifetime:
+        stage('bt-process-lifetime',script('build_bt_process_lifetime.py','--clean-build',out,'--helper-trace-build',out/'bt-helper-trace','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-process-lifetime'),'bt-process-lifetime/result.json')
+        kernel_folder=out/'bt-process-lifetime';runtime_folder=kernel_folder/'runtime'
+    if a.bt_optional17:
+        stage('bt-optional-runtime',script('prepare_bt_optional17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-optional-runtime'),'bt-optional-runtime/result.json')
+        stage('bt-optional17',script('build_bt_optional17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--optional-runtime',out/'bt-optional-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-optional17'),'bt-optional17/result.json')
+        kernel_folder=out/'bt-optional17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_complete17:
+        stage('bt-complete-runtime',script('prepare_bt_complete17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-complete-runtime'),'bt-complete-runtime/result.json')
+        stage('bt-complete17',script('build_bt_complete17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--complete-runtime',out/'bt-complete-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-complete17'),'bt-complete17/result.json')
+        kernel_folder=out/'bt-complete17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_scan17:
+        stage('bt-scan-runtime',script('prepare_bt_scan17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-scan-runtime'),'bt-scan-runtime/result.json')
+        stage('bt-scan17',script('build_bt_scan17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-scan-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-scan17'),'bt-scan17/result.json')
+        kernel_folder=out/'bt-scan17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_scan_ready17:
+        stage('bt-scan-ready-runtime',script('prepare_bt_scan_ready17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-scan-ready-runtime'),'bt-scan-ready-runtime/result.json')
+        stage('bt-scan-ready17',script('build_bt_scan_ready17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-scan-ready-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-scan-ready17'),'bt-scan-ready17/result.json')
+        kernel_folder=out/'bt-scan-ready17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_scan_observe17:
+        stage('bt-scan-observe-runtime',script('prepare_bt_scan_observe17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-scan-observe-runtime'),'bt-scan-observe-runtime/result.json')
+        stage('bt-scan-observe17',script('build_bt_scan_observe17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-scan-observe-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-scan-observe17'),'bt-scan-observe17/result.json')
+        kernel_folder=out/'bt-scan-observe17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_scan_roles17:
+        stage('bt-scan-roles-runtime',script('prepare_bt_scan_roles17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-scan-roles-runtime'),'bt-scan-roles-runtime/result.json')
+        stage('bt-scan-roles17',script('build_bt_scan_roles17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-scan-roles-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-scan-roles17'),'bt-scan-roles17/result.json')
+        kernel_folder=out/'bt-scan-roles17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_discovery17:
+        stage('bt-discovery-runtime',script('prepare_bt_discovery17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-discovery-runtime'),'bt-discovery-runtime/result.json')
+        stage('bt-discovery17',script('build_bt_discovery17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-discovery-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-discovery17'),'bt-discovery17/result.json')
+        kernel_folder=out/'bt-discovery17';runtime_folder=kernel_folder/'runtime'
+    if a.bt_address17:
+        stage('bt-address-runtime',script('prepare_bt_address17.py','--os-image',inputs['os_image'],'--runtime',runtime_folder,'--output',out/'bt-address-runtime'),'bt-address-runtime/result.json')
+        stage('bt-address17',script('build_bt_address17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-address-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-address17'),'bt-address17/result.json')
+        kernel_folder=out/'bt-address17';runtime_folder=kernel_folder/'runtime'
+    if a.charge_verification:
+        charge_name='charge-window-handoff' if a.charge_window_handoff else 'charge-verification'
+        charge_args=['--window-handoff'] if a.charge_window_handoff else []
+        if a.spmi_translation_survey:charge_name='spmi-translation-survey';charge_args+=['--translation-survey']
+        stage(charge_name,script('build_charge_verification.py','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/charge_name,*charge_args),charge_name+'/result.json')
+        kernel_folder=out/charge_name;runtime_folder=kernel_folder/'runtime'
+    if a.backlight_service:
+        backlight_name='backlight-power-trial' if a.backlight_power_trial else 'backlight-service'
+        backlight_args=['--backlight-power-trial'] if a.backlight_power_trial else []
+        stage(backlight_name,script('build_charge_verification.py','--backlight-service',*backlight_args,'--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/backlight_name),backlight_name+'/result.json')
+        kernel_folder=out/backlight_name;runtime_folder=kernel_folder/'runtime'
+    if a.pd_power_trial:
+        stage('pd-power-trial',script('build_charge_verification.py','--pd-power-trial','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'pd-power-trial'),'pd-power-trial/result.json')
+        kernel_folder=out/'pd-power-trial';runtime_folder=kernel_folder/'runtime'
+    if a.cpu_power_observation:
+        stage('cpu-power-observation',script('build_charge_verification.py','--cpu-power-observation','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'cpu-power-observation'),'cpu-power-observation/result.json')
+        kernel_folder=out/'cpu-power-observation';runtime_folder=kernel_folder/'runtime'
     if a.target=='boot':
         stage('firmware',script('build_v91_firmware.py','--mu-root',inputs['mu_repository'],'--unixnu-root',inputs['unixnu_repository'],'--crypto-path',inputs['crypto'],'--llvm',inputs['llvm'],'--output',out/'firmware','--jobs',a.jobs),'firmware/result.json')
         stage('loader',script('build_v91_payload_loader.py','--mu-root',out/'firmware/project/third_party/mu_wide_platforms','--unixnu-root',out/'firmware/project/third_party/UniXNU','--llvm',inputs['llvm'],'--output',out/'loader'),'loader/result.json')
@@ -126,6 +242,7 @@ def main():
         ep={'candidate_sha256':read(kernel_folder/'result.json')['kernel_sha256'],'original_executable_sha256':read(ROOT/'profiles/v91/image-build/plan.json')['prelink']['original_executable_sha256']};(out/'entry-plan.json').write_text(json.dumps(ep,indent=2)+'\n')
         stage('entry',script('prepare_v91_entry.py','--kernel',kernel_folder/'kernel.macho','--plan',out/'entry-plan.json','--clang',inputs['llvm']/'clang','--output',out/'entry'),'entry/result.json')
         variant_args=['--wcn-report',kernel_folder/'result.json','--bt-runtime',runtime_folder] if a.variant=='bluetooth' else ['--hid-report',kernel_folder/'result.json']
+        if a.pd_gui:variant_args+=['--pd-gui']
         stage('boot',script('build_v91_boot.py','--portable-fat','--kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--fd',out/'firmware/UEFI.fd','--loader',out/'loader/EldenPayloadLoader.efi','--data',out/'data/data.packed','--data-report',out/'data/result.json','--library',out/'icon/EldenIconCpuMode.dylib','--agent',out/'agent/iconservicesagent','--stock-boot',inputs['stock_boot'],'--avbtool',inputs['avbtool'],'--key',inputs['signing_key'],'--clang',inputs['llvm']/'clang',*variant_args,'--output',out/'boot'),'boot/result.json')
         stage('boot-audit',script('audit_v91_boot.py','--image',out/'boot/boot-signed.img','--entry-kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--stock-boot',inputs['stock_boot'],'--parent-vbmeta',inputs['parent_vbmeta'],'--data-report',out/'data/result.json',*variant_args,'--output',out/'boot/audit.json'),'boot/audit.json')
     state['complete']=True;save();print('Completed '+a.target+'; no device operation performed',flush=True)

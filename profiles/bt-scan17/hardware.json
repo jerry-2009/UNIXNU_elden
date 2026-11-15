@@ -1,0 +1,33 @@
+{
+  "trial": "v133",
+  "bytes": 1172265,
+  "raw_sha256": "f6f8d7218fbf5686530a29325f8de3fb71509fc760beeee24812eb1115a4b355",
+  "raw_log": "edl_work/live-scan-v133-20261115/usb/20261114-213148.bin",
+  "dropped": 50,
+  "discontinuities": [],
+  "recovery_complete": true,
+  "explicit_sync_return": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_boot_completed": true,
+  "sleep_requested": true,
+  "key_lines": [
+    "ELDEN_BT_NATIVE_INIT pid=79 result=0 accepted=1",
+    "[bt] controller refused opcode=0x2007 status=0xc",
+    "[bt] controller refused opcode=0x200b status=0xc",
+    "ELDEN_BT_EXIT_STACK pid=79 pc=1db2165f0 lr=100676bd4 fp=16faa66b0 syscall=1",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=0 return=100a8f250",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=1 return=1005c7904",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=2 return=19f039c9c",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=3 return=19f03acc0",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=4 return=19f0168f8",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=5 return=19f017374",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=6 return=19f020a34",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=7 return=19f020338",
+    "[bt] client gone ready=1 failed_starts=0",
+    "ELDEN_BT_HOST live client=0 ready=1 out=50 up=49 bad=0 pending=0",
+    "ELDEN_BT_HOST live client=0 ready=1 out=50 up=49 bad=0 pending=0"
+  ],
+  "scanning_verified": false,
+  "pairing_verified": false,
+  "scan_timing_hypothesis_pending": true
+}

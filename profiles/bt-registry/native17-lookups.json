@@ -1,0 +1,14 @@
+{
+  "original_daemon_sha256": "3f1e4493ea6a76976625f7af58a8f330c0c90d82d9020b11110b4f3f5b758df4",
+  "matching_function": "0x10009abc0",
+  "marconi_call": "0x100099c10",
+  "fallback_test": "0x100099c14",
+  "bluetooth_call": "0x100099c20",
+  "success_message": "0x10077dd0f",
+  "lookup": "IOServiceNameMatching -> IOServiceGetMatchingService -> IORegistryEntrySearchCFProperty(IODeviceTree)",
+  "speed_cfstring": "0x1008f9918",
+  "encoding_cfstring": "0x1008f9938",
+  "result": "marconi warning is first failed lookup; subsequent bluetooth address success is not a global discovery failure. No marconi alias needed.",
+  "wait_sampler": "Existing EldenUserWaitProbe first delay120s is later than observed log stop; do not enable unchanged as next diagnostic.",
+  "next": "Observe typed script/result/reply stages of the owned BlueTool; current logs show only kernel status read, not script or XPC reply completion."
+}

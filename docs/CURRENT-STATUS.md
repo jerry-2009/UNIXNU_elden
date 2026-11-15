@@ -1,5 +1,97 @@
 # 当前状态 · 2026-11-14
 
+v145（11月15日）菜单级GUI整合通过：完整复用v144内核/入口/运行资产，只将ebl5改6。
+PD与系统背光共存，软件Home进入SpringBoard、四帧CRC/视觉核对通过，原亮度/Android
+均恢复。画面仍有占位组件；默认亮度2048尾10样本中位−177.5mA，日用净充尚未完成。
+详profiles/pd-gui；没有把软件输入或同核GUI整合当完整实指/充电/图形验收。
+
+v144（11月15日）完成当前组合的9V启动/ICL0暂停/500mA恢复，随后才做背光对照。
+半原始亮度码798的九份完整后过渡样本均支持净充电，中位+190mA；原亮度1597两段
+均近零。仍非峰值快充/长时/全周期证明。1281918B/drop26，无重连；同步回程和完整
+stock/Android设置恢复通过。详profiles/pd-power-trial；普通GUI候选仍v142，Goal未完成。
+
+v143（11月15日）完成原亮度/减半/恢复的45秒分段采样，排除前六周期后10/9/10样本，
+电池电流中位−480.5/−212/−368.5mA，仍全部放电；原亮度两段存在负载漂移。
+背光及Android均完整恢复。短边PD合同5V3A不代表实际取15W；后续核现有9V启动流程
+为何未接入当前配置。日用仍v142，v143是后端试验。Wi-Fi仍未通，蓝牙未完成配对/重连验收。
+
+v142（11月15日）将已验原生背光服务接回v140基线：仅短参数fallback，一对象重编，
+原亮度/保护/恢复代码不变；系统请求2048/硬件回读2048，退出恢复1597并释放成功。
+1144721B/drop0，同步回程/全SHA恢复stock/Android设置一致并熄屏。手动滑块和净充电未验。
+47仓参考同步完成，Sheng仅新增充电源码归属说明，Armada新增方向/触控同步与功耗源码归属；
+候选未自动换输入，两个既有远端缺失保留。详profiles/backlight-service及工作台reference-reviews。
+
+v141（11月15日）只读AT检查：SDAM/ADC/DC读写翻译均匹配预期PA，DC为0xc7c1010，
+PAR属性一致。无FIFO访问，不能证明总线写可用，旧异常尚未精确定因；第二SID7是GLINK
+debug proxy。171487B/drop1，同步回fastboot/全SHA恢复stock及Android设置一致并熄屏。
+详profiles/spmi-translation-survey；诊断不是日用默认，后续仍用v140，充电缺口保持。
+
+11月15日补充更正：v140原测试模型把普通/EU窗口标签反置，现已按setter/原字符串确认
+普通29优先、续充比例31仅影响EU分支、SOC截断整数；59处核对及新18/原146检查通过。
+实际v140两驱动源未变，无新镜像或刷机，原实机交接记录保留。详CHARGING-STATUS.md。
+
+v140（11月15日）修复旁路→自动窗口高SOC时不释放手动停充标志，以及主机用手动停充
+模拟窗口上限的问题。27处原厂指令/表检查，旧7/新11场景与原146项ASan/UBSan通过。
+两PMIC对象/整核/Apple30/entry/AVB过；一次旁路→80%→旁路→40–60%→原厂实机完成代次1..5。
+两次退出均实际SET28=1/ACK，固件仍保持上限停充；原厂窗口/许可恢复。同步回fastboot/
+全SHA stock恢复及Android/root/green/boot完成，刷前后设置一致并熄屏。详profiles/charge-window-handoff。
+低SOC续充/完整周期、双口净取电仍欠；没有把本轮模式转换当全充电完成。所有本轮设备任务已结束。
+
+v139充电确认层已修复：拒绝过期/旧策略轮次回读，ACK后等待有30秒预算，遥测失效不再
+继续标为可用。原实际函数复现缺口，修复及146项正常模式检查通过；冻结6c7fbcb客户端
+保留旧DC试验排除，2 PMIC对象重编/Apple30/entry/AVB通过。一次旁路→原厂实机确认通过，
+代次0→1→2；完整恢复Android后充电开关和两窗口与刷前一致。双口净取电/完整保护周期
+仍未完成；充电文档已整合，旧状态原样归档，不能把验证层修复当全充电验收。
+
+v138（11月15日）通过延后90秒连日志口的实机测试：等待真实IOKit地址57次后，原始
+校验通过、HCI初始化0、服务持续连接。2041参数7次/2042启停13次均有对应成功回复，
+349条完整扩展广播报告投递到原生套接字，incomplete0/malformed0。不是349台设备，
+也尚非界面列表/配对/持久密钥验收。日志299260B/drop47，退出仅在我们请求关机之后，
+完整恢复stock/Android并熄屏。v137自定义sysctl等待未读通且独立供电stage1/-19拒绝，
+失败证据保留；新路径复用原地址读者已有IOKit API，不放宽电源或身份检查。
+
+v135实读确认能力byte37ff、补丁已执行，发现此前把17版两扫描位角色对应反了。
+v136按实际发送器纠正为32e标准扩展扫描、32d厂商回调；同像有效复核中client1/ready1
+持续，out110/up916，回程时119/1071，未记录原200b/c拒绝。唯一观察到的BT退出在我们
+RPC ACK/driver withdrawal之后，为SIGKILL9。仍未验附近设备记录/配对，2007可选拒绝保留。
+首次尝试因COM短暂消失而暴露daemon早于真实地址发布的启动竞态，未运行到扫描，不混记。
+两次均同步回程/完整恢复Android；PC有界重试已补，目标端脱离USB启动顺序仍待修。
+
+v133/v134（11月15日）按Sheng标准扩展扫描策略移植准确17版getter/缓存/底层开关，
+并在成功HCI完成时重新发布，分别38/40规则，解析器仅扩到40。静态/实际函数测试
+及整核/签包通过，但两轮实机仍0x200b/status0xc、out50/up49后退出，不能称扫描已修。
+实际能力字节和最终开关尚未抓到；下一步只取这组判定证据，不强开能力或重复猜修。
+两轮均同步回程、完整恢复stock/Android并熄屏。47仓同步完成，Sheng属性引用寿命、
+官方macOS内存/I/O及QcomDwc3的PD数据角色分支已归档，不自动换候选输入。
+
+v132（11月15日）实机已跨过原生HCI初始化：真实完成回调result0/accepted1，
+bluetoothd发布On，H4 out50/up49；随后在另一调用栈退出，扫描/配对仍未通过。
+准确17版支持位控制可选0c5b步骤，完整失败/身份/超时保护保留。新4单元整核、
+32规则/Apple30/entry/AVB均核验，日志1172960B/drop31无断点；同步回程、完整
+stock8b8e72da恢复、Android/root/green/boot完成并熄屏。全部设备任务结束。
+下一步定位post-On退出，详profiles/bt-complete17；充电双口/保护周期及Wi-Fi仍欠。
+
+v130（11月15日）已修复明确的内核panic：H4 connect不再把proc_find引用留出系统
+调用，改存PID/uniqueid/unit并按回调配平引用。原代码host复现refcount1，新代码
+ASan/UBSan、原生构建和实机通过；首次H4 out26/up25，原panic未记录，日志继续，
+同步RPC回fastboot及完整stock/Android恢复重新正常。daemon之后另有初始化退出，
+尚未stack-ready/配对；下一步按新退出栈查0x0c33/0x0c31附近流程。
+
+BaseCrypto获取缺口已关闭：Microsoft mu_crypto_release v1.1.3官方附件重新下载，
+ZIP和994件输入全部匹配；新增tools/fetch_basecrypto.py及公开锁，见CLEAN-INPUTS.md。
+
+v129（11月15日）实机首次完整确认：BlueTool的boot/init均完成8阶段、result0，
+随后H4 client connected pid79/unit1、connect-result0。仍未证实后续命令流量/配对，
+USB之后中断；自动实fastboot/全SHA恢复Android成功，无同步复位证明。下一步定位
+连接成功之后的控制路径，不再怀疑已返回成功的boot/init或假放行deepsleep。
+实际助手SVC发送器64例通过，整像首次查出旧未消费头替换错误后已修正再包；详profiles/bt-helper-trace。
+
+v128补齐Bluetooth DT节点与platform-service发布，实机确认encoding1/speed8M和双侧
+发布成功；之后仍USB停顿，H4未观察到。已自动实fastboot/完整stock/Android恢复。
+静态查明marconi-bt警告只是先尝试该名字失败，后续bluetooth地址查询已成功；不能
+靠造marconi别名解决。下一步确认自有BlueTool的真实script/result/reply完成，现有
+bootstrap Ready/0不等于用户态回复成功。详profiles/bt-registry。Goal仍active。
+
 v127已将BlueTool四字段缓存、签名和新信任项完整接入。实机两轮cache stage5/status0，
 925323B完整回读和runtime prepared1；之后仍停顿。第一轮114763B/drop23后写查询超时；
 同像纯接收对照110710B后也不再增长，监听器保持到设备复位，说明PC周期查询不是

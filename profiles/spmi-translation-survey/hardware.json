@@ -1,0 +1,77 @@
+{
+  "image_sha256": "7d17a921b68a7111c28e0e1466c7e2076c5cd42605df3bd3b91e0fbf68eba51c",
+  "session": "ee1691e0c7013a11",
+  "raw_log": "edl_work\\live-spmi-translation-v141-20261115\\usb\\20261115-011524.bin",
+  "assessment": {
+    "session": "ee1691e0c7013a11",
+    "boot_nonce": "1bffbf5178fa6974",
+    "raw_sha256": "5a899d29a355d34323e6ac84ec93d8f91d85ee2a87f9fc22a786ef7071678eb5",
+    "bytes": 171487,
+    "complete": true,
+    "samples": [
+      {
+        "ppid": "0x71",
+        "apid": 586,
+        "expected_pa": "0xc74a010",
+        "va": "0xfffffffa40b1f010",
+        "read_par": "0xc74ab00",
+        "write_par": "0xc74ab00",
+        "read_fault": false,
+        "read_translated_pa": "0xc74a010",
+        "read_attributes": 0,
+        "write_fault": false,
+        "write_translated_pa": "0xc74a010",
+        "write_attributes": 0
+      },
+      {
+        "ppid": "0x90",
+        "apid": 593,
+        "expected_pa": "0xc751010",
+        "va": "0xfffffffa40b1f010",
+        "read_par": "0xc751b00",
+        "write_par": "0xc751b00",
+        "read_fault": false,
+        "read_translated_pa": "0xc751010",
+        "read_attributes": 0,
+        "write_fault": false,
+        "write_translated_pa": "0xc751010",
+        "write_attributes": 0
+      },
+      {
+        "ppid": "0x72a",
+        "apid": 705,
+        "expected_pa": "0xc7c1010",
+        "va": "0xfffffffa40b1f010",
+        "read_par": "0xc7c1b00",
+        "write_par": "0xc7c1b00",
+        "read_fault": false,
+        "read_translated_pa": "0xc7c1010",
+        "read_attributes": 0,
+        "write_fault": false,
+        "write_translated_pa": "0xc7c1010",
+        "write_attributes": 0
+      }
+    ],
+    "translations_match_expected": true,
+    "translation_only": true,
+    "bus_write_access_proven": false,
+    "dropped": 1,
+    "limit": "No FIFO access performed. Successful AT does not establish downstream interconnect/SPMI write permission or fix charging."
+  },
+  "discontinuities": [],
+  "synchronized_return": true,
+  "full_stock_restored": true,
+  "android_root_green_boot_completed": true,
+  "android_before": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "android_after": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "sleep_requested": true,
+  "scope": "Current mapping/AT results only. No DC FIFO access or write retry. Historical abort cause and dual-port charging remain unproven."
+}

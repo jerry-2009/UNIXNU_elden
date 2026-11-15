@@ -40,7 +40,7 @@ class MenuTests(unittest.TestCase):
         with self.assertRaises(ValueError): template(old.replace('elden-ui=1', 'elden-ui=2'))
         with self.assertRaises(ValueError): template(old.replace('smp-hold=240', 'smp-hold=' + '1' * 100))
 
-def actual_parser(source, work, cc):
+def actual_parser(source, work, cc, extra_menus=()):
     digest = hashlib.sha256(source.read_bytes()).hexdigest()
     if digest != '814d2f779300bfbf7ef13c8c830ae0f98ada271586518b808d43a019a7e7db3a':
         raise ValueError('Not the parser used by the frozen XNU build')
@@ -81,11 +81,15 @@ static int SecureDTGetProperty(DTEntry a,const char *b,const void **c,unsigned *
             if is_new:
                 for key, value in BATTERY.items():
                     c.append(f'check({json.dumps(key)},{value},4);check({json.dumps(key)},{value},8);')
+    for args, values in extra_menus:
+        c.append('active_args=' + json.dumps(args) + ';')
+        for key,value in values.items():
+            c.append(f'check({json.dumps(key)},{value},4);check({json.dumps(key)},{value},8);')
     c += ['printf("XNU parser: %u checks passed\\n",checks);return 0;}']
     harness = work / 'parser-test.c'
     harness.write_text('\n'.join(c) + '\n')
     binary = work / 'parser-test'
-    command = [cc, '-std=c11', '-O1', '-g', '-fsanitize=address,undefined', '-fno-omit-frame-pointer', '-fno-pie', '-no-pie', '-I', str(work), str(harness), '-o', str(binary)]
+    command = [cc, '-x', 'c', '-std=c11', '-O1', '-g', '-fsanitize=address,undefined', '-fno-omit-frame-pointer', '-fno-pie', '-no-pie', '-I', str(work), str(harness), '-o', str(binary)]
     subprocess.run(command, check=True)
     result = subprocess.run([str(binary)], check=True, capture_output=True, text=True)
     report = {'parser_sha256': digest, 'command': command, 'stdout': result.stdout,

@@ -1,0 +1,179 @@
+{
+  "firmware_sha256": "9edad6f458caa609a189b916694eecec99bb0c01fa8d2bd02c630552a7dbba75",
+  "assembly_sha256": "16bf1c895df9b72af95c6afba6c15bd71fa0bb9f18200575e9d7b6fd14f82221",
+  "hal_sha256": "9f0ea0a64f9dd7e2f484bd2bfd664bd3b41dd11047b60c21a0e4ddf5bfffc11a",
+  "linux_ref": "6f97250ead155fc3b980856323e99a4623dae73d",
+  "linux_sources": {
+    "drivers/power/supply/qcom_battmgr.c": {
+      "sha256": "d7bc2477a5944be724d7e4b6e2ab0ce487f20d43541c42df5c5141fdf2ed69cf",
+      "matching_lines": [
+        {
+          "line": 86,
+          "text": "#define USB_INPUT_CURR_LIMIT\t\t5"
+        },
+        {
+          "line": 1035,
+          "text": "[POWER_SUPPLY_PROP_INPUT_CURRENT_LIMIT] = USB_INPUT_CURR_LIMIT,"
+        },
+        {
+          "line": 1125,
+          "text": "USB_INPUT_CURR_LIMIT, ua);"
+        },
+        {
+          "line": 1610,
+          "text": "le32_to_cpu(resp->intval.property) != USB_INPUT_CURR_LIMIT) {"
+        },
+        {
+          "line": 1649,
+          "text": "case USB_INPUT_CURR_LIMIT:"
+        }
+      ]
+    },
+    "drivers/power/supply/qcom_smbx.c": {
+      "sha256": "228d32a70853a7488bc299f9ddb9e34f1d942c7834d9ec049ad3d8fc76efed3c",
+      "matching_lines": [
+        {
+          "line": 228,
+          "text": "#define INPUT_PRIORITY_BIT\t\t\t\tBIT(4)"
+        }
+      ]
+    },
+    "drivers/usb/typec/ucsi/ucsi.h": {
+      "sha256": "07be96a4b835f659108a630607908b808153b1db6761f29fa73f33e683015e42",
+      "matching_lines": [
+        {
+          "line": 140,
+          "text": "#define UCSI_SET_SINK_PATH\t\t\t0x1c"
+        },
+        {
+          "line": 377,
+          "text": "#define UCSI_CONSTAT_SINK_PATH_STATUS_V2_0\tUCSI_DECLARE_BITFIELD_V2_0(87, 1)"
+        }
+      ]
+    }
+  },
+  "checks": {
+    "main_dispatch_subtracts2": true,
+    "main_dispatch_upper17": true,
+    "main_dispatch_default": true,
+    "main_dispatch_table": true,
+    "immediate_dispatch_same_bound": true,
+    "immediate_default202": true,
+    "suspend_usb_can_skip2": true,
+    "suspend_second_can_skip2": true,
+    "separate_usb_helper": true,
+    "separate_second_helper": true,
+    "limit_dispatch_reads_selected_path": true,
+    "selected_path_status_only": true
+  },
+  "ranges": {
+    "command-dispatch": {
+      "start": "0x6010d094",
+      "end": "0x6010d20c",
+      "bytes_sha256": "0f4770faf163da3eb20232b22f22a47a2869eb1ef272f7c131496c825489716d",
+      "assembly_sha256": "aa79af51be88f1f217b4a2d3bf566d3b8c4b5161d6cb99e6a70ced13fa2b5cfa"
+    },
+    "immediate-command-bound": {
+      "start": "0x60110250",
+      "end": "0x601102a4",
+      "bytes_sha256": "61baf5274801959318df04a8a1f684ffd62bdd64e4b45ab4ec07c60e946bd97a",
+      "assembly_sha256": "9288438456a40a3bbf19bfae6f878675c2e544289075cdd3a39b3e7a09fd0b34"
+    },
+    "immediate-default": {
+      "start": "0x60110bec",
+      "end": "0x60110c14",
+      "bytes_sha256": "055af672a0b9936fce49efbb9d7d3165fbfff16f75a228686a4eeeedeee9bc28",
+      "assembly_sha256": "3125426a749de0e0b82b244c3dbafbb7b65565c63605f21542b7a22771ee8c76"
+    },
+    "suspend-wrapper": {
+      "start": "0x60098850",
+      "end": "0x60098b64",
+      "bytes_sha256": "8095f34032fc2e52de4930486034dea5255a9700778f3370535ac74456ea89bf",
+      "assembly_sha256": "c81ad6a3c62bd75c341c0b990ba8f4c2737ef3a64b83d8cb740db71edbbed54a"
+    },
+    "current-limit-dispatch": {
+      "start": "0x6003fdc0",
+      "end": "0x6003fe60",
+      "bytes_sha256": "fd79d1be90ed9fc3c38beabb03abbe536f945149fe78ac4a1377e2784dd5e442",
+      "assembly_sha256": "0deb9b06a0cc71e753b8ae24817f8dd41ef9b6c7c99653811d59189623df3960"
+    },
+    "current-path-status": {
+      "start": "0x6003fb40",
+      "end": "0x6003fbdc",
+      "bytes_sha256": "f51cfede7270745684624276b391edf971f9b52203c8a75c8d2f2123a8a24917",
+      "assembly_sha256": "7b9f914327e5444ed46830803ebaf5714de1ee4f55e30a21941b4d66492c1322"
+    },
+    "external-boost-caller": {
+      "start": "0x600777d0",
+      "end": "0x60077b30",
+      "bytes_sha256": "a89f4e7625e25963757f9dad1eae6a98da36c8f70b7dfdb43e13ed4ed3bb1e95",
+      "assembly_sha256": "18b5445997303f75c39e112e6105fd57c39ab8ba7b36a7cff8454ca1b4a966ab"
+    },
+    "haptics-boost-caller": {
+      "start": "0x60077b30",
+      "end": "0x600780a0",
+      "bytes_sha256": "dcc0d65c0bd02ba303888dcf14028b9d5ad9e076c72864e708850dfcc9975a41",
+      "assembly_sha256": "32ce0fa95438dd822415b27ba08a68387cc5c1e9dbd476979c13ca7e5a9034a4"
+    }
+  },
+  "dispatch_commands_2_through_19": {
+    "0x2": "0x6010d0c8",
+    "0x3": "0x6010d1a0",
+    "0x4": "0x6010d1e0",
+    "0x5": "0x6010d0c8",
+    "0x6": "0x6010d0c8",
+    "0x7": "0x6010d0c8",
+    "0x8": "0x6010d1f4",
+    "0x9": "0x6010d1b0",
+    "0xa": "0x6010d1f4",
+    "0xb": "0x6010d1c0",
+    "0xc": "0x6010d1d0",
+    "0xd": "0x6010d0c8",
+    "0xe": "0x6010d0c8",
+    "0xf": "0x6010d1f4",
+    "0x10": "0x6010d190",
+    "0x11": "0x6010d1f4",
+    "0x12": "0x6010d0c8",
+    "0x13": "0x6010d0c8"
+  },
+  "outside_main_dispatch": [
+    "0x14",
+    "0x1c"
+  ],
+  "hal_bypass": {
+    "path": "/sys/class/power_supply/battery/bypass_setting",
+    "constructor_field": "0x178",
+    "setter": "0xd990..0xdb18",
+    "getter": "0xdb18..0xdc90",
+    "setter_file_helper": "0x9850",
+    "getter_file_helper": "0x8e94"
+  },
+  "conclusions": [
+    "0x6003fdc0 sets the current limit of the selected path; it does not select a connector.",
+    "The internal suspend wrapper has two inputs and a no-change value2, but independent calls found here include external/haptics boost. They are not an exposed HLOS input-selector contract.",
+    "The original PPM main dispatcher routes command0x1c outside its table; SET_SINK_PATH is not qualified by a newer Linux constant.",
+    "A generic HAL bypass path does not establish that this kernel exports it. Pausing battery charging is not proof of system-power bypass or dual-input selection."
+  ],
+  "device_operation": false,
+  "new_write_qualified": false,
+  "android_read_only": {
+    "model": {
+      "returncode": 0,
+      "text": "TB322FC"
+    },
+    "bypass_setting": {
+      "returncode": 1,
+      "text": "cat: /sys/class/power_supply/battery/bypass_setting: No such file or directory"
+    },
+    "charging_enable": {
+      "returncode": 0,
+      "text": "1"
+    }
+  },
+  "console_sha256": "7caacc3f9c38e4f9acdf959e2708a319cac1cb93280f5e6de6260465ba50e5eb",
+  "observed_ucsi_lines": [
+    "ELDEN_UCSI cycle=1 version=110 buffer=48 connectors=2 ppm-init=1; GET/ACK cycle, no role/sink change",
+    "ELDEN_UCSI cycle=2 version=110 buffer=48 connectors=2 ppm-init=1; GET/ACK cycle, no role/sink change",
+    "ELDEN_UCSI cycle=3 version=110 buffer=48 connectors=2 ppm-init=1; GET/ACK cycle, no role/sink change"
+  ]
+}

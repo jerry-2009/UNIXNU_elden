@@ -1,0 +1,152 @@
+{
+  "firmware_sha256": "9edad6f458caa609a189b916694eecec99bb0c01fa8d2bd02c630552a7dbba75",
+  "assembly_sha256": "16bf1c895df9b72af95c6afba6c15bd71fa0bb9f18200575e9d7b6fd14f82221",
+  "checks": {
+    "0x600698d0": true,
+    "0x600698d8": true,
+    "0x60069a84": true,
+    "0x60069a8c": true,
+    "0x60069a90": true,
+    "0x60047cfc": true,
+    "0x60047d04": true,
+    "0x600483a8": true,
+    "0x600483b0": true,
+    "0x6004b600": true,
+    "0x6004b608": true,
+    "0x6004b614": true,
+    "0x6004b618": true,
+    "0x6004b620": true,
+    "0x6004b658": true,
+    "0x6004b690": true,
+    "0x60069b78": true,
+    "0x60069ba8": true,
+    "0x6004b8ac": true,
+    "0x6004badc": true,
+    "0x6004bae4": true,
+    "0x6004baf0": true,
+    "0x600480a4": true,
+    "0x600480dc": true,
+    "0x600480fc": true,
+    "0x600481f8": true,
+    "0x60047f14": true,
+    "0x60047f4c": true,
+    "0x60047f6c": true,
+    "0x60048068": true,
+    "0x60069bd8": true,
+    "0x60047eb0": true,
+    "0x6004b660": true,
+    "0x6004b688": true,
+    "0x6004b674": true,
+    "0x6004b680": true,
+    "0x6004b6ac": true,
+    "0x6004b6b8": true,
+    "0x6004b6c4": true,
+    "0x6004b6cc": true,
+    "0x6004b6d0": true,
+    "0x6004b6d8": true,
+    "0x6004b6e0": true,
+    "0x6004b6f4": true,
+    "0x6004b5b0": true,
+    "0x6004b5b8": true,
+    "0x6004b5c0": true,
+    "0x6004b5c8": true,
+    "property28": true,
+    "property29": true,
+    "property30": true,
+    "gauge16": true,
+    "gauge24": true,
+    "gauge19_normal": true,
+    "gauge20_eu": true,
+    "property31_recharge": true,
+    "gauge21_recharge": true,
+    "normal_log_label": true,
+    "eu_log_label": true
+  },
+  "ranges": {
+    "property28": {
+      "start": "0x60069a30",
+      "end": "0x60069a9c",
+      "bytes_sha256": "f8f78fc6e454ecfb60f70eeec9b148fa26f9cbbc82570773c8f0da4b783aae8e",
+      "assembly": "60069a30: { \timmext(#0x602b8000)\n60069a34:   \tr2 = memw(##0x602b8020) } \n60069a38: { \tr3 = memub(r30+#-0x3) } \n60069a3c: { \tr2 = addasl(r2,r3,#0x2) } \n60069a40: { \tr2 = memw(r2+#0x784) } \n60069a44: { \tr3 = memw(r30+#-0x8) } \n60069a48: { \tp0 = cmp.eq(r2,r3) } \n60069a4c: { \tif (p0) jump:nt 0x60069a84 } \n60069a50: { \tjump 0x60069a54 } \n60069a54: { \tr2 = memw(r30+#-0x8) } \n60069a58: { \tr3 = !cmp.eq(r2,#0x0) } \n60069a5c: { \timmext(#0x602b8000)\n60069a60:   \tr2 = memw(##0x602b8020) } \n60069a64: { \tr4 = memub(r30+#-0x3) } \n60069a68: { \tr2 = addasl(r2,r4,#0x2) } \n60069a6c: { \tmemw(r2+#0x784) = r3 } \n60069a70: { \tr2 = memw(r30+#-0x8) } \n60069a74: { \tr1 = !cmp.eq(r2,#0x0) } \n60069a78: { \tr0 = #0x7 } \n60069a7c: { \tcall 0x600caf10 } \n60069a80: { \tjump 0x60069a84 } \n60069a84: { \tr2 = memw(r30+#-0x8) } \n60069a88: { \tr0 = #0x0 } \n60069a8c: { \tr1 = #0x10 } \n60069a90: { \tcall 0x60047bc0 } \n60069a94: { \tmemh(r30+#-0xa) = r0 } \n60069a98: { \tjump 0x60069a9c } \n"
+    },
+    "manual-latch": {
+      "start": "0x600483a4",
+      "end": "0x600483b4",
+      "bytes_sha256": "14b47104f5de7b1f0d30bfb7f802a7365cec1b55f3763d928ee389cfce065c04",
+      "assembly": "600483a4: { \tr2 = memw(r30+#-0x10) } \n600483a8: { \tr2 = cmp.eq(r2,#0x0) } \n600483ac: { \timmext(#0x602e2340)\n600483b0:   \tmemb(##0x602e235d) = r2 } \n"
+    },
+    "precedence": {
+      "start": "0x6004b590",
+      "end": "0x6004b71c",
+      "bytes_sha256": "bfddaa0cd334202483bf546293f444f728ca63ced0b0bfb730feec53cc5d5e59",
+      "assembly": "6004b590: { \tallocframe(#0x50) } \n6004b594: { \tr2 = add(r30,#-0x4) } \n6004b598: { \tmemh(r2+#0x0) = #0x0 } \n6004b59c: { \tr2 = add(r30,#-0x6) } \n6004b5a0: { \tmemh(r2+#0x0) = #0x0 } \n6004b5a4: { \tr2 = add(r30,#-0x8) } \n6004b5a8: { \tmemh(r2+#0x0) = #0x64 } \n6004b5ac: { \timmext(#0x602ab900)\n6004b5b0:   \tr2 = memw(##0x602ab908) } \n6004b5b4: { \timmext(#0x51eb8500)\n6004b5b8:   \tr3 = ##0x51eb851f } \n6004b5bc: { \tr3 = mpy(r2,r3) } \n6004b5c0: { \tr2 = lsr(r3,#0x5) } \n6004b5c4: { \tr2 += lsr(r3,#0x1f) } \n6004b5c8: { \tmemh(r30+#-0xa) = r2 } \n6004b5cc: { \tr2 = add(r30,#-0xc) } \n6004b5d0: { \tmemh(r2+#0x0) = #0x0 } \n6004b5d4: { \tr2 = add(r30,#-0x10) } \n6004b5d8: { \tmemw(r2+#0x0) = #0x0 } \n6004b5dc: { \timmext(#0x602ab940)\n6004b5e0:   \tr2 = memb(##0x602ab95a) } \n6004b5e4: { \tp0 = cmp.eq(r2,#0x1) } \n6004b5e8: { \tif (p0) jump:nt 0x6004b5fc } \n6004b5ec: { \tjump 0x6004b5f0 } \n6004b5f0: { \tr2 = memuh(r30+#-0x4) } \n6004b5f4: { \tmemh(r30+#-0x2) = r2 } \n6004b5f8: { \tjump 0x6004bb14 } \n6004b5fc: { \timmext(#0x602e2340)\n6004b600:   \tr2 = memb(##0x602e235d) } \n6004b604: { \tp0 = cmp.eq(r2,#0x0) } \n6004b608: { \tif (p0) jump:nt 0x6004b61c } \n6004b60c: { \tjump 0x6004b610 } \n6004b610: { \tr2 = add(r30,#-0xc) } \n6004b614: { \tmemh(r2+#0x0) = #0x4 } \n6004b618: { \tjump 0x6004b71c } \n6004b61c: { \timmext(#0x602ab940)\n6004b620:   \tr2 = memb(##0x602ab954) } \n6004b624: { \tp0 = cmp.eq(r2,#0x0) } \n6004b628: { \tif (p0) jump:nt 0x6004b654 } \n6004b62c: { \tjump 0x6004b630 } \n6004b630: { \tr2 = add(r30,#-0xc) } \n6004b634: { \tmemh(r2+#0x0) = #0x3 } \n6004b638: { \timmext(#0x602ab940)\n6004b63c:   \tr2 = memuh(##0x602ab956) } \n6004b640: { \tmemh(r30+#-0x6) = r2 } \n6004b644: { \timmext(#0x602ab940)\n6004b648:   \tr2 = memuh(##0x602ab958) } \n6004b64c: { \tmemh(r30+#-0x8) = r2 } \n6004b650: { \tjump 0x6004b718 } \n6004b654: { \timmext(#0x602ab940)\n6004b658:   \tr2 = memb(##0x602ab94e) } \n6004b65c: { \tp0 = cmp.eq(r2,#0x0) } \n6004b660: { \tif (p0) jump:nt 0x6004b68c } \n6004b664: { \tjump 0x6004b668 } \n6004b668: { \tr2 = add(r30,#-0xc) } \n6004b66c: { \tmemh(r2+#0x0) = #0x2 } \n6004b670: { \timmext(#0x602ab940)\n6004b674:   \tr2 = memuh(##0x602ab950) } \n6004b678: { \tmemh(r30+#-0x6) = r2 } \n6004b67c: { \timmext(#0x602ab940)\n6004b680:   \tr2 = memuh(##0x602ab952) } \n6004b684: { \tmemh(r30+#-0x8) = r2 } \n6004b688: { \tjump 0x6004b714 } \n6004b68c: { \timmext(#0x602ab940)\n6004b690:   \tr2 = memb(##0x602ab948) } \n6004b694: { \tp0 = cmp.eq(r2,#0x0) } \n6004b698: { \tif (p0) jump:nt 0x6004b710 } \n6004b69c: { \tjump 0x6004b6a0 } \n6004b6a0: { \tr2 = add(r30,#-0xc) } \n6004b6a4: { \tmemh(r2+#0x0) = #0x1 } \n6004b6a8: { \timmext(#0x602e2380)\n6004b6ac:   \tr2 = memuh(##0x602e2388) } \n6004b6b0: { \tp0 = cmp.gt(r2,#0x0) } \n6004b6b4: { \tp0 = not(p0) } \n6004b6b8: { \tif (p0) jump:nt 0x6004b6f0 } \n6004b6bc: { \tjump 0x6004b6c0 } \n6004b6c0: { \timmext(#0x602ab940)\n6004b6c4:   \tr2 = memuh(##0x602ab94c) } \n6004b6c8: { \timmext(#0x602e2380)\n6004b6cc:   \tr3 = memuh(##0x602e2388) } \n6004b6d0: { \tr2 = mpyi(r2,r3) } \n6004b6d4: { \timmext(#0x51eb8500)\n6004b6d8:   \tr3 = ##0x51eb851f } \n6004b6dc: { \tr3 = mpy(r2,r3) } \n6004b6e0: { \tr2 = lsr(r3,#0x5) } \n6004b6e4: { \tr2 += lsr(r3,#0x1f) } \n6004b6e8: { \tmemh(r30+#-0x6) = r2 } \n6004b6ec: { \tjump 0x6004b700 } \n6004b6f0: { \timmext(#0x602ab940)\n6004b6f4:   \tr2 = memuh(##0x602ab94a) } \n6004b6f8: { \tmemh(r30+#-0x6) = r2 } \n6004b6fc: { \tjump 0x6004b700 } \n6004b700: { \timmext(#0x602ab940)\n6004b704:   \tr2 = memuh(##0x602ab94c) } \n6004b708: { \tmemh(r30+#-0x8) = r2 } \n6004b70c: { \tjump 0x6004b710 } \n6004b710: { \tjump 0x6004b714 } \n6004b714: { \tjump 0x6004b718 } \n6004b718: { \tjump 0x6004b71c } \n"
+    },
+    "manual-hold": {
+      "start": "0x6004bad8",
+      "end": "0x6004bafc",
+      "bytes_sha256": "62889d472f8654a48670e1041f0501b5a90bb6ec4fd01651937e34e2a4e75d83",
+      "assembly": "6004bad8: { \tr0 = #0x7 } \n6004badc: { \tr1 = #0x0 } \n6004bae0: { \tmemw(r30+#-0x30) = r1 } \n6004bae4: { \tcall 0x600caf10 } \n6004bae8: { \tr2 = r0 } \n6004baec: { \tr0 = memw(r30+#-0x30) } \n6004baf0: { \tcall 0x6006bf90 } \n6004baf4: { \tjump 0x6004bafc } \n6004baf8: { \tjump 0x6004bafc } \n"
+    },
+    "normal-setter": {
+      "start": "0x60048088",
+      "end": "0x60048218",
+      "bytes_sha256": "5c6d7a62ca043c67a6ea367dfef5aee9885c2a868f7a24f085e1cad3a3eb5d79",
+      "assembly": "60048088: { \tr2 = memw(r30+#-0x10) } \n6004808c: { \timmext(#0x14f8b580)\n60048090:   \tr3 = ##0x14f8b589 } \n60048094: { \tr3 = mpy(r2,r3) } \n60048098: { \tr2 = lsr(r3,#0xd) } \n6004809c: { \tr2 += lsr(r3,#0x1f) } \n600480a0: { \timmext(#0x602ab940)\n600480a4:   \tmemb(##0x602ab94e) = r2 } \n600480a8: { \tr2 = memw(r30+#-0x10) } \n600480ac: { \timmext(#0x10624dc0)\n600480b0:   \tr3 = ##0x10624dd3 } \n600480b4: { \tr4 = mpy(r2,r3) } \n600480b8: { \tr2 = asr(r4,#0x6) } \n600480bc: { \tr2 += lsr(r4,#0x1f) } \n600480c0: { \timmext(#0x51eb8500)\n600480c4:   \tr4 = ##0x51eb851f } \n600480c8: { \tr5 = mpy(r2,r4) } \n600480cc: { \tr4 = lsr(r5,#0x5) } \n600480d0: { \tr4 += lsr(r5,#0x1f) } \n600480d4: { \tr2 -= mpyi(r4,#0x64) } \n600480d8: { \timmext(#0x602ab940)\n600480dc:   \tmemh(##0x602ab950) = r2 } \n600480e0: { \tr2 = memw(r30+#-0x10) } \n600480e4: { \tr4 = mpy(r2,r3) } \n600480e8: { \tr3 = lsr(r4,#0x6) } \n600480ec: { \tr3 += lsr(r4,#0x1f) } \n600480f0: { \timmext(#0x3c0)\n600480f4:   \tr2 -= mpyi(r3,##0x3e8) } \n600480f8: { \timmext(#0x602ab940)\n600480fc:   \tmemh(##0x602ab952) = r2 } \n60048100: { \timmext(#0x602e2340)\n60048104:   \tr0 = ##0x602e2378 } \n60048108: { \tmemw(r30+#-0x58) = r0 } \n6004810c: { \tr1 = #0x0 } \n60048110: { \tcall 0x600a7b20 } \n60048114: { \tr1 = memw(r30+#-0x18) } \n60048118: { \tr2 = memub(r30+#-0x1c) } \n6004811c: { \tr3 = memub(r30+#-0x1b) } \n60048120: { \tr4 = memub(r30+#-0x1a) } \n60048124: { \tr5 = memw(r30+#-0x10) } \n60048128: { \timmext(#0x602ab880)\n6004812c:   \tr0 = ##0x602ab8b0 } \n60048130: { \tcall 0x60048490 } \n60048134: { \tr2 = r0 } \n60048138: { \tr0 = memw(r30+#-0x58) } \n6004813c: { \tcall 0x600a7ad0 } \n60048140: { \tjump 0x60048144 } \n60048144: { \timmext(#0x602b8180)\n60048148:   \tr1:0 = memd(##0x602b8188) } \n6004814c: { \tr2 = r0 } \n60048150: { \tp0 = tstbit(r2,#0x0) } \n60048154: { \tif (p0) jump:nt 0x60048174 } \n60048158: { \tjump 0x6004815c } \n6004815c: { \timmext(#0x602ac340)\n60048160:   \tr1:0 = memd(##0x602ac360) } \n60048164: { \tr2 = r0 } \n60048168: { \tp0 = tstbit(r2,#0x0) } \n6004816c: { \tif (!p0) jump:nt 0x60048210 } \n60048170: { \tjump 0x60048174 } \n60048174: { \tjump 0x60048178 } \n60048178: { \timmext(#0x602ac340)\n6004817c:   \tr2 = memub(##0x602ac358) } \n60048180: { \tp0 = cmp.gt(r2,#0x2) } \n60048184: { \tp0 = not(p0) } \n60048188: { \tif (p0) jump:nt 0x60048208 } \n6004818c: { \tjump 0x60048190 } \n60048190: { \tjump 0x60048194 } \n60048194: { \timmext(#0x602ab940)\n60048198:   \tr1 = memub(##0x602ab94e) } \n6004819c: { \timmext(#0x602ab940)\n600481a0:   \tr2 = memuh(##0x602ab950) } \n600481a4: { \timmext(#0x602ab940)\n600481a8:   \tr3 = memuh(##0x602ab952) } \n600481ac: { \timmext(#0x6022f140)\n600481b0:   \tr0 = ##0x6022f160 } \n600481b4: { \tcall 0x60018d98 } \n600481b8: { \tjump 0x600481bc } \n600481bc: { \timmext(#0x602b8140)\n600481c0:   \tr0 = memw(##0x602b816c) } \n600481c4: { \timmext(#0x602ab940)\n600481c8:   \tr3 = memub(##0x602ab94e) } \n600481cc: { \timmext(#0x602ab940)\n600481d0:   \tr4 = memuh(##0x602ab950) } \n600481d4: { \timmext(#0x602ab940)\n600481d8:   \tr5 = memuh(##0x602ab952) } \n600481dc: { \tr2 = r29 } \n600481e0: { \tmemw(r2+#0xc) = r5 } \n600481e4: { \tmemw(r2+#0x8) = r4 } \n600481e8: { \tmemw(r2+#0x4) = r3 } \n600481ec: { \timmext(#0x6022e940)\n600481f0:   \tmemw(r2+#0x0) = ##0x6022e97d } \n600481f4: { \timmext(#0x6022e980)\n600481f8:   \tr2 = ##0x6022e98d } \n600481fc: { \tr1 = #0x4 } \n60048200: { \tcall 0x60017c90 } \n60048204: { \tjump 0x60048208 } \n60048208: { \tjump 0x6004820c } \n6004820c: { \tjump 0x60048210 } \n60048210: { \tjump 0x60048214 } \n60048214: { \tjump 0x60048478 } \n"
+    },
+    "eu-setter": {
+      "start": "0x60047ef8",
+      "end": "0x60048088",
+      "bytes_sha256": "62dd29644795acd6c9ba393166153e098ca1ebe89fe504d12c0d7fe045a5e86e",
+      "assembly": "60047ef8: { \tr2 = memw(r30+#-0x10) } \n60047efc: { \timmext(#0x14f8b580)\n60047f00:   \tr3 = ##0x14f8b589 } \n60047f04: { \tr3 = mpy(r2,r3) } \n60047f08: { \tr2 = lsr(r3,#0xd) } \n60047f0c: { \tr2 += lsr(r3,#0x1f) } \n60047f10: { \timmext(#0x602ab940)\n60047f14:   \tmemb(##0x602ab948) = r2 } \n60047f18: { \tr2 = memw(r30+#-0x10) } \n60047f1c: { \timmext(#0x10624dc0)\n60047f20:   \tr3 = ##0x10624dd3 } \n60047f24: { \tr4 = mpy(r2,r3) } \n60047f28: { \tr2 = asr(r4,#0x6) } \n60047f2c: { \tr2 += lsr(r4,#0x1f) } \n60047f30: { \timmext(#0x51eb8500)\n60047f34:   \tr4 = ##0x51eb851f } \n60047f38: { \tr5 = mpy(r2,r4) } \n60047f3c: { \tr4 = lsr(r5,#0x5) } \n60047f40: { \tr4 += lsr(r5,#0x1f) } \n60047f44: { \tr2 -= mpyi(r4,#0x64) } \n60047f48: { \timmext(#0x602ab940)\n60047f4c:   \tmemh(##0x602ab94a) = r2 } \n60047f50: { \tr2 = memw(r30+#-0x10) } \n60047f54: { \tr4 = mpy(r2,r3) } \n60047f58: { \tr3 = lsr(r4,#0x6) } \n60047f5c: { \tr3 += lsr(r4,#0x1f) } \n60047f60: { \timmext(#0x3c0)\n60047f64:   \tr2 -= mpyi(r3,##0x3e8) } \n60047f68: { \timmext(#0x602ab940)\n60047f6c:   \tmemh(##0x602ab94c) = r2 } \n60047f70: { \timmext(#0x602e2340)\n60047f74:   \tr0 = ##0x602e2378 } \n60047f78: { \tmemw(r30+#-0x54) = r0 } \n60047f7c: { \tr1 = #0x0 } \n60047f80: { \tcall 0x600a7b20 } \n60047f84: { \tr1 = memw(r30+#-0x18) } \n60047f88: { \tr2 = memub(r30+#-0x20) } \n60047f8c: { \tr3 = memub(r30+#-0x1f) } \n60047f90: { \tr4 = memub(r30+#-0x1e) } \n60047f94: { \tr5 = memw(r30+#-0x10) } \n60047f98: { \timmext(#0x602ab880)\n60047f9c:   \tr0 = ##0x602ab8b0 } \n60047fa0: { \tcall 0x60048490 } \n60047fa4: { \tr2 = r0 } \n60047fa8: { \tr0 = memw(r30+#-0x54) } \n60047fac: { \tcall 0x600a7ad0 } \n60047fb0: { \tjump 0x60047fb4 } \n60047fb4: { \timmext(#0x602b8180)\n60047fb8:   \tr1:0 = memd(##0x602b8188) } \n60047fbc: { \tr2 = r0 } \n60047fc0: { \tp0 = tstbit(r2,#0x0) } \n60047fc4: { \tif (p0) jump:nt 0x60047fe4 } \n60047fc8: { \tjump 0x60047fcc } \n60047fcc: { \timmext(#0x602ac340)\n60047fd0:   \tr1:0 = memd(##0x602ac360) } \n60047fd4: { \tr2 = r0 } \n60047fd8: { \tp0 = tstbit(r2,#0x0) } \n60047fdc: { \tif (!p0) jump:nt 0x60048080 } \n60047fe0: { \tjump 0x60047fe4 } \n60047fe4: { \tjump 0x60047fe8 } \n60047fe8: { \timmext(#0x602ac340)\n60047fec:   \tr2 = memub(##0x602ac358) } \n60047ff0: { \tp0 = cmp.gt(r2,#0x2) } \n60047ff4: { \tp0 = not(p0) } \n60047ff8: { \tif (p0) jump:nt 0x60048078 } \n60047ffc: { \tjump 0x60048000 } \n60048000: { \tjump 0x60048004 } \n60048004: { \timmext(#0x602ab940)\n60048008:   \tr1 = memub(##0x602ab948) } \n6004800c: { \timmext(#0x602ab940)\n60048010:   \tr2 = memuh(##0x602ab94a) } \n60048014: { \timmext(#0x602ab940)\n60048018:   \tr3 = memuh(##0x602ab94c) } \n6004801c: { \timmext(#0x6022f140)\n60048020:   \tr0 = ##0x6022f154 } \n60048024: { \tcall 0x60018d98 } \n60048028: { \tjump 0x6004802c } \n6004802c: { \timmext(#0x602b8140)\n60048030:   \tr0 = memw(##0x602b816c) } \n60048034: { \timmext(#0x602ab940)\n60048038:   \tr3 = memub(##0x602ab948) } \n6004803c: { \timmext(#0x602ab940)\n60048040:   \tr4 = memuh(##0x602ab94a) } \n60048044: { \timmext(#0x602ab940)\n60048048:   \tr5 = memuh(##0x602ab94c) } \n6004804c: { \tr2 = r29 } \n60048050: { \tmemw(r2+#0xc) = r5 } \n60048054: { \tmemw(r2+#0x8) = r4 } \n60048058: { \tmemw(r2+#0x4) = r3 } \n6004805c: { \timmext(#0x6022e940)\n60048060:   \tmemw(r2+#0x0) = ##0x6022e97d } \n60048064: { \timmext(#0x6022e940)\n60048068:   \tr2 = ##0x6022e945 } \n6004806c: { \tr1 = #0x4 } \n60048070: { \tcall 0x60017c90 } \n60048074: { \tjump 0x60048078 } \n60048078: { \tjump 0x6004807c } \n6004807c: { \tjump 0x60048080 } \n60048080: { \tjump 0x60048084 } \n60048084: { \tjump 0x60048478 } \n"
+    },
+    "recharge-setter": {
+      "start": "0x60047ea8",
+      "end": "0x60047ef8",
+      "bytes_sha256": "69b8f2ae1c083f0953878e1bb32697eff4e07e3c1c0d75bdfd66f2d40108c801",
+      "assembly": "60047ea8: { \tr2 = memw(r30+#-0x10) } \n60047eac: { \timmext(#0x602e2380)\n60047eb0:   \tmemh(##0x602e2388) = r2 } \n60047eb4: { \timmext(#0x602e2340)\n60047eb8:   \tr0 = ##0x602e2378 } \n60047ebc: { \tmemw(r30+#-0x50) = r0 } \n60047ec0: { \tr1 = #0x0 } \n60047ec4: { \tcall 0x600a7b20 } \n60047ec8: { \tr1 = memw(r30+#-0x18) } \n60047ecc: { \tr2 = memub(r30+#-0x2c) } \n60047ed0: { \tr3 = memub(r30+#-0x2b) } \n60047ed4: { \tr4 = memub(r30+#-0x2a) } \n60047ed8: { \tr5 = memw(r30+#-0x10) } \n60047edc: { \timmext(#0x602ab880)\n60047ee0:   \tr0 = ##0x602ab8b0 } \n60047ee4: { \tcall 0x60048490 } \n60047ee8: { \tr2 = r0 } \n60047eec: { \tr0 = memw(r30+#-0x50) } \n60047ef0: { \tcall 0x600a7ad0 } \n60047ef4: { \tjump 0x60048478 } \n"
+    }
+  },
+  "model_revision": 2,
+  "window_log_labels": {
+    "normal": {
+      "address": "0x6022e98d",
+      "text": "Info: %s: [LENOVO_CHG_BP] : bp_setting: [%d, %d, %d]"
+    },
+    "eu": {
+      "address": "0x6022e945",
+      "text": "Info: %s: [LENOVO_CHG_BP] : bp_setting_eu: [%d, %d, %d]"
+    }
+  },
+  "window_map": {
+    "normal": {
+      "property": 29,
+      "gauge_selector": 19,
+      "enabled_address": "0x602ab94e",
+      "low_address": "0x602ab950",
+      "high_address": "0x602ab952"
+    },
+    "eu": {
+      "property": 30,
+      "gauge_selector": 20,
+      "enabled_address": "0x602ab948",
+      "low_address": "0x602ab94a",
+      "high_address": "0x602ab94c"
+    },
+    "recharge": {
+      "property": 31,
+      "gauge_selector": 21,
+      "address": "0x602e2388",
+      "applies_to": "EU branch only"
+    }
+  },
+  "selection_order": [
+    "manual inhibit",
+    "bypass window",
+    "normal window",
+    "EU window"
+  ],
+  "contract": "SET vendor property28 -> mm8013 info16 -> manual inhibit=(value==0). Normal window precedes EU. Normal low uses the configured value; EU low is floor(high*recharge/100) if recharge>0, otherwise configured low. SOC comparisons use integer percent.",
+  "correction": "Revision1 swapped normal/EU labels and its model compared centi-percent directly. The latch proof and v140 driver delegating windows to OEM remain unchanged; do not use the old model to infer window boundaries.",
+  "limits": "Static fixed-firmware proof. Contract-model tests are not actual DSP execution, power-flow measurement, or complete device charge-cycle acceptance.",
+  "device_operations": false
+}

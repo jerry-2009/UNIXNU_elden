@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "result": "PASS 23 actual observer/load/failure cases",
+  "asan_ubsan": true,
+  "actual_observer": true,
+  "source_sha256": "253d6075754dd6e1673b973afa152709296e1ab5105454ab2d862b65e7b57486",
+  "hardware": false,
+  "limits": "Mock kernel counters and SCMI results; no real CPU load, transport or power acceptance.",
+  "actual_bootarg_parser": true,
+  "menu_bytes": 1023,
+  "watcher": {
+    "passed": true,
+    "cases": 5,
+    "old_misreport_reproduced": true,
+    "v146_frame_timing_replayed": true,
+    "actual_watcher_blocks": true,
+    "device_operations": false
+  },
+  "native": {
+    "kernel_sha256": "3b3b6de661172f03fe6316e441965136bbd567ee2855a746bbccd55c5d06506a",
+    "native_sha256": "7f346dc00986d6b171a81dda3795c4e5dcc11743e1292c029b7ea5339617d74c",
+    "changed_core_objects": 0,
+    "changed_native_objects": 1,
+    "scalar": true,
+    "original_apple_executables_hashed": 30
+  },
+  "native_compile_warnings": 0,
+  "combined_clean_command_rerun": false
+}

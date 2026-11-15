@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/microsoft/mu_crypto_release",
+  "release": "v1.1.3",
+  "asset": "Mu_CryptoBin_v1_1_3.zip",
+  "url": "https://github.com/microsoft/mu_crypto_release/releases/download/v1.1.3/Mu_CryptoBin_v1_1_3.zip",
+  "bytes": 255451552,
+  "sha256": "2136c410dc44135830e2e33062243563d642e0be868d6affc2930c6b0854f5cf",
+  "files": 994,
+  "manifest": "profiles/v91/firmware-build/plan.json"
+}

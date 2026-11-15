@@ -37,7 +37,7 @@ FAT16由仓库自己的写入器产生，已用独立fsck.fat核验，不依赖m
 | os_image | 原21H461 OS裸镜像，Data种子清单核SHA和所需文件；不是旧Data分区 |
 | nvt_firmware | TB322FC原厂novatek_ts_csot_3k_fw.bin，253952B/SHA413216d0…；生成完整头文件 |
 | wcn_firmware | 目录下包含qca/brhbtfw20.tlv、qca/brhperifw20.tlv、qca/brhperinv20.bin、qca/tmel_peach_20.elf、qca/lenovo/tb322fc/brhbtnv20.bin；全SHA在profiles/v110-bt-fifo/plan.json |
-| crypto | 固定BaseCrypto预编译发布包的解压根目录；完整994件文件指纹在profiles/v91/firmware-build/plan.json，原始ZIP指纹见CLEAN-INPUTS.md |
+| crypto | Microsoft Project Mu CryptoBin v1.1.3的解压根目录；先运行 `python3 tools/fetch_basecrypto.py --output ../inputs/basecrypto`，填入其输出的绝对路径。官方链接和994件核验见CLEAN-INPUTS.md |
 | mu_repository | mu_wide_platforms Git源和初始化子模块，必须包含firmware-build/plan.json的mu_commit及子模块Git对象；builder只导出固定对象，不拿工作树修改 |
 | unixnu_repository | 官方UniXNU Git源，包含固定unixnu_commit与drivers/DarwinBoot子模块对象；同样只导出固定对象 |
 | stock_boot / parent_vbmeta | 本项目准确stock签名模板，供不抬升floor的审核/打包；不是待重编内核 |
@@ -56,6 +56,13 @@ FAT16由仓库自己的写入器产生，已用独立fsck.fat核验，不依赖m
 缺少子模块时也不能用旧UEFI产物替代。
 
 ## 命令
+
+当前充电旁路退出修订的完整选项链见
+[charge-window-handoff](../profiles/charge-window-handoff/README.md#build)。
+恢复系统亮度服务时再加 `--backlight-service`，见[该配置的实机记录](../profiles/backlight-service/README.md)。
+PD确认后进行功耗试验使用 `--pd-power-trial`，见[独立试验配置](../profiles/pd-power-trial/README.md)；它不是普通GUI日用配置。
+需要PD初始化与正常系统亮度服务共同运行时使用 `--pd-gui`，见[GUI整合配置](../profiles/pd-gui/README.md)。
+下方不加额外选项的命令仍构建冻结基础版本，不自动等同于最新实验功能。
 
 ```sh
 git clone https://github.com/zenkernelsam/UniXNU_elden.git
@@ -107,3 +114,15 @@ v125追加 `--bt-transport-trace`，记录有上限的bootstrap与H4回调阶段
 v127在此链上添加 `--bluetool-lifecycle`，从声明的原OS镜像生成四字段修改的
 签名缓存，并编译进RAM挂载阶段。不要同时选择更细的 `--bt-syscall-trace`。
 缓存挂载与完整回读已实机通过，后续蓝牙/USB停顿仍待修复。
+
+当前蓝牙实验v130还包含registry、助手阶段记录和进程引用修复，可从同一源码入口生成：
+
+```sh
+python3 tools/build_clean.py --variant bluetooth --bt-exit-stack \
+  --software-keystore --bluetool-launch --bt-transport-trace \
+  --bluetool-lifecycle --bt-registry --bt-helper-trace --bt-process-lifetime \
+  --inputs inputs.json --output NEW --target boot --jobs 4
+```
+
+完整基础构建与这些后续阶段均已执行并生成实测像；这一组完整选项尚未重新从空
+输出跑一遍。v130修复了H4连接时的内核引用panic，已有真实收发，但尚未完成配对。

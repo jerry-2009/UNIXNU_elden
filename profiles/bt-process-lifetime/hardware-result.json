@@ -1,0 +1,40 @@
+{
+  "candidate": "v130",
+  "image_sha256": "588cc53c644de5cf5716531d033b29d14ebc85abb0c1e5e3c342fa0920906479",
+  "session": "a07ba677acb41917",
+  "bytes": 1170810,
+  "raw_sha256": "1f47b55beb29196f1e1e64e847ddeed0bf3ac3106ad15bea080b73d60a93ae9c",
+  "max_reported_drop": 58,
+  "discontinuities": [],
+  "proc_refcount_panic_observed": false,
+  "native_lines": [
+    "[bt] bridge up held_bytes=0 client=0",
+    "ELDEN_BT_HOST published actual H4 transport; no fabricated capabilities",
+    "[bt] client connected pid=79 unit=1",
+    "[bt] client gone ready=0 failed_starts=1",
+    "ELDEN_BT_HOST live client=0 ready=0 out=26 up=25 bad=0 pending=0",
+    "ELDEN_BT_HOST live client=0 ready=0 out=26 up=25 bad=0 pending=0",
+    "[bt] GUARD why=1 pending=0 last 0x2001 0xc56 0xc6d 0x2060 0x202f 0x2031 0x2024 0x201c 0x200f 0x1005 0x204a 0x2074 0x2074 0x207d 0xc33 0xc31",
+    "ELDEN_BT_HOST withdrawn guard=1 out=26 up=25 dropped=0"
+  ],
+  "h4_out": 26,
+  "h4_up": 25,
+  "stack_ready": false,
+  "bluetooth_pairing_verified": false,
+  "explicit_sync_return": true,
+  "recovery_complete": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "daemon_exit_stack": [
+    "ELDEN_BT_EXIT_STACK pid=79 pc=1e09be5f0 lr=10052dbd4 fp=16fc753f0 syscall=1",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=0 return=100591e88",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=1 return=100525e78",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=2 return=100880344",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=3 return=10088166c",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=4 return=10085e048",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=5 return=10085db78",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=6 return=1a47e1c9c",
+    "ELDEN_BT_EXIT_FRAME pid=79 index=7 return=1a47e2cc0"
+  ],
+  "inferred_daemon_slide": "0x426000",
+  "slide_measured": false
+}
