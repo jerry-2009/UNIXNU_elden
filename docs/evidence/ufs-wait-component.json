@@ -1,0 +1,99 @@
+{
+  "stage": "ufs-wait-component-v151",
+  "date": "2026-11-15",
+  "host": {
+    "passed": true,
+    "outputs": {
+      "Completion": "PASS 36 actual completion/submit cases",
+      "Spi": "PASS 14 actual SPI cases (two 16-thread races)"
+    },
+    "asan_ubsan": true,
+    "actual_transformed_functions": true,
+    "hardware_and_scheduler_modeled": true,
+    "native_build": false,
+    "hardware": false,
+    "sha256": {
+      "ufs": "23411876d2a7f30847b56354d3506c1ebfcdd3cacf1d5290c6253e5f22dbe3ba",
+      "commands": "e6d2adb5bd07f9787c56ea7b030a3d75ecc0160cff82dab5138d02c09b6fb069",
+      "cpu": "99074ff162630bb77086c3d1c276d7e7a98e6b6df08dec1195f64f25cd6cfd56",
+      "recovery": "9d9b2438ebba3f97ec3f002d220f25ebec2d6ffbb790120a6a5c8f276d6b001f",
+      "completion": "ed9e94a50ee0918309bc0edb1bf76b2c6f32a499dfc1cda51aaf259978c9f216",
+      "transfer_poll_unchanged": "30ec996e2f0bfa858aff5129ba382ae38deb923604ac47716bffd13100e072ea"
+    }
+  },
+  "native": {
+    "ArmCpu": {
+      "source_sha256": "99074ff162630bb77086c3d1c276d7e7a98e6b6df08dec1195f64f25cd6cfd56",
+      "object_sha256": "140f22f9545ecb3f8fd7352fa1c61b4717ee045866625549e9b359c9a8a8cb48",
+      "new_exports": [
+        "_armcpu_spi_mask"
+      ],
+      "new_imports": [
+        "_IOLockAlloc",
+        "_IOLockFree",
+        "_lck_mtx_lock",
+        "_lck_mtx_unlock"
+      ],
+      "warnings": 2,
+      "initializers_preserved": true
+    },
+    "ShengUfs": {
+      "source_sha256": "23411876d2a7f30847b56354d3506c1ebfcdd3cacf1d5290c6253e5f22dbe3ba",
+      "object_sha256": "dbf1bfce2405d45815549b89baef4144dd4f65e09755fb7dde37a2598e739ff2",
+      "new_exports": [
+        "_elden_ufs_wait_shutdown"
+      ],
+      "new_imports": [
+        "__ZN12OSDictionary14withDictionaryEPKS_j",
+        "__ZN12OSDictionary9metaClassE",
+        "_absolutetime_to_nanoseconds",
+        "_armcpu_spi_attach",
+        "_armcpu_spi_mask",
+        "_assert_wait_timeout",
+        "_clear_wait",
+        "_nanoseconds_to_absolutetime",
+        "_panic_active",
+        "_preemption_enabled",
+        "_thread_wakeup_prim"
+      ],
+      "warnings": 26,
+      "initializers_preserved": true
+    }
+  },
+  "ufs_warnings_unchanged_versus_v150": true,
+  "ufs_warnings": 26,
+  "source_inputs": {
+    "drivers/EldenUfsWait/Source.py": "f2c9207aabf1924fcd8deccac7f92a2dc9f8ee85624bbf02a8f7bbc0a0f79ba1",
+    "drivers/EldenUfsWait/EldenUfsCompletion.inc": "ed9e94a50ee0918309bc0edb1bf76b2c6f32a499dfc1cda51aaf259978c9f216",
+    "drivers/EldenUfsWait/TestCompletion.cpp": "fe69192a010547c6557170d6f6f52204b44ab7355f4badfd3c0538bb48b6c6b5",
+    "drivers/EldenUfsWait/TestSpi.cpp": "5ac5b2c2673cf0cdaaeb29a70b1d8f7077e1cf228217303ea27a27d81ef04773",
+    "tools/build_ufs_wait_objects.py": "a9ac3e14eead5dfd5fabadad6ca5ca9aa60f60552fbfdb592eac587e6c612cbe",
+    "tools/test_ufs_wait.py": "44105ab9f75b782ed3aee899d95cc12bdcc9b26f6c371cd1c4fdcbab4b427fd1"
+  },
+  "limits": {
+    "whole_kernel": false,
+    "new_boot_image": false,
+    "hardware": false,
+    "throughput_benchmark": false,
+    "single_slot": true,
+    "direct_dma": false,
+    "multislot": false,
+    "authentication_cache": false
+  },
+  "provenance": {
+    "ShengUfs": "b6fe07b307eeddc5e258c9d5d4387b968a55e4e9",
+    "ArmCpu": "d90e457b8392623853ec85c860feef546c767621",
+    "sm8750_dts": "6f97250ead155fc3b980856323e99a4623dae73d",
+    "irq_spi": 265,
+    "irq_intid": 297,
+    "max_transfer_bytes": 131072
+  },
+  "records": "lab/records/ufs-wait-v151-20261115",
+  "native_build": "isolated/ufs-wait-objects-v151-3",
+  "failed_attempts": [
+    "host-1: test declaration alignas placement rejected",
+    "native-1: checker incorrectly required old Apple prelink imports in native nlist",
+    "native-2: two new warnings from unnecessary same-TU weak shutdown declaration; removed"
+  ],
+  "device_accessed": false
+}
