@@ -5,7 +5,7 @@ schema_version = 1
 name = "elden"
 soc = "SM8750P"
 os_profile = "ipados-17.7.11-21H461"
-summary = "v15532-slot UFS/direct DMA and matched read trials passed with stock restoration. Touch/Settings and original network stack have worked; Wi-Fi hardware, charging/endurance, persistence, memory and remaining peripherals are incomplete."
+summary = "v156 adds verified UFS automatic idle/wake and restoration to the v15532-slot direct-DMA path. Charging cycles/net power, wireless, persistence, memory and remaining peripherals are incomplete; GPU is separate offline work."
 
 [[area]]
 id = "configuration"
@@ -151,15 +151,15 @@ evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Re
 id = "power"
 status = "implemented"
 components = []
-paths = ["soc/sm8750/**", "package/**", "drivers/EldenPmicGlink/**", "scripts/driver-patches/EldenPowerInspect.cpp", "scripts/driver-patches/EldenPowerStartup.inc", "scripts/driver-patches/EldenModemReader.inc", "docs/ADSP-PMIC-RUNTIME-20261108.md", "docs/UCSI-DUALPORT-20261108.md", "docs/BATTERY-TELEMETRY-20261108.md"]
+paths = ["soc/sm8750/**", "package/**", "drivers/EldenPmicGlink/**", "scripts/driver-patches/EldenPowerInspect.cpp", "scripts/driver-patches/EldenPowerStartup.inc", "scripts/driver-patches/EldenModemReader.inc", "docs/ADSP-PMIC-RUNTIME-20261108.md", "docs/UCSI-DUALPORT-20261108.md", "docs/BATTERY-TELEMETRY-20261108.md", "drivers/EldenUfsIdle/**", "profiles/ufs-idle-trial/**", "tools/test_ufs_idle.py", "tools/analysis/assess_ufs_idle.py"]
 inputs = ["PM8550-class PMIC, RPMh resources and device power domains.", "Volume and power key behavior."]
 completion = ["Declared power controls match readings.", "Sleep/resume or shutdown transitions restore dependent peripherals."]
 configuration = ["Frozen v91 inputs and explicit experimental v92 separation; see docs/REPRODUCIBILITY.md."]
 procedure = ["Follow docs/PLAN.md and retain identity, fresh power, floor and full SHA admission."]
-findings = ["Battery/backlight, OEM ADSP/GLINK, UCSI notifications and controlled PD procedures have hardware evidence."]
-limits = ["Shared 500mA, complete fast charging, bypass, charge windows and all dual-port failure cases remain open."]
+findings = ["Battery/backlight, OEM ADSP/GLINK, UCSI notifications and controlled PD procedures have hardware evidence.", "v156 enables the stock-observed5000us UFS auto-Hibern8 timer with owned clock-request bits and error handling.32 hardware enter/exit cycles and authenticated reads passed; controller restoration, sync/reset and stock Android recovery passed."]
+limits = ["Shared 500mA, complete fast charging, bypass, charge windows and all dual-port failure cases remain open.", "UFS low-power entry is not whole-system sleep or measured tablet energy savings. Read-after-idle latency was0.8-1.0ms; high-SOC current and log loss do not establish net charging."]
 next_action = ["Use decision-changing functional tests; do not repeat the rejected GLINK write path."]
-evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "Battery/backlight, OEM ADSP/GLINK, UCSI notifications and controlled PD procedures have hardware evidence. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }]
+evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "Battery/backlight, OEM ADSP/GLINK, UCSI notifications and controlled PD procedures have hardware evidence. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }, { kind = "device", reference = "profiles/ufs-idle-trial/hardware.json", command = "Run v156 auto-Hibern8 idle/read proof, verify32 hardware enter/exit counters and block hashes, then controller restore, sync/reset and full stock recovery.", revision = "9c9a739148b175c4df362d91467ae39a7fadb9c2", result = "AHIT5f4/CFG183c/IE61 admitted;32 wake reads verified; stop0 phaseRestored and original Android UFS/charging settings restored. Drop1172; critical records complete, no net-energy claim." }]
 
 [[area]]
 id = "packaging"
