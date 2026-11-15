@@ -1,0 +1,269 @@
+{
+  "kind": "root+PHY transaction component",
+  "date": "2026-11-16",
+  "host": {
+    "passed": true,
+    "result": "1840 root+PHY transaction scenarios / 3588395 checks passed",
+    "asan_ubsan": true,
+    "hardware_callbacks_modeled": true,
+    "hardware": false,
+    "source_sha256": {
+      "Root.c": "1406f1bd7878053918bca74cc8ccae811e549822095c3183fe02c6ad6d431a84",
+      "Root.h": "6b607a22dec2acd4e516c921ddecae6c8f169eca508af39de93426019ab88cda",
+      "Phy.c": "a18afd15e9f1385bf2d07723d8ceea94cf2eafc9d89cb2d9d9490f1c63fee428",
+      "Phy.h": "a2dcfd5068fab775a2706b0e290eb1fcb368e777ab34b84ec262b18b2c9898fa",
+      "PhySequence.inc": "15a669913b5aef092eb1cf556561caac7a6cb9fdc5c52cecf2e1ac04f11fcc24",
+      "TestRoot.c": "b2c95a9712ec3cb36ddfeecac6320bc24fdab53c3a55a1dc199189ff76364858"
+    }
+  },
+  "native": {
+    "compiled": true,
+    "objects": {
+      "Root": {
+        "object_sha256": "c60809bb1740bbe2a22878cb7e4ee3e6516e4cc551654c8c382d103651656aa4",
+        "exports": [
+          "_elden_pcie_config_read32",
+          "_elden_pcie_root_start",
+          "_elden_pcie_window_base",
+          "_elden_pcie_window_bytes"
+        ],
+        "imports": [
+          "_elden_pcie_phy_start"
+        ],
+        "command": [
+          "xcrun",
+          "--sdk",
+          "iphoneos",
+          "clang",
+          "-target",
+          "arm64-apple-ios17.0",
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-ffreestanding",
+          "-fno-builtin",
+          "-fno-stack-protector",
+          "-mgeneral-regs-only",
+          "-c",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/pcie-root-20261116/source/drivers/EldenPcie/Root.c",
+          "-o",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/pcie-root-20261116/native1/Root.o"
+        ],
+        "warnings": 0
+      },
+      "Phy": {
+        "object_sha256": "b35bfcc847768af23b43c669b284bacd98dc01b6a79fb444125f1178333fb2d0",
+        "exports": [
+          "_elden_pcie_phy_start"
+        ],
+        "imports": [],
+        "command": [
+          "xcrun",
+          "--sdk",
+          "iphoneos",
+          "clang",
+          "-target",
+          "arm64-apple-ios17.0",
+          "-std=c11",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-ffreestanding",
+          "-fno-builtin",
+          "-fno-stack-protector",
+          "-mgeneral-regs-only",
+          "-c",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/pcie-root-20261116/source/drivers/EldenPcie/Phy.c",
+          "-o",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/pcie-root-20261116/native1/Phy.o"
+        ],
+        "warnings": 0
+      }
+    },
+    "combined_sha256": "7d0b354ae26de929f9f84021223cecae6647d95debcd5e234adb6fda44dda875",
+    "root_phy_bound": true,
+    "scalar": true,
+    "kernel_linked": false,
+    "native_provider_implemented": false,
+    "hardware_tested": false,
+    "source_sha256": {
+      "Root.c": "1406f1bd7878053918bca74cc8ccae811e549822095c3183fe02c6ad6d431a84",
+      "Root.h": "6b607a22dec2acd4e516c921ddecae6c8f169eca508af39de93426019ab88cda",
+      "Phy.c": "a18afd15e9f1385bf2d07723d8ceea94cf2eafc9d89cb2d9d9490f1c63fee428",
+      "Phy.h": "a2dcfd5068fab775a2706b0e290eb1fcb368e777ab34b84ec262b18b2c9898fa",
+      "PhySequence.inc": "15a669913b5aef092eb1cf556561caac7a6cb9fdc5c52cecf2e1ac04f11fcc24"
+    }
+  },
+  "linux_contract": {
+    "passed": true,
+    "linux_revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+    "source_inputs": {
+      "drivers/clk/qcom/gcc-sm8750.c": "31f7644672976b9b39a850e3143750ebfc01000730ccafbf9ca71e7fcd5a495e",
+      "drivers/clk/qcom/gdsc.c": "a7ba3aad9fe83609a9562eb8f4153ee9b91d9108130e7a4d1439437b5501b791",
+      "drivers/clk/qcom/clk-rcg2.c": "4a1c8f29e2d4a80ef14f5c58f14de7a3576ea591c84f091b59cf5257e303f947",
+      "drivers/clk/qcom/clk-regmap-phy-mux.c": "76be83dfd9ad18692d3f09d85589be6cff60cec62573344bdf2fd4eb47357380",
+      "drivers/clk/qcom/tcsrcc-sm8750.c": "4c02d5110d6d1c4c7161ee70ee76a26046f17a62e481ad6c1914504794604aed",
+      "drivers/pci/controller/dwc/pcie-qcom.c": "ba352de7ade47999f20df5c3a511586e6989a2c81a03c505a82dd676d0c10630",
+      "arch/arm64/boot/dts/qcom/sm8750.dtsi": "cbf8bad5006ec6d2c3d654aeec94bb0f08be235e03804164a2252e5b65a4e175"
+    },
+    "root_source_sha256": "1406f1bd7878053918bca74cc8ccae811e549822095c3183fe02c6ad6d431a84",
+    "branches": [
+      {
+        "name": "pcie_0_slv_axi",
+        "vote_reg": 335880,
+        "vote_bit": 0,
+        "halt_reg": 438304,
+        "hwcg": true,
+        "skip": false
+      },
+      {
+        "name": "pcie_0_mstr_axi",
+        "vote_reg": 335880,
+        "vote_bit": 1,
+        "halt_reg": 438320,
+        "hwcg": true,
+        "skip": true
+      },
+      {
+        "name": "pcie_0_cfg_ahb",
+        "vote_reg": 335880,
+        "vote_bit": 2,
+        "halt_reg": 438336,
+        "hwcg": true,
+        "skip": false
+      },
+      {
+        "name": "pcie_0_aux",
+        "vote_reg": 335880,
+        "vote_bit": 3,
+        "halt_reg": 438340,
+        "hwcg": false,
+        "skip": false
+      },
+      {
+        "name": "pcie_0_pipe",
+        "vote_reg": 335880,
+        "vote_bit": 4,
+        "halt_reg": 438356,
+        "hwcg": false,
+        "skip": true
+      },
+      {
+        "name": "pcie_0_slv_q2a_axi",
+        "vote_reg": 335880,
+        "vote_bit": 5,
+        "halt_reg": 438300,
+        "hwcg": false,
+        "skip": false
+      },
+      {
+        "name": "cnoc_pcie_sf_axi",
+        "vote_reg": 335880,
+        "vote_bit": 6,
+        "halt_reg": 65624,
+        "hwcg": true,
+        "skip": false
+      },
+      {
+        "name": "qmip_pcie_ahb",
+        "vote_reg": 335872,
+        "vote_bit": 11,
+        "halt_reg": 438296,
+        "hwcg": true,
+        "skip": false
+      },
+      {
+        "name": "aggre_noc_pcie_axi",
+        "vote_reg": 335872,
+        "vote_bit": 12,
+        "halt_reg": 65640,
+        "hwcg": true,
+        "skip": true
+      },
+      {
+        "name": "ddrss_pcie_sf_qtb",
+        "vote_reg": 335872,
+        "vote_bit": 19,
+        "halt_reg": 65660,
+        "hwcg": true,
+        "skip": true
+      },
+      {
+        "name": "cfg_noc_pcie_anoc_ahb",
+        "vote_reg": 335872,
+        "vote_bit": 20,
+        "halt_reg": 65616,
+        "hwcg": true,
+        "skip": false
+      },
+      {
+        "name": "pcie_0_phy_rchng",
+        "vote_reg": 335872,
+        "vote_bit": 22,
+        "halt_reg": 438372,
+        "hwcg": false,
+        "skip": false
+      }
+    ],
+    "vote_masks": {
+      "0x52008": "0x7f",
+      "0x52000": "0x581800"
+    },
+    "gdsc": [
+      {
+        "name": "gcc_pcie_0_gdsc",
+        "gdscr": 438276,
+        "status_register": 438280,
+        "up_bit": 16,
+        "collapse_bit": 0,
+        "wait_value": 2289664
+      },
+      {
+        "name": "gcc_pcie_0_phy_gdsc",
+        "gdscr": 442368,
+        "status_register": 442372,
+        "up_bit": 16,
+        "collapse_bit": 2,
+        "wait_value": 2236416
+      }
+    ],
+    "parf_registers": {
+      "PARF_PHY_CTRL": 64,
+      "PARF_DBI_BASE_ADDR_V2": 848,
+      "PARF_DBI_BASE_ADDR_V2_HI": 852,
+      "PARF_SLV_ADDR_SPACE_SIZE_V2": 856,
+      "PARF_SLV_ADDR_SPACE_SIZE_V2_HI": 860,
+      "PARF_ATU_BASE_ADDR": 1588,
+      "PARF_ATU_BASE_ADDR_HI": 1592,
+      "PARF_DEVICE_TYPE": 4096,
+      "PARF_BDF_TO_SID_TABLE_N": 8192,
+      "PARF_BDF_TO_SID_CFG": 11264,
+      "PARF_MHI_CLOCK_RESET_CTRL": 372,
+      "PARF_AXI_MSTR_WR_ADDR_HALT_V2": 424,
+      "PARF_LTSSM": 432
+    },
+    "tcsr_physical": 253771784,
+    "rcg_values": {
+      "tcxo_19_2_mhz": 1,
+      "gpll_even_100_mhz": 1541
+    },
+    "board_facts_sha256": "b6de310e9f5ad01da92ad1c9998ba8e4b030da5f607d3b3780e48cfe01509d54",
+    "scope": "Source-level register/clock contract; not native supplies/NoC admission or hardware acceptance"
+  },
+  "scope": {
+    "native_platform_power_noc_mapping_provider": false,
+    "bar_dma_smmu_msi_mhi": false,
+    "kernel_linked": false,
+    "boot_created": false,
+    "device_access": false,
+    "hardware_tested": false
+  },
+  "next": "Real native maps/admission/PHY supplies/NoC and shared GCC gate, then endpoint BAR/DMA/MSI/MHI and full-kernel recovery test",
+  "goal_complete": false,
+  "charging_complete": false,
+  "all_jobs_terminal": true,
+  "gpu_worktree_accessed": false
+}

@@ -23,6 +23,10 @@ Linux QMI桥接与128对象可重定位链接随后已通过，见[QMI接入](..
 与固定SM8750 Linux逐寄存器对比，PHY事务编译/错误测试通过。原厂端点当前休眠、配置全FF，
 因此把WLAN准入修正为“板级供电→链路/实读身份→QMI”两阶段。下一步是root时钟/GDSC/PARF/链路，
 不是直接拿缓存PCI身份授权DMA；没有整核或新硬件试验。
+
+随后[根控制器事务](../drivers/EldenPcie/ROOT.md)已完成离线Root＋PHY组件：本机CFG_GDSCR完成位、
+12路时钟、PARF/SID/L0/配置访问及端点禁DMA；1840场景和ARM64链接通过。下一步把这些回调接到
+真实平台映射、PHY供电与NoC，再BAR/DMA/MSI/MHI；不能以host模型替代电源提供者或实机。
 还没有启动Wi-Fi射频或生成新候选，不把接口核心验过当作Wi-Fi供电已打通。
 
 v156已经补齐一项可执行电源缺口：[UFS自动Hibern8](../profiles/ufs-idle-trial/README.md)。

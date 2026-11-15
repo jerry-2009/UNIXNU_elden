@@ -1,5 +1,9 @@
 # Elden PCIe cold bring-up components
 
+Follow-up: the [root transaction](ROOT.md) now compiles and binds this PHY,
+covering clocks/GDSC/PARF/SID/L0/config with1840 host scenarios. Real native
+power/NoC/mapping callbacks, the full kernel and hardware are still unfinished.
+
 This directory currently contains the exact TB322FC PHY table and a bounded
 cold PHY transaction. It does **not** yet contain a complete root-complex,
 DMA/MSI or MHI driver. The PHY and revised WLAN/QMI objects compile offline;

@@ -24,6 +24,9 @@ Linux QMI消费者绑定、整核和实机尚未完成。当前没有新boot，�
 stock sysfs为休眠端点且config全FF，所列ID/BAR只是缓存。先取得板级供电，之后实读身份确认，
 QMI才可准入；新版47组合场景与128对象链接通过。root clocks/GDSC/链路/DMA/MSI/MHI仍缺。
 
+Root clocks/GDSC/PARF/SID/L0/配置事务现已在[Root组件](../drivers/EldenPcie/ROOT.md)实现并离线编译验证；
+真正的平台映射/电源/NoC回调、整核与硬件尚缺，不能把该组件当作PCIe已经启动。
+
 ## 已完成的前置项
 
 原modem_a七件主要Peach固件的只读文件访问已有实现，尺寸/SHA按原厂备份固定。
