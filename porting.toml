@@ -192,39 +192,55 @@ evidence = [{ kind = "device", reference = "docs/CURRENT-STATUS.md", command = "
 [[area]]
 id = "network-initialization"
 status = "device-verified"
-components = ["XnuPrelink", "com.apple.iokit.IONetworkingFamily"]
+components = ["XnuPrelink", "IONetworkingFamily"]
 paths = ["profiles/v107-iokit-busy", "profiles/v108-network-family", "tools/build_network_family.py", "docs/NETWORK-INITIALIZATION.md"]
+inputs = ["Original iPadOS17 21H461 kernelcache and its IONetworkingFamily3.4; the frozen v107/v108 profiles."]
+configuration = ["v108 adds the original network family to prelink roots and retains its IOResources/IOBSD personality; it does not create a network interface."]
+procedure = ["Follow profiles/v108-network-family/README.md, audit the original family extent, then inspect the six IOKit snapshots and full stock-restoration record."]
+completion = ["The real IONetworkStack registers without a dummy MAC/interface; Wi-Fi scan, association and traffic are separate unfinished requirements."]
 findings = ["v107: six complete busy0/AES-only snapshots. v108: exact original21H461 family added; six snapshots show real IONetworkStack and AES, busy0."]
 limits = ["No WLAN/Ethernet interface; About latency not measured in v108. Capture dropped36 bytes."]
 next_action = ["Measure userland initialization when useful and continue qualified RAM expansion; no fake network readiness."]
-evidence = [{kind="device", reference="profiles/v108-network-family/hardware-result.json", result="Signed candidate, sync return and complete stock restoration verified."}]
+evidence = [{command="Run the recorded v108 candidate, inspect six busy/provider snapshots, request session-bound reset-after-sync and verify the full stock boot hash and Android recovery.", revision="1bb142e0375ed47a38b7b7166cc4cc442d3e792a", kind="device", reference="profiles/v108-network-family/hardware-result.json", result="Signed candidate, sync return and complete stock restoration verified."}]
 
 [[area]]
 id = "memory-window8"
 status = "device-verified"
 components = ["DarwinBoot", "ArmDTPlatform"]
 paths = ["profiles/v109-memory8", "tools/memory_window_patch.py", "docs/MEMORY-EXPANSION.md"]
+inputs = ["TB322FC EFI memory map, the v108 parent and three coherent bootstrap objects recorded in profiles/v109-memory8."]
+configuration = ["The separate v109 GUI profile manages8GiB with24 page-table-pool pages; current Bluetooth/PD profiles still use6GiB."]
+procedure = ["Follow profiles/v109-memory8/README.md and inspect its window, entry, original-Apple-region and captured GUI/stock-restoration checks."]
+completion = ["The requested EFI allocation and kernel window agree, root/GUI and recovery work; this does not qualify16GiB or every page under stress."]
 findings = ["Real EFI allocation and XNU8GiB window; three coherent bootstrap objects,24page pool and31 original Apple text extents audited. Software Settings/General frame CRCb92cfd0a validated."]
 limits = ["Not16GiB, full-page stress, About-latency or physical-finger acceptance. Home transition artifacts remain. Final capture drop10; damaged frame12 rejected."]
 next_action = ["Keep8GiB baseline and evaluate KVA/EFI reservations before larger windows or outside-page adoption."]
-evidence = [{kind="device", reference="profiles/v109-memory8/ui-hardware-result.json", result="Three trials completed sync return and full stock restoration; Android/root/green restored."}]
+evidence = [{command="Run the v109 GUI window trial, verify captured Settings/General frames and the recorded full-SHA stock Android restoration.", revision="63c7f9994776f9e1d9b990fdf5c59c06c8356a66", kind="device", reference="profiles/v109-memory8/ui-hardware-result.json", result="Three trials completed sync return and full stock restoration; Android/root/green restored."}]
 
 [[area]]
 id = "spmi-adc-bt-serialization"
 status = "host-verified"
 components = ["EldenPmicGlink", "EldenBluetooth"]
 paths = ["drivers/EldenSpmi", "profiles/v110-bt-fifo"]
+inputs = ["Frozen v110 ADC and Bluetooth readers, the same-board Linux transaction-serialization contract and the EldenSpmi transaction gate."]
+configuration = ["One shared provider serializes complete ADC and Bluetooth SPMI transactions; this area records the historical component stage."]
+procedure = ["Run tools/test_spmi_transaction_gate.py and build the ADC/WCN consumer components as documented in drivers/EldenSpmi; inspect host-result.json."]
+completion = ["The real readers use one gate, collisions and errors release it correctly; full-kernel and device qualification are recorded separately by v111."]
 findings = ["Both v110 runs stop before UART with completed SPMI status9 and ADC errors. Same-board Linux serializes entire bus transactions; Elden lacked a common gate. Actual-reader host collision/error tests and four ARM64 gate components pass."]
 limits = ["No full gate kernel or hardware test. FIFO hardware not reached. Status9 causality is not proved. Charging/net-current/cycles and Bluetooth remain incomplete."]
 next_action = ["Integrate one gate provider plus actual ADC and BT consumers, audit and then test thermal/WCN together."]
-evidence = [{kind="host", reference="drivers/EldenSpmi/host-result.json", result="Injected concurrency/error model; not hardware proof."}]
+evidence = [{command="Run the actual-reader transaction-gate fault/concurrency host tests recorded in drivers/EldenSpmi/host-result.json.", revision="b86a5f368ca97ebdd2c2a31f58437b1cd61ed917", kind="host", reference="drivers/EldenSpmi/host-result.json", result="Injected concurrency/error model; not hardware proof."}]
 
 [[area]]
 id = "spmi-hci-v114"
 status = "implemented"
 components = ["EldenPmicGlink", "EldenBluetooth"]
 paths = ["profiles/v111-spmi-gate", "profiles/v113-uart-gic", "profiles/v114-hci-length"]
+inputs = ["Qualified v111 shared SPMI consumers, v113 UART/peripheral evidence and the12-byte HCI identity response format in v114."]
+configuration = ["v114 keeps the v113 board/firmware path and adjusts the validated response-length gate; v112 remains withdrawn."]
+procedure = ["Follow the v111, v113 and v114 profile READMEs; inspect the frozen hardware records and preserve errors/stock recovery."]
+completion = ["The expected response is reached and accepted on hardware with clean recovery; a source fix alone is insufficient for native HCI readiness or pairing."]
 findings = ["v111 shared-bus consumers verified,54 ADC readings/thermal/WCN pass. v113 peripheral complete and real EDL response captured. v114 length12 validation fixes proven old-source rejection."]
 limits = ["v112 withdrawn for GIC address typo. Initial IBS wake remains variable. v114 did not reach its new check on hardware. No native HCI-ready/pairing or charge-policy completion."]
 next_action = ["Inspect cold-start UART synchronization and same-board Linux port-reopen sequence before further device runs."]
-evidence = [{kind="device", reference="profiles/v114-hci-length/hardware-result.json", result="Typed sync/reset and stock restore; stage2 timeout retained."}]
+evidence = [{command="Run the recorded v114 candidate and preserve its failed preparation-stage trace plus the verified stock restoration; the new length gate was not reached.", revision="79ecf38be39bcade9bb6f90ec95af60a9f57c36a", kind="device", reference="profiles/v114-hci-length/hardware-result.json", result="Typed sync/reset and stock restore; stage2 timeout retained."}]
