@@ -1,5 +1,13 @@
 # v140: automatic charge windows after explicit bypass
 
+Model correction after v140: the initial fixture swapped the normal and EU
+window labels. Property29/info19 is the normal window and wins over
+property30/info20 (EU). Recharge31/info21 affects only the EU branch; comparisons
+use truncated integer SOC. The updated59-anchor audit, corrected18 scenarios and
+original146 checks pass. The two compiled driver sources are byte-identical to
+v140: the driver delegates selection to OEM and never used the fixture's rule.
+No new candidate or flash was needed. See [review evidence](../../docs/evidence/charge-window-model-review.json).
+
 One real high-SOC trial passed: bypass →80% →bypass →40–60% →stock,
 applied generations1..5. Both exits from bypass sent SET28=1 and received real
 ACKs, while firmware kept charging off at100% (`firmware-held=1`). Stock restored
@@ -21,20 +29,20 @@ normal window write/readback and two later complete polls, leaving our previousl
 applied explicit bypass always sends SET28=1, waits for its real ACK and later
 fresh readback. Firmware may still hold charging off; that is reported separately.
 Automatic window transitions otherwise leave charging permission to OEM firmware.
-Only explicit bypass sends SET28=0. Original EU precedence, hysteresis and other
+Only explicit bypass sends SET28=0. Original window precedence, hysteresis and other
 firmware protections are not replaced by a host approximation.
 
 The distinction is established by the fixed stock ADSP: vendor property28 calls
 `mm8013_set_info` selector16, which stores `(value == 0)` in the manual inhibit
-flag. The automatic controller checks that flag before the bypass/EU/normal
+flag. The automatic controller checks that flag before the bypass/normal/EU
 windows. The dormant selector24 bypass-window setter is not a newly qualified
-host command. `tools/analysis/audit_charge_window_contract.py` checks27 instruction
+host command. `tools/analysis/audit_charge_window_contract.py` now checks59 instruction
 and table anchors; its output is in [the firmware evidence](../../docs/evidence/charge-window-contract.json).
 
 Host validation executes the actual v139 and v140 C policies with a bounded
-firmware-contract model: old7 scenarios reproduce the defects, fixed11 cover
+firmware-contract model: old7 scenarios reproduce the defects, corrected fixed18 cover
 high-SOC mode changes, subsequent low/high/low SOC, unrelated firmware holds,
-refused/missing release ACK and unchanged EU priority. The existing146 mode
+refused/missing release ACK, normal-before-EU selection and integer-SOC boundaries. The existing146 mode
 checks also pass under ASan/UBSan. These are not actual DSP execution or physical
 charge-cycle tests. Original v139 freshness/quarantine/30-second timeout handling
 and the same ChargePolicy structure/API remain.

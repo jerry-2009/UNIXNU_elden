@@ -1,0 +1,39 @@
+{
+  "correction": "Normal29/info19 precedes EU30/info20. Recharge31/info21 applies only to EU. SOC is truncated to integer percent before comparisons.",
+  "v140_compiled_sources_unchanged": {
+    "ChargePolicy": true,
+    "PmicClient": true
+  },
+  "host": {
+    "passed": true,
+    "asan_ubsan": true,
+    "actual_policy": true,
+    "firmware_contract_model": true,
+    "firmware_model_revision": 2,
+    "normal_before_eu": true,
+    "hardware_tested": false,
+    "results": [
+      {
+        "case": "original",
+        "output": "PASS 7 charge-window contract scenarios",
+        "source_sha256": "5f9691921c1545f315aee0ef50ac390630034c26c7ae9b3878cf5fc949727ea9",
+        "fixture_sha256": "5090fd290d5e0d09f06582dda33a597a8c59cc3061ac2218109074c1d197e256"
+      },
+      {
+        "case": "fixed",
+        "output": "PASS 18 charge-window contract scenarios",
+        "source_sha256": "ff0847a18b64859ab7543f8cca21c0b5e5c11e293bbbdee0aae8e4ad1a867726",
+        "fixture_sha256": "5090fd290d5e0d09f06582dda33a597a8c59cc3061ac2218109074c1d197e256"
+      },
+      {
+        "case": "existing",
+        "output": "ChargePolicy: 146 checks passed",
+        "source_sha256": "ff0847a18b64859ab7543f8cca21c0b5e5c11e293bbbdee0aae8e4ad1a867726",
+        "fixture_sha256": "b1e92da06285256759055c5965055edea2b2089ae70c33abc620f7295c94c884"
+      }
+    ]
+  },
+  "candidate_rebuilt": false,
+  "device_flashed": false,
+  "old_evidence_archive": "docs\\archive\\charge-window-contract-before-label-review-20261115.json"
+}

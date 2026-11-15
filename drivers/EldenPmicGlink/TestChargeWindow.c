@@ -6,17 +6,22 @@
 #include <stdio.h>
 #include <string.h>
 typedef struct {
-    unsigned window,eu,soc,enabled,manual,external_hold,cycle,disable_writes,enable_writes;
+    unsigned window,eu,recharge,soc,enabled,manual,external_hold,cycle,disable_writes,enable_writes;
 } Firmware;
 static unsigned get(const unsigned char *p){return p[0]|(unsigned)p[1]<<8|(unsigned)p[2]<<16|(unsigned)p[3]<<24;}
 static void put(unsigned char*p,unsigned v){for(unsigned i=0;i<4;i++)p[i]=(unsigned char)(v>>(8*i));}
 static void tick(Firmware*f){
     if(f->manual||f->external_hold){f->enabled=0;return;}
-    unsigned w=f->eu/100000?f->eu:f->window;
+    /* Property29 -> info19 -> 602ab94e is tested before property30's
+     * info20 -> 602ab948. The previous model had these labels reversed. */
+    unsigned w=f->window/100000?f->window:f->eu;
     if(! (w/100000)){f->enabled=1;return;}
     unsigned low=w/1000%100,high=w%1000;
-    if(f->soc>=high*100)f->enabled=0;
-    else if(f->soc<=low*100)f->enabled=1;
+    if(!(f->window/100000)&&f->recharge)low=high*f->recharge/100;
+    /* Firmware truncates centi-percent capacity before comparisons. */
+    unsigned soc=f->soc/100;
+    if(soc>=high)f->enabled=0;
+    else if(soc<=low)f->enabled=1;
 }
 static void observe(EldenChargePolicy*s,Firmware*f){
     tick(f);elden_charge_policy_observe(s,++f->cycle,f->soc,f->enabled);
@@ -38,7 +43,7 @@ static int transact(EldenChargePolicy*s,Firmware*f,unsigned error){
     int rc=elden_charge_policy_receive(s,r,24);assert(rc==(error?-1:1));return 1;
 }
 static void setup(EldenChargePolicy*s,Firmware*f,unsigned eu,unsigned soc){
-    memset(f,0,sizeof(*f));f->window=95100;f->eu=eu;f->soc=soc;f->enabled=1;f->cycle=10;
+    memset(f,0,sizeof(*f));f->window=95100;f->eu=eu;f->recharge=95;f->soc=soc;f->enabled=1;f->cycle=10;
     elden_charge_policy_init(s);elden_charge_policy_link(s,true);
     assert(transact(s,f,0));assert(transact(s,f,0));observe(s,f);
 }
@@ -95,10 +100,20 @@ int main(void){
         else assert(transact(&s,&f,4));
         assert(s.phase==EldenPolicyFailed&&s.applied_sequence==before&&f.manual);cases++;
     }
-    /* Repeated automatic changes leave the EU firmware precedence intact. */
+    /* Normal protection wins; restoring its disabled stock window falls back
+     * to EU without changing EU or its recharge parameter. */
     setup(&s,&f,176080,6500);select_mode(&s,&f,EldenChargeWindow4060);
-    assert(f.enabled&&!f.manual&&f.eu==176080&&!f.enable_writes&&!f.disable_writes);
-    select_mode(&s,&f,EldenChargeStock);assert(f.eu==176080&&!f.enable_writes&&!f.disable_writes);cases++;
+    assert(!f.enabled&&!f.manual&&f.eu==176080&&!f.enable_writes&&!f.disable_writes);
+    select_mode(&s,&f,EldenChargeStock);assert(f.enabled&&f.eu==176080&&f.recharge==95&&!f.enable_writes&&!f.disable_writes);cases++;
+    /* Boundaries from the identified normal/EU branches distinguish this
+     * contract from the prior reversed/centi-percent model. */
+    setup(&s,&f,140060,5000);f.enabled=0;tick(&f);assert(f.enabled);cases++;
+    f.recharge=0;f.enabled=0;tick(&f);assert(!f.enabled);cases++;
+    f.window=140060;f.recharge=95;f.enabled=0;tick(&f);assert(!f.enabled);cases++;
+    f.soc=4099;tick(&f);assert(f.enabled);cases++;
+    f.soc=4100;f.enabled=0;tick(&f);assert(!f.enabled);cases++;
+    f.soc=5999;f.enabled=1;tick(&f);assert(f.enabled);cases++;
+    f.soc=6000;tick(&f);assert(!f.enabled);cases++;
 #endif
     printf("PASS %u charge-window contract scenarios\n",cases);
 }
