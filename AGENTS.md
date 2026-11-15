@@ -1,5 +1,22 @@
 # UniXNU elden — authoritative source repository
 
+Latest v15920261116: real early SMMU wrapper+fault handlers/domain/programmer/immutable route integrated and signed.
+Hardware601selection reads pass bank7/slot8/ASID1/CB0a9f00e0, but allocator returns-71 at native stage3 BEFORE IRQ
+registration, registry reserve or SMMU writes. Exact segment/PAR rejection unknown; next instrument those values,
+do not guess/relax gates or repeat selection alone. Late PCIe correctly refuses before WLAN power. Root/PID1/eightCPU
+admission and baseline touch DMA attach/transfers/detach/release pass; registered Wi-Fi coexistence and real finger not tested.
+Typed sync/physical fastboot/full stock8b8e72da/Android/root/green/original charge/radio/scans/sleep restored; all jobs terminal.
+Imagecc29e9e3/sessionfa0f855a25106996; rawkernel50424764,148056B/raw9ebed94e/dropmax0/no reconnect; floor1738713600/0/3.
+Important correction: actual ID04c017e84 has ATOSNS26=1 (NOT supported), confirmed fixed6f97250e Linux fallback to table
+walk. Final core uses mode2/audited graph+context; native ATS writes refuse, no hardware translation/DMA claim. Native1
+without this gate withdrawn before boot. Kernelbuild1 failed forward declarations; noinline invoke bridge fixed build2.
+25core4020100checks+17fault/status tests ASan/UBSan; MMIO/GIC modeled. Native2/11components, WCN3/PCIe3, 5existing native
+replacements+16added, core/other members/init/Apple30/entry7124 preserved;11 direct calls audited. Normal8core admission
+passes owned-SGI derivative; deliberate selfprobe untested. Final profile docs profiles/smmu-domain-trial/README.md.
+Mac lab/smmu-domain-20261116/{source5,host2,fault2,native2,wcn3,pcie3}, smmu-kernel-v159-20261116/build2 and
+smmu-boot-v159-20261116/package1; Windows corresponding edl (wcn3/pcie3 collected under kernel folder), lab/records/smmu-domain-20261116.
+Goal active/charging and networking incomplete; GPU/QRTR/AnyRouter preserved. Device last fully restored stock; fresh state required next write.
+
 Latest DMA-memory20261116 offline: real IOKit DmaMemory allocator prepares130MiB contiguous/mapper-none backing
 for aligned128MiB data plus66table pages; every4K PA/PAR r/w checked, WB primaries cleaned, data NC alias44 verified,
 no cached-alias reuse/fixed RAM. Same-owner/epoch release proof after claim; failed complete retains all refs and forbids

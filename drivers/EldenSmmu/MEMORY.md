@@ -1,10 +1,13 @@
 # Owned Wi-Fi DMA memory and domain selection
 
 The real IOKit allocator, upstream page-table code and read-only bank/ASID
-selector now compile for ARM64/iOS17. Host fault tests run the actual methods
-with physical mappings/cache/IOKit services modeled. **They have not run on
-Y700; no SMMU context, full new kernel or boot image is claimed.** v158 remains
-the hardware baseline.
+selector compile for ARM64/iOS17. Host fault tests run the actual methods with
+physical mappings/cache/IOKit services modeled. [v159](../../profiles/smmu-domain-trial/README.md)
+then ran the selector successfully on Y700 and entered the allocator, which
+refused with-71 before SMMU writes. The full build/boot and return are verified;
+allocation and the SMMU domain are not accepted. Investigate exact segment/PAR
+values next. ID0.ATOSNS forbids hardware translation queries here; use audited
+tables and eventual real DMA evidence.
 
 ## Memory and tables
 

@@ -14,16 +14,21 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['clean-build','parent-build','native-build','wlan-build','root-build','power-build','wcn-build','original-kernelcache','llvm','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--endpoint-build',type=Path,help='Add the explicitly built BAR/Peach transaction')
+    p.add_argument('--smmu-build',type=Path,help='Add the concrete early DMA/SMMU owner')
+    p.add_argument('--route-build',type=Path,help='Matched boot registry and derived touch route')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
+    if bool(a.smmu_build)!=bool(a.route_build) or (a.smmu_build and not a.endpoint_build):raise ValueError('SMMU needs endpoint and route builds together')
     contract=read(ROOT/'profiles/ufs-idle-trial/native-contract.json');assert native_identity(parent/'native.macho')==(contract['sections'],contract['commands'],contract['symbols'])
     previous=read(parent/'result.json');assert previous['profile']=='ufs-idle-trial' and sha(parent/'kernel.macho')==previous['kernel_sha256']
     out.mkdir(parents=True,exist_ok=False);(out/'source').mkdir()
     from build_ufs_wait_objects import compile_units
-    changed,records,_,inherited=compile_units(base,parent,out,a.llvm,queue=True,idle=True,idle_normal=True)
-    assert set(changed)=={'ShengUfs.o'}
+    providers=[a.smmu_build/'SmmuNativeBinding.o'] if a.smmu_build else []
+    changed,records,_,inherited=compile_units(base,parent,out,a.llvm,queue=True,idle=True,idle_normal=True,early_smmu=bool(a.smmu_build),providers=providers)
+    assert set(changed)==({'ShengUfs.o','ArmCpu.o'} if a.smmu_build else {'ShengUfs.o'})
     nr=read(a.native_build/'result.json');wr=read(a.wlan_build/'result.json');rr=read(a.root_build/'result.json');pr=read(a.power_build/'result.json');cr=read(a.wcn_build/'result.json')
     assert nr['native_root_worker_bound'] and wr['root_worker_hooks'] and wr['root_power_provider']
     assert bool(nr.get('endpoint_worker_bound'))==bool(a.endpoint_build)
+    assert bool(nr.get('smmu_domain_required'))==bool(a.smmu_build) and bool(wr.get('smmu_stop_hook'))==bool(a.smmu_build)
     supplied={'Native.o':(a.native_build/'Native.o',nr['object_sha256']),
               'Root.o':(a.root_build/'Root.o',rr['objects']['Root']['object_sha256']),
               'Phy.o':(a.root_build/'Phy.o',rr['objects']['Phy']['object_sha256']),
@@ -36,6 +41,14 @@ def main():
         supplied['Endpoint.o']=(a.endpoint_build/'Endpoint.o',er['object_sha256'])
         endpoint_sources={'drivers/EldenPcie/'+n:h for n,h in er['source_sha256'].items()}
         for name,h in endpoint_sources.items():assert sha(ROOT/name)==h,name
+    smmu_sources={};smmu_count=0
+    if a.smmu_build:
+        sr=read(a.smmu_build/'result.json');tr=read(a.route_build/'result.json');smmu_count=sr['component_count'];assert smmu_count==11
+        supplied['SmmuNativeBinding.o']=(a.smmu_build/'SmmuNativeBinding.o',sr['binding_sha256'])
+        supplied['EldenNvtDmaRoute.o']=(a.route_build/'DmaRoute.o',tr['objects']['DmaRoute']['object_sha256'])
+        for report in [sr,tr]:
+            for path,h in report['source_inputs'].items():assert sha(ROOT/path)==h,path;smmu_sources[path]=h
+        smmu_sources['drivers/EldenSmmu/EarlySource.py']=sha(ROOT/'drivers/EldenSmmu/EarlySource.py')
     for file,h in supplied.values():assert sha(file)==h,file
     for report,key,prefix in [(nr,'source_inputs',ROOT),(wr,'source_inputs',ROOT),(rr,'source_sha256',ROOT/'drivers/EldenPcie'),(pr,'source_sha256',ROOT)]:
         for file,h in report[key].items():assert sha(prefix/file)==h,file
@@ -46,6 +59,9 @@ def main():
     link=read(parent/'link-command.json');replacements={};member_hashes={}
     groups={'libShengUfs.a':{'ShengUfs.o':changed['ShengUfs.o']},
             'libEldenBluetooth.a':{name:supplied[name][0] for name in ['WcnPower.o','WcnPowerNative.o']}}
+    if a.smmu_build:
+        groups['libArmCpu.a']={'ArmCpu.o':changed['ArmCpu.o']}
+        groups['libNativeLegacyDisplay.late.a']={'EldenNvtDmaRoute.o':supplied['EldenNvtDmaRoute.o'][0]}
     for archive_name,selected in groups.items():
         found=[x.split(',')[-1] for x in link if x.endswith('/'+archive_name)];assert len(found)==1;old=Path(found[0])
         folder=out/archive_name.removesuffix('.a');folder.mkdir()
@@ -60,6 +76,7 @@ def main():
             assert actual==expected or actual==expected+b'\n'*((-len(expected))%8)
         replacements[str(old)]=str(target);member_hashes[archive_name]=members
     pcie_members=['Native.o','Root.o','Phy.o','Power.o']+(['Endpoint.o'] if a.endpoint_build else [])
+    if a.smmu_build:pcie_members.append('SmmuNativeBinding.o')
     pcie=out/'libEldenPcie.a';subprocess.run(['ar','rcs',str(pcie),*[str(supplied[n][0]) for n in pcie_members]],env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
     inherited_inputs={str(parent/'link.filelist'):sha(parent/'link.filelist')}
     for file in (parent/'link.filelist').read_text().splitlines():inherited_inputs[file]=sha(Path(file))
@@ -73,7 +90,7 @@ def main():
     command.append('-Wl,-force_load,'+str(pcie));write(out/'link-command.json',command)
     env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as log:subprocess.run(command,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
-    expected=exports(parent/'native.macho')|set().union(*(exports(p) for p,h in supplied.values()))
+    expected=exports(parent/'native.macho')|set().union(*(exports(p) for p,h in supplied.values()))|set().union(*(exports(p) for p in changed.values()))
     assert exports(out/'native.macho')==expected
     for file,h in {**inherited_inputs,**inherited}.items():assert sha(Path(file))==h,file
     pre=read(ROOT/'profiles/v91/image-build/plan.json')['prelink'];assert sha(a.original_kernelcache)==pre['original_kernelcache_sha256']
@@ -88,16 +105,17 @@ def main():
     before=entry((parent/'kernel.macho').read_bytes());after=entry((out/'kernel.macho').read_bytes())
     assert before[2]==after[2] and before[1]-before[0]==after[1]-after[0]==7124
     shutil.copytree(parent/'runtime',out/'runtime')
-    own={**nr['source_inputs'],**wr['source_inputs'],**{'drivers/EldenPcie/'+n:h for n,h in rr['source_sha256'].items()},**pr['source_sha256'],**shared_sources,**endpoint_sources}
+    own={**nr['source_inputs'],**wr['source_inputs'],**{'drivers/EldenPcie/'+n:h for n,h in rr['source_sha256'].items()},**pr['source_sha256'],**shared_sources,**endpoint_sources,**smmu_sources}
     for path in ['tools/build_pcie_root_kernel.py','tools/build_ufs_wait_objects.py','drivers/EldenUfsIdle/IdleSource.py']:own[path]=sha(ROOT/path)
     sources={**previous['source_inputs'],**own}
-    report={'profile':'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
+    report={'profile':'smmu-domain-trial' if a.smmu_build else 'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
             'source_inputs':sources,'optional_runtime':previous['optional_runtime'],'core_filelist_unchanged':True,'changed_core_objects':0,'scalar':True,
-            'changed_native_objects':3,'added_native_objects':len(pcie_members),'native_objects':records,'archive_members':member_hashes,
+            'changed_native_objects':5 if a.smmu_build else 3,'added_native_objects':len(pcie_members)+(smmu_count-1 if a.smmu_build else 0),'native_objects':records,'archive_members':member_hashes,
             'component_objects':{n:{'path':str(p),'sha256':h} for n,(p,h) in supplied.items()},
             'parent_kernel_sha256':previous['kernel_sha256'],'original_apple_executables_hashed':30,'entry_return_target':hex(after[1]),
             'ufs_diagnostic_removed':True,'ufs_ah8_retained':True,'root_worker_bound':True,
             'endpoint_worker_bound':bool(a.endpoint_build),'endpoint_generated_sources':nr.get('generated_sources',{}),
+            'smmu_domain_bound':bool(a.smmu_build),'smmu_component_count':smmu_count,'owned_sgi_guard':bool(a.smmu_build),
             'boot_packaged':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['profile','kernel_sha256','changed_native_objects','added_native_objects','original_apple_executables_hashed','boot_packaged']}))
 if __name__=='__main__':main()

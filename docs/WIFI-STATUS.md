@@ -8,6 +8,11 @@ v158随后通过[BAR/芯片身份实机](../profiles/pcie-endpoint-trial/README.
 芯片40210200/major2/minor0、MEM-only/禁BM，真实WLAN epoch确认、同步回程及完整Android恢复。
 Wi-Fi仍不能联网：SMMU/DMA/MSI/MHI/固件上传、en0、扫描、关联和流量均未验收。
 128对象QMI可重定位链接尚未接入此候选。下一步有所有权的DMA/MSI及MHI，已通过的身份诊断不重跑。
+
+v159[早期SMMU候选](../profiles/smmu-domain-trial/README.md)完成601次实读，选出bank7/ASID1；
+内存校验随后返回-71，尚未配置SMMU/故障IRQ，后续PCIe正确拒绝上电。UFS、CPU、触控DMA和完整
+Android回程通过。下一步记录分配器物理段长度/地址/PAR的具体失败值，不猜测原因或放宽门槛。
+本机ID0的ATOSNS表示不支持硬件翻译查询，已按Linux改用完整页表遍历；实际DMA仍待MHI验证。
 显式full-on预算不是日用电源策略，日用净充及完整保护周期仍欠。
 
 [BAR/Peach事务](../drivers/EldenPcie/ENDPOINT.md)采用stock61MiB与Linux573MiB窗口的较窄交集。

@@ -7,17 +7,23 @@ from charge_verification_boot import qualify_shared_assets
 ROOT=Path(__file__).resolve().parents[1]
 def qualify(report_path,entry_path,runtime):
     report_path=Path(report_path);r=json.loads(report_path.read_text());folder=report_path.parent
-    endpoint=r.get('profile')=='pcie-endpoint-trial'
-    if r.get('profile') not in ('pcie-root-trial','pcie-endpoint-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=3 or r['added_native_objects']!=4+int(endpoint):
+    smmu=r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
+    if r.get('profile') not in ('pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(16 if smmu else 4+int(endpoint)):
         raise ValueError('Wrong root kernel build')
     if not all(r.get(k) is True for k in ['core_filelist_unchanged','scalar','ufs_diagnostic_removed','ufs_ah8_retained','root_worker_bound']):
         raise ValueError('Root/idle integration contract missing')
     components={'Native.o','Root.o','Phy.o','Power.o','WcnPowerNative.o','WcnPower.o'}
     if endpoint:components.add('Endpoint.o')
-    if set(r['native_objects'])!={'ShengUfs'} or set(r['component_objects'])!=components:
+    if smmu:components|={'SmmuNativeBinding.o','EldenNvtDmaRoute.o'}
+    if set(r['native_objects'])!=({'ArmCpu','ShengUfs'} if smmu else {'ShengUfs'}) or set(r['component_objects'])!=components:
         raise ValueError('Wrong root object set')
     if endpoint:
         sys.path.insert(0,str(ROOT/'drivers/EldenPcie'));from EndpointNativeSource import generated
+        if smmu:
+            sys.path.insert(0,str(ROOT/'drivers/EldenSmmu'));import EarlySource
+            generated=EarlySource.pcie_generated
+            if not r.get('smmu_domain_bound') or r.get('smmu_component_count')!=11 or not r.get('owned_sgi_guard'):raise ValueError('SMMU owner/CPU guard not qualified')
+            if hashlib.sha256(EarlySource.cpu()).hexdigest()!=r['native_objects']['ArmCpu']['source_sha256']:raise ValueError('Owned SGI source differs')
         if not r.get('endpoint_worker_bound') or r['endpoint_generated_sources']!={n:hashlib.sha256(b).hexdigest() for n,b in generated().items()}:
             raise ValueError('Endpoint worker source/qualification differs')
     sys.path.insert(0,str(ROOT/'drivers/EldenUfsIdle'));import IdleSource as ah8
@@ -27,16 +33,24 @@ def qualify(report_path,entry_path,runtime):
               'EldenPinnedRootXnu.inc':q.pinned_root(),'EldenUfsPrdtAlgorithm.h':q.header(),'TransferPoll.h':ah8.transfer(),
               'EldenUfsIdle.inc':ah8.normal_runtime()}
     row=r['native_objects']['ShengUfs']
-    if not row['initializers_preserved'] or hashlib.sha256(ah8.normal_source()).hexdigest()!=row['source_sha256']:
+    ufs_source=ah8.normal_source
+    if smmu:
+        expected['EldenSdamRecovery.inc']=EarlySource.recovery();ufs_source=EarlySource.ufs
+    if not row['initializers_preserved'] or hashlib.sha256(ufs_source()).hexdigest()!=row['source_sha256']:
         raise ValueError('Root UFS source/initializer differs')
     if {k:hashlib.sha256(v).hexdigest() for k,v in expected.items()}!=row['generated_sources']:
         raise ValueError('Root UFS dependencies differ')
-    hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint)
+    hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu)
     result=qualify_shared_assets(report_path,entry_path,runtime)
-    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint)
+    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu)
     return result
 
 def menu(qualification):
+    if qualification.get('profile')=='smmu-domain-trial':
+        if qualification.get('smmu_domain') is not True:raise ValueError('Explicit qualified SMMU intent required')
+        base=menu(dict(qualification,profile='pcie-endpoint-trial'));old=tomllib.loads(base);args=old['entry'][0]['args'];value=args+' esm'
+        if len(value.replace('@SESSION@','0'*16).encode())>1023:raise ValueError('SMMU menu exceeds parser contract')
+        return base.replace('args = "'+args+'"','args = "'+value+'"',1).replace('Wi-Fi chip identity + USB - TEST','Wi-Fi DMA mapping + USB - TEST',1)
     if qualification.get('profile')=='pcie-endpoint-trial':
         if qualification.get('endpoint_trial') is not True:raise ValueError('Explicit qualified endpoint intent required')
         base=menu(dict(qualification,profile='pcie-root-trial'));old=tomllib.loads(base);args=old['entry'][0]['args']

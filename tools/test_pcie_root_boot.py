@@ -27,5 +27,12 @@ def main():
         try:menu(bad)
         except ValueError:pass
         else:raise AssertionError('Invalid endpoint intent accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':7}))
+    smmu=dict(ep,profile='smmu-domain-trial',smmu_domain=True);smmu_menu=tomllib.loads(bt_runtime_boot.menu(smmu))
+    assert len(smmu_menu['entry'][0]['args'].replace('@SESSION@','0'*16).encode())==1019
+    smmu_args=arguments(smmu_menu['entry'][0]['args']);assert smmu_args.pop('esm')=='1' and smmu_args==arguments(epmenu['entry'][0]['args'])
+    assert smmu_menu['entry'][1:]==actual['entry'][1:] and smmu_menu['boot']==actual['boot']
+    try:menu(dict(smmu,smmu_domain=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified SMMU accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':8}))
 if __name__=='__main__':main()

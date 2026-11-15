@@ -39,6 +39,11 @@ ARM64组件通过，但尚无真实早期分配器/bank-ASID/fault处理/页表/
 4KiB页表、逐页CPU PA/cache检查、独立遍历和只读选择器。host故障模型通过，仍未在真机执行。
 下一步接早期wrapper、故障IRQ、真实context/ATOS与注册发布，再进入MHI；当前候选保持v158。
 
+上述入口已在[v159](../profiles/smmu-domain-trial/README.md)整合并上机：601次选择读取通过，
+bank7/ASID1成立，但分配器-71使流程停在SMMU写入之前。立即下一步是精确记录物理段长度/地址/
+PAR拒绝值；不要重复独立bank扫描，也不要猜改充电/电压。ATOSNS已证实不支持硬件ATOS，
+相应步骤改为实际context＋完整物理页表核验，之后以受控MHI传输验证DMA。自动回程/stock已恢复。
+
 不重复v157/v158诊断，也不复制其它设备未保留的低地址DMA内存。power_ready/CPR/QMI仍必须
 核对当前确认代际，不能沿用历史实机结果。更详细的边界见[原生worker](../drivers/EldenPcie/NATIVE.md)。
 

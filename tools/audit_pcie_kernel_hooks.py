@@ -2,7 +2,7 @@
 import argparse,json,struct
 from pathlib import Path
 from replay_xnu_objects import global_symbols
-def audit(native,kernel,endpoint=False):
+def audit(native,kernel,endpoint=False,smmu=False):
     data=Path(native).read_bytes();after=Path(kernel).read_bytes();at=32;sections={};code=[]
     for _ in range(struct.unpack_from('<I',data,16)[0]):
         cmd,size=struct.unpack_from('<II',data,at)
@@ -28,6 +28,8 @@ def audit(native,kernel,endpoint=False):
     targets=[('_elden_pcie_native_start','_elden_wcn_power_start',256),('_elden_pcie_native_stop_begin','_elden_wcn_request_stop',512),
              ('_elden_pcie_root_start',None,0),('_elden_wlan_root_power',None,0)]
     if endpoint:targets+=[('_elden_pcie_endpoint_identify',None,0),('_elden_wlan_power_confirm_endpoint',None,0)]
+    if smmu:targets+=[('_elden_wifi_smmu_early_initialize','_elden_wifi_smmu_early_invoke',256),('_elden_wifi_smmu_early_invoke',None,0),('_elden_wifi_smmu_stop_begin','_elden_wcn_request_stop',512),
+                      ('_elden_smmu_domain_start',None,0),('_elden_smmu_select_boot_domain',None,0)]
     for target,caller,bound in targets:
         dest=address(target);calls=[]
         for base,size,off in code:
@@ -47,5 +49,6 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['native','kernel','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--endpoint',action='store_true')
-    a=p.parse_args();r=audit(a.native,a.kernel,a.endpoint);a.output.write_text(json.dumps(r,indent=2)+'\n',encoding='utf-8');print(json.dumps(r))
+    p.add_argument('--smmu',action='store_true')
+    a=p.parse_args();r=audit(a.native,a.kernel,a.endpoint,a.smmu);a.output.write_text(json.dumps(r,indent=2)+'\n',encoding='utf-8');print(json.dumps(r))
 if __name__=='__main__':main()

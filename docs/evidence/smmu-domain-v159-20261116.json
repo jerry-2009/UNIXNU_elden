@@ -1,0 +1,281 @@
+{
+  "hardware": {
+    "selection_passed": true,
+    "selection_reads": 601,
+    "bank": 7,
+    "slot": 8,
+    "asid": 1,
+    "cb0_sctlr": "0xa9f00e0",
+    "allocator_result": -71,
+    "allocator_stage_detail_unknown": true,
+    "smmu_configured": false,
+    "fault_irqs_registered": false,
+    "pcie_power_refused_on_missing_domain": true,
+    "touch_dma_start_stop_passed": true,
+    "real_finger_tested": false,
+    "all_eight_cpu_admission": true,
+    "sync_and_full_stock_restore_passed": true,
+    "original_settings_restored": true,
+    "capture_bytes": 148056,
+    "capture_sha256": "9ebed94e71d2e7287e710c6e5b1e0ccc271b6755412fb9b5efc97a738ebf65ef",
+    "reported_drop_max": 0,
+    "session": "fa0f855a25106996",
+    "image_sha256": "cc29e9e305e95db69ef0a88a2f8f405d0cac8db4a346a3de25b2e03c933eca76",
+    "scope": "Read-only SMMU selection and guarded refusal/recovery; no mapped Wi-Fi domain, IRQ/DMA/MHI/network acceptance",
+    "next": "Expose exact allocation/physical-segment/PAR failure before changing a gate or retrying hardware"
+  },
+  "atos_capability": {
+    "passed": true,
+    "revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+    "inputs": {
+      "drivers/iommu/arm/arm-smmu/arm-smmu.h": "4a9671ab3a04687ab1371a0aca9718912ada0acd846492fdb6592a8e488d0c24",
+      "drivers/iommu/arm/arm-smmu/arm-smmu.c": "47d25eb392223b934a6a0f2e648ec8d9e07d0679459178e91b2762a6586b9606"
+    },
+    "known_id0": 1275166340,
+    "atos_supported": false,
+    "fallback": "Linux page-table walk; Elden independently audits the full physical table graph and observes the context",
+    "hardware_dma_verified": false,
+    "scope": "Source/known-capability audit; actual selected IDs must still be read in native preflight"
+  },
+  "host": {
+    "passed": true,
+    "result": "25 domain scenarios / 4020100 checks; actual programmer/walker/ATOS model, no physical MMIO",
+    "asan_ubsan": true,
+    "actual_domain_and_upstream_programmer": true,
+    "hardware_mmio_modeled": true,
+    "hardware": false,
+    "source_sha256": {
+      "drivers/EldenSmmu/Domain.c": "7bddc012b70200dc6d23f22f816da9b00e527b13e6ca1267e5135ea1e4e3e452",
+      "drivers/EldenSmmu/DmaTables.c": "e9aec139cf0317167835bdb5c6df82c5c499d179e6105c29d6c4b677d8cf03b6",
+      "drivers/EldenSmmu/TestDomain.c": "9bc7e9426d4b8cb06af091d4705aa7c32cd679505700552049d331955153d5eb",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4K.c": "b5b71541fa5a1de50e4dd993036e01a7ac5e8e54eaa20929c2ea2827fb923602",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KAudit.c": "339200a21ddd8daeadbb64d24b45ecaae33e3b5d4f2061ed9d76bb00c8b01b65",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KContext.c": "0f2c726760f4a7c9fd5d8c85b970dd199a7c61d6fbe28e8e08d17e03716515bf",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KProgram.c": "d7cc79be2b1fb99003badbcce6d4aeef595f4d89524651cbc4709568f27e2a51",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KTableMemory.c": "6391e4b8cc0147666bf55fe41596bc326b9d54d125f5bcfb03df8ff76de9797e"
+    }
+  },
+  "fault_host": {
+    "passed": true,
+    "result": "Fault handler/status: 17 checks, actual extracted functions; MMIO/GIC modeled",
+    "asan_ubsan": true,
+    "native_source_sha256": "d19a3d68b26563a7f5b3496c903cd304670b839ef797e66da0abdb9b6fa480d7",
+    "extracted_functions_sha256": "b1ffc94d9f27d36ddeb648372165e45d22e0c076405023cf8b4c748ce75a9fed",
+    "hardware": false
+  },
+  "native": {
+    "compiled": true,
+    "binding_sha256": "ec97d97c180f23b52e45540a714722e404ffc14a7852cd3c5439d673706f55e3",
+    "component_count": 11,
+    "remaining_imports": [
+      "_IODelay",
+      "_IOFree",
+      "_IOMalloc_internal",
+      "_KHEAP_DEFAULT",
+      "_PE_parse_boot_argn",
+      "__ZN14IODeviceMemory9withRangeEyy",
+      "__ZN18IOMemoryDescriptor19createMappingInTaskEP4taskyjyy",
+      "__ZN24IOBufferMemoryDescriptor17inTaskWithOptionsEP4taskjmm",
+      "__ZTV24IOBufferMemoryDescriptor",
+      "__ZTV25IOGeneralMemoryDescriptor",
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_armcpu_gic_ready",
+      "_armcpu_spi_attach",
+      "_armcpu_spi_mask",
+      "_bzero",
+      "_elden_usb_log_putc",
+      "_elden_wifi_smmu_early_guard",
+      "_kernel_task",
+      "_memcpy",
+      "_ml_at_interrupt_context",
+      "_vsnprintf"
+    ],
+    "requires_ufs_guard": true,
+    "source_inputs": {
+      "drivers/EldenSmmu/DmaMemory.cpp": "a3f3dd0be4c7182111468298e378d7beebeb14122f1a7b9a557724cabb8fb961",
+      "drivers/EldenSmmu/DmaMemory.h": "72f9a8d2b09b611abb4812057994481eb7e5e76ad56129ee1b14bd1dc78d9b15",
+      "drivers/EldenSmmu/DmaTables.c": "e9aec139cf0317167835bdb5c6df82c5c499d179e6105c29d6c4b677d8cf03b6",
+      "drivers/EldenSmmu/DmaTables.h": "b8c1e9b05cfe5ae4d28fa9e982bdd582519788564ca27de5294127e81158f743",
+      "drivers/EldenSmmu/upstream/source.json": "37c36c6a187a15621e61043791c30162eccaf3862550a5fc7e13b0de0322f971",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4K.c": "b5b71541fa5a1de50e4dd993036e01a7ac5e8e54eaa20929c2ea2827fb923602",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4K.h": "8bc2931f419f7fe4538e073bb61f799fce35a3bc7472b67ad054a6c5166a2554",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KContext.c": "0f2c726760f4a7c9fd5d8c85b970dd199a7c61d6fbe28e8e08d17e03716515bf",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KContext.h": "bb0ba67290d345e1dec8480847ab828de94c255fe075d03bba00a8991b972b96",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KProgram.c": "d7cc79be2b1fb99003badbcce6d4aeef595f4d89524651cbc4709568f27e2a51",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KProgram.h": "f4e33f8ea0ff94ca716e18f5a2c12e4ca500efdf5b498f90499849ba74511ace",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KAudit.c": "339200a21ddd8daeadbb64d24b45ecaae33e3b5d4f2061ed9d76bb00c8b01b65",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KAudit.h": "693c387950e8740a66748398941e67e7329f4f7c1619b6d905ff397b4d4298eb",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KTableMemory.c": "6391e4b8cc0147666bf55fe41596bc326b9d54d125f5bcfb03df8ff76de9797e",
+      "drivers/EldenSmmu/upstream/EldenWifiSmmu4KTableMemory.h": "b851879a3e2cf2994fdcc7da05ef9cfb78d3d674408d5b3f869651dc82da3d7f",
+      "drivers/EldenSmmu/upstream/LICENSE": "7a730b868c1ff986cdfc210a7b140ab4e0a31bf7db1d15db901427973efaa70f",
+      "drivers/EldenSmmu/Select.c": "39df01eae6b5948aea453c1d822009dbdf48c451d429770ef2996ebef0227e8a",
+      "drivers/EldenSmmu/Select.h": "48c589d21ba328fd86548c8775d6d9211a9e53e32bf6be5a127f793b190eea14",
+      "drivers/EldenSmmu/BootRoute.h": "03e94e52dea7ab6a7a85bf3f2d17ce9fb3f19882811619b63c07b78fa78f0c0b",
+      "package/EldenTouchBoard.h": "aaddf2d19b174d9401dccb3232c96ed220d919c481ad174d49db007c71e60bce",
+      "soc/sm8750/include/EldenTouchResources.h": "043b635b05372782e765d95be65c42441c3c6d3616b874c4484449385d33d780",
+      "drivers/EldenSmmu/BootRoute.c": "c6827601374a1b3dd8fdad4eca399f45f1a0ae001177ab2536bc048ddeca11ed",
+      "drivers/EldenSmmu/TouchSource.py": "744be2e98925b5dd3b4196990d604fb99da23bc9901a332c6ced068a2c8966bc",
+      "drivers/EldenNvt36536/DmaRoute.c": "a8272e1348b597bd0b71eedbd62c905b065db03978ed69ba6fe49728d408e142",
+      "drivers/EldenNvt36536/DmaRoute.h": "fdf8e16c273691ed300320d270b46377c3c3eba6be4c81ec1734705cdc256e00",
+      "drivers/EldenSmmu/Native.cpp": "d19a3d68b26563a7f5b3496c903cd304670b839ef797e66da0abdb9b6fa480d7",
+      "drivers/EldenSmmu/Domain.c": "7bddc012b70200dc6d23f22f816da9b00e527b13e6ca1267e5135ea1e4e3e452",
+      "drivers/EldenSmmu/Native.h": "d3b6635c49bdc7fc424a2a901a82e967ce96aaf798a175886a06a473aff41a4b",
+      "drivers/EldenSmmu/Domain.h": "debdc56b1532af0b2f4b8f4a16a84268fcb8cf7e7608a072495b4310fdef7034",
+      "drivers/EldenSmmu/Irqs.h": "28fd0892b8b906ebfda2e2f2a665c887c52ee5d43b362457cc894cf2422b8d8b"
+    },
+    "kernel_linked": false,
+    "hardware": false
+  },
+  "native_objects": {
+    "Native": {
+      "sha256": "dc0056988da41a2345be35524e6125310c7c321da747cd633fda79faf00f2c89",
+      "exports": [
+        "_elden_wifi_smmu_early_initialize",
+        "_elden_wifi_smmu_ready",
+        "_elden_wifi_smmu_status",
+        "_elden_wifi_smmu_stop_begin"
+      ],
+      "imports": [
+        "_IODelay",
+        "_IOMalloc_internal",
+        "_KHEAP_DEFAULT",
+        "_PE_parse_boot_argn",
+        "__ZN14IODeviceMemory9withRangeEyy",
+        "__ZN18EldenWifiDmaMemory15claimForContextEPKvy",
+        "__ZN18EldenWifiDmaMemory6createEPPS_jj",
+        "___stack_chk_fail",
+        "___stack_chk_guard",
+        "_armcpu_gic_ready",
+        "_armcpu_spi_attach",
+        "_armcpu_spi_mask",
+        "_bzero",
+        "_elden_smmu_boot_route_state",
+        "_elden_smmu_domain_start",
+        "_elden_smmu_select_boot_domain",
+        "_elden_usb_log_putc",
+        "_elden_wifi_smmu_early_guard",
+        "_memcpy",
+        "_ml_at_interrupt_context",
+        "_vsnprintf"
+      ],
+      "warnings": 1
+    },
+    "Domain": {
+      "sha256": "8d6a06bc107e0582085dc8d9f8b3cad009430b96d4ba33c39e2e7edc6bbccc5a",
+      "exports": [
+        "_elden_smmu_domain_start"
+      ],
+      "imports": [
+        "_EldenWifiSmmu4KAuditDeclaredContext",
+        "_EldenWifiSmmu4KObserveAuditedContext",
+        "_EldenWifiSmmu4KProgramDisabledContext",
+        "_elden_smmu_boot_route_commit",
+        "_elden_smmu_boot_route_poison",
+        "_elden_smmu_boot_route_reserve"
+      ],
+      "warnings": 0
+    }
+  },
+  "kernel": {
+    "profile": "smmu-domain-trial",
+    "kernel_sha256": "50424764d8f19f211e1ee033e09a9cf422e8fe65c1484163c726b2c4800b94bc",
+    "native_sha256": "ecaa270d8d4eb2bcb0ea470f4178143e17c4d28b2802e57deec6b8093d807f55",
+    "changed_native_objects": 5,
+    "added_native_objects": 16,
+    "core_filelist_unchanged": true,
+    "original_apple_executables_hashed": 30,
+    "owned_sgi_guard": true
+  },
+  "hooks": {
+    "_elden_pcie_native_start": {
+      "address": "0xfffffff007ba155c",
+      "calls": [
+        "0xfffffff007b9a5ac"
+      ],
+      "caller": "_elden_wcn_power_start",
+      "prelink_preserved": true
+    },
+    "_elden_pcie_native_stop_begin": {
+      "address": "0xfffffff007ba1e4c",
+      "calls": [
+        "0xfffffff007b9b1ec"
+      ],
+      "caller": "_elden_wcn_request_stop",
+      "prelink_preserved": true
+    },
+    "_elden_pcie_root_start": {
+      "address": "0xfffffff007ba33ac",
+      "calls": [
+        "0xfffffff007ba1bfc"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_wlan_root_power": {
+      "address": "0xfffffff007b9c014",
+      "calls": [
+        "0xfffffff007ba2398"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_pcie_endpoint_identify": {
+      "address": "0xfffffff007ba576c",
+      "calls": [
+        "0xfffffff007ba2728"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_wlan_power_confirm_endpoint": {
+      "address": "0xfffffff007b9ba4c",
+      "calls": [
+        "0xfffffff007ba27b4"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_wifi_smmu_early_initialize": {
+      "address": "0xfffffff007ba6a44",
+      "calls": [
+        "0xfffffff007b3b8c4"
+      ],
+      "caller": "_elden_wifi_smmu_early_invoke",
+      "prelink_preserved": true
+    },
+    "_elden_wifi_smmu_early_invoke": {
+      "address": "0xfffffff007b3b894",
+      "calls": [
+        "0xfffffff007b3e468"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_wifi_smmu_stop_begin": {
+      "address": "0xfffffff007ba7130",
+      "calls": [
+        "0xfffffff007b9b1f0"
+      ],
+      "caller": "_elden_wcn_request_stop",
+      "prelink_preserved": true
+    },
+    "_elden_smmu_domain_start": {
+      "address": "0xfffffff007ba7c3c",
+      "calls": [
+        "0xfffffff007ba6f84"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_smmu_select_boot_domain": {
+      "address": "0xfffffff007babbe4",
+      "calls": [
+        "0xfffffff007ba6e70"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    }
+  },
+  "goal_complete": false
+}

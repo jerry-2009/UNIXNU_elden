@@ -32,9 +32,11 @@ def exports(p):
     return {k for k, v in global_symbols(p).items() if v[0] & 0x0e}
 
 
-def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial=False, idle=False, idle_normal=False):
+def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial=False, idle=False, idle_normal=False, early_smmu=False, providers=()):
     if idle_normal and not (idle and queue):
         raise ValueError('Normal AH8 mode requires the reviewed idle queue source')
+    if early_smmu and not idle_normal:raise ValueError('Early SMMU requires the normal audited idle queue')
+    if early_smmu and (trial or queue_trial):raise ValueError('Early SMMU does not repeat UFS diagnostics')
     objects, records, archives, inherited, new_imports = {}, {}, {}, {}, {}
     native = read(base / 'native/build/results.json')
     capture = read(base / 'native/capture.json')
@@ -58,14 +60,18 @@ def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial
             if idle_normal:
                 derive=ah8.normal_source;queue_files['EldenUfsIdle.inc']=ah8.normal_runtime()
         for name,data in queue_files.items():(out/'source'/name).write_bytes(data)
+    cpu_derive=cpu_source
+    if early_smmu:
+        sys.path.insert(0,str(ROOT/'drivers/EldenSmmu'));import EarlySource
+        derive=EarlySource.ufs;cpu_derive=EarlySource.cpu;queue_files['EldenSdamRecovery.inc']=EarlySource.recovery()
     if trial:
         from TrialSource import source as derive, completion
         (out/'source/EldenUfsCompletion.inc').write_bytes(completion())
-    for name, data in {'NativeUfs.cpp': derive(), 'ArmCpu.cpp': cpu_source(),
+    for name, data in {'NativeUfs.cpp': derive(), 'ArmCpu.cpp': cpu_derive(),
                        'RootCommands.h': queue_files.get('RootCommands.h',commands()),
                        'EldenSdamRecovery.inc':queue_files.get('EldenSdamRecovery.inc',recovery())}.items():
         (out / 'source' / name).write_bytes(data)
-    for unit in (('ShengUfs',) if queue else ('ArmCpu','ShengUfs')):
+    for unit in (('ShengUfs',) if queue and not early_smmu else ('ArmCpu','ShengUfs')):
         if unit == 'ShengUfs':
             row = current['units'][unit]
             old = Path(row['object'])
@@ -80,6 +86,7 @@ def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial
                         'EldenSdamRecovery.inc': RECOVERY_SHA}
             member, archive = 'ShengUfs.o', 'libShengUfs.a'
             added = {'_elden_ufs_wait_shutdown'}
+            if early_smmu:added|={'_elden_wifi_smmu_early_guard','_elden_wifi_smmu_early_invoke'}
             if queue:
                 expected.update({'RootQueue.h':'3a22f86e432446a3cd7267078c195cfca5b8bb1c2bd55741e67d265de97c6447',
                                  'RootTransportLayout.h':'77699362f09e103ceda0d5f216d0be7749cdc1e88c6143ddd15ceb11dfd42e91',
@@ -201,6 +208,7 @@ def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial
                                  completion_sha256=sha(out/'source/EldenUfsCompletion.inc') if trial or queue else sha(ROOT/'drivers/EldenUfsWait/EldenUfsCompletion.inc'))
             if queue:records[unit]['generated_sources']={n:sha(out/'source'/n) for n in queue_files}
     available = exports(parent / 'native.macho')
+    for provider in providers:available |= exports(provider)
     for obj in objects.values():
         available |= exports(obj)
     for name, obj in objects.items():
