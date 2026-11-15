@@ -1,0 +1,481 @@
+{
+  "pd": {
+    "profile": "cpu-power-observation",
+    "session": "f88f55ed2faebab6",
+    "boot_nonce": "67bedd3fd98c50c2",
+    "image_sha256": "57b15d388ba2f60782f3321de5c17e1749420a898ecd7f0c7dfc07c72c8f473a",
+    "raw_sha256": "48ab403575edb4a89bc4390a1bff25c098a45937dd7130052962a8a97dc3fbb6",
+    "bytes": 3606628,
+    "phases": [
+      {
+        "line": 371,
+        "phase": 1,
+        "error": 0,
+        "pulse": 0,
+        "high": 0,
+        "cycle": 0,
+        "deadline": 880,
+        "suspend": 0,
+        "restored": 0
+      },
+      {
+        "line": 1552,
+        "phase": 2,
+        "error": 0,
+        "pulse": 2,
+        "high": 0,
+        "cycle": 9,
+        "deadline": 862,
+        "suspend": 0,
+        "restored": 0
+      },
+      {
+        "line": 1674,
+        "phase": 3,
+        "error": 0,
+        "pulse": 4,
+        "high": 0,
+        "cycle": 11,
+        "deadline": 859,
+        "suspend": 0,
+        "restored": 0
+      },
+      {
+        "line": 1972,
+        "phase": 4,
+        "error": 0,
+        "pulse": 4,
+        "high": 1,
+        "cycle": 16,
+        "deadline": 856,
+        "suspend": 1,
+        "restored": 0
+      },
+      {
+        "line": 2700,
+        "phase": 5,
+        "error": 0,
+        "pulse": 4,
+        "high": 1,
+        "cycle": 25,
+        "deadline": 836,
+        "suspend": 0,
+        "restored": 0
+      },
+      {
+        "line": 2759,
+        "phase": 6,
+        "error": 0,
+        "pulse": 4,
+        "high": 1,
+        "cycle": 26,
+        "deadline": 834,
+        "suspend": 0,
+        "restored": 1
+      }
+    ],
+    "zero_cycles": [
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    "zero_readback_interrupted": false,
+    "pulse_attempted": true,
+    "pulse": [
+      [
+        "0",
+        "101022",
+        "0"
+      ]
+    ],
+    "pulse_restored_or_unneeded": true,
+    "controller_completed": true,
+    "pd_contracts": [
+      "ELDEN_PD_CONTRACT port=2 result=0 position=1 type=0 range-mv=5000/5000 exact-v=1 requested-mv=5000 requested-ma=3000 requested-mw=15000; contract-only, not metering",
+      "ELDEN_PD_CONTRACT port=2 result=0 position=2 type=0 range-mv=9000/9000 exact-v=1 requested-mv=9000 requested-ma=2220 requested-mw=19980; contract-only, not metering"
+    ],
+    "pd_ready_observed": true,
+    "ready_before_measurement": null,
+    "observation_loss_during_measurement": null,
+    "backlight_trial_finished": null,
+    "observations": [
+      {
+        "line": 369,
+        "state": 1,
+        "phase": 1,
+        "error": 0,
+        "epoch": 0,
+        "cycle": 0
+      },
+      {
+        "line": 2757,
+        "state": 2,
+        "phase": 6,
+        "error": 0,
+        "epoch": 1,
+        "cycle": 26
+      },
+      {
+        "line": 12643,
+        "state": 3,
+        "phase": 6,
+        "error": 0,
+        "epoch": 1,
+        "cycle": 71
+      }
+    ],
+    "stopped_cleanly": true,
+    "reset_after_sync": true,
+    "dropped": 25,
+    "discontinuities": [],
+    "reconnections": [],
+    "limits": "Critical received markers and readbacks, not proof of every instant or individual-port watts. Character drops remain reported. Net charging is assessed separately from complete battery samples."
+  },
+  "observer": {
+    "ok": 1,
+    "complete": 1,
+    "intervals": 8,
+    "domain0": 1,
+    "domain1": 1,
+    "free": 1,
+    "access_error": 0,
+    "transfers": 55
+  },
+  "counter_hz": 19200000,
+  "tick_interval": 192000,
+  "load_rows": 72,
+  "all_load_intervals_verified": true,
+  "all_level_samples_received": true,
+  "cpu_load": {
+    "0": {
+      "intervals": 8,
+      "median_busy_pm": 57.0,
+      "min_busy_pm": 26,
+      "max_busy_pm": 627
+    },
+    "1": {
+      "intervals": 8,
+      "median_busy_pm": 548.0,
+      "min_busy_pm": 353,
+      "max_busy_pm": 685
+    },
+    "2": {
+      "intervals": 8,
+      "median_busy_pm": 99.0,
+      "min_busy_pm": 6,
+      "max_busy_pm": 504
+    },
+    "3": {
+      "intervals": 8,
+      "median_busy_pm": 75.5,
+      "min_busy_pm": 0,
+      "max_busy_pm": 363
+    },
+    "4": {
+      "intervals": 8,
+      "median_busy_pm": 18.0,
+      "min_busy_pm": 0,
+      "max_busy_pm": 388
+    },
+    "5": {
+      "intervals": 8,
+      "median_busy_pm": 73.5,
+      "min_busy_pm": 0,
+      "max_busy_pm": 706
+    },
+    "6": {
+      "intervals": 8,
+      "median_busy_pm": 74.0,
+      "min_busy_pm": 0,
+      "max_busy_pm": 224
+    },
+    "7": {
+      "intervals": 8,
+      "median_busy_pm": 47.0,
+      "min_busy_pm": 0,
+      "max_busy_pm": 529
+    }
+  },
+  "frequency": [
+    {
+      "sample": 0,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 0,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    },
+    {
+      "sample": 1,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 1,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    },
+    {
+      "sample": 2,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 2,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    },
+    {
+      "sample": 3,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 3,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    },
+    {
+      "sample": 4,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 4,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    },
+    {
+      "sample": 5,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 5,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    },
+    {
+      "sample": 6,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 6,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    },
+    {
+      "sample": 7,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 7,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    },
+    {
+      "sample": 8,
+      "domain": 0,
+      "raw": 8,
+      "index": 8,
+      "table_khz": 1996800,
+      "exact": 1
+    },
+    {
+      "sample": 8,
+      "domain": 1,
+      "raw": 0,
+      "index": 0,
+      "table_khz": 1017600,
+      "exact": 1
+    }
+  ],
+  "level_errors": [],
+  "limits": "Load is per-core XNU accounting over bounded intervals. PERF table values are firmware-reported levels, not measured instantaneous MHz. Character drops remain in pd.dropped. No DVFS/retention or net-charge acceptance follows from this observation.",
+  "supervisor": {
+    "events": [
+      {
+        "event": "stock-android-admitted",
+        "utc": "2026-11-15T04:32:54.404918+00:00",
+        "soc": 100,
+        "mv": 4464.0,
+        "temperature_c": 29.3
+      },
+      {
+        "event": "listeners-started",
+        "utc": "2026-11-15T04:33:05.256083+00:00",
+        "pid": 121636
+      },
+      {
+        "event": "watcher-started",
+        "utc": "2026-11-15T04:33:05.259913+00:00",
+        "pid": 109948
+      },
+      {
+        "event": "flash-verified",
+        "utc": "2026-11-15T04:33:10.165758+00:00",
+        "sha256": "57b15d388ba2f60782f3321de5c17e1749420a898ecd7f0c7dfc07c72c8f473a"
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T04:33:10.192547+00:00",
+        "seconds": 0,
+        "bytes": 0,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T04:33:40.582948+00:00",
+        "seconds": 30,
+        "bytes": 14789,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T04:34:10.964950+00:00",
+        "seconds": 61,
+        "bytes": 90485,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T04:34:41.420856+00:00",
+        "seconds": 91,
+        "bytes": 162693,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T04:35:11.799099+00:00",
+        "seconds": 122,
+        "bytes": 1140960,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T04:35:42.174696+00:00",
+        "seconds": 152,
+        "bytes": 3056944,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T04:36:10.549848+00:00",
+        "seconds": 180,
+        "bytes": 3558736,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T04:36:40.957300+00:00",
+        "seconds": 211,
+        "bytes": 3594409,
+        "logger_exit": null
+      },
+      {
+        "event": "physical-fastboot-observed",
+        "utc": "2026-11-15T04:36:55.134046+00:00"
+      },
+      {
+        "event": "restore-verified",
+        "utc": "2026-11-15T04:36:59.909797+00:00",
+        "sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890"
+      },
+      {
+        "event": "android-restored",
+        "utc": "2026-11-15T04:37:15.528364+00:00",
+        "settings_equal": true,
+        "root": true,
+        "green": true,
+        "sleep_requested": true
+      },
+      {
+        "event": "supervisor-terminal",
+        "utc": "2026-11-15T04:37:15.529462+00:00",
+        "candidate_written": false,
+        "complete": true
+      }
+    ],
+    "android_before": [
+      "1",
+      "095100",
+      "095100"
+    ],
+    "android_after": [
+      "1",
+      "095100",
+      "095100"
+    ],
+    "complete": true
+  },
+  "visual_review": {
+    "frames": [
+      4,
+      6,
+      7
+    ],
+    "springboard_visible": true,
+    "white_placeholders_remain": true,
+    "physical_touch_tested": false
+  },
+  "watcher_original_misreport_preserved": true,
+  "battery_last10_published_median_ma": -147
+}

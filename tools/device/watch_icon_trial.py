@@ -95,7 +95,8 @@ def main():
      if desktop_at is None:desktop_at=time.monotonic();event('desktop-settling',seconds=a.desktop_settle_seconds)
     elif swipe_at is not None and tap_at is None and ident>request_frame and not isdesk:
      desktop_at=None
-     if a.desktop_only:desktop_done_at=None
+     # A later template mismatch is recorded above, but does not erase an
+     # already observed desktop or extend its bounded observation deadline.
     if tap_at is not None and ident>tap_frame:image.save(out/f'after-tap-{ident}.png')
   if desktop_at is not None and tap_at is None and time.monotonic()-desktop_at>=a.desktop_settle_seconds:
    if a.desktop_only:

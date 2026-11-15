@@ -22,10 +22,12 @@ def main():
     p.add_argument('--backlight-service',action='store_true',help='Rebuild the backlight boot alias over the qualified window parent')
     p.add_argument('--backlight-power-trial',action='store_true',help='Use the existing dim/restore path with bounded observation timing')
     p.add_argument('--pd-power-trial',action='store_true',help='Observe confirmed PD handoff before the brightness power trial')
+    p.add_argument('--cpu-power-observation',action='store_true',help='One read-only load/PERF observer over the qualified PD kernel')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
     if a.backlight_power_trial and not a.backlight_service:raise ValueError('Power trial requires --backlight-service')
     if a.backlight_service and (a.window_handoff or a.translation_survey):raise ValueError('Backlight uses an already qualified window parent')
     if a.pd_power_trial and (a.backlight_service or a.backlight_power_trial or a.window_handoff or a.translation_survey):raise ValueError('PD power uses an already qualified backlight power parent')
+    if a.cpu_power_observation and (a.pd_power_trial or a.backlight_service or a.backlight_power_trial or a.window_handoff or a.translation_survey):raise ValueError('CPU observation uses the qualified PD parent')
     policy_derive=policy
     if a.window_handoff:
         from WindowSource import policy as window_policy
@@ -37,6 +39,7 @@ def main():
         client_derive=translation_client
     if out.exists():raise ValueError('Fresh output required')
     contract='profiles/backlight-power-trial/native-contract.json' if a.pd_power_trial else 'profiles/charge-window-handoff/native-contract.json' if a.backlight_service else 'profiles/bt-address17/native-contract.json'
+    if a.cpu_power_observation:contract='profiles/pd-power-trial/native-contract.json'
     c=read(ROOT/contract)
     assert native_identity(parent/'native.macho')==(c['sections'],c['commands'],c['symbols'])
     parent_report=read(parent/'result.json');assert sha(parent/'kernel.macho')==parent_report['kernel_sha256']
@@ -54,6 +57,10 @@ def main():
             from PdStartupSource import client as pd_client
             from PdPowerSource import source as pd_backlight
             units=[('PmicClient','PmicClient.cpp',pd_client,CLIENT),('BacklightRuntime','BacklightRuntime.cpp',pd_backlight,SOURCE_SHA)]
+    if a.cpu_power_observation:
+        sys.path.insert(0,str(ROOT/'drivers/EldenCpuPower'))
+        from SurveySource import source as cpu_source,SOURCE_SHA as CPU_SOURCE_SHA
+        units=[('CpuPerfSurvey','CpuPerfSurvey.cpp',cpu_source,CPU_SOURCE_SHA)]
     for unit,name,derive,expected in units:
         matches=[r for r in rows.values() if Path(r['source']).name==name];assert len(matches)==1;row=matches[0]
         old=Path(row['output']);assert row['accepted'] and sha(old)==row['sha256']
@@ -76,6 +83,9 @@ def main():
                 if a.pd_power_trial:
                     headers=['PdObservation.h','PdCompletion.h'] if unit=='PmicClient' else ['PdObservation.h']
                     for header in headers:extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenPmicGlink'/header)})
+                if a.cpu_power_observation:
+                    for folder,header in [('EldenCpuPower','CpuLoad.h'),('EldenPmicGlink','PdObservation.h')]:
+                        extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers'/folder/header)})
         assert bindings;known={x['name'] for x in overlay['roots']}
         for item in extra:
             if item['name'] not in known:overlay['roots'].append(item);known.add(item['name'])
@@ -132,6 +142,7 @@ def main():
     if a.backlight_service:files += [ROOT/'drivers/EldenBacklight/BootSource.py',ROOT/'drivers/EldenBacklight/BacklightRuntime.cpp']
     if a.backlight_power_trial:files.append(ROOT/'drivers/EldenBacklight/PowerTrialSource.py')
     if a.pd_power_trial:files += [ROOT/'drivers/EldenPmicGlink'/n for n in ('PdObservation.h','PdCompletion.h','PdStartupSource.py')]+[ROOT/'drivers/EldenBacklight/PdPowerSource.py']
+    if a.cpu_power_observation:files += [ROOT/'drivers/EldenCpuPower'/n for n in ('SurveySource.py','Survey.inc','CpuLoad.h')]+[ROOT/'drivers/EldenPmicGlink/PdObservation.h',ROOT/'profiles/v91/sources/power/CpuPerfSurvey.cpp']
     sources={**parent_report['source_inputs'],**{str(f.relative_to(ROOT)):sha(f) for f in files}}
     report={'profile':'charge-verification','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),'changed_core_objects':0,'changed_native_objects':2,'native_objects':records,'archive_members':members,'core_filelist_unchanged':True,'scalar':True,'optional_runtime':parent_report['optional_runtime'],'source_inputs':sources,'inherited_inputs':inputs,'inherited_sources':inherited,'entry_return_target':hex(after[1]),'parent_kernel_sha256':parent_report['kernel_sha256'],'original_apple_executables_hashed':30,'hardware':False}
     if a.window_handoff:report['profile']='charge-window-handoff'
@@ -139,5 +150,6 @@ def main():
     if a.backlight_service:report['profile']='backlight-service';report['changed_native_objects']=1
     if a.backlight_power_trial:report['profile']='backlight-power-trial'
     if a.pd_power_trial:report['profile']='pd-power-trial'
+    if a.cpu_power_observation:report['profile']='cpu-power-observation';report['changed_native_objects']=1
     write(out/'result.json',report);shutil.copytree(parent/'runtime',out/'runtime');print(json.dumps({'kernel_sha256':report['kernel_sha256'],'changed_objects':report['changed_native_objects']}))
 if __name__=='__main__':main()

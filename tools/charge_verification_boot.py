@@ -14,7 +14,12 @@ def qualify(report_path,entry_path,runtime):
     profile=r.get('profile')
     units={'BacklightRuntime'} if profile in ('backlight-service','backlight-power-trial') else {'PmicClient','ChargePolicy'}
     if profile=='pd-power-trial':units={'PmicClient','BacklightRuntime'}
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='cpu-power-observation':units={'CpuPerfSurvey'}
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='cpu-power-observation':
+        sys.path.insert(0,str(ROOT/'drivers/EldenCpuPower'))
+        from SurveySource import source
+        if hashlib.sha256(source()).hexdigest()!=r['native_objects']['CpuPerfSurvey']['source_sha256']:raise ValueError('CPU observer source differs')
     if profile=='pd-power-trial':
         sys.path[:0]=[str(ROOT/'drivers/EldenPmicGlink'),str(ROOT/'drivers/EldenBacklight')]
         from PdStartupSource import client

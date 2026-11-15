@@ -33,6 +33,7 @@ def main():
     p.add_argument('--backlight-power-trial',action='store_true',help='Bounded baseline/dim/restore power observation; separate from brightness service use')
     p.add_argument('--pd-power-trial',action='store_true',help='Require confirmed legacy PD handoff before the bounded brightness observation')
     p.add_argument('--pd-gui',action='store_true',help='Build the same PD integration kernel but select the normal GUI brightness service')
+    p.add_argument('--cpu-power-observation',action='store_true',help='Read-only eight-core load/PERF observation with normal GUI and confirmed PD')
     p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
     p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
     p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')
@@ -61,7 +62,8 @@ def main():
     if a.bt_scan_roles17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17):raise ValueError('--bt-scan-roles17 requires --bt-process-lifetime without other native17 options')
     if a.bt_discovery17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17):raise ValueError('--bt-discovery17 requires --bt-process-lifetime without other native17 options')
     if a.bt_address17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17 or a.bt_discovery17):raise ValueError('--bt-address17 requires --bt-process-lifetime without other native17 options')
-    if a.pd_gui:a.pd_power_trial=True
+    if a.cpu_power_observation and a.pd_gui:raise ValueError('CPU observation already selects GUI; omit --pd-gui')
+    if a.pd_gui or a.cpu_power_observation:a.pd_power_trial=True
     if a.pd_power_trial:a.backlight_power_trial=True
     if a.backlight_power_trial:a.backlight_service=True
     if a.backlight_service and a.spmi_translation_survey:raise ValueError('Use separate backlight and translation variants')
@@ -110,6 +112,7 @@ def main():
     identity['backlight_power_trial']=a.backlight_power_trial
     identity['pd_power_trial']=a.pd_power_trial
     identity['pd_gui']=a.pd_gui
+    identity['cpu_power_observation']=a.cpu_power_observation
     identity['charge_verification']=a.charge_verification
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
@@ -229,6 +232,9 @@ def main():
     if a.pd_power_trial:
         stage('pd-power-trial',script('build_charge_verification.py','--pd-power-trial','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'pd-power-trial'),'pd-power-trial/result.json')
         kernel_folder=out/'pd-power-trial';runtime_folder=kernel_folder/'runtime'
+    if a.cpu_power_observation:
+        stage('cpu-power-observation',script('build_charge_verification.py','--cpu-power-observation','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'cpu-power-observation'),'cpu-power-observation/result.json')
+        kernel_folder=out/'cpu-power-observation';runtime_folder=kernel_folder/'runtime'
     if a.target=='boot':
         stage('firmware',script('build_v91_firmware.py','--mu-root',inputs['mu_repository'],'--unixnu-root',inputs['unixnu_repository'],'--crypto-path',inputs['crypto'],'--llvm',inputs['llvm'],'--output',out/'firmware','--jobs',a.jobs),'firmware/result.json')
         stage('loader',script('build_v91_payload_loader.py','--mu-root',out/'firmware/project/third_party/mu_wide_platforms','--unixnu-root',out/'firmware/project/third_party/UniXNU','--llvm',inputs['llvm'],'--output',out/'loader'),'loader/result.json')
