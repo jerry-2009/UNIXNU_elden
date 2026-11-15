@@ -13,7 +13,13 @@ def main():
     for n in ['clean-build','root-build','power-build','wlan-build','wcn-build','llvm','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--endpoint-build',type=Path,help='Explicit CPU-only BAR/Peach extension')
     p.add_argument('--smmu-build',type=Path,help='Require the concrete early SMMU domain')
+    p.add_argument('--config-build',type=Path,help='Explicit config/MSI transport extension')
+    p.add_argument('--msi-build',type=Path)
+    p.add_argument('--reference-kernel',type=Path)
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);base=a.clean_build.resolve()
+    transport=bool(a.config_build)
+    if transport!=bool(a.msi_build) or (transport and (not a.smmu_build or not a.endpoint_build or not a.reference_kernel)):
+        raise ValueError('Transport needs config/MSI, DMA SMMU, endpoint and reference kernel together')
     generated={};native_source=ROOT/'drivers/EldenPcie/Native.cpp'
     if a.endpoint_build:
         spec=importlib.util.spec_from_file_location('endpoint_native',ROOT/'drivers/EldenPcie/EndpointNativeSource.py')
@@ -23,6 +29,9 @@ def main():
         if a.smmu_build:
             spec=importlib.util.spec_from_file_location('pcie_smmu_source',ROOT/'drivers/EldenSmmu/EarlySource.py')
             early=importlib.util.module_from_spec(spec);spec.loader.exec_module(early);derive=early.pcie_generated
+        if transport:
+            spec=importlib.util.spec_from_file_location('pcie_transport',ROOT/'drivers/EldenPcie/TransportNativeSource.py')
+            extension=importlib.util.module_from_spec(spec);spec.loader.exec_module(extension);derive=extension.generated
         for name,data in derive().items():(folder/name).write_bytes(data);generated[name]=hashlib.sha256(data).hexdigest()
         native_source=folder/'Native.cpp'
     elif a.smmu_build:raise ValueError('SMMU requires endpoint stage')
@@ -39,6 +48,9 @@ def main():
     if a.endpoint_build:
         files.update({n:ROOT/'drivers/EldenPcie'/n for n in ['Endpoint.h','EndpointNative.h','EndpointNativeRuntime.inc']})
     if a.smmu_build:files['EldenWifiSmmuNative.h']=ROOT/'drivers/EldenSmmu/Native.h'
+    if transport:
+        files.update({n:ROOT/'drivers/EldenPcie'/n for n in ['Config.h','Msi.h','TransportNative.h','TransportNativeRuntime.inc']})
+        files['EldenWifiDmaNative.h']=ROOT/'drivers/EldenSmmu/DmaNative.h'
     existing={item['name']:item for item in ov['roots']}
     for directory in directories:
         for n,original in files.items():
@@ -51,6 +63,7 @@ def main():
     r=subprocess.run(cmd,cwd=base/'units/working/WcnPowerNative',capture_output=True);(out/'compile.log').write_bytes(r.stdout+r.stderr);r.check_returncode()
     expected_defs={'_elden_pcie_native_start','_elden_pcie_native_stop_begin','_elden_pcie_native_status','_sm8750_gcc_vote_owner'}
     if a.endpoint_build:expected_defs.add('_elden_pcie_endpoint_status')
+    if transport:expected_defs.add('_elden_pcie_transport_status')
     assert defs(obj)==expected_defs
     assert not any(n.endswith('/__mod_init_func') for n in sections(obj))
     asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',str(obj)],text=True);(out/'Native.asm').write_text(asm,encoding='utf-8')
@@ -71,6 +84,13 @@ def main():
         smmu=read(a.smmu_build/'result.json')
         for name,h in smmu['source_inputs'].items():assert sha(ROOT/name)==h,name
         objects.append(a.smmu_build/'SmmuNativeBinding.o');expected.append(smmu['binding_sha256'])
+    extra_sources={}
+    if transport:
+        assert smmu['dma_provider_bound'] and smmu['component_count']==12
+        for directory,name in [(a.config_build,'Config'),(a.msi_build,'Msi')]:
+            report=read(directory/'result.json')
+            for file,h in report['source_inputs'].items():assert sha(ROOT/file)==h,file;extra_sources[file]=h
+            objects.append(directory/(name+'.o'));expected.append(report['object_sha256'])
     for file,h in zip(objects,expected):
         if h:assert sha(file)==h,file
     rpmh=read(base/'units/result.json')['units']['Sm8750Rpmh'];rp=Path(rpmh['object']);assert sha(rp)==rpmh['sha256'];objects.append(rp)
@@ -78,16 +98,21 @@ def main():
     required={'_elden_pcie_root_start','_elden_pcie_phy_start','_elden_wlan_root_power','_elden_pcie_power_plan','_elden_pcie_native_start','_elden_pcie_native_stop_begin'}
     if a.endpoint_build:required|={'_elden_pcie_endpoint_identify','_elden_wlan_power_confirm_endpoint','_elden_wlan_power_ready'}
     if a.smmu_build:required|={'_elden_wifi_smmu_ready','_elden_wifi_smmu_status','_elden_wifi_smmu_stop_begin'}
+    if transport:required|={'_elden_pcie_transport_status','_elden_wifi_dma_bind','_elden_wifi_dma_msi_sink','_elden_wifi_dma_stop_begin','_elden_pcie_cfg_open','_elden_pcie_msi_prepare','_elden_pcie_msi_arm','_elden_pcie_msi_stop'}
     assert required<=union and not required&pending
     target=out/'PcieNativeBinding.o';link=['xcrun','ld','-r','-arch','arm64','-platform_version','ios','17.0','17.0','-o',str(target),*map(str,objects)]
     linked=subprocess.run(link,capture_output=True);(out/'link.log').write_bytes(linked.stdout+linked.stderr);linked.check_returncode()
     assert defs(target)==union and refs(target)==pending
+    if transport:assert pending<=defs(a.reference_kernel),sorted(pending-defs(a.reference_kernel))
     inputs={str(p.relative_to(ROOT)):sha(p) for p in files.values()};inputs['drivers/EldenPcie/Native.cpp']=sha(ROOT/'drivers/EldenPcie/Native.cpp')
     if a.endpoint_build:inputs['drivers/EldenPcie/EndpointNativeSource.py']=sha(ROOT/'drivers/EldenPcie/EndpointNativeSource.py')
     if a.smmu_build:inputs['drivers/EldenSmmu/EarlySource.py']=sha(ROOT/'drivers/EldenSmmu/EarlySource.py')
+    if transport:
+        inputs.update(extra_sources);inputs['drivers/EldenPcie/TransportNativeSource.py']=sha(ROOT/'drivers/EldenPcie/TransportNativeSource.py')
     report={'compiled':True,'object_sha256':sha(obj),'binding_sha256':sha(target),'command':cmd,'link':link,'source_inputs':inputs,'inherited_input_count':len(inherited),
             'input_objects':{str(f):sha(f) for f in objects},'remaining_imports':sorted(pending),'warnings':r.stderr.count(b'warning:'),'scalar':True,
             'native_root_worker_bound':True,'endpoint_worker_bound':bool(a.endpoint_build),'smmu_domain_required':bool(a.smmu_build),'generated_sources':generated,
+            'transport_worker_bound':transport,'device_dma_enabled':False,'mhi_started':False,
             'kernel_linked':False,'boot_created':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['compiled','object_sha256','binding_sha256','warnings','kernel_linked']}))
 if __name__=='__main__':main()

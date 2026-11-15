@@ -1,23 +1,23 @@
 # UniXNU elden — authoritative source repository
 
-Latest MSI20261116 offline: receiver Msi.c prepare/arm/W1C/pending/stop core completed against fixed
-TB322FC group0/INTID173, no ITS or endpoint BM write. Real admit/quiesced/GIC/DBI/wake callbacks are mandatory;
-native callback provider still pending. Stop first requires actual MHI/DMA drain, then SC IRQ withdrawal/inflight
-wait and receiver disable; early stop keeps completions alive, uncertain state held to reset.45actual-core
-scenarios132checks ASan/UBSan; scalar/import-free/no init/warnings Msi7b31f720. Source constants independently bound.
-Frozen Ath12k MSI alloc/free reproduced ignored write failure,3-vs4 vectors and no hardware disable. PciMsiPatch
-now checks capability/count/32-64bit/data16/masks/all I/O/readbacks, only then publishes; failed free keeps metadata.
-29actual-entrypoint scenarios50checks ASan/UBSan. One nw_pci object52291af3 rebuilt;124others+all old inputs unchanged.
-125object ld-r dfdba164 has same imports, including real external pwrseq.24inherited unit warnings vs26old,
-0in repaired functions; earlier runtime1 extra conversions corrected and retained. Full runtime recipe/auditor
-updated, not rerun from empty. No native MSI provider, MHI caller/drain, full kernel/new boot or hardware proof yet.
-Next connect native DBI/GIC/config and DMA callbacks from confirmed PCIe owner, qualify actual drain, then MHI.
-Old reset-only/dma-started0/SMMU IRQ-stop ordering must change before BM. No mapping-only trial.
-Mac lab/pcie-msi-20261116/{source3,host1,native1,pci-host3,runtime2}; workbench corresponding edl/lab.
-drivers/EldenPcie/MSI.md and docs/evidence/pcie-msi-20261116.json current. DMA provider ccece9b8/84e5a00a remains
-qualified component with13scenarios98checks and actual IOLock/NC/epoch; not yet called by worker. Last hardware
-v163/stock restoration remains; this round no tablet or charge writes. Goal/charging incomplete, jobs terminal;
-GPU worktree/QRTR/AnyRouter preserved. Last full65-repo reference sync20261115-200229; no automatic pin swap.
+Latest native-transport20261116 offline: TransportNativeSource calls real DMA bind, config and MSI providers
+from confirmed PCIe worker; explicit ewt=1 intent requires epe1/esm1. Raw held DBI/config maps,
+native GIC attach/mask and IRQ-safe wake wired. Bounded Config rejects capability cycles/overlaps, foreign MSI
+targets and generic BM writes; W1C status preserved. Cleanup uses retained owner after admission withdrawal,
+MSI/inflight stop before PERST, try-lock status gate. Master readiness explicitly returns-95 until actual MHI
+execution/drain exists; NO hardware DMA or MHI success claim.74actual native/config/MSI scenarios315checks
+ASan/UBSan, physical services/DMA provider modeled. Initial fixture C/static linkage compile failure retained.
+Config0e822d7b/native8dd0e9e9/binding6ae33c50, scalar/no init/0warnings;11supplied bindings/objects,
+72remaining imports all found in v163 reference. Not a complete kernel/boot, no hardware transport test.
+Read-only stock CNSS modulefd8e10b2 matched device SHA. M3 selector maps PCI110e/major2 to phy_ucode20.elf;
+generic m3.bin is another branch. Exact ELF instructions/relocations/major diagnostic anchored by audit_oem_wifi_m3.py.
+Original modem manifest provides fullpath/SHA; binary stays local. No charge settings/boot/partition write.
+Next original FW cache + actual Linux QMI consumer + MHI execution/cancel/reset and IRQ/DMA drain, then BM.
+Change old reset-only/dma-started0/SMMU-IRQ stop order before DMA. No mapping/receiver-only test.
+Mac lab/wifi-transport-20261116/{source2,host2,config1,native1}; workbench matching edl/lab.
+drivers/EldenPcie/TRANSPORT.md + docs/evidence/wifi-transport-20261116.json current. Prior MSI7b31f720,
+PCI52291af3/runtime125 dfdba164 and DMA84e5a00a remain qualified offline components. All jobs terminal;
+v163/stock remains latest hardware evidence, full Goal/charging incomplete. GPU/QRTR/AnyRouter preserved.
 
 Latest v16320261116: owned128MiB NC mapping and early SMMU domain PASS hardware.
 v160 first64MiB descriptor segment was an IOPL boundary; v161 preserves every4KiB PA/PAR check,

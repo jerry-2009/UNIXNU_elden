@@ -1,5 +1,9 @@
 # MSI receiver and endpoint configuration — offline components ready
 
+The [native control transport](TRANSPORT.md) now connects the DMA/MSI/config
+providers to the PCIe worker and compiles as a combined native binding. MHI
+execution/drain and complete-kernel/hardware validation remain pending.
+
 The local DesignWare receiver core is implemented in `Msi.c`. The endpoint
 configuration fix is in `EldenWifi/peach/PciMsiPatch.py` / `PciMsi.inc`.
 Both are compiled; neither has been connected to a native Wi-Fi worker or
