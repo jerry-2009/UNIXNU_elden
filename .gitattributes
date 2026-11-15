@@ -20,3 +20,4 @@ archive/host-differences/** -text -whitespace
 archive/kshimc-wsl-20261111/** -text -whitespace
 archive/lilac-toolkit-20261101/** -text -whitespace
 docs/archive/** -whitespace
+drivers/EldenCpuPower/upstream/** -text -whitespace

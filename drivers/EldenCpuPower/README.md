@@ -1,5 +1,9 @@
 # CPU load and firmware-level observation
 
+The subsequent [load-aware governor component](GOVERNOR.md) is implemented and
+host/native compiled, but not linked into a boot candidate or tested on hardware.
+The observer and its v146 image below remain unchanged.
+
 This extends the frozen `CpuPerfSurvey.cpp` through a SHA-bound transform. Mode1
 keeps the original survey. Opt-in `elden-cpu-survey=2` (or `ecp=2`, with the long
 name taking precedence) waits for recovery, root/Data/PID1, confirmed current PD
