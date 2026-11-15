@@ -1,0 +1,37 @@
+{
+  "utc": "2026-11-15T13:07:57.558369+00:00",
+  "device": "HA2A1PT2/TB322FC",
+  "device_reads_only": true,
+  "android": {
+    "auto_hibern8": "5000",
+    "qcom/hibern8_count": "hw_h8_enter: 1483\r\nsw_h8_enter: 21\r\nsw_after_hw_h8_enter: 1286\r\nhw_h8_exit: 197\r\nsw_h8_exit: 1307",
+    "clkgate_enable": "1",
+    "clkscale_enable": "1",
+    "rpm_lvl": "3",
+    "spm_lvl": "3",
+    "rpm_target_link_state": "HIBERN8",
+    "spm_target_link_state": "HIBERN8"
+  },
+  "linux_revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+  "linux_origin": "ArmadaOS Freedom TB322FC README -> h0cheung/tb322fc-linux-kernel",
+  "files": {
+    "ufs-qcom.c": "daefd6f0d3616ffa5e9d031e1b2be31d77ee2464e7ba66b9a1d0e64f04fc8bfe",
+    "ufs-qcom.h": "3fdaf00c036d7f2a847263d2ec0ec8ff4c827bb532044a2210bca24661a2cf88",
+    "ufshcd.c": "be6ed1fe9891b273e62ea867a4c5a4ea720f627ed66c6f396dd8519e309c4bdc",
+    "ufshcd.h": "bc31186c83f42630548a5b5e9b77cb13dcd114e0f47d8a8ce3695fe11e8e7d0a",
+    "ufshci.h": "1269a9643c8bd88d91c6c1bb171bcc35c04e4692b03c03255dfeec26867218a0",
+    "ufs-sysfs.c": "168904261dfc4f75908ce108edd607e56028a46f2ca5080e74c48fb49fc4a54d"
+  },
+  "facts": {
+    "AHIT": 24,
+    "stock_us": 5000,
+    "encoded": 1524,
+    "auto_h8_cap": 8388608,
+    "AH8_CFG": 252,
+    "clock_request_mask": 60,
+    "hw_enter_count": 9984,
+    "hw_exit_count": 9996,
+    "unexpected_h8_interrupt_mask": 96
+  },
+  "limits": "Stock Android behavior/source evidence only; XNU enabling, counters, wake I/O, restoration and net power still require hardware validation."
+}

@@ -96,6 +96,9 @@ static void modeledBarrier(){}
 extern "C" IOReturn armcpu_spi_attach(uint32_t n,bool edge,void(*)(void*),void*,uint32_t*r,uint64_t*a){assert(n==297&&!edge);*r=0xa003;*a=0;return 0;}
 extern "C" IOReturn armcpu_spi_mask(uint32_t n,bool){assert(n==297);return 0;}
 #define NATIVE_UFS_READ_ONLY 1
+#if ELDEN_UFS_IDLE
+static volatile uint32_t gEldenAh8Active;
+#endif
 #include "RootTransportLayout.h"
 #include "TransferPoll.h"
 #include "Prelude.inc"
@@ -134,9 +137,22 @@ static void reset(unsigned ceiling=~0u,unsigned attr=0x44,bool wf=false){
     for(auto&s:gSnapshots)s={};
     eldenUfsIrqState=eldenUfsIrqAttached=eldenUfsGen=0;eldenUfsIrqHc=0;eldenUfsSpinTicks=0;
     eldenUfsIrqs=eldenUfsSleeps=eldenUfsWakes=eldenUfsWaitTimeouts=eldenUfsWaitOther=eldenUfsIrqSpurious=eldenUfsWaitTicks=eldenUfsCommands=0;
+#if ELDEN_UFS_IDLE
+    gEldenAh8Active=0;
+#endif
 }
 static void setup(unsigned expected=32){const char *why="";assert(eldenAllocateQueue(&why));assert(eldenUpgradeQueue(&why));assert(gSlotCount==expected);gHost.ready=true;eldenUfsIrqStart();assert(eldenUfsIrqRunning());}
 int main(){unsigned cases=0;
+#if ELDEN_UFS_IDLE
+    reset();setup();regs[0x20/4]=0x20;eldenUfsInterrupt(nullptr);assert(!queueFailed());cases++;
+    for(bool interrupt:{false,true}){
+        reset();setup();UfsSlot s;assert(nativeSlotTake(s));uint64_t deadline;uint32_t scsi;uint8_t cdb[10]={0x28};
+        assert(hostScsiIssue(s,0,cdb,10,2,4096,1000000,&deadline,&scsi)==0);gEldenAh8Active=1;regs[0x20/4]=0x40;
+        if(interrupt)eldenUfsInterrupt(nullptr);
+        assert(hostScsiAwait(s,0,4096,deadline,&scsi)!=0&&queueFailed()&&(regs[0x20/4]&0x40));nativeSlotGive(s);
+        assert(gQueuePool.slots[0].state==EldenUfsQuarantined);cases++;
+    }
+#endif
 #if ELDEN_LEGACY_CACHE
     reset();setup(16);assert(!gListUncached);reset();printf("PASS reproduced legacy cache-flag omission: 16-slot fallback\n");return 0;
 #endif

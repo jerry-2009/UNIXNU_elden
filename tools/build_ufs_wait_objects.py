@@ -32,7 +32,7 @@ def exports(p):
     return {k for k, v in global_symbols(p).items() if v[0] & 0x0e}
 
 
-def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial=False):
+def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial=False, idle=False):
     objects, records, archives, inherited, new_imports = {}, {}, {}, {}, {}
     native = read(base / 'native/build/results.json')
     capture = read(base / 'native/capture.json')
@@ -50,6 +50,9 @@ def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial
                      'EldenUfsCompletion.inc':q.completion(),'RootQueue.h':q.root_queue(),
                      'RootTransportLayout.h':q.layout(),'EldenQueuePrelude.inc':q.prelude(),
                      'EldenPinnedRootXnu.inc':q.pinned_root(),'EldenUfsPrdtAlgorithm.h':q.header()}
+        if idle:
+            sys.path.insert(0,str(ROOT/'drivers/EldenUfsIdle'));import IdleSource as ah8
+            derive=ah8.source;queue_files['EldenSdamRecovery.inc']=ah8.recovery();queue_files['TransferPoll.h']=ah8.transfer()
         for name,data in queue_files.items():(out/'source'/name).write_bytes(data)
     if trial:
         from TrialSource import source as derive, completion
@@ -78,6 +81,9 @@ def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial
                                  'RootTransportLayout.h':'77699362f09e103ceda0d5f216d0be7749cdc1e88c6143ddd15ceb11dfd42e91',
                                  'EldenPinnedRootXnu.inc':'5014eae216ade21ad7f53e97401292270f18fed671d6bdfa54dd4f70d12c8150'})
                 added|={'_elden_ufs_queue_halt','_elden_ufs_dma_limit','_elden_ufs_prdt_build'}|{'_elden_ufs_pool_'+n for n in ('init','take','enqueue','cancel','issue','complete','release','stop')}
+                if idle:
+                    expected['TransferPoll.h']='30ec996e2f0bfa858aff5129ba382ae38deb923604ac47716bffd13100e072ea'
+                    added.add('_elden_ufs_idle_stop')
         else:
             rows = [r for r in native.values() if r['source'].endswith('/ArmCpu.cpp')]
             if len(rows) != 1:
@@ -133,6 +139,9 @@ def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial
                     if queue_trial:
                         for header in ('NativeBatchTrial.inc','BatchTrial.h'):
                             extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenUfsQueue'/header)})
+                    if idle:
+                        for header in ('Ah8Control.h','EldenUfsIdle.inc'):
+                            extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenUfsIdle'/header)})
                 if trial:
                     for header in ('EldenUfsReadTrial.inc','UfsReadTrial.h'):
                         extra.append({'type':'file','name':str(Path(item['name']).parent/header),
