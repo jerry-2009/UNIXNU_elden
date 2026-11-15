@@ -32,7 +32,9 @@ def exports(p):
     return {k for k, v in global_symbols(p).items() if v[0] & 0x0e}
 
 
-def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial=False, idle=False):
+def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial=False, idle=False, idle_normal=False):
+    if idle_normal and not (idle and queue):
+        raise ValueError('Normal AH8 mode requires the reviewed idle queue source')
     objects, records, archives, inherited, new_imports = {}, {}, {}, {}, {}
     native = read(base / 'native/build/results.json')
     capture = read(base / 'native/capture.json')
@@ -53,6 +55,8 @@ def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial
         if idle:
             sys.path.insert(0,str(ROOT/'drivers/EldenUfsIdle'));import IdleSource as ah8
             derive=ah8.source;queue_files['EldenSdamRecovery.inc']=ah8.recovery();queue_files['TransferPoll.h']=ah8.transfer()
+            if idle_normal:
+                derive=ah8.normal_source;queue_files['EldenUfsIdle.inc']=ah8.normal_runtime()
         for name,data in queue_files.items():(out/'source'/name).write_bytes(data)
     if trial:
         from TrialSource import source as derive, completion
@@ -141,7 +145,8 @@ def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial
                             extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenUfsQueue'/header)})
                     if idle:
                         for header in ('Ah8Control.h','EldenUfsIdle.inc'):
-                            extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenUfsIdle'/header)})
+                            external=out/'source'/header if header in queue_files else ROOT/'drivers/EldenUfsIdle'/header
+                            extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(external)})
                 if trial:
                     for header in ('EldenUfsReadTrial.inc','UfsReadTrial.h'):
                         extra.append({'type':'file','name':str(Path(item['name']).parent/header),

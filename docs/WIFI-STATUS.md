@@ -30,6 +30,9 @@ Root clocks/GDSC/PARF/SID/L0/配置事务现已在[Root组件](../drivers/EldenP
 最新[PCIe供电提供者](../drivers/EldenPcie/POWER.md)已接真实RPMh发送与LDO读回并完成原生编译；85个host场景通过。
 新投票未上机，显式full-on模式只是诊断预算；仍缺映射/pins/GCC及根worker，尚非可用Wi-Fi。
 
+这些原生root回调现已连入[v157整核](../drivers/EldenPcie/NATIVE.md)，20个worker场景及整核/分支审计通过。
+仍未签包上机，BAR/DMA/MSI/MHI和联网未完成；不能把整核链接成功当PCIe实机成功。
+
 ## 已完成的前置项
 
 原modem_a七件主要Peach固件的只读文件访问已有实现，尺寸/SHA按原厂备份固定。

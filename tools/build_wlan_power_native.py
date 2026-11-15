@@ -15,7 +15,9 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['clean-build','llvm','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--root-power',action='store_true',help='Add explicit full-on PCIe supply/NoC provider')
-    a=p.parse_args();base=a.clean_build.resolve();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
+    p.add_argument('--root-worker',action='store_true',help='Also wire native root start/stop; implies --root-power')
+    a=p.parse_args();a.root_power=a.root_power or a.root_worker
+    base=a.clean_build.resolve();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     row=read(base/'units/result.json')['units']['WcnPowerNative']
     old=Path(row['object']);assert row['accepted'] and sha(old)==row['sha256']
     cmd=list(row['command']);ov=read(Path(cmd[cmd.index('-ivfsoverlay')+1]));assert ov['fallthrough'] is False
@@ -23,6 +25,8 @@ def main():
     if a.root_power:
         sys.path.insert(0,str(ROOT/'drivers/EldenPcie'))
         from PowerNativeSource import source as derive
+    if a.root_worker:
+        from NativeHookSource import source as derive
     src=out/'WcnPowerNative.cpp';src.write_bytes(derive());bindings=[];inherited={};directories=set()
     for item in ov['roots']:
         original=Path(item['external-contents']);h=sha(original);inherited[str(original)]=h
@@ -60,9 +64,10 @@ def main():
         inputs[rel]=sha(ROOT/rel)
     if a.root_power:
         for name in ['PowerNativeSource.py','PowerNative.inc','PowerExports.inc']:inputs['drivers/EldenPcie/'+name]=sha(ROOT/'drivers/EldenPcie'/name)
+    if a.root_worker:inputs['drivers/EldenPcie/NativeHookSource.py']=sha(ROOT/'drivers/EldenPcie/NativeHookSource.py')
     result={'compiled':True,'source_sha256':sha(src),'object_sha256':sha(obj),'exports':sorted(exports(obj)),
             'imports':sorted(imports),'source_inputs':inputs,'inherited_inputs':inherited,'command':cmd,'bindings':bindings,
             'warning_count':r.stderr.count(b'warning:'),'scalar':True,'legacy_power_entrypoints_removed':True,
-            'root_power_provider':a.root_power,'kernel_linked':False,'hardware_tested':False}
+            'root_power_provider':a.root_power,'root_worker_hooks':a.root_worker,'kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:v for k,v in result.items() if k in ['compiled','source_sha256','object_sha256','warning_count','kernel_linked']}))
 if __name__=='__main__':main()

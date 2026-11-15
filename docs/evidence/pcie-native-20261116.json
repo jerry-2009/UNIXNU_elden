@@ -1,0 +1,855 @@
+{
+  "kind": "native PCIe root worker and full v157 kernel",
+  "host": {
+    "passed": true,
+    "result": "20 native root scenarios / 1822 checks passed",
+    "asan_ubsan": true,
+    "actual_native_runtime_root_phy": true,
+    "kernel_services_mmio_power_modeled": true,
+    "hardware": false,
+    "source_sha256": {
+      "NativeRuntime.inc": "477d70e2080a8f6d16e35a845688f4fa892a4a5e70521ab9b981d791be58f724",
+      "NativeExports.inc": "369aab3e5664822c2852253c5ff4605db780c5382cd115f4e4af370476924f23",
+      "Native.h": "043d8467c6dc9a8745496e81c32f3142433c010206e0cf079f13b87557646fd7",
+      "Pins.h": "2337cd2603c6025886ec530aecb10758ebd52f0b02135b105d0f32afc18b02ba",
+      "Root.c": "1406f1bd7878053918bca74cc8ccae811e549822095c3183fe02c6ad6d431a84",
+      "Root.h": "6b607a22dec2acd4e516c921ddecae6c8f169eca508af39de93426019ab88cda",
+      "Phy.c": "a18afd15e9f1385bf2d07723d8ceea94cf2eafc9d89cb2d9d9490f1c63fee428",
+      "Phy.h": "a2dcfd5068fab775a2706b0e290eb1fcb368e777ab34b84ec262b18b2c9898fa",
+      "PhySequence.inc": "15a669913b5aef092eb1cf556561caac7a6cb9fdc5c52cecf2e1ac04f11fcc24",
+      "TestRoot.c": "b2c95a9712ec3cb36ddfeecac6320bc24fdab53c3a55a1dc199189ff76364858",
+      "TestNativeBridge.c": "a936a2a87163c4e9079791a14437ae00f13ce1ed14e419132ebce3b23f624503",
+      "TestNative.cpp": "0fa54ec7bb055b6b1ac72742fea8556cd057e40dfa8c05849d4e74bfa8e922cb"
+    }
+  },
+  "native": {
+    "compiled": true,
+    "object_sha256": "3aca46110f9cb1407294562576910bcdc37a85d0295c9ab7867d725f2c18cf75",
+    "binding_sha256": "1d130002a7a11d5625580d6875fab94a73961c44de46dd11e547f5f8032306cf",
+    "inherited_input_count": 1901,
+    "remaining_imports": [
+      "_IODelay",
+      "_IOFree",
+      "_IOMalloc_internal",
+      "_IOSleep",
+      "_KHEAP_DEFAULT",
+      "_PE_parse_boot_argn",
+      "_Sm8750AossQmpInit",
+      "_Sm8750AossQmpSend",
+      "__ZN14IODeviceMemory9withRangeEyy",
+      "__ZN15IORegistryEntry8fromPathEPKcPK15IORegistryPlanePcPiPS_",
+      "__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass",
+      "__ZN6OSData9metaClassE",
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_bzero",
+      "_current_thread",
+      "_elden_battery_temperature_get",
+      "_elden_bt_bootstrap_publish",
+      "_elden_bt_host_publish",
+      "_elden_bt_host_run",
+      "_elden_bt_runtime_ready",
+      "_elden_charge_policy_ready",
+      "_elden_init_exec_accepted",
+      "_elden_recovery_armed",
+      "_elden_recovery_deadline_remaining",
+      "_elden_recovery_rpc_ready",
+      "_elden_spmi_transaction_acquire",
+      "_elden_spmi_transaction_release",
+      "_elden_usb_log_putc",
+      "_elden_wcn_bt_nvm",
+      "_elden_wcn_bt_patch",
+      "_elden_wcn_hci_firmware_prepare",
+      "_elden_wcn_hci_prepare",
+      "_elden_wcn_hci_run",
+      "_elden_wcn_nvm",
+      "_elden_wcn_patch",
+      "_elden_wcn_peripheral_prepare",
+      "_elden_wcn_startup_prepare",
+      "_elden_wcn_startup_run",
+      "_elden_wcn_tmel",
+      "_elden_wcn_uart_backend_close",
+      "_elden_wcn_uart_backend_open",
+      "_gIODTPlane",
+      "_kernel_thread_start",
+      "_memcmp",
+      "_memcpy",
+      "_ml_at_interrupt_context",
+      "_native_owner_data_status",
+      "_pb_bdaddr_from_seed",
+      "_pb_bdaddr_written",
+      "_pb_spmi_find",
+      "_pb_spmi_read8",
+      "_snprintf",
+      "_strcmp",
+      "_thread_deallocate",
+      "_thread_terminate",
+      "_vsnprintf"
+    ],
+    "warnings": 0,
+    "scalar": true,
+    "native_root_worker_bound": true,
+    "kernel_linked": false,
+    "boot_created": false,
+    "hardware_tested": false,
+    "full_report_sha256": "dc7ce7d1bebe9f71ded3f9c07fba5a63fa78712d62662e8ba022726e60a49c7e"
+  },
+  "wcn": {
+    "compiled": true,
+    "source_sha256": "192c440eb780e88be15d94d930f44b065b82f50081d698a6c96b0c69d85b0ea5",
+    "object_sha256": "cf3b1b40eef539d32817c6771a1bd4a4d531675f1a6d0f82c04fb4577114f65f",
+    "exports": [
+      "_elden_wcn_power_lease_check",
+      "_elden_wcn_power_parent_hz",
+      "_elden_wcn_power_start",
+      "_elden_wcn_request_stop",
+      "_elden_wcn_stop_requested",
+      "_elden_wlan_power_acquire",
+      "_elden_wlan_power_check",
+      "_elden_wlan_power_confirm_endpoint",
+      "_elden_wlan_power_cpr",
+      "_elden_wlan_power_ready",
+      "_elden_wlan_power_stop",
+      "_elden_wlan_root_power",
+      "_sm8750_aoss_qmp_owner"
+    ],
+    "imports": [
+      "_IODelay",
+      "_IOFree",
+      "_IOMalloc_internal",
+      "_IOSleep",
+      "_KHEAP_DEFAULT",
+      "_PE_parse_boot_argn",
+      "_Sm8750AossQmpInit",
+      "_Sm8750AossQmpSend",
+      "_Sm8750CmdDbCopy",
+      "_Sm8750CmdDbVrm",
+      "_Sm8750RpmhWriteActive",
+      "__ZN14IODeviceMemory9withRangeEyy",
+      "__ZN15IORegistryEntry8fromPathEPKcPK15IORegistryPlanePcPiPS_",
+      "__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass",
+      "__ZN6OSData9metaClassE",
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_bzero",
+      "_current_thread",
+      "_elden_battery_temperature_get",
+      "_elden_bt_bootstrap_publish",
+      "_elden_bt_host_publish",
+      "_elden_bt_host_run",
+      "_elden_bt_runtime_ready",
+      "_elden_charge_policy_ready",
+      "_elden_init_exec_accepted",
+      "_elden_pcie_native_start",
+      "_elden_pcie_native_stop_begin",
+      "_elden_pcie_power_plan",
+      "_elden_recovery_armed",
+      "_elden_recovery_deadline_remaining",
+      "_elden_recovery_rpc_ready",
+      "_elden_spmi_transaction_acquire",
+      "_elden_spmi_transaction_release",
+      "_elden_usb_log_putc",
+      "_elden_wcn_bt_nvm",
+      "_elden_wcn_bt_patch",
+      "_elden_wcn_hci_firmware_prepare",
+      "_elden_wcn_hci_prepare",
+      "_elden_wcn_hci_run",
+      "_elden_wcn_nvm",
+      "_elden_wcn_parent_decode",
+      "_elden_wcn_patch",
+      "_elden_wcn_peripheral_prepare",
+      "_elden_wcn_rail_specs",
+      "_elden_wcn_shared_acquire",
+      "_elden_wcn_shared_check",
+      "_elden_wcn_shared_cpr",
+      "_elden_wcn_shared_snapshot",
+      "_elden_wcn_shared_stop",
+      "_elden_wcn_startup_prepare",
+      "_elden_wcn_startup_run",
+      "_elden_wcn_tmel",
+      "_elden_wcn_uart_backend_close",
+      "_elden_wcn_uart_backend_open",
+      "_gIODTPlane",
+      "_kernel_thread_start",
+      "_memcmp",
+      "_ml_at_interrupt_context",
+      "_native_owner_data_status",
+      "_pb_bdaddr_from_seed",
+      "_pb_bdaddr_written",
+      "_pb_spmi_find",
+      "_pb_spmi_read8",
+      "_snprintf",
+      "_thread_deallocate",
+      "_thread_terminate",
+      "_vsnprintf"
+    ],
+    "bindings": [
+      "/Users/ciscohe/Desktop/UniXNU_elden/lab/reset-v116-20261114/build/source/WcnPowerNative.cpp"
+    ],
+    "warning_count": 1,
+    "scalar": true,
+    "legacy_power_entrypoints_removed": true,
+    "root_power_provider": true,
+    "root_worker_hooks": true,
+    "kernel_linked": false,
+    "hardware_tested": false,
+    "full_report_sha256": "191dd828b0f389b49c8da8c560bc2e6888d7f2fcd0994b11f97451e9260ba5fe"
+  },
+  "kernel": {
+    "profile": "pcie-root-trial",
+    "kernel_sha256": "36be060cc924399af0a88ab9b9186acd3e63065f9426add12a73835a2edae389",
+    "native_sha256": "e7f6b534a775b27c644c2dd5e681a226a24a6e3c07af6fc67681935bfef80b76",
+    "optional_runtime": {
+      "profile": "bt-address17-runtime",
+      "original_sha256": "3f1e4493ea6a76976625f7af58a8f330c0c90d82d9020b11110b4f3f5b758df4",
+      "table_count": 59,
+      "table_hex": "64796c645f7368617265645f63616368655f61726d36342e31352c343231653862632c323861643162623030303835343466392c633030333566643630303835343466390064796c645f7368617265645f63616368655f61726d36342e31332c316230356265632c34343030383035322c32343030383035320064796c645f7368617265645f63616368655f61726d36342e31332c316230356230382c34343030383035322c3234303038303532004254417564696f48414c506c7567696e2c33386265632c666663333030643166343466303161392c3030303038306432633030333566643600626c7565746f6f7468642c64646432302c61303035303033342c316632303033643500626c7565746f6f7468642c326330302c30303030303030303030303030303030303030303030303030303030303030302c303130303830353239663436306231343430303030303335373237633037313400626c7565746f6f7468642c326331302c30303030303030303030303030303030303030303030303030303030303030302c303930343030353136653763303731346130303230303335363034393030663000626c7565746f6f7468642c326332302c30303030303030303030303030303030303030303030303030303030303030302c303030303235393130313066383135326539313731633934363834393030663000626c7565746f6f7468642c326333302c30303030303030303030303030303030303030303030303030303030303030302c303832313036393131663031303066393638343930306630303830313036393100626c7565746f6f7468642c326334302c30303030303030303030303030303030303030303030303030303030303030302c316630313030663936383439303066303038613130363931316630313030663900626c7565746f6f7468642c326335302c30303030303030303030303030303030303030303030303030303030303030302c383834393030393030386531303639313166303130306639363834393030663000626c7565746f6f7468642c326336302c30303030303030303030303030303030303030303030303030303030303030302c303865313234393131663031303062393465376330373134303830343030353100626c7565746f6f7468642c326337302c30303030303030303030303030303030303030303030303030303030303030302c323337633037313434383030303033356632376330373134303930353030353100626c7565746f6f7468642c326338302c30303030303030303030303030303030303030303030303030303030303030302c643037633037313434383030303033353135376430373134303830353030353100626c7565746f6f7468642c326339302c30303030303030303030303030303030303030303030303030303030303030302c666337633037313466333762626661396633303330306161303030343830353200626c7565746f6f7468642c326361302c30303030303030303030303030303030303030303030303030303030303030302c303063656266373232313030383035326532303331336161303334613030663000626c7565746f6f7468642c326362302c30303030303030303030303030303030303030303030303030303030303030302c363430383839353237303136383064323031313030306434653030333133616100626c7565746f6f7468642c326363302c30303030303030303030303030303030303030303030303030303030303030302c663337626331613831663030303037316338666630353134313034613030663000626c7565746f6f7468642c326364302c30303030303030303030303030303030303030303030303030303030303030302c313063613630333937303030313833366666633330306431663230343036313400626c7565746f6f7468642c326365302c30303030303030303030303030303030303030303030303030303030303030302c363834393030643030306635343666393432656430383134303834613030663000626c7565746f6f7468642c326366302c30303030303030303030303030303030303030303030303030303030303030302c303931353631333932393035316231323366383130313731653031373966316100626c7565746f6f7468642c326430302c30303030303030303030303030303030303030303030303030303030303030302c633030333566643666333762626661396639666666663937663337626331613800626c7565746f6f7468642c326431302c30303030303030303030303030303030303030303030303030303030303030302c653834393030393030306331323233396338343930306430373235303038313400626c7565746f6f7468642c326432302c30303030303030303030303030303030303030303030303030303030303030302c663337626266613966333033303061613430303030303335366435303038393400626c7565746f6f7468642c326433302c30303030303030303030303030303030303030303030303030303030303030302c653030333133616166333762633161386437666666663137666634333031643100626c7565746f6f7468642c326434302c30303030303030303030303030303030303030303030303030303030303030302c663335333031613966353562303261396637363330336139666437623034613900626c7565746f6f7468642c326435302c30303030303030303030303030303030303030303030303030303030303030302c666430333031393166333033303061613134316538303532313730303830353200626c7565746f6f7468642c326436302c30303030303030303030303030303030303030303030303030303030303030302c663231313163393466383033303061616530303331336161386331343163393400626c7565746f6f7468642c326437302c30303030303030303030303030303030303030303030303030303030303030302c613030343030623465313033303061613030303038303532376631343163393400626c7565746f6f7468642c326438302c30303030303030303030303030303030303030303030303030303030303030302c323030343030333466353033303032616331336230306630323163303333393100626c7565746f6f7468642c326439302c30303030303030303030303030303030303030303030303030303030303030302c613234373030623034326530323139316533303331666161323430303830353200626c7565746f6f7468642c326461302c30303030303030303030303030303030303030303030303030303030303030302c363731343163393466363033303061613830303230306234333631323163393400626c7565746f6f7468642c326462302c30303030303030303030303030303030303030303030303030303030303030302c316630303138656265313031303035346530303331366161643831313163393400626c7565746f6f7468642c326463302c30303030303030303030303030303030303030303030303030303030303030302c316631383030663136623031303035346530303331366161653130333166616100626c7565746f6f7468642c326464302c30303030303030303030303030303030303030303030303030303030303030302c633230303830353265333033303039316365313131633934653830333430623900626c7565746f6f7468642c326465302c30303030303030303030303030303030303030303030303030303030303030302c653930623430373930383031303932613166303130303731663730373966316100626c7565746f6f7468642c326466302c30303030303030303030303030303030303030303030303030303030303030302c653030333136616137383132316339346530303331356161303531343163393400626c7565746f6f7468642c326530302c30303030303030303030303030303030303030303030303030303030303030302c643730303030333530303234393435326530303061303732653431623163393400626c7565746f6f7468642c326531302c30303030303030303030303030303030303030303030303030303030303030302c393430363030373161316661666635343030303538303532303063656266373200626c7565746f6f7468642c326532302c30303030303030303030303030303030303030303030303030303030303030302c323130303830353230323165383035323432303031343462653330333137616100626c7565746f6f7468642c326533302c30303030303030303030303030303030303030303030303030303030303030302c363430383839353237303136383064323031313030306434653030333133616100626c7565746f6f7468642c326534302c30303030303030303030303030303030303030303030303030303030303030302c666437623434613966373633343361396635356234326139663335333431613900626c7565746f6f7468642c326535302c303030303030303030303030303030302c6666343330313931356235663032313400626c7565746f6f7468642c39396332302c65383033303039342c343761346664393700626c7565746f6f7468642c3138326265342c31663030303037312c346630306661313700626c7565746f6f7468642c3138343061302c66666333303064312c306266626639313700626c7565746f6f7468642c3138346336302c65303033313361612c653030333166616100626c7565746f6f7468642c3138346339342c63313031303035342c633030313030333400626c7565746f6f7468642c3138346434632c65303033313361612c653030333166616100626c7565746f6f7468642c3165316366382c30383034303035312c633838336638313700626c7565746f6f7468642c3165316463382c30393034303035312c393038336638313700626c7565746f6f7468642c3165316662632c30393035303035312c326538336638313700626c7565746f6f7468642c3165323037632c30383035303035312c303238336638313700626c7565746f6f7468642c3231366565302c32383339303064302c383961666637313700626c7565746f6f7468642c3231366633382c30306235306333392c316662353063333900626c7565746f6f7468642c3264353065342c36376664666631372c633762366634313700626c7565746f6f7468642c3264356362632c30386138343262392c306362346634313700626c7565746f6f7468642c3331636339302c30303034303033342c316632303033643500626c7565746f6f7468642c3337373932632c666437626266613966643033303039312c3030303038303532633030333566643600",
+      "rules": [
+        {
+          "offset": 908576,
+          "before": "a0050034",
+          "after": "1f2003d5"
+        },
+        {
+          "offset": 11264,
+          "before": "00000000000000000000000000000000",
+          "after": "010080529f460b1440000035727c0714"
+        },
+        {
+          "offset": 11280,
+          "before": "00000000000000000000000000000000",
+          "after": "090400516e7c0714a0020035604900f0"
+        },
+        {
+          "offset": 11296,
+          "before": "00000000000000000000000000000000",
+          "after": "00002591010f8152e9171c94684900f0"
+        },
+        {
+          "offset": 11312,
+          "before": "00000000000000000000000000000000",
+          "after": "082106911f0100f9684900f008010691"
+        },
+        {
+          "offset": 11328,
+          "before": "00000000000000000000000000000000",
+          "after": "1f0100f9684900f008a106911f0100f9"
+        },
+        {
+          "offset": 11344,
+          "before": "00000000000000000000000000000000",
+          "after": "8849009008e106911f0100f9684900f0"
+        },
+        {
+          "offset": 11360,
+          "before": "00000000000000000000000000000000",
+          "after": "08e124911f0100b94e7c071408040051"
+        },
+        {
+          "offset": 11376,
+          "before": "00000000000000000000000000000000",
+          "after": "237c071448000035f27c071409050051"
+        },
+        {
+          "offset": 11392,
+          "before": "00000000000000000000000000000000",
+          "after": "d07c071448000035157d071408050051"
+        },
+        {
+          "offset": 11408,
+          "before": "00000000000000000000000000000000",
+          "after": "fc7c0714f37bbfa9f30300aa00048052"
+        },
+        {
+          "offset": 11424,
+          "before": "00000000000000000000000000000000",
+          "after": "00cebf7221008052e20313aa034a00f0"
+        },
+        {
+          "offset": 11440,
+          "before": "00000000000000000000000000000000",
+          "after": "64088952701680d2011000d4e00313aa"
+        },
+        {
+          "offset": 11456,
+          "before": "00000000000000000000000000000000",
+          "after": "f37bc1a81f000071c8ff0514104a00f0"
+        },
+        {
+          "offset": 11472,
+          "before": "00000000000000000000000000000000",
+          "after": "10ca603970001836ffc300d1f2040614"
+        },
+        {
+          "offset": 11488,
+          "before": "00000000000000000000000000000000",
+          "after": "684900d000f546f942ed0814084a00f0"
+        },
+        {
+          "offset": 11504,
+          "before": "00000000000000000000000000000000",
+          "after": "0915613929051b123f810171e0179f1a"
+        },
+        {
+          "offset": 11520,
+          "before": "00000000000000000000000000000000",
+          "after": "c0035fd6f37bbfa9f9ffff97f37bc1a8"
+        },
+        {
+          "offset": 11536,
+          "before": "00000000000000000000000000000000",
+          "after": "e849009000c12239c84900d072500814"
+        },
+        {
+          "offset": 11552,
+          "before": "00000000000000000000000000000000",
+          "after": "f37bbfa9f30300aa400000356d500894"
+        },
+        {
+          "offset": 11568,
+          "before": "00000000000000000000000000000000",
+          "after": "e00313aaf37bc1a8d7ffff17ff4301d1"
+        },
+        {
+          "offset": 11584,
+          "before": "00000000000000000000000000000000",
+          "after": "f35301a9f55b02a9f76303a9fd7b04a9"
+        },
+        {
+          "offset": 11600,
+          "before": "00000000000000000000000000000000",
+          "after": "fd030191f30300aa141e805217008052"
+        },
+        {
+          "offset": 11616,
+          "before": "00000000000000000000000000000000",
+          "after": "f2111c94f80300aae00313aa8c141c94"
+        },
+        {
+          "offset": 11632,
+          "before": "00000000000000000000000000000000",
+          "after": "a00400b4e10300aa000080527f141c94"
+        },
+        {
+          "offset": 11648,
+          "before": "00000000000000000000000000000000",
+          "after": "20040034f503002ac13b00f021c03391"
+        },
+        {
+          "offset": 11664,
+          "before": "00000000000000000000000000000000",
+          "after": "a24700b042e02191e3031faa24008052"
+        },
+        {
+          "offset": 11680,
+          "before": "00000000000000000000000000000000",
+          "after": "67141c94f60300aa800200b436121c94"
+        },
+        {
+          "offset": 11696,
+          "before": "00000000000000000000000000000000",
+          "after": "1f0018ebe1010054e00316aad8111c94"
+        },
+        {
+          "offset": 11712,
+          "before": "00000000000000000000000000000000",
+          "after": "1f1800f16b010054e00316aae1031faa"
+        },
+        {
+          "offset": 11728,
+          "before": "00000000000000000000000000000000",
+          "after": "c2008052e3030091ce111c94e80340b9"
+        },
+        {
+          "offset": 11744,
+          "before": "00000000000000000000000000000000",
+          "after": "e90b40790801092a1f010071f7079f1a"
+        },
+        {
+          "offset": 11760,
+          "before": "00000000000000000000000000000000",
+          "after": "e00316aa78121c94e00315aa05141c94"
+        },
+        {
+          "offset": 11776,
+          "before": "00000000000000000000000000000000",
+          "after": "d700003500249452e000a072e41b1c94"
+        },
+        {
+          "offset": 11792,
+          "before": "00000000000000000000000000000000",
+          "after": "94060071a1faff540005805200cebf72"
+        },
+        {
+          "offset": 11808,
+          "before": "00000000000000000000000000000000",
+          "after": "21008052021e80524200144be30317aa"
+        },
+        {
+          "offset": 11824,
+          "before": "00000000000000000000000000000000",
+          "after": "64088952701680d2011000d4e00313aa"
+        },
+        {
+          "offset": 11840,
+          "before": "00000000000000000000000000000000",
+          "after": "fd7b44a9f76343a9f55b42a9f35341a9"
+        },
+        {
+          "offset": 11856,
+          "before": "0000000000000000",
+          "after": "ff4301915b5f0214"
+        },
+        {
+          "offset": 629792,
+          "before": "e8030094",
+          "after": "47a4fd97"
+        },
+        {
+          "offset": 1584100,
+          "before": "1f000071",
+          "after": "4f00fa17"
+        },
+        {
+          "offset": 1589408,
+          "before": "ffc300d1",
+          "after": "0bfbf917"
+        },
+        {
+          "offset": 1592416,
+          "before": "e00313aa",
+          "after": "e0031faa"
+        },
+        {
+          "offset": 1592468,
+          "before": "c1010054",
+          "after": "c0010034"
+        },
+        {
+          "offset": 1592652,
+          "before": "e00313aa",
+          "after": "e0031faa"
+        },
+        {
+          "offset": 1973496,
+          "before": "08040051",
+          "after": "c883f817"
+        },
+        {
+          "offset": 1973704,
+          "before": "09040051",
+          "after": "9083f817"
+        },
+        {
+          "offset": 1974204,
+          "before": "09050051",
+          "after": "2e83f817"
+        },
+        {
+          "offset": 1974396,
+          "before": "08050051",
+          "after": "0283f817"
+        },
+        {
+          "offset": 2191072,
+          "before": "283900d0",
+          "after": "89aff717"
+        },
+        {
+          "offset": 2191160,
+          "before": "00b50c39",
+          "after": "1fb50c39"
+        },
+        {
+          "offset": 2969828,
+          "before": "67fdff17",
+          "after": "c7b6f417"
+        },
+        {
+          "offset": 2972860,
+          "before": "08a842b9",
+          "after": "0cb4f417"
+        },
+        {
+          "offset": 3263632,
+          "before": "00040034",
+          "after": "1f2003d5"
+        },
+        {
+          "offset": 3635500,
+          "before": "fd7bbfa9fd030091",
+          "after": "00008052c0035fd6"
+        }
+      ],
+      "optional_sites": {
+        "host_buffer": "0x100184c60",
+        "host_flow": "0x100184c94",
+        "erroneous_data": "0x100184d4c"
+      },
+      "entries": {
+        "constructor": "0x100002c00",
+        "registration": "0x100002c08",
+        "vendor_init": "0x100002c18",
+        "callbacks_0": "0x100002c74",
+        "callbacks_1": "0x100002c84",
+        "native_init_result": "0x100002c94",
+        "optional_supported_0c5b": "0x100002ccc",
+        "extended_scan_support": "0x100002cec",
+        "extended_scan_publish": "0x100002d04",
+        "scan_before_observation": "0x100002d20",
+        "wait_for_address_property": "0x100002d3c"
+      },
+      "native_edits": [
+        {
+          "address": "0x100002c00",
+          "offset": 11264,
+          "before": "0000000000000000",
+          "after": "010080529f460b14"
+        },
+        {
+          "address": "0x1002d50e4",
+          "offset": 2969828,
+          "before": "67fdff17",
+          "after": "c7b6f417"
+        },
+        {
+          "address": "0x10031cc90",
+          "offset": 3263632,
+          "before": "00040034",
+          "after": "1f2003d5"
+        },
+        {
+          "address": "0x10037792c",
+          "offset": 3635500,
+          "before": "fd7bbfa9fd030091",
+          "after": "00008052c0035fd6"
+        },
+        {
+          "address": "0x100002c08",
+          "offset": 11272,
+          "before": "00000000000000000000000000000000",
+          "after": "40000035727c0714090400516e7c0714"
+        },
+        {
+          "address": "0x1001e1dc8",
+          "offset": 1973704,
+          "before": "09040051",
+          "after": "9083f817"
+        },
+        {
+          "address": "0x100002c18",
+          "offset": 11288,
+          "before": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "after": "a0020035604900f000002591010f8152e9171c94684900f0082106911f0100f9684900f0080106911f0100f9684900f008a106911f0100f98849009008e106911f0100f9684900f008e124911f0100b94e7c071408040051237c0714"
+        },
+        {
+          "address": "0x1001e1cf8",
+          "offset": 1973496,
+          "before": "08040051",
+          "after": "c883f817"
+        },
+        {
+          "address": "0x100002c74",
+          "offset": 11380,
+          "before": "00000000000000000000000000000000",
+          "after": "48000035f27c071409050051d07c0714"
+        },
+        {
+          "address": "0x1001e1fbc",
+          "offset": 1974204,
+          "before": "09050051",
+          "after": "2e83f817"
+        },
+        {
+          "address": "0x100002c84",
+          "offset": 11396,
+          "before": "00000000000000000000000000000000",
+          "after": "48000035157d071408050051fc7c0714"
+        },
+        {
+          "address": "0x1001e207c",
+          "offset": 1974396,
+          "before": "08050051",
+          "after": "0283f817"
+        },
+        {
+          "address": "0x100184c60",
+          "offset": 1592416,
+          "before": "e00313aa",
+          "after": "e0031faa"
+        },
+        {
+          "address": "0x100184c94",
+          "offset": 1592468,
+          "before": "c1010054",
+          "after": "c0010034"
+        },
+        {
+          "address": "0x100184d4c",
+          "offset": 1592652,
+          "before": "e00313aa",
+          "after": "e0031faa"
+        },
+        {
+          "address": "0x100002c94",
+          "offset": 11412,
+          "before": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "after": "f37bbfa9f30300aa0004805200cebf7221008052e20313aa034a00f064088952701680d2011000d4e00313aaf37bc1a81f000071c8ff0514"
+        },
+        {
+          "address": "0x100182be4",
+          "offset": 1584100,
+          "before": "1f000071",
+          "after": "4f00fa17"
+        },
+        {
+          "address": "0x100002ccc",
+          "offset": 11468,
+          "before": "0000000000000000000000000000000000000000000000000000000000000000",
+          "after": "104a00f010ca603970001836ffc300d1f2040614684900d000f546f942ed0814"
+        },
+        {
+          "address": "0x1001840a0",
+          "offset": 1589408,
+          "before": "ffc300d1",
+          "after": "0bfbf917"
+        },
+        {
+          "address": "0x100002cec",
+          "offset": 11500,
+          "before": "000000000000000000000000000000000000000000000000",
+          "after": "084a00f00915613929051b123f810171e0179f1ac0035fd6"
+        },
+        {
+          "address": "0x1002d5cbc",
+          "offset": 2972860,
+          "before": "08a842b9",
+          "after": "0cb4f417"
+        },
+        {
+          "address": "0x100002d04",
+          "offset": 11524,
+          "before": "00000000000000000000000000000000000000000000000000000000",
+          "after": "f37bbfa9f9ffff97f37bc1a8e849009000c12239c84900d072500814"
+        },
+        {
+          "address": "0x100216ee0",
+          "offset": 2191072,
+          "before": "283900d0",
+          "after": "89aff717"
+        },
+        {
+          "address": "0x100216f38",
+          "offset": 2191160,
+          "before": "00b50c39",
+          "after": "1fb50c39"
+        },
+        {
+          "address": "0x100002d20",
+          "offset": 11552,
+          "before": "00000000000000000000000000000000000000000000000000000000",
+          "after": "f37bbfa9f30300aa400000356d500894e00313aaf37bc1a8d7ffff17"
+        },
+        {
+          "address": "0x100002d3c",
+          "offset": 11580,
+          "before": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "after": "ff4301d1f35301a9f55b02a9f76303a9fd7b04a9fd030191f30300aa141e805217008052f2111c94f80300aae00313aa8c141c94a00400b4e10300aa000080527f141c9420040034f503002ac13b00f021c03391a24700b042e02191e3031faa2400805267141c94f60300aa800200b436121c941f0018ebe1010054e00316aad8111c941f1800f16b010054e00316aae1031faac2008052e3030091ce111c94e80340b9e90b40790801092a1f010071f7079f1ae00316aa78121c94e00315aa05141c94d700003500249452e000a072e41b1c9494060071a1faff540005805200cebf7221008052021e80524200144be30317aa64088952701680d2011000d4e00313aafd7b44a9f76343a9f55b42a9f35341a9ff4301915b5f0214"
+        },
+        {
+          "address": "0x100099c20",
+          "offset": 629792,
+          "before": "e8030094",
+          "after": "47a4fd97"
+        }
+      ],
+      "source_inputs": {
+        "drivers/EldenBluetooth/userland/Native17.py": "e8cf6d64d275770488198a48781694df002336d15eced5a8c0327ed352048bc2",
+        "drivers/EldenBluetooth/userland/Native17Optional.py": "dea2788cba2b97cd200f94d055fe01d54780baaf9c2e1e394d2d9c5fa96d1296",
+        "drivers/EldenBluetooth/userland/Native17Completion.py": "4c8d7cb13eea3956309184e95066244f313bab719e6983481674ffbafb228786",
+        "drivers/EldenBluetooth/userland/Native17Scan.py": "9f429761879903b23a3affefbc836d1c4c8619d471735b617ab096167f4c1526",
+        "drivers/EldenBluetooth/userland/Native17ScanObserve.py": "64f109893c30504735e3b5723824ab7b4ba3ccaed2adfeac68171dd97e622b72",
+        "drivers/EldenBluetooth/userland/Native17ScanRoles.py": "9bf4e5f494e6534398ed589829519317f5a2ab8cc876bf6f7820db92092cd888",
+        "drivers/EldenBluetooth/userland/Native17AddressWait.py": "2bd977130e88c7319a714dc00841429303dfbb808ae5a70bf929c3ebe2e7348e",
+        "drivers/EldenBluetooth/runtime/TextGuard.h": "aa96bf101d34d0f481a88dd75007b50f61cdc953ed18b2a601cd1a8dd1154b5e",
+        "tools/prepare_bt_address17.py": "a473f29492543e1af83759e2cce49e9b3e1f3bd5be8c1893ba44c908c380b38f"
+      },
+      "files": {
+        "BlueTool": "5ba171b40cbedeb3eef1f5a3dffc19fba4a84d330377e738a3bf0e32cf78b00a",
+        "runtime.trustcache": "68a56a47a546df3b2d89031dd929c9e196b10d04b2680be0e2c3eb36576ed8d5",
+        "EldenBtTextGuard.h": "45f4294b612da6349302f5e813c7a8cfb8844da034ee6974bb017865d0218a85",
+        "EldenBtRuntimePayload.h": "bc9a3dce85e039ff89e0b6e19771a82e4146f02a4129d5c3d9971d3f4b86f80b"
+      },
+      "hardware": false
+    },
+    "core_filelist_unchanged": true,
+    "changed_core_objects": 0,
+    "scalar": true,
+    "changed_native_objects": 3,
+    "added_native_objects": 4,
+    "parent_kernel_sha256": "22b104e4f4ae0efb35954277bc3b27f4d1b2032b6d1ac97bf08d8e00d09e338a",
+    "original_apple_executables_hashed": 30,
+    "entry_return_target": "0xfffffff0075b605c",
+    "ufs_diagnostic_removed": true,
+    "ufs_ah8_retained": true,
+    "root_worker_bound": true,
+    "boot_packaged": false,
+    "hardware_tested": false,
+    "full_report_sha256": "a8a3246e0c48b4e668c7eac95023a9ee6387e38394f2ca18082242be2d61d765"
+  },
+  "hook_audit": {
+    "_elden_pcie_native_start": {
+      "address": "0xfffffff007ba1304",
+      "calls": [
+        "0xfffffff007b9a358"
+      ],
+      "caller": "_elden_wcn_power_start",
+      "prelink_preserved": true
+    },
+    "_elden_pcie_native_stop_begin": {
+      "address": "0xfffffff007ba1a24",
+      "calls": [
+        "0xfffffff007b9af98"
+      ],
+      "caller": "_elden_wcn_request_stop",
+      "prelink_preserved": true
+    },
+    "_elden_pcie_root_start": {
+      "address": "0xfffffff007ba2654",
+      "calls": [
+        "0xfffffff007ba1924"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_wlan_root_power": {
+      "address": "0xfffffff007b9bdbc",
+      "calls": [
+        "0xfffffff007ba1dc0"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    }
+  },
+  "ufs_initializers_preserved": true,
+  "ufs_warnings": 26,
+  "build_comparison": {
+    "loaded_native_identity_equal": true,
+    "kernel_changes_only_archive_paths_and_kcid": true,
+    "archive_path_changes": 10
+  },
+  "source_inputs": {
+    "tools/build_bt_address17.py": "1ae20cb9816148ef8963b7b97aec02099d541ffa5a32e4a214b98f119d30a7c1",
+    "tools/prepare_bt_helper_trace.py": "4d2f48bca348825bb9839710186bad16995931a2f977755f4e76f9622877624f",
+    "drivers/EldenBluetooth/runtime/LaunchCacheSource.py": "5395ec8f6a33b3a34ca2d204ab41c2c0b214419b8e53bc6d9e9ed72926559d38",
+    "drivers/EldenBluetooth/runtime/LaunchCache.inc": "398a283c8d7e66ffdec7509086285cf2432b907c13aa74eebf418b23be9025b2",
+    "drivers/EldenBluetooth/NativeInitSource.py": "5d15395c99dfccbb18b129e3279c68e7f7c4b5ba98bad7ac96a035c3289e6153",
+    "drivers/EldenBluetooth/ScanInitSource.py": "772f1d1385e56f94d47f258b69892beadb2db947d1dc377fc702e1e07401cbaf",
+    "drivers/EldenBluetooth/AddressWaitCapacitySource.py": "5db1b1b8acf7e2b6acc60e3dbcf0914be4affee7651c3c8f12a6ce389fea15e9",
+    "drivers/EldenBluetooth/AdmissionTraceSource.py": "81bb5f5d24e9373d67f4ff3766f24b8143ef40e8005c005cb59557935b179e74",
+    "drivers/EldenBluetooth/DiscoverySource.py": "c972ea31e0f39557001bc0664143a70952b23b527c8d4e30be526fb1f972b468",
+    "drivers/EldenBluetooth/Discovery.inc": "bd837fb655470853083c387893bac8d56a47b5c9e6377825153da8eed486a183",
+    "drivers/EldenBluetooth/diagnostics/AddressPropertyMarker.inc": "28f9b68eb1441282dc065c03410a7af2e4c6c617af81837102606a0dc6947560",
+    "drivers/EldenBluetooth/ProcessLifetimeSource.py": "8596e3815397b9b31d636a62a403eda589ab41e1d6dca84f7cc3c402d70a8fe0",
+    "drivers/EldenBluetooth/RegistrySource.py": "395e393e87cc73a022f05fc6c9179630819b0c21420c122258108a1c852f3791",
+    "drivers/EldenBluetooth/NativeHost.cpp": "646849166bcd935a8c594cff2470a24ed56484f274c15bff1f8eeb9ca64496e3",
+    "drivers/EldenBluetooth/diagnostics/TransportTrace.py": "5f0812b9148e252fefea321ed83a7de7db2bed6fc721b6ffbe1429b1bc435445",
+    "drivers/EldenBluetooth/diagnostics/NativeScanRolesMarker.inc": "116bc9f7ce8046414588fb1d47840989f03be7603296bb97041d7ccee09b617f",
+    "tools/build_charge_verification.py": "cdf554be5b406abea36cad01e8389a3206817bb669c77dd641246a1ce6101353",
+    "drivers/EldenPmicGlink/VerificationSource.py": "91d315c011d6b8a025a24ab81c569646bce0c757bb9f7d026f864ff78756728f",
+    "drivers/EldenPmicGlink/ChargeVerification.h": "dfdc83887f21bb65f29fdd452b8a8e2988ec0fb6848c5a0197d66f62ab5c9ac1",
+    "drivers/EldenPmicGlink/ChargePolicy.c": "baea8785f4353b020293126b7b109f40157f3287e34c080134ad3d70c29bdfeb",
+    "drivers/EldenPmicGlink/ChargePolicy.h": "ffa9a0c4cb4aee9a4f0881058365306dcd8e0cb1c1b5fc8356322e18c48a0605",
+    "profiles/v91/sources/power/PmicClient.cpp": "6c7fbcb75b1fbc7aa39c286171d9e6859534a4f79c197a28ab8542b20321e17a",
+    "drivers/EldenPmicGlink/WindowSource.py": "62eee5440f7feccd9c845f0e9e801c15e15b2c6cc2d66329bfa74fc00a0cf462",
+    "drivers/EldenBacklight/BootSource.py": "aa9576b9b5ae674bf5b7b9bafd4c22ba9e22e37d264806739b344c11d744946a",
+    "drivers/EldenBacklight/BacklightRuntime.cpp": "9418f7f7e3016e4d398a6d7d6b0f3053aa76b75309c61b65d827f617873cdcfa",
+    "drivers/EldenBacklight/PowerTrialSource.py": "72f4e7f55990b88f66792712a4ec655afe9c507398aada366ae6e760571f5d36",
+    "drivers/EldenPmicGlink/PdObservation.h": "f4c9c7700121245e878a66a43cde60c545d7f23659634303585cd26453320559",
+    "drivers/EldenPmicGlink/PdCompletion.h": "850a69924d8db3728a4813754693d045c5b9db31c72444bfb374b7d78c72dd93",
+    "drivers/EldenPmicGlink/PdStartupSource.py": "bffb24205ab151c5224d0aeb73c479f721732b7cad0290aee424dea8256b1724",
+    "drivers/EldenBacklight/PdPowerSource.py": "7b68cc70125578795a019ba9b99993c380a4ced0d9b36bdfd6613505451edab9",
+    "drivers/EldenCpuPower/SurveySource.py": "60c569fc3b8ec1095cc2c64e8186788da34147fe96f9ea4f256e02da1836b896",
+    "drivers/EldenCpuPower/Survey.inc": "7dd84180f15978227dd6edb700a9938318c864b8e17edf145b2ad77784651fa5",
+    "drivers/EldenCpuPower/CpuLoad.h": "9d38315819dea7439ee9d9bc043040c04513d152795d4f691c0acdaecd9a6a30",
+    "profiles/v91/sources/power/CpuPerfSurvey.cpp": "6c71236e924895b4059264c30baa160a3304239923d7bdfb57ed40ae230e008c",
+    "drivers/EldenStorageMedium/EldenStorageMedium.h": "8b28ba5ba5b020567450ac69bfc061ed005270a34398112441fee4e39992d05a",
+    "drivers/EldenStorageMedium/MediumSource.py": "3662012846bb18cc5fdf64c57e2d8b423d99ec462e8cadac3a25c9f10eb64626",
+    "tools/storage_medium_build.py": "e0217e793f22303f319b42a3ea8075203e064a49416cd2ef829ca8ed2aa53f3c",
+    "profiles/current-build/plan.json": "e15b65da67efed878e187e934000539dc00ff2fab3b0e5a7c2ff18bf180070c3",
+    "profiles/v91/native-build/extra/aaa89ac1f150/NativeUfs.cpp": "aaa89ac1f1502b55422783b4a7bf5bf01fcba24b35616e938cee3e45201a9955",
+    "profiles/v91/native-build/extra/e2ace3522943/NativeRamBlock.cpp": "e2ace3522943df38806ef2006525371691beaf0199f971266bd849d4f5253391",
+    "drivers/EldenCpuActivation/EarlyStorageSource.py": "c42806081e159dbeb50e1d3fd51c78dd17e918f2e08297f353eb7b8440d36725",
+    "profiles/v97-wcn/EldenSdamRecovery.inc": "ce63730b121d825dd9405cd9c537eaf7c0c73f78ed6dba0fe6c5021472a45781",
+    "drivers/EldenUfsWait/Source.py": "f2c9207aabf1924fcd8deccac7f92a2dc9f8ee85624bbf02a8f7bbc0a0f79ba1",
+    "drivers/EldenUfsWait/TrialSource.py": "9966f93d2b1c5c0b748989d29b167d7953c6080b7c6aace5932c05e6856a1996",
+    "drivers/EldenUfsWait/EldenUfsCompletion.inc": "ed9e94a50ee0918309bc0edb1bf76b2c6f32a499dfc1cda51aaf259978c9f216",
+    "drivers/EldenUfsWait/EldenUfsReadTrial.inc": "d497352fc3626881bbe063f18effaed4f9ed967330588c0f39b50eadcde19479",
+    "drivers/EldenUfsWait/UfsReadTrial.h": "0f9e2015f4428fe4d54b693d4e1c44ac862b1be7d5347e8fd4033ac10b0e8d5c",
+    "tools/build_ufs_wait_objects.py": "86121149b7dba0e65fcdae514dbfca09cb0bdcf2c8c0921bc7b4cee15b5457d3",
+    "profiles/v91/sources/cpu/ArmCpu.cpp": "f48f1b313b2a5034a461f685a4fd0d4c40eace4268389a318c12c8fa7a98ff9a",
+    "drivers/EldenUfsQueue/NativeSource.py": "df02ee48a3194e65d041fa802ab598e72396152b261731b41a1328d02d23bfe5",
+    "drivers/EldenUfsQueue/NativePrelude.inc": "b507e1751d0b1028b3f3ecc40ea41ced575ddd8c4a714a5302407d39d75294ad",
+    "drivers/EldenUfsQueue/NativeRead.inc": "ff389f0025a8cc8b6a6ae6f857f3921317985a1438af6036b954c15554afc240",
+    "drivers/EldenUfsQueue/NativeWindow.inc": "1d5f85ebd15079dde4302f837a84faefd7e8fa0188baab3171c872e171f3a75e",
+    "drivers/EldenUfsQueue/NativeBatchTrial.inc": "ce4a1ad38ca8ac2039bdee75deadcbe8c1d6d94384c0fcddd730f82070377e63",
+    "drivers/EldenUfsQueue/BatchTrial.h": "122373e889d5199dc99964bae75408ccffd7d422ac00247a422ed96c630b2f33",
+    "drivers/EldenUfsQueue/QueueCore.h": "d9da09279a47dfc3ada2efb32098307f6661e257e5b2b8543af5f04aa3a415e1",
+    "drivers/EldenUfsQueue/QueueCore.cpp": "4968a53627ceac08b4a17b212a1648736f2d8c62b277cf38cb3d0c18428e0d2b",
+    "drivers/EldenUfsQueue/DmaPlan.h": "8b7d6954d38469cb0916d25966fd3d7c50e0ea7fef96a3007e2530e6d751a8ef",
+    "drivers/EldenUfsQueue/DmaPlan.cpp": "609d983cf8bd51fc2a2a122f0491f6ab377f9795df800d27afe8d1f63e62babd",
+    "drivers/EldenUfsQueue/PrdtSource.py": "5a1cc718cbac687ecaf8d89ebddbc9b68ffae480d30d71ad9dae09420ef4344d",
+    "drivers/EldenUfsQueue/upstream/source.json": "912c0d6e4f6d21e4052146897626023791afe1cd8cf7c1571100226a819eb1b2",
+    "drivers/EldenUfsQueue/upstream/RootCommands.h": "1d90996f5cc7e94ddbb0f78b8ea5151aca7f24f50d09d7438e6825d8fa8b95e6",
+    "drivers/EldenUfsQueue/upstream/RootTransportLayout.h": "5f52df07f7db0c47feccd9234ddc2cfad0057c3ce54cc4e2746a01fb05f44d5c",
+    "drivers/EldenUfsQueue/upstream/LICENSE": "d3cdce3b19df47f2e4dcafdfd54909eb9bc64ac722645ceb1feae58695c97b09",
+    "drivers/EldenUsbThermal/TranslationSurvey.h": "1eb3730cf43461f99b35ff46082b00778a5ec20216857ca2159cab553bbedcef",
+    "scripts/driver-patches/EldenPinnedRootXnu.inc": "5014eae216ade21ad7f53e97401292270f18fed671d6bdfa54dd4f70d12c8150",
+    "drivers/EldenUfsIdle/Ah8Control.h": "56234b5c9094e4b4f3e22ec2c7dc6f99d02bf4ad62dfe6a48c522e34372aa92d",
+    "drivers/EldenUfsIdle/EldenUfsIdle.inc": "7aeb4e8993873c9896a34350993adb89222aa3de1e8bf473d830decf8a7667ba",
+    "drivers/EldenUfsIdle/IdleSource.py": "96ad582c763a99bb29396140e8d2237308a48c9f1a8569a5b237f2b23286814e",
+    "drivers/EldenPcie/Native.h": "043d8467c6dc9a8745496e81c32f3142433c010206e0cf079f13b87557646fd7",
+    "drivers/EldenPcie/NativeRuntime.inc": "477d70e2080a8f6d16e35a845688f4fa892a4a5e70521ab9b981d791be58f724",
+    "drivers/EldenPcie/NativeExports.inc": "369aab3e5664822c2852253c5ff4605db780c5382cd115f4e4af370476924f23",
+    "drivers/EldenPcie/Root.h": "6b607a22dec2acd4e516c921ddecae6c8f169eca508af39de93426019ab88cda",
+    "drivers/EldenPcie/Phy.h": "a2dcfd5068fab775a2706b0e290eb1fcb368e777ab34b84ec262b18b2c9898fa",
+    "drivers/EldenPcie/Power.h": "a0373250d7c45b36d47120452146d87533bd4348666730a48715273e8407dc46",
+    "drivers/EldenPcie/Pins.h": "2337cd2603c6025886ec530aecb10758ebd52f0b02135b105d0f32afc18b02ba",
+    "drivers/EldenWifi/WlanPower.h": "adea0f3f42a196a8412e6cc1d63224d9db5cbbeff15a79661d5e1bcf87ee7a68",
+    "soc/sm8750/include/EldenWifiResources.h": "1d30232ebbe2d47641fb36dfce80df50b3d0025e703696b18d810d34c31b368c",
+    "drivers/EldenPcie/Native.cpp": "32f2f47a5222c660eed754ae43c8f66f6ee3b8927bda11bf04c869d60fa176a7",
+    "drivers/EldenBluetooth/WcnSharedPower.h": "9f7c484035ffaaec76946ececf52bda9227cd8139ffeca8684a659821f201266",
+    "drivers/EldenWifi/WlanGpio.h": "db9e4f66fc32f0bd5cb6571fb6667175633e281e9c5407b10222f9f756f4b571",
+    "drivers/EldenWifi/SharedNativeSource.py": "32a3b0dea8ce44f62202f581a96a4b7e40cc850ea0b945a5829957f8b7e1fc36",
+    "drivers/EldenWifi/WlanPowerNative.inc": "41e5adc3092c54d44ba36de79ce6ce642130744b226969a3bc56df5df51d6a89",
+    "drivers/EldenWifi/WlanPowerExports.inc": "7e7ae94cb8aeac5321c88f820a8ff9381d2cac51af247a782ee647c49128680c",
+    "profiles/v116-hci-reset/sources/WcnPowerNative.cpp": "5c16106e90622150686b90706fcfc8c674cf3c4d563ed782fd7d57fc864e2c72",
+    "drivers/EldenPcie/PowerNativeSource.py": "b6e43187379b96b7b721d831967f1058436f356ae2440204becfe43918505cb0",
+    "drivers/EldenPcie/PowerNative.inc": "10b1ce4fa7df1449bfea7118759e03a635054d99fe9ad005c082afdc3ea1dc96",
+    "drivers/EldenPcie/PowerExports.inc": "31e5b9bf5b382f9f69870f1872d974925beebacf17efe08bea4cf44382c6d2fe",
+    "drivers/EldenPcie/NativeHookSource.py": "3a8c22b14323cb80a5f35829465af6948516826e4a6f535e391a28162ca72ca2",
+    "drivers/EldenPcie/Root.c": "1406f1bd7878053918bca74cc8ccae811e549822095c3183fe02c6ad6d431a84",
+    "drivers/EldenPcie/Phy.c": "a18afd15e9f1385bf2d07723d8ceea94cf2eafc9d89cb2d9d9490f1c63fee428",
+    "drivers/EldenPcie/PhySequence.inc": "15a669913b5aef092eb1cf556561caac7a6cb9fdc5c52cecf2e1ac04f11fcc24",
+    "drivers/EldenPcie/Power.c": "f275d48c368ad99c219bc7f6dc972005dfc922b6751cf5432aa0bab656c535ae",
+    "profiles/current-build/sources/a39f9324d152faf7/Sm8750Rpmh.h": "a39f9324d152faf7b83063d71784555031d5c4e4f142b359478ccf656562843f",
+    "drivers/EldenBluetooth/WcnPower.c": "8028445481b7012df33ce6ce13739171a17dfeb89fba4f84d30ca4af85fe16ab",
+    "drivers/EldenBluetooth/WcnPower.h": "2047193ec2337bf0ef83f4308c0a83d879fdd6738e80f422a6c1907111a6fff3",
+    "drivers/EldenBluetooth/WcnSharedPower.inc": "4e2f63533c45003bd9ece5a9c8f16d7bae95c28444a20af818bfdd1e7a8d6190",
+    "tools/build_pcie_root_kernel.py": "1f4302a83525e3cf4806deae468b5eda3eac207381e34328d702ba9ee6e80800"
+  },
+  "native_contract_sha256": "afa8b64aa95d949de387c50db4e21a54f23efd71fd0fea022e8108726eddb8a0",
+  "scope": {
+    "native_worker_connected": true,
+    "kernel_linked": true,
+    "entry_converted": false,
+    "boot_packaged": false,
+    "hardware_tested": false
+  },
+  "next": "Explicit root trial entry/menu/signature and complete artifact/AVB/return audit, then one bounded hardware test",
+  "goal_complete": false,
+  "charging_complete": false,
+  "gpu_worktree_accessed": false,
+  "device_operations": false,
+  "all_jobs_terminal": true
+}

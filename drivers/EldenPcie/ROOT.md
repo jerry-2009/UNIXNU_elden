@@ -1,5 +1,9 @@
 # PCIe0 root transaction — offline component
 
+The [native worker and v157 kernel](NATIVE.md) now connect the mappings, pins,
+power and shared GCC callbacks. The complete kernel is built, but no signed boot
+or hardware result exists yet; the component history below remains scoped as written.
+
 Follow-up: [POWER.md](POWER.md) now provides the real native supply/NoC sender
 under an explicit diagnostic full-on policy. Native maps/pins/GCC/worker glue,
 whole-kernel integration and hardware validation remain pending.

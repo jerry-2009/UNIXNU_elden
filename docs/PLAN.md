@@ -31,6 +31,10 @@ Linux QMI桥接与128对象可重定位链接随后已通过，见[QMI接入](..
 原生[PCIe供电/NoC入口](../drivers/EldenPcie/POWER.md)随后已编译并绑定现有RPMh实现；本机只读确认
 L1F880mV/L3G1200mV，未执行新投票。未知启动投票暂用显式诊断full-on预算保护，默认关闭，不能当日用省电。
 下一步接映射/pins/GCC与worker/quiesce再整核；正常预算、共享投票与充电验收仍须继续完成。
+
+v157已完成[原生root工作线程及整核](../drivers/EldenPcie/NATIVE.md)：实际映射/GPIO/共享GCC与
+冷启动停止确认接入，Root/WCN start-stop直接分支及prelink保持已核；原Apple30/core/入口保持。
+已去掉UFS重复诊断、保留队列/AH8/认证和恢复。尚未入口转换/签包/上机；下一步完整打包审计后一次实机root验证。
 还没有启动Wi-Fi射频或生成新候选，不把接口核心验过当作Wi-Fi供电已打通。
 
 v156已经补齐一项可执行电源缺口：[UFS自动Hibern8](../profiles/ufs-idle-trial/README.md)。
