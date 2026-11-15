@@ -1,0 +1,55 @@
+{
+  "xnu": {
+    "hardware": false,
+    "limits": "Source/ABI evidence only; the existing spec_open log is used for actual ioctl outcomes.",
+    "xnu_sources": {
+      "bsd/sys/disk.h": {
+        "sha256": "51715b7926fec9d3556aa702f4b63e377611b83b3a709b6f5a0780fa66f67392",
+        "bytes": 14015
+      },
+      "bsd/miscfs/specfs/spec_vnops.c": {
+        "sha256": "8accdcdf5ef48fe72064cb7fbc5b9c26661a4ab9c6ee8953a5a689debc95f134",
+        "bytes": 87815
+      },
+      "bsd/vfs/vfs_subr.c": {
+        "sha256": "a2f8ed1a2541b407364b4b237524e469ee1b19e330b33b8a382dbb9fc0e812d4",
+        "bytes": 337936
+      }
+    },
+    "ioctl": "0x4004644f",
+    "default_period_ms": {
+      "LOWPRI_TIER1_IO_PERIOD_MSECS": 40,
+      "LOWPRI_TIER1_IO_PERIOD_SSD_MSECS": 5,
+      "LOWPRI_TIER2_IO_PERIOD_MSECS": 85,
+      "LOWPRI_TIER2_IO_PERIOD_SSD_MSECS": 15,
+      "LOWPRI_TIER3_IO_PERIOD_MSECS": 200,
+      "LOWPRI_TIER3_IO_PERIOD_SSD_MSECS": 25
+    },
+    "mount_sets_mntk_ssd": true
+  },
+  "family": {
+    "hardware": false,
+    "limits": "Source/ABI evidence only; the existing spec_open log is used for actual ioctl outcomes.",
+    "family_sources": [
+      {
+        "tag": "312",
+        "commit": "0993ad6b36e85774fb0bc280e7d795f6dcbc641c",
+        "file_sha256": "5da53cac98a62faa48320e01955129a4da3004e1cfba7a08c3b89f1d10d39c53",
+        "case_sha256": "aecd3846305984fc7aac91c1e01a40c6bfc253b9ac6cadc94c33f7ac08b2f627"
+      },
+      {
+        "tag": "315",
+        "commit": "e45fbe30a7879e0b16e26dddb78538f1b00e0bff",
+        "file_sha256": "5da53cac98a62faa48320e01955129a4da3004e1cfba7a08c3b89f1d10d39c53",
+        "case_sha256": "aecd3846305984fc7aac91c1e01a40c6bfc253b9ac6cadc94c33f7ac08b2f627"
+      },
+      {
+        "tag": "337.100.1",
+        "commit": "7edb88fbae296fb7c8ce2f64e115e116e566d51c",
+        "file_sha256": "6b4ae728a8fdb267df2d35cca832b2c4fa08c489e491863d595614f6da70cc5a",
+        "case_sha256": "aecd3846305984fc7aac91c1e01a40c6bfc253b9ac6cadc94c33f7ac08b2f627"
+      }
+    ],
+    "same_ioctl_body": true
+  }
+}

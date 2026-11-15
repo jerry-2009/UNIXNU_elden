@@ -305,6 +305,11 @@
       "name": "XnuPrelink",
       "url": "https://github.com/UniXNU/XnuPrelink.git",
       "observed_head": "440589b0c31625f17edf363e24b3c82c51c70bb9"
+    },
+    {
+      "name": "IOStorageFamily",
+      "url": "https://github.com/apple-oss-distributions/IOStorageFamily.git",
+      "observed_head": "7edb88fbae296fb7c8ce2f64e115e116e566d51c"
     }
   ]
 }

@@ -16,7 +16,13 @@ def qualify(report_path,entry_path,runtime):
     if profile=='pd-power-trial':units={'PmicClient','BacklightRuntime'}
     if profile=='cpu-power-observation':units={'CpuPerfSurvey'}
     if profile=='cpu-governor':units={'CpuPerfSurvey','ShengUfs'}
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='storage-medium':units={'ShengUfs','NativeRamBlock'}
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='storage-medium':
+        sys.path.insert(0,str(ROOT/'drivers/EldenStorageMedium'))
+        from MediumSource import source
+        for unit in units:
+            if hashlib.sha256(source(unit)).hexdigest()!=r['native_objects'][unit]['source_sha256'] or not r['native_objects'][unit].get('initializers_preserved'):raise ValueError('Storage medium source/initializer differs')
     if profile=='cpu-governor':
         sys.path.insert(0,str(ROOT/'drivers/EldenCpuPower'))
         from RuntimeSource import source,recovery
