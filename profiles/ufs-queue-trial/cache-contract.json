@@ -1,0 +1,17 @@
+{
+  "source": "source-built XNU IOBufferMemoryDescriptor.cpp",
+  "source_sha256": "606d18527db26310912b88d8c1ce29cfa853d9b7e6914c837a8c5ecdcd5869a4",
+  "header_sha256": "92e19dc6505041fe0ff4b067224473b03f5731f9152915b7399d41524f61e29b",
+  "anchors": {
+    "page_alignment": 248,
+    "memory_entry_cache_mode": 285,
+    "persistent_memory_entry": 383,
+    "mapping_cache_mode": 443
+  },
+  "upstream": "ShengUfs b6fe07b3 hostContiguous includes cache allocation flag",
+  "host_old_sha256": "5d4a9529613480367282d8eff41dc3dda3587d7545c8073da490eae846dd9c10",
+  "host_fixed_sha256": "6e2f1a7e1f9c05631ea54a3f62421daedb065c8493a8a63d781d59b4e6a5450e",
+  "host_change_only_allocation_flag": true,
+  "old_hardware_par_unrecorded": true,
+  "limits": "Source/API model identifies the omitted allocation contract; original hardware subcheck not individually traced."
+}

@@ -1,9 +1,9 @@
-# Elden multi-slot / DMA core (v153, not yet connected)
+# Elden multi-slot / DMA core
 
-The source-only slot/PRDT core passes host fault tests and ARM64/iPadOS17
-compilation. **There is no native allocation adapter, linked kernel, new boot
-image or hardware trial yet.** v152 remains the last verified signed candidate;
-the tablet was not accessed for this work.
+The v153 source-only core below is now integrated and hardware-tested in
+[v155](../../profiles/ufs-queue-trial/README.md): owned IOKit allocations,
+per-slot issue/await, direct DMA,32 slots and post-sync shutdown are connected.
+The remainder records the original component contract and its validation scope.
 
 ## Reuse and required adaptation
 
@@ -86,11 +86,13 @@ link nor flash a kernel. [Validation](../../docs/evidence/ufs-queue-core.json)
 records source identities. Workbench: `lab/records/ufs-queue-v153-20261115`.
 Mac final: `isolated/ufs-queue-core-v153-final`.
 
-## Next implementation step
+## Integration completed in v155
 
-Connect this core to owned IOMemoryDescriptor allocations, request-list cache
+The integration plan was to connect this core to owned IOMemoryDescriptor allocations, request-list cache
 mapping/readback, the actual NativeUfs issue/await path, per-slot diagnostics and
 shutdown. The old global diagnostic `residual` must not participate in concurrent
 response decisions. Then integrate per-request snapshots/pipeline, perform full
 native/Apple/entry/AVB checks, and one known-data QD1/8/32 comparison with recovery.
+Those steps are now recorded in the v155 profile; sustained stress and actual
+user-visible latency are separate unfinished validation.
 Do not repeat component-only or v152 IRQ-only device trials.

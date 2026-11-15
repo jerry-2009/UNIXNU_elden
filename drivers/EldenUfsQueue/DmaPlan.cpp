@@ -14,14 +14,14 @@ extern "C" bool elden_ufs_prdt_build(uintptr_t va,uint64_t bytes,uint64_t capaci
                                     EldenUfsPageAddress page,void *context,EldenUfsPrdtPlan *out){
     if(!va||!out||!page||!bytes||bytes>capacity||limit<(1ULL<<32)||limit>(1ULL<<48)||
        (limit&(limit-1))||bytes>UINTPTR_MAX-va)return false;
-    UfsPrd raw[kMaxPrds]={};
+    elden_prdt::UfsPrd raw[elden_prdt::kMaxPrds]={};
     auto map=[&](const void *address)->uint64_t{
         uint64_t offset=reinterpret_cast<uintptr_t>(address)-va;
         if(offset>bytes||4096>bytes-offset)return 0;
         uint64_t physical=page(context,offset);
         return physical&&physical<limit&&4096<=limit-physical?physical:0;
     };
-    unsigned count=eldenUfsBuildPrds(reinterpret_cast<const void*>(va),bytes,raw,map);
+    unsigned count=elden_prdt::eldenUfsBuildPrds(reinterpret_cast<const void*>(va),bytes,raw,map);
     if(!count)return false;
     uint64_t total=0;for(unsigned i=0;i<count;++i)total+=raw[i].bytes;
     if(total!=bytes)return false;

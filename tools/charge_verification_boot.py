@@ -19,7 +19,16 @@ def qualify(report_path,entry_path,runtime):
     if profile=='storage-medium':units={'ShengUfs','NativeRamBlock'}
     if profile=='early-storage-guard':units={'ShengUfs'}
     if profile=='ufs-wait-trial':units={'ArmCpu','ShengUfs'}
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','ufs-wait-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='ufs-queue-trial':units={'ShengUfs'}
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','ufs-wait-trial','ufs-queue-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='ufs-queue-trial':
+        sys.path.insert(0,str(ROOT/'drivers/EldenUfsQueue'));import NativeSource as q
+        row=r['native_objects']['ShengUfs']
+        expected={'RootCommands.h':q.commands(),'EldenSdamRecovery.inc':q.recovery(),'EldenUfsCompletion.inc':q.completion(),
+                  'RootQueue.h':q.root_queue(),'RootTransportLayout.h':q.layout(),'EldenQueuePrelude.inc':q.prelude(),
+                  'EldenPinnedRootXnu.inc':q.pinned_root(),'EldenUfsPrdtAlgorithm.h':q.header()}
+        if hashlib.sha256(q.trial_source()).hexdigest()!=row['source_sha256'] or not row['initializers_preserved']:raise ValueError('Queue source/initializer differs')
+        if {n:hashlib.sha256(data).hexdigest() for n,data in expected.items()}!=row['generated_sources']:raise ValueError('Queue generated dependencies differ')
     if profile=='ufs-wait-trial':
         sys.path.insert(0,str(ROOT/'drivers/EldenUfsWait'))
         from TrialSource import source,recovery,commands,cpu_source,completion

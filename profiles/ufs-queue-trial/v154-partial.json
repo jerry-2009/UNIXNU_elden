@@ -1,0 +1,43 @@
+{
+  "experiment_passed": false,
+  "identity": {
+    "profile": "ufs-queue-trial",
+    "session": "fac17a50376c632c",
+    "boot_nonce": "f84b9a18cd4e55bf",
+    "image_sha256": "8e116930d4ca2b283d40adc3e6f863d5c269f38d3f96940e6149caa4d17baad9",
+    "raw_sha256": "290039c3567d39124d18c013afab3bd4b66a0d3c2183e47bd85f6d617e63ada9",
+    "bytes": 22635,
+    "phases": [],
+    "zero_cycles": [],
+    "zero_readback_interrupted": false,
+    "pulse_attempted": false,
+    "pulse": [],
+    "pulse_restored_or_unneeded": true,
+    "controller_completed": false,
+    "pd_contracts": [],
+    "pd_ready_observed": false,
+    "ready_before_measurement": null,
+    "observation_loss_during_measurement": null,
+    "backlight_trial_finished": null,
+    "observations": [],
+    "stopped_cleanly": false,
+    "reset_after_sync": false,
+    "dropped": 0,
+    "discontinuities": [],
+    "reconnections": [],
+    "limits": "Critical received markers and readbacks, not proof of every instant or individual-port watts. Character drops remain reported. Net charging is assessed separately from complete battery samples."
+  },
+  "rows": [
+    "ELDEN_UFS_QD row name=OS qd=1 bytes=4096 pass=0 commands=32 io-ns=4002443 db-peak=1 direct=32 irq=32 sleeps=0 wakes=0 timeouts=0 sha=8e0c7c61493549b8ace9c2dd6bfc27bdacd45223ece4f674a50b8fedeb01a07f",
+    "ELDEN_UFS_QD row name=OS qd=8 bytes=4096 pass=0 commands=32 io-ns=699323 db-peak=8 direct=32 irq=28 sleeps=0 wakes=0 timeouts=0 sha=8e0c7c61493549b8ace9c2dd6bfc27bdacd45223ece4f674a50b8fedeb01a07f"
+  ],
+  "configured": [
+    "ELDEN_UFS_QUEUE configured slots=16 entries=32 uncached=0 list=8eb455000 dma-limit=1000000000"
+  ],
+  "failure": "Requested QD32 refused because independent list did not qualify; actual fallback16. No old PAR log, so do not assert the exact failing subcondition.",
+  "panic_return_observed": true,
+  "stock_restore_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "supervisor_complete": true,
+  "android_settings_unchanged": true,
+  "no_root": true
+}

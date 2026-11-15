@@ -24,7 +24,8 @@ def header():
 // Derived from pinned ShengUfs; see upstream/LICENSE and source.json.
 #pragma once
 #include <stdint.h>
+namespace elden_prdt {
 struct UfsPrd { uint64_t addr; uint32_t bytes; };
 static constexpr unsigned kMaxPrds=64;
 static constexpr uint32_t kXferMax=1U<<20,kPrdMax=256U<<10;
-'''+fn+'\n').encode()
+'''+fn+'\n}\n').encode()

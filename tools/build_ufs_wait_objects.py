@@ -32,7 +32,7 @@ def exports(p):
     return {k for k, v in global_symbols(p).items() if v[0] & 0x0e}
 
 
-def compile_units(base, parent, out, llvm, trial=False):
+def compile_units(base, parent, out, llvm, trial=False, queue=False, queue_trial=False):
     objects, records, archives, inherited, new_imports = {}, {}, {}, {}, {}
     native = read(base / 'native/build/results.json')
     capture = read(base / 'native/capture.json')
@@ -41,13 +41,24 @@ def compile_units(base, parent, out, llvm, trial=False):
     if not current['complete'] or current['profile_sha256'] != sha(ROOT / 'profiles/current-build/plan.json'):
         raise ValueError('Current units changed')
     derive=source
+    queue_files={}
+    if queue:
+        sys.path.insert(0,str(ROOT/'drivers/EldenUfsQueue'))
+        import NativeSource as q
+        derive=q.trial_source if queue_trial else q.source
+        queue_files={'RootCommands.h':q.commands(),'EldenSdamRecovery.inc':q.recovery(),
+                     'EldenUfsCompletion.inc':q.completion(),'RootQueue.h':q.root_queue(),
+                     'RootTransportLayout.h':q.layout(),'EldenQueuePrelude.inc':q.prelude(),
+                     'EldenPinnedRootXnu.inc':q.pinned_root(),'EldenUfsPrdtAlgorithm.h':q.header()}
+        for name,data in queue_files.items():(out/'source'/name).write_bytes(data)
     if trial:
         from TrialSource import source as derive, completion
         (out/'source/EldenUfsCompletion.inc').write_bytes(completion())
     for name, data in {'NativeUfs.cpp': derive(), 'ArmCpu.cpp': cpu_source(),
-                       'RootCommands.h': commands(), 'EldenSdamRecovery.inc': recovery()}.items():
+                       'RootCommands.h': queue_files.get('RootCommands.h',commands()),
+                       'EldenSdamRecovery.inc':queue_files.get('EldenSdamRecovery.inc',recovery())}.items():
         (out / 'source' / name).write_bytes(data)
-    for unit in ('ArmCpu', 'ShengUfs'):
+    for unit in (('ShengUfs',) if queue else ('ArmCpu','ShengUfs')):
         if unit == 'ShengUfs':
             row = current['units'][unit]
             old = Path(row['object'])
@@ -62,6 +73,11 @@ def compile_units(base, parent, out, llvm, trial=False):
                         'EldenSdamRecovery.inc': RECOVERY_SHA}
             member, archive = 'ShengUfs.o', 'libShengUfs.a'
             added = {'_elden_ufs_wait_shutdown'}
+            if queue:
+                expected.update({'RootQueue.h':'3a22f86e432446a3cd7267078c195cfca5b8bb1c2bd55741e67d265de97c6447',
+                                 'RootTransportLayout.h':'77699362f09e103ceda0d5f216d0be7749cdc1e88c6143ddd15ceb11dfd42e91',
+                                 'EldenPinnedRootXnu.inc':'5014eae216ade21ad7f53e97401292270f18fed671d6bdfa54dd4f70d12c8150'})
+                added|={'_elden_ufs_queue_halt','_elden_ufs_dma_limit','_elden_ufs_prdt_build'}|{'_elden_ufs_pool_'+n for n in ('init','take','enqueue','cancel','issue','complete','release','stop')}
         else:
             rows = [r for r in native.values() if r['source'].endswith('/ArmCpu.cpp')]
             if len(rows) != 1:
@@ -108,7 +124,15 @@ def compile_units(base, parent, out, llvm, trial=False):
                 for folder, header in [('EldenStorageMedium', 'EldenStorageMedium.h'),
                                        ('EldenUfsWait', 'EldenUfsCompletion.inc')]:
                     extra.append({'type': 'file', 'name': str(Path(item['name']).parent / header),
-                                  'external-contents': str(out/'source'/header if trial and header=='EldenUfsCompletion.inc' else ROOT / 'drivers' / folder / header)})
+                                  'external-contents': str(out/'source'/header if (trial or queue) and header=='EldenUfsCompletion.inc' else ROOT / 'drivers' / folder / header)})
+                if queue:
+                    for header in ('EldenQueuePrelude.inc','EldenUfsPrdtAlgorithm.h'):
+                        extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(out/'source'/header)})
+                    for header in ('QueueCore.h','QueueCore.cpp','DmaPlan.h','DmaPlan.cpp'):
+                        extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenUfsQueue'/header)})
+                    if queue_trial:
+                        for header in ('NativeBatchTrial.inc','BatchTrial.h'):
+                            extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenUfsQueue'/header)})
                 if trial:
                     for header in ('EldenUfsReadTrial.inc','UfsReadTrial.h'):
                         extra.append({'type':'file','name':str(Path(item['name']).parent/header),
@@ -160,7 +184,8 @@ def compile_units(base, parent, out, llvm, trial=False):
         if unit=='ShengUfs':
             records[unit].update(recovery_sha256=sha(out/'source/EldenSdamRecovery.inc'),
                                  commands_sha256=sha(out/'source/RootCommands.h'),
-                                 completion_sha256=sha(out/'source/EldenUfsCompletion.inc') if trial else sha(ROOT/'drivers/EldenUfsWait/EldenUfsCompletion.inc'))
+                                 completion_sha256=sha(out/'source/EldenUfsCompletion.inc') if trial or queue else sha(ROOT/'drivers/EldenUfsWait/EldenUfsCompletion.inc'))
+            if queue:records[unit]['generated_sources']={n:sha(out/'source'/n) for n in queue_files}
     available = exports(parent / 'native.macho')
     for obj in objects.values():
         available |= exports(obj)
@@ -180,12 +205,13 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     for arg in ('clean-build', 'parent-build', 'llvm', 'output'):
         p.add_argument('--' + arg, type=Path, required=True)
+    p.add_argument('--queue',action='store_true',help='Compile the native queue/owned-memory integration')
     a = p.parse_args()
     out = a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     (out / 'source').mkdir()
-    objects, records, archives, inputs = compile_units(a.clean_build.resolve(), a.parent_build.resolve(), out, a.llvm.resolve())
-    report = {'profile': 'ufs-wait-objects', 'passed': True, 'native_objects': records,
+    objects, records, archives, inputs = compile_units(a.clean_build.resolve(), a.parent_build.resolve(), out, a.llvm.resolve(),queue=a.queue)
+    report = {'profile': 'ufs-queue-objects' if a.queue else 'ufs-wait-objects', 'passed': True, 'native_objects': records,
               'archives': archives, 'inherited_sources': inputs,
               'whole_kernel': False, 'hardware': False}
     (out / 'result.json').write_text(json.dumps(report, indent=2) + '\n')
