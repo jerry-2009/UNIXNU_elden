@@ -1,5 +1,18 @@
 # UniXNU elden — authoritative source repository
 
+Latest endpoint-component20261116: Endpoint.c sizes/restores32/64-bit BARs, assigns BAR0/2,
+region1+root MEM routing, maps via mandatory callback, MEM-only/no BM, Peach3278 window/version1b00000 major2,
+restores remap/rechecks config+BARs. Native map/worker/epoch confirmation/full kernel/hardware NOT integrated.
+Same root/admit epoch every access, partial failure Held to reset, no retry or DMA/MSI/MHI. Stock FDT memory
+40300000..44000000 is61MiB, fixed Linux extends64000000/573MiB; use stock intersection. Cache expected sizes
+2MiB/32KiB require real config discovery; planned addresses40400000/40600000 are not cached Android assignments.
+295 actual-function model scenarios45259 ASan/UBSan checks pass including every callback failure,32/64bits,
+lost BAR after mapping, epoch loss, readback/timeouts/W1C/remap. ARM64/iOS17 Endpoint91695536 no imports/SIMD/init/warnings;
+source7555cd73. Fixed Sheng24aab961 and TB322FC6f97250e plus full stock FDT audited. See drivers/EldenPcie/ENDPOINT.md.
+Mac lab/pcie-endpoint-20261116/native1, workbench corresponding edl and lab host3/source-audit2.
+No new device access/boot; last restored stock remains. All jobs terminal. Next native mapping/worker/status/real identity
+confirmation then full kernel/one bounded combined trial. Goal active, charging/Wi-Fi incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v157-hardware20261116: signed root trial f717f7a5/session0b8c9da91e696299 passed Gen3x2,
 root011c17cb/endpoint110e17cb,127PHY/430writes/GCC released, endpoint command low16=0.
 Actual power stage9 requests MX448/CX480/SN4=16383 (not measured ARC voltage), PHY LDO880/1200 readback.

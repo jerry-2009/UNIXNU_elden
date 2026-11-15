@@ -9,6 +9,10 @@ Wi-Fi仍不能开启联网：尚未验证BAR映射/Peach major2/SMMU/DMA/MSI/MHI
 下一步先BAR与芯片身份，再有所有权的DMA/MSI及MHI；已通过的root诊断不重跑。
 显式full-on预算不是日用电源策略，日用净充及完整保护周期仍欠。
 
+[BAR/Peach事务组件](../drivers/EldenPcie/ENDPOINT.md)现已离线测试及ARM64编译完成，
+原生映射、worker接入和实机身份读取仍未完成。stock61MiB与Linux573MiB窗口差异已核，
+采用较窄交集；不能以组件的模拟身份值解除真实QMI准入门。
+
 已具备的源码链为[共享WCN](WCN-SHARED-POWER.md)→[原生WLAN](WLAN-POWER-NATIVE.md)
 →[本机PHY/root](../drivers/EldenPcie/README.md)→[原生worker](../drivers/EldenPcie/NATIVE.md)。
 [QMI桥接](../drivers/EldenWifi/QMI-POWER.md)要求实读端点+major确认后的epoch，不能伪造成功。

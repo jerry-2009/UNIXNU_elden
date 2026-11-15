@@ -26,6 +26,10 @@ WLAN/NoC原生提供者与worker已实跑，128对象QMI链接仍属离线结果
 2. 确立SMMU/DMA内存所有权和MSI路由，补真实排空与停止，再允许端点bus-master。
 3. 接入已编译的MHI/Peach/QMI栈和真实WLAN consumer，验证固件/扫描/关联/联网。
 
+第一项的[BAR/Peach事务组件](../drivers/EldenPcie/ENDPOINT.md)已通过295场景与ARM64编译，
+按stock更窄的61MiB窗口配置、保持bus-master关闭。尚缺原生map/worker/状态与epoch确认接线，
+未整核/上机；下一步完成这些后合并一次root+BAR+身份试验。
+
 不重复v157根链路诊断，也不复制其它设备未保留的低地址DMA内存。芯片major确认前，
 现有power_ready/CPR/QMI门保持关闭。更详细的边界见[原生worker](../drivers/EldenPcie/NATIVE.md)。
 

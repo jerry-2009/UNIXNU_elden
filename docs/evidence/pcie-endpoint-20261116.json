@@ -1,0 +1,55 @@
+{
+  "host": {
+    "passed": true,
+    "result": "295 scenarios / 45259 checks passed; physical hardware modeled",
+    "asan_ubsan": true,
+    "hardware_callbacks_modeled": true,
+    "hardware": false,
+    "source_sha256": {
+      "Endpoint.c": "7555cd735b51fb1cf13d66c3f1aa9563c25a4bdb539a09142a8dd9c70192c1b8",
+      "Endpoint.h": "5779d5357a7d5bfb9e04bab0b39af80fc168ef317975f467f900df12504e18c4",
+      "Root.h": "6b607a22dec2acd4e516c921ddecae6c8f169eca508af39de93426019ab88cda",
+      "Phy.h": "a2dcfd5068fab775a2706b0e290eb1fcb368e777ab34b84ec262b18b2c9898fa",
+      "TestEndpoint.c": "d377580b6a8bbde985022418149e39c2945f44a0370f7a27d06ea114be723760"
+    }
+  },
+  "native": {
+    "compiled": true,
+    "object_sha256": "91695536406cb5d9e90e286c4f2d7f71eb721c4fd639eb08b264c759015ab921",
+    "source_sha256": {
+      "Endpoint.c": "7555cd735b51fb1cf13d66c3f1aa9563c25a4bdb539a09142a8dd9c70192c1b8",
+      "Endpoint.h": "5779d5357a7d5bfb9e04bab0b39af80fc168ef317975f467f900df12504e18c4",
+      "Root.h": "6b607a22dec2acd4e516c921ddecae6c8f169eca508af39de93426019ab88cda",
+      "Phy.h": "a2dcfd5068fab775a2706b0e290eb1fcb368e777ab34b84ec262b18b2c9898fa"
+    },
+    "exports": [
+      "_elden_pcie_endpoint_identify"
+    ],
+    "imports": [],
+    "scalar": true,
+    "warnings": 0,
+    "native_map_provider_implemented": false,
+    "kernel_linked": false,
+    "hardware_tested": false
+  },
+  "source_audit": {
+    "passed": true,
+    "linux_revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+    "sheng_revision": "24aab96163799cb1db083d94539a5eefc07e0475",
+    "source_inputs": {
+      "6f97250ead155fc3b980856323e99a4623dae73d:arch/arm64/boot/dts/qcom/sm8750.dtsi": "cbf8bad5006ec6d2c3d654aeec94bb0f08be235e03804164a2252e5b65a4e175",
+      "6f97250ead155fc3b980856323e99a4623dae73d:drivers/net/wireless/ath/ath12k/wifi7/pci.c": "db0a577f79e6a9095441059217e5e0991aa3abdba563725a742ece229b999826",
+      "6f97250ead155fc3b980856323e99a4623dae73d:drivers/net/wireless/ath/ath12k/pci.c": "9a97838cc28065fd6c02bb89862ab598f836932d984dd84f198e2b602f409019",
+      "24aab96163799cb1db083d94539a5eefc07e0475:package/WifiProbe.cpp": "e449a40b423ed0f4b0750cb5c1edcd8139cbe9bd11b73a82d2885c8ad21060a5",
+      "6f97250ead155fc3b980856323e99a4623dae73d:drivers/pci/controller/dwc/pcie-designware.h": "9c58efbbcbb1e71d64a595738053e6f81f275e95dcb4beb95c52c9772d50ee12"
+    },
+    "stock_fdt_checked": true,
+    "facts_sha256": "42956995ee253ca73800e5b49de35f2c4fca493ddb5b22882a22c21365100e7e",
+    "endpoint_source_sha256": "7555cd735b51fb1cf13d66c3f1aa9563c25a4bdb539a09142a8dd9c70192c1b8",
+    "scope": "Source fields/provenance only; native mapping and hardware not tested"
+  },
+  "native_provider_implemented": false,
+  "full_kernel_built": false,
+  "hardware_tested": false,
+  "next": "Native BAR maps/worker/status/real epoch confirmation, then full build and one combined trial"
+}
