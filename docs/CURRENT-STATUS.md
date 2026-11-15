@@ -1,4 +1,9 @@
-# 当前状态 · 2026-11-15
+# 当前状态 · 2026-11-16
+
+v157 PCIe根链路已实机通过：Gen3 ×2、正确root/endpoint、127项PHY写入及禁DMA状态。
+同步返回fastboot并完整恢复Android和原设置。[结果与边界](../profiles/pcie-root-trial/HARDWARE.md)。
+Wi-Fi下一步是BAR/芯片major确认、SMMU/DMA/MSI和MHI；目前仍不能联网。
+当前设备为最后已恢复的stock，所有本轮设备任务结束；再次访问前须重新读取电量与状态。
 
 v156已实机接通UFS自动Hibern8：原厂5000µs策略、32次硬件进入/退出和空闲后数据校验均通过，
 原控制配置/同步回程/stock Android恢复通过。唤醒读取约0.8–1.0ms，整机省电及完整充电仍未验收。

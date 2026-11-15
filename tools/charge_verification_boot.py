@@ -83,6 +83,12 @@ def qualify(report_path,entry_path,runtime):
             from TranslationSource import client
         for unit,data in [('ChargePolicy',policy()),('PmicClient',client())]:
             if hashlib.sha256(data).hexdigest()!=r['native_objects'][unit]['source_sha256']:raise ValueError('Window source differs from declared derivation')
+    return qualify_shared_assets(report_path,entry_path,runtime)
+
+def qualify_shared_assets(report_path,entry_path,runtime):
+    """Common immutable runtime/entry/assets checks after profile-specific qualification."""
+    folder=Path(report_path).parent;r=json.loads(Path(report_path).read_text());e=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
+    profile=r['profile']
     trace=json.loads((runtime/'trace-runtime.json').read_text())
     optional=r['optional_runtime']
     fixed_rules=json.loads((ROOT/'profiles/bt-address17/runtime-report.json').read_text())

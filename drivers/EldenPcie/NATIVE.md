@@ -3,8 +3,10 @@
 The root controller now has a native worker, real MMIO mappings, GPIO102/103
 PERST/CLKREQ access, the shared GCC owner, provisional WLAN power/NoC calls and
 shutdown handling. These pieces are linked into a complete derivative of v156.
-**The kernel is not packaged/signed or tested on hardware yet. Do not flash the
-raw kernel.** BAR/DMA/MSI/MHI and Wi-Fi networking remain unfinished.
+The signed v157 root-only trial passed on TB322FC: **Gen3 ×2**, root17cb:011c,
+endpoint17cb:110e, endpoint I/O/MEM/bus-master disabled. Sync return and complete
+stock restoration passed. [Hardware evidence](../../profiles/pcie-root-trial/HARDWARE.md).
+BAR/DMA/MSI/MHI and Wi-Fi networking remain unfinished. Never flash the raw kernel.
 
 ## Admission, mapping and lifetime
 
@@ -98,6 +100,8 @@ Final Mac build: `lab/pcie-kernel-v157-20261116/build2`; components:
 The second build adds complete shared-provider source fingerprints. Its loaded
 native sections/commands/symbols match build1 exactly; whole-file differences
 are archive build-directory strings in LINKEDIT and the derived PrelinkKCID.
-Next prepare the relocated entry, explicit menu and signed boot, audit all assets,
-floor and automatic return, then perform one bounded root hardware trial. Current
-device image is unchanged; charging and the complete peripheral Goal remain open.
+Entry conversion, signed boot, complete asset/floor audit and one bounded hardware
+trial have now passed. The device was restored to stock Android with original
+charging/radio/scan settings. Do not repeat the root-only trial; next establish
+BAR sizing/mapping, a real Peach-major read and DMA/MSI ownership before MHI.
+Charging and the complete peripheral Goal remain open.

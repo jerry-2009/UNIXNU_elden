@@ -1,37 +1,19 @@
-# Wi-Fi：协议服务已离线构建，硬件链未验收
+# Wi-Fi：PCIe根链路已通过，联网仍未验收
 
-当前Wi-Fi仍未打通：没有已验证的en0、扫描、关联或联网；真实WLAN供电、PCIe/DMA/MHI
-与网络接口的集成仍待完成。125对象编译和用户态服务准备不等于Wi-Fi可用。
-最新实机基线为v156（UFS自动空闲低功耗），完成后已恢复stock Android；本轮没有启动Wi-Fi射频。
-蓝牙已通过原生初始化和BLE广播报告接收，但设备列表、配对及稳定重连尚未验收。
-下方各构建记录保留其当时版本与范围。
+v157在TB322FC实机上训练到Gen3 ×2，读到root17cb:011c和endpoint17cb:110e；
+127项PHY与真实WLAN/NoC调用通过，端点IO/MEM/BM关闭。完整回程、stock Android及
+原充电/无线/后台扫描设置恢复通过。[硬件范围与原始证据](../profiles/pcie-root-trial/HARDWARE.md)。
 
-2026-11-15新增[WCN共享供电控制器](WCN-SHARED-POWER.md)：BT/WLAN独立代际、共享投票、
-CPR按两消费者最大值合并，单独停止不复位另一设备。330场景/50658断言、旧行为差分及
-ARM64/iOS17组件编译通过；原生Context/WLAN GPIO/QMI接入仍待完成，不能说Wi-Fi已上电。
-采用同一WcnPower提供者，不使用BT acquire冒充WLAN，也不伪造缺失pwrseq回调的成功。
+Wi-Fi仍不能开启联网：尚未验证BAR映射/Peach major2/SMMU/DMA/MSI/MHI/固件上传，
+更没有en0、扫描、关联或流量验收。128对象QMI可重定位链接尚未接入此候选。
+下一步先BAR与芯片身份，再有所有权的DMA/MSI及MHI；已通过的root诊断不重跑。
+显式full-on预算不是日用电源策略，日用净充及完整保护周期仍欠。
 
-随后已完成[原生WLAN供电适配器](WLAN-POWER-NATIVE.md)的源码和组件编译：平台持有Context，
-GPIO16输出与回读、真实CPR入口、停止前DMA quiesce契约。335核心场景及38原生/GPIO场景通过；
-Linux QMI消费者绑定、整核和实机尚未完成。当前没有新boot，也未启用WLAN。
-
-最新[QMI供电桥接](../drivers/EldenWifi/QMI-POWER.md)已提供准确Linux回调与consumer/provider/epoch
-绑定API；47组合host场景通过，128对象可重定位链接真实解析了原缺失符号。仍缺PCIe/MHI原生caller，
-未在候选中注册consumer，没有整核或硬件验收，不能据此宣布Wi-Fi已通。
-
-2026-11-16冷启动跟进：[本机PHY与身份分阶段](../drivers/EldenPcie/README.md)已完成离线组件。
-127项表来自Y700实际FDT；四个RX值及PCS地址与通用Linux有差量，未照搬Pagani额外写项。
-stock sysfs为休眠端点且config全FF，所列ID/BAR只是缓存。先取得板级供电，之后实读身份确认，
-QMI才可准入；新版47组合场景与128对象链接通过。root clocks/GDSC/链路/DMA/MSI/MHI仍缺。
-
-Root clocks/GDSC/PARF/SID/L0/配置事务现已在[Root组件](../drivers/EldenPcie/ROOT.md)实现并离线编译验证；
-真正的平台映射/电源/NoC回调、整核与硬件尚缺，不能把该组件当作PCIe已经启动。
-
-最新[PCIe供电提供者](../drivers/EldenPcie/POWER.md)已接真实RPMh发送与LDO读回并完成原生编译；85个host场景通过。
-新投票未上机，显式full-on模式只是诊断预算；仍缺映射/pins/GCC及根worker，尚非可用Wi-Fi。
-
-这些原生root回调现已连入[v157整核](../drivers/EldenPcie/NATIVE.md)，20个worker场景及整核/分支审计通过。
-仍未签包上机，BAR/DMA/MSI/MHI和联网未完成；不能把整核链接成功当PCIe实机成功。
+已具备的源码链为[共享WCN](WCN-SHARED-POWER.md)→[原生WLAN](WLAN-POWER-NATIVE.md)
+→[本机PHY/root](../drivers/EldenPcie/README.md)→[原生worker](../drivers/EldenPcie/NATIVE.md)。
+[QMI桥接](../drivers/EldenWifi/QMI-POWER.md)要求实读端点+major确认后的epoch，不能伪造成功。
+蓝牙已通过原生初始化和BLE报告接收；设备列表、配对及稳定重连仍未验收。
+下方旧构建记录保留各自版本与范围，历史步骤也可查Git。
 
 ## 已完成的前置项
 

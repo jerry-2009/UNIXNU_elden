@@ -14,28 +14,20 @@ UFS本轮收尾后，先用已有记录区分高SOC停充/滞回、真实输入�
 选口命令不再试。完整周期必须等真实SOC跨阈值，设置持久化依赖持久Data，不能伪造完成。
 受这些前置条件限制时继续有用的离线接口工作，不用重复探针填时间，也不擅自改Goal状态。
 
-当前离线工作已完成[WCN共享供电核心](WCN-SHARED-POWER.md)及ARM64组件编译；
-随后原生平台owner和WLAN GPIO已完成组件编译，见[原生接入](WLAN-POWER-NATIVE.md)。
-Linux QMI桥接与128对象可重定位链接随后已通过，见[QMI接入](../drivers/EldenWifi/QMI-POWER.md)。
-下一步PCIe/DMA/MHI原生caller及真实consumer注册，再整核验证；不将原生API存在当WLAN已上电。
+v157已完成[PCIe根链路实机验收](../profiles/pcie-root-trial/HARDWARE.md)：Gen3 ×2、
+root17cb:011c/endpoint17cb:110e、127项PHY写入、GCC释放通过。端点IO/MEM/BM保持关闭。
+WLAN/NoC原生提供者与worker已实跑，128对象QMI链接仍属离线结果，未加载Wi-Fi完整运行栈。
+同步回程/完整stock SHA/Android/root/green及原充电/无线/扫描设置恢复通过。
+显式full-on是诊断预算，不是日用省电策略。历史步骤见各组件文档和Git记录。
 
-已新增[PCIe冷启动准备](../drivers/EldenPcie/README.md)：按本机FDT生成127项PHY表，
-与固定SM8750 Linux逐寄存器对比，PHY事务编译/错误测试通过。原厂端点当前休眠、配置全FF，
-因此把WLAN准入修正为“板级供电→链路/实读身份→QMI”两阶段。下一步是root时钟/GDSC/PARF/链路，
-不是直接拿缓存PCI身份授权DMA；没有整核或新硬件试验。
+接下来的顺序固定为：
 
-随后[根控制器事务](../drivers/EldenPcie/ROOT.md)已完成离线Root＋PHY组件：本机CFG_GDSCR完成位、
-12路时钟、PARF/SID/L0/配置访问及端点禁DMA；1840场景和ARM64链接通过。下一步把这些回调接到
-真实平台映射、PHY供电与NoC，再BAR/DMA/MSI/MHI；不能以host模型替代电源提供者或实机。
+1. 按本机地址窗口发现BAR尺寸、配置映射，实读Peach major；不能拿Android缓存代替。
+2. 确立SMMU/DMA内存所有权和MSI路由，补真实排空与停止，再允许端点bus-master。
+3. 接入已编译的MHI/Peach/QMI栈和真实WLAN consumer，验证固件/扫描/关联/联网。
 
-原生[PCIe供电/NoC入口](../drivers/EldenPcie/POWER.md)随后已编译并绑定现有RPMh实现；本机只读确认
-L1F880mV/L3G1200mV，未执行新投票。未知启动投票暂用显式诊断full-on预算保护，默认关闭，不能当日用省电。
-下一步接映射/pins/GCC与worker/quiesce再整核；正常预算、共享投票与充电验收仍须继续完成。
-
-v157已完成[原生root工作线程及整核](../drivers/EldenPcie/NATIVE.md)：实际映射/GPIO/共享GCC与
-冷启动停止确认接入，Root/WCN start-stop直接分支及prelink保持已核；原Apple30/core/入口保持。
-已去掉UFS重复诊断、保留队列/AH8/认证和恢复。尚未入口转换/签包/上机；下一步完整打包审计后一次实机root验证。
-还没有启动Wi-Fi射频或生成新候选，不把接口核心验过当作Wi-Fi供电已打通。
+不重复v157根链路诊断，也不复制其它设备未保留的低地址DMA内存。芯片major确认前，
+现有power_ready/CPR/QMI门保持关闭。更详细的边界见[原生worker](../drivers/EldenPcie/NATIVE.md)。
 
 v156已经补齐一项可执行电源缺口：[UFS自动Hibern8](../profiles/ufs-idle-trial/README.md)。
 32次真实空闲进入/退出、数据验证与配置恢复通过，并恢复Android；5000µs取自本机原厂。
