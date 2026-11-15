@@ -1,5 +1,11 @@
 # 当前状态 · 2026-11-14
 
+v142（11月15日）将已验原生背光服务接回v140基线：仅短参数fallback，一对象重编，
+原亮度/保护/恢复代码不变；系统请求2048/硬件回读2048，退出恢复1597并释放成功。
+1144721B/drop0，同步回程/全SHA恢复stock/Android设置一致并熄屏。手动滑块和净充电未验。
+47仓参考同步完成，Sheng仅新增充电源码归属说明，Armada新增方向/触控同步与功耗源码归属；
+候选未自动换输入，两个既有远端缺失保留。详profiles/backlight-service及工作台reference-reviews。
+
 v141（11月15日）只读AT检查：SDAM/ADC/DC读写翻译均匹配预期PA，DC为0xc7c1010，
 PAR属性一致。无FIFO访问，不能证明总线写可用，旧异常尚未精确定因；第二SID7是GLINK
 debug proxy。171487B/drop1，同步回fastboot/全SHA恢复stock及Android设置一致并熄屏。

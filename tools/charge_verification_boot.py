@@ -12,7 +12,12 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def qualify(report_path,entry_path,runtime):
     folder=Path(report_path).parent;r=json.loads(Path(report_path).read_text());e=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     profile=r.get('profile')
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey') or r['changed_core_objects']!=0 or r['changed_native_objects']!=2 or set(r['native_objects'])!={'PmicClient','ChargePolicy'} or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    units={'BacklightRuntime'} if profile=='backlight-service' else {'PmicClient','ChargePolicy'}
+    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='backlight-service':
+        sys.path.insert(0,str(ROOT/'drivers/EldenBacklight'))
+        from BootSource import source
+        if hashlib.sha256(source()).hexdigest()!=r['native_objects']['BacklightRuntime']['source_sha256']:raise ValueError('Backlight source differs from declared derivation')
     if profile in ('charge-window-handoff','spmi-translation-survey'):
         sys.path.insert(0,str(ROOT/'drivers/EldenPmicGlink'))
         from WindowSource import policy

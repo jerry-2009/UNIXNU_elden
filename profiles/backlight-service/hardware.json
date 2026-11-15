@@ -1,0 +1,49 @@
+{
+  "image_sha256": "b4bac5c8ce7b9031d3c70eeee3e55233f86a00b88af4f4b6a053821cec70bea5",
+  "session": "0cc7733bcdc5f3ed",
+  "raw_log": "edl_work\\live-backlight-service-v142-20261115\\usb\\20261115-014632.bin",
+  "raw_sha256": "4d87aa5e39ff69fb184d99a8e33f2643bc92223866d6cf0cfae7d236cfb65cd3",
+  "bytes": 1144721,
+  "dropped": 0,
+  "discontinuities": [],
+  "backlight_lines": [
+    "ELDEN_BACKLIGHT acquire=0 stage=5 vote=f100df rcg=0/100001 pins=6/6 hwen=3c3/3 irq=0 config=3000021",
+    "ELDEN_BACKLIGHT entry status=0 gsi=0 dma=0 tx=0 rx=0 secondary=8000000 interface=0 revision=304 clock=21 scl=503018",
+    "ELDEN_BACKLIGHT first-read delay-ms=5000",
+    "ELDEN_BACKLIGHT inspect=-5 mode=6 ready=0 enabled=0 level=0 config=0 chip-writes=0",
+    "ELDEN_BACKLIGHT registers id=07 mode=65 high=06 low=3d config=f8 open=3c short=00",
+    "ELDEN_BACKLIGHT protection-flags=08",
+    "ELDEN_BACKLIGHT cfg7=05 brightness-mode=1",
+    "ELDEN_BACKLIGHT observation=1 ms=100 result=0 open=00 short=00 flags=00 config=f8 high=06 low=3d writes=0 ready=0",
+    "ELDEN_BACKLIGHT observation=2 ms=1000 result=0 open=00 short=00 flags=00 config=f8 high=06 low=3d writes=0 ready=0",
+    "ELDEN_BACKLIGHT observation=3 ms=2000 result=0 open=00 short=00 flags=00 config=f8 high=06 low=3d writes=0 ready=0",
+    "ELDEN_BACKLIGHT observation=4 ms=4000 result=0 open=00 short=00 flags=00 config=f8 high=06 low=3d writes=0 ready=0",
+    "ELDEN_BACKLIGHT observation=5 ms=8000 result=0 open=00 short=00 flags=00 config=f8 high=06 low=3d writes=0 ready=0",
+    "ELDEN_BACKLIGHT trial-qualified=0 samples=5 level=1597 writes=0",
+    "ELDEN_BACKLIGHT registering class; qualified mode=6",
+    "ELDEN_BACKLIGHT published AppleARMBacklight level=1597 range=0..4095",
+    "ELDEN_BACKLIGHT request=1 goal=2048 fade-ms=0 actual=2048",
+    "ELDEN_BACKLIGHT restore=0 original=1597 actual=1597 confirmed=1",
+    "ELDEN_BACKLIGHT release=0 quarantine=0 transfers=81 chip-writes=4",
+    "ELDEN_BACKLIGHT stop=1 worker-done=1 held=0 restored=1",
+    "ELDEN_BACKLIGHT RPC stop=1; original brightness confirmed"
+  ],
+  "system_brightness_request_readback": true,
+  "original_level_restored": true,
+  "synchronized_return": true,
+  "full_stock_restored": true,
+  "android_root_green_boot_completed": true,
+  "android_before": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "android_after": [
+    "1",
+    "095100",
+    "095100"
+  ],
+  "sleep_requested": true,
+  "manual_slider_tested": false,
+  "net_charge_proven": false
+}
