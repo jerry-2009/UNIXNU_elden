@@ -90,7 +90,7 @@ static void reset(){
     delete active;active=nullptr;clock_us=0;native_owner_data_status=0;elden_init_exec_accepted=1;
     armed=map_ok=true;boot_enable=1;quiesce_result=0;quiesce_late=false;
     platform_init_state=platform_io_busy=platform_stopping=wlan_api_busy=0;
-    wlan_provider=nullptr;wlan_quiesce=nullptr;wlan_epoch=wlan_next_epoch=0;creates=destroys=0;qmp_hook=nullptr;
+    wlan_provider=nullptr;wlan_quiesce=nullptr;wlan_epoch=wlan_next_epoch=wlan_endpoint_epoch=0;creates=destroys=0;qmp_hook=nullptr;
 }
 static void native_cases(){
     for(unsigned first=0;first<2;first++){
@@ -99,6 +99,13 @@ static void native_cases(){
         CHECK(!elden_wlan_power_acquire(&identity,&epoch)&&epoch==1);c=active;
         CHECK(c->wlan.regs[0]==0x3c3&&c->wlan.regs[1]==3&&creates==1&&destroys==0);
         CHECK(!elden_wlan_power_check(identity.provider,epoch));
+        CHECK(elden_wlan_power_ready(identity.provider,epoch)==-11);
+        EldenWcnPmuParam early={"VDDD_AON_0P9",900,820,true,true};
+        CHECK(elden_wlan_power_cpr(identity.provider,epoch,&early,1)==-11);
+        CHECK(elden_wlan_power_confirm_endpoint(identity.provider,epoch,UINT32_MAX,2)==-19);
+        CHECK(elden_wlan_power_confirm_endpoint(identity.provider,epoch,0x110e17cb,1)==-19);
+        CHECK(!elden_wlan_power_confirm_endpoint(identity.provider,epoch,0x110e17cb,2));
+        CHECK(!elden_wlan_power_ready(identity.provider,epoch));
         unsigned q=c->qmp_calls;
         if(first)CHECK(!bt_power_acquire(c,1));
         CHECK(c->qmp_calls==q&&c->bt);
@@ -112,13 +119,14 @@ static void native_cases(){
         CHECK(!elden_wlan_power_stop(identity.provider,epoch)&&c->quiesces==1&&!(c->wlan.regs[1]&1u));
         CHECK(creates==1&&destroys==0&&elden_wlan_power_check(identity.provider,epoch)==-11);
         CHECK(!elden_wlan_power_acquire(&identity,&epoch)&&epoch==2&&c->qmp_calls==q+2);
+        CHECK(elden_wlan_power_ready(identity.provider,epoch)==-11);
         __atomic_store_n(&platform_stopping,1,__ATOMIC_RELEASE);
         CHECK(!wlan_shutdown(clock_us+9000000)&&c->quiesces==2);
         CHECK(elden_wlan_power_acquire(&identity,&epoch)==-11);scenarios++;
     }
     for(unsigned kind=0;kind<8;kind++){
         reset();auto id=identity;uint64_t epoch=0xbeef;
-        if(kind==0)id.vendor++;if(kind==1)id.device++;if(kind==2)id.rid++;
+        if(kind==0)id.expected_vendor++;if(kind==1)id.expected_device++;if(kind==2)id.rid++;
         if(kind==3)id.sid++;if(kind==4)id.quiesce=nullptr;
         if(kind==5)boot_enable=0;if(kind==6)armed=false;if(kind==7)native_owner_data_status=1;
         CHECK(elden_wlan_power_acquire(&id,&epoch)<0&&epoch==0xbeef&&creates==0);scenarios++;

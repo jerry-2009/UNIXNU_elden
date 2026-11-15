@@ -37,7 +37,8 @@ def main():
     obj=out/'WcnPowerNative.o';cmd[cmd.index('-o')+1]=str(obj)
     r=subprocess.run(cmd,cwd=base/'units/working/WcnPowerNative',capture_output=True)
     (out/'compile.log').write_bytes(r.stdout+r.stderr);r.check_returncode()
-    added={'_elden_wlan_power_acquire','_elden_wlan_power_stop','_elden_wlan_power_check','_elden_wlan_power_cpr'}
+    added={'_elden_wlan_power_acquire','_elden_wlan_power_stop','_elden_wlan_power_check','_elden_wlan_power_cpr',
+           '_elden_wlan_power_confirm_endpoint','_elden_wlan_power_ready'}
     assert exports(obj)==exports(old)|added
     assert not any(k.endswith('/__mod_init_func') for k in sections(obj))
     asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',str(obj)],text=True)

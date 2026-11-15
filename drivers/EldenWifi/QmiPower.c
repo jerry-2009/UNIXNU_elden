@@ -33,7 +33,7 @@ int elden_wlan_qmi_bind(struct device *consumer,const void *provider,uint64_t ep
     int rc=enter();if(rc)return rc;
     if(binding.consumer&&(binding.consumer!=consumer||binding.provider!=provider||binding.epoch!=epoch))
         return leave(-16);
-    rc=elden_wlan_power_check(provider,epoch);
+    rc=elden_wlan_power_ready(provider,epoch);
     if(!rc){binding.consumer=consumer;binding.provider=provider;binding.epoch=epoch;}
     return leave(rc);
 }
@@ -48,7 +48,7 @@ int pwrseq_qcom_wcn_set_ol_cpr(struct device *consumer,
     if(!consumer||!params||!count||count>PWRSEQ_QCOM_WCN_PMU_MAX_PARAMS)return -22;
     int rc=enter();if(rc)return rc;
     if(binding.consumer!=consumer||!binding.provider||!binding.epoch)return leave(-19);
-    rc=elden_wlan_power_check(binding.provider,binding.epoch);
+    rc=elden_wlan_power_ready(binding.provider,binding.epoch);
     if(rc)return leave(rc);
     EldenWcnPmuParam converted[PWRSEQ_QCOM_WCN_PMU_MAX_PARAMS]={0};
     for(size_t i=0;i<count;i++){

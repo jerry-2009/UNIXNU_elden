@@ -4,7 +4,7 @@ static unsigned platform_init_state,platform_io_busy,platform_stopping;
 static unsigned wlan_api_busy;
 static const void *wlan_provider;
 static int (*wlan_quiesce)(const void *,uint64_t,uint64_t);
-static uint64_t wlan_epoch,wlan_next_epoch;
+static uint64_t wlan_epoch,wlan_next_epoch,wlan_endpoint_epoch;
 static int platform_enter(uint64_t deadline=0){
     /* Serialize maps/preflight/physical callbacks with the existing BT survey.
      * Read-only lease checks do not take this gate. No register transaction is
@@ -82,6 +82,7 @@ static int wlan_check(const void *provider,uint64_t epoch){
 static int wlan_stop_locked(const void *provider,uint64_t epoch,uint64_t deadline){
     int rc=wlan_check(provider,epoch);if(rc)return rc;
     /* Withdraw future calls before asking the device driver to drain DMA. */
+    __atomic_store_n(&wlan_endpoint_epoch,0,__ATOMIC_RELEASE);
     __atomic_store_n(&wlan_epoch,0,__ATOMIC_RELEASE);
     if(now_us(nullptr)>=deadline)return -110;
     rc=wlan_quiesce(provider,epoch,deadline);if(rc)return rc;

@@ -16,6 +16,8 @@ static void qmi_cases(){
     CHECK(pwrseq_qcom_wcn_set_ol_cpr(consumer,&param,1)==-19);
     CHECK(elden_wlan_qmi_bind(consumer,identity.provider,1)==-11);
     CHECK(!elden_wlan_power_acquire(&identity,&epoch));
+    CHECK(elden_wlan_qmi_bind(consumer,identity.provider,epoch)==-11);
+    CHECK(!elden_wlan_power_confirm_endpoint(identity.provider,epoch,0x110e17cb,2));
     CHECK(elden_wlan_qmi_bind(consumer,(void *)0x9999,epoch)==-11);
     CHECK(!elden_wlan_qmi_bind(consumer,identity.provider,epoch));
     CHECK(!elden_wlan_qmi_bind(consumer,identity.provider,epoch));
@@ -45,11 +47,15 @@ static void qmi_cases(){
     CHECK(pwrseq_qcom_wcn_set_ol_cpr(consumer,&all,1)==-11&&active->qmp_calls==q);
     CHECK(!elden_wlan_qmi_unbind(consumer,identity.provider,epoch));
     CHECK(!elden_wlan_power_acquire(&identity,&epoch)&&epoch==2);
+    CHECK(elden_wlan_qmi_bind(consumer,identity.provider,epoch)==-11);
+    CHECK(elden_wlan_power_confirm_endpoint(identity.provider,epoch-1,0x110e17cb,2)==-11);
+    CHECK(!elden_wlan_power_confirm_endpoint(identity.provider,epoch,0x110e17cb,2));
     CHECK(!elden_wlan_qmi_bind(consumer,identity.provider,epoch));
     CHECK(!pwrseq_qcom_wcn_set_ol_cpr(consumer,&all,1));
     CHECK(!elden_wlan_qmi_unbind(consumer,identity.provider,epoch));scenarios++;
     for(unsigned at=1;at<=8;at++){
         reset();CHECK(!elden_wlan_power_acquire(&identity,&epoch));
+        CHECK(!elden_wlan_power_confirm_endpoint(identity.provider,epoch,0x110e17cb,2));
         CHECK(!elden_wlan_qmi_bind(consumer,identity.provider,epoch));
         struct pwrseq_qcom_wcn_pmu_param four[]={pmu("VDDD_AON_0P9"),pmu("VDDD_WLMX_0P9"),pmu("VDDA_RFA_1P9",1900,1800),pmu("VDDA_RFA_1P3",1300,1200)};
         active->qmp_fail_at=active->qmp_calls+at;

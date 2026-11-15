@@ -40,7 +40,7 @@ def main():
     r=subprocess.run(cmd,cwd=runtime/'component',capture_output=True)
     (out/'compile.log').write_bytes(r.stdout+r.stderr);r.check_returncode()
     assert exports(obj)=={'_pwrseq_qcom_wcn_set_ol_cpr','_elden_wlan_qmi_bind','_elden_wlan_qmi_unbind'}
-    assert {'_elden_wlan_power_check','_elden_wlan_power_cpr'}<=imports(obj)
+    assert {'_elden_wlan_power_ready','_elden_wlan_power_cpr'}<=imports(obj)
     assert not any(n.endswith('/__mod_init_func') for n in sections(obj))
     asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',str(obj)],text=True)
     (out/'QmiPower.asm').write_text(asm,encoding='utf-8')
@@ -61,7 +61,7 @@ def main():
     duplicate={n:ps for n,ps in defs.items() if len(ps)>1};assert not duplicate,duplicate
     expected_unresolved=unresolved-set(defs)
     assert '_pwrseq_qcom_wcn_set_ol_cpr' not in expected_unresolved
-    assert not {'_elden_wlan_power_check','_elden_wlan_power_cpr','_elden_wcn_shared_cpr'}&expected_unresolved
+    assert not {'_elden_wlan_power_ready','_elden_wlan_power_cpr','_elden_wcn_shared_cpr'}&expected_unresolved
     combined=out/'wifi-power-binding.o'
     command=['xcrun','ld','-r','-arch','arm64','-platform_version','ios','17.0','17.0','-o',str(combined),*map(str,all_objects)]
     write(out/'link-command.json',command)

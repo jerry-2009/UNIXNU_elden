@@ -19,6 +19,11 @@ Linux QMI消费者绑定、整核和实机尚未完成。当前没有新boot，�
 绑定API；47组合host场景通过，128对象可重定位链接真实解析了原缺失符号。仍缺PCIe/MHI原生caller，
 未在候选中注册consumer，没有整核或硬件验收，不能据此宣布Wi-Fi已通。
 
+2026-11-16冷启动跟进：[本机PHY与身份分阶段](../drivers/EldenPcie/README.md)已完成离线组件。
+127项表来自Y700实际FDT；四个RX值及PCS地址与通用Linux有差量，未照搬Pagani额外写项。
+stock sysfs为休眠端点且config全FF，所列ID/BAR只是缓存。先取得板级供电，之后实读身份确认，
+QMI才可准入；新版47组合场景与128对象链接通过。root clocks/GDSC/链路/DMA/MSI/MHI仍缺。
+
 ## 已完成的前置项
 
 原modem_a七件主要Peach固件的只读文件访问已有实现，尺寸/SHA按原厂备份固定。

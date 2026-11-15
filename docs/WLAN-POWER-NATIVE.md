@@ -1,5 +1,8 @@
 # WLAN原生供电接入：组件已编译，尚未上机
 
+冷启动顺序更正：现区分预期板级身份取得供电与上电后实读端点身份，后者确认前QMI不准入。
+见[PCIe冷启动组件](../drivers/EldenPcie/README.md)；旧文中的“先验证实际端点再上电”不适用于断电芯片。
+
 后续：准确Linux QMI回调桥接已完成，见[QMI供电接入](../drivers/EldenWifi/QMI-POWER.md)。
 与125个Wi-Fi对象及两供电对象的可重定位链接通过；实际PCIe/MHI caller、整核和硬件仍未完成。
 

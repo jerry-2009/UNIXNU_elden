@@ -1,5 +1,11 @@
 # Linux QMI → native WLAN power
 
+Cold-start follow-up: [EldenPcie](../EldenPcie/README.md) separates provisional
+power acquisition from fresh endpoint confirmation. This gateway now requires
+`power_ready`, not just an active power lease. The earlier47/423 and object
+hash below remain the initial report; the updated47/450 build and128-object
+link are recorded in the follow-up.
+
 The exact Peach `pwrseq_qcom_wcn_set_ol_cpr` callback now has a real bridge to
 the native WLAN owner. The bridge and the unchanged125-object Wi-Fi runtime,
 WcnPowerNative and WcnPower pass a128-object **relocatable link**. This is not
@@ -17,7 +23,8 @@ No Linux `struct device` is cast to an IOKit object or dereferenced by the bridg
 
 The native PCIe/MHI glue must:
 
-1. Verify the actual endpoint and obtain a native WLAN lease via `WlanPower.h`.
+1. Obtain a provisional native WLAN lease from the matched board/root resources,
+   bring up the link and confirm fresh endpoint identity via `WlanPower.h`.
 2. Call `elden_wlan_qmi_bind(ab->dev, provider, epoch)` using the actual Linux
    consumer instance before the firmware capability/QMI OL-CPR path.
 3. During quiesce, drain QMI requests and call the exact matching `unbind`

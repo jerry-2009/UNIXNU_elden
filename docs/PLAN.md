@@ -18,6 +18,11 @@ UFS本轮收尾后，先用已有记录区分高SOC停充/滞回、真实输入�
 随后原生平台owner和WLAN GPIO已完成组件编译，见[原生接入](WLAN-POWER-NATIVE.md)。
 Linux QMI桥接与128对象可重定位链接随后已通过，见[QMI接入](../drivers/EldenWifi/QMI-POWER.md)。
 下一步PCIe/DMA/MHI原生caller及真实consumer注册，再整核验证；不将原生API存在当WLAN已上电。
+
+已新增[PCIe冷启动准备](../drivers/EldenPcie/README.md)：按本机FDT生成127项PHY表，
+与固定SM8750 Linux逐寄存器对比，PHY事务编译/错误测试通过。原厂端点当前休眠、配置全FF，
+因此把WLAN准入修正为“板级供电→链路/实读身份→QMI”两阶段。下一步是root时钟/GDSC/PARF/链路，
+不是直接拿缓存PCI身份授权DMA；没有整核或新硬件试验。
 还没有启动Wi-Fi射频或生成新候选，不把接口核心验过当作Wi-Fi供电已打通。
 
 v156已经补齐一项可执行电源缺口：[UFS自动Hibern8](../profiles/ufs-idle-trial/README.md)。
