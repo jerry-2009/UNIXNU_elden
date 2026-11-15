@@ -1,5 +1,8 @@
 # Wi-Fi：PCIe根链路已通过，联网仍未验收
 
+[DMA arena组件](../drivers/EldenWifi/DMA-ARENA.md)已完成Sheng原函数对照及ARM64编译，
+仍未接入原生回调或设备DMA。下一步锁/所有权视图、MSI及真实排空，再启动MHI；v163仍是实机基线。
+
 v157在TB322FC实机上训练到Gen3 ×2，读到root17cb:011c和endpoint17cb:110e；
 127项PHY与真实WLAN/NoC调用通过，端点IO/MEM/BM关闭。完整回程、stock Android及
 原充电/无线/后台扫描设置恢复通过。[硬件范围与原始证据](../profiles/pcie-root-trial/HARDWARE.md)。

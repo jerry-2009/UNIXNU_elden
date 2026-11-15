@@ -1,5 +1,18 @@
 # UniXNU elden — authoritative source repository
 
+Latest DMA-arena20261116 offline: adapted pinned Sheng e8937177 split/coalesce/size alignment,
+reserved MSI page; complete live-allocation range validation, checked size/metadata, owner/epoch and stop.
+4000actual upstream allocation/free comparisons/1554917checks pass ASan/UBSan. Nativeb9b5a93b scalar,
+no init/warnings; six exports, real bzero/memmove imports resolve in v163. Initial native1 checker expected
+memset; rejection retained, actual Apple bzero lowering verified in native2. Host2 allows existing-buffer
+range validation/free during drain, rejects new map/alloc after stop. Full upstream license retained.
+Component only: caller serialization, live native memory/ABI callbacks, MSI ownership and actual drain
+NOT connected; live0 is not DMA-stopped proof. No new boot/device operation; v163 remains current hardware.
+Mac lab/wifi-dma-arena-20261116/{source2,host2,native2}; workbench matching edl/lab. See drivers/EldenWifi/DMA-ARENA.md.
+Next native arena binding plus TB322FC MSI (not Sheng SPI141), propagate ignored nw_pci config errors,
+then real MHI/IRQ/completion drain before bus-master. No repeated mapping-only trial. All jobs terminal,
+device last restored stock; Goal/charging incomplete, GPU/QRTR/AnyRouter preserved.
+
 Latest v16320261116: owned128MiB NC mapping and early SMMU domain PASS hardware.
 v160 first64MiB descriptor segment was an IOPL boundary; v161 preserves every4KiB PA/PAR check,
 v162 Unique avoids same-task cached map reuse, v163 Prefault populates the prepared/wired alias.

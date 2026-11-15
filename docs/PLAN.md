@@ -1,5 +1,8 @@
 # Elden 基本可用实施计划
 
+[DMA arena组件](../drivers/EldenWifi/DMA-ARENA.md)已完成Sheng原函数对照及ARM64编译，
+仍未接入原生回调或设备DMA。下一步锁/所有权视图、MSI及真实排空，再启动MHI；v163仍是实机基线。
+
 目标仍是如官方 Sheng 一样基本可用的 iPadOS 平板：基本外设、正常交互、可靠供电与
 恢复均需实机验收。GPU 最后；音频启用前先讨论衰减与保护。完整 Goal 尚未完成。
 本计划依据[组织复用审核](UNIXNU-ORG-REUSE-AUDIT-20261115.md)更新，历史逐轮记录已
