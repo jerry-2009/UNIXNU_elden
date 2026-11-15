@@ -1,0 +1,169 @@
+{
+  "kind": "offline-shared-WCN-component",
+  "board": "TB322FC / SM8750",
+  "source": {
+    "revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+    "path": "drivers/power/sequencing/pwrseq-qcom-wcn.c",
+    "git_blob": "71a73d966f9616bc7c5c085b38f643412f947e9b",
+    "sha256": "94ec1447aba0cadeefe2235867c5190d35d6eac4f058e0cef89b73bea9526a0d"
+  },
+  "host": {
+    "passed": true,
+    "result": "330 shared-owner scenarios, 50658 checks passed",
+    "asan_ubsan": true,
+    "legacy_revision": "2062ad1d2591b0b0095363b3e601fd04d7eaf09b",
+    "legacy_source_sha256": "feb9fefa74ee07e39b7f5694c5921329d0017163a6391bdd82bf64a2ae9208c0",
+    "callbacks_modeled": true,
+    "native_adapter_connected": false,
+    "hardware_operations": false,
+    "source_sha256": {
+      "WcnPower.c": "8028445481b7012df33ce6ce13739171a17dfeb89fba4f84d30ca4af85fe16ab",
+      "WcnPower.h": "2047193ec2337bf0ef83f4308c0a83d879fdd6738e80f422a6c1907111a6fff3",
+      "WcnSharedPower.h": "baed706c552b563c23ff1b5dfe202278899eb24330eeb80c726625d7b0ace5c0",
+      "WcnSharedPower.inc": "f42c2285fcdb36c540d6db83aeb9f6948ab0e3d1e338e52b8a74a7442799a9a2",
+      "TestWcnSharedPower.c": "048efbae900925230fc2632040e79f1a1023304f368b68b02c5cfe23ddac49d4"
+    }
+  },
+  "legacy_compatibility": {
+    "legacy_revision": "174365f537be6ce34bd000c6e688d9160e7d0f3f",
+    "legacy_source_sha256": "6a1d69b8660ebe5bbeb4cc1415ebe5d780b34126d74b1bf811e71c959543ff4f",
+    "source_sha256": {
+      "WcnPower.c": "8028445481b7012df33ce6ce13739171a17dfeb89fba4f84d30ca4af85fe16ab",
+      "WcnPower.h": "2047193ec2337bf0ef83f4308c0a83d879fdd6738e80f422a6c1907111a6fff3",
+      "TestCprCompatibility.c": "dadbe6945d5121210df44e2272cd50df9ff1cab8ee300009047b431d63d979f0",
+      "TestWcnPower.c": "1c4b632f12088f6991afc51d8eac7c7d90eaf42454458aa0b06f6bad460450de"
+    },
+    "comparisons": "4096 legacy/new comparisons plus all8 command-failure positions passed; command bytes, errors, epochs and quarantine preserved\n",
+    "original_sequence_checks": "PASS 12 power scenarios, 344 sequence/lease/rail/PLL/OL-CPR assertions\n",
+    "passed": true,
+    "callbacks_are_host_recorders": true,
+    "hardware_operations": false
+  },
+  "native": {
+    "objects": {
+      "WcnPower": {
+        "source_sha256": "8028445481b7012df33ce6ce13739171a17dfeb89fba4f84d30ca4af85fe16ab",
+        "object_sha256": "30f0198179389859da6d8ee719e81f5ea2245739ab3360a59a8fb2a3b8459215",
+        "exports": [
+          "_elden_wcn_cpr_adjust",
+          "_elden_wcn_cpr_pdc_name",
+          "_elden_wcn_cpr_plan",
+          "_elden_wcn_cpr_plan_details",
+          "_elden_wcn_cpr_rail_name",
+          "_elden_wcn_parent_decode",
+          "_elden_wcn_power_acquire",
+          "_elden_wcn_power_check",
+          "_elden_wcn_power_cpr",
+          "_elden_wcn_power_finish",
+          "_elden_wcn_power_stop",
+          "_elden_wcn_rail_specs",
+          "_elden_wcn_shared_acquire",
+          "_elden_wcn_shared_cpr",
+          "_elden_wcn_shared_snapshot",
+          "_elden_wcn_shared_stop"
+        ],
+        "imports": [
+          "_strcmp"
+        ],
+        "scalar": true,
+        "command": [
+          "xcrun",
+          "--sdk",
+          "iphoneos",
+          "clang",
+          "-target",
+          "arm64-apple-ios17.0",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-ffreestanding",
+          "-fno-builtin",
+          "-fno-stack-protector",
+          "-mgeneral-regs-only",
+          "-I/Users/ciscohe/Desktop/UniXNU_elden/lab/wcn-shared-power-20261115/source/drivers/EldenBluetooth",
+          "-I/Users/ciscohe/Desktop/UniXNU_elden/lab/wcn-shared-power-20261115/source/drivers/EldenWifi",
+          "-c",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/wcn-shared-power-20261115/source/drivers/EldenBluetooth/WcnPower.c",
+          "-o",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/wcn-shared-power-20261115/native1/WcnPower.o"
+        ]
+      },
+      "OlCprPlan": {
+        "source_sha256": "08d7dd9ee21228a194582fd1bea5a0b319007e8be58fb1f1a1a1282e9c449896",
+        "object_sha256": "f1841e648495c24a61e593f4b044cfc3d654623a95b486e402fbd88acc9a3845",
+        "exports": [
+          "_elden_olcpr_adjust",
+          "_elden_olcpr_pdc_name",
+          "_elden_olcpr_prepare",
+          "_elden_olcpr_rail_name"
+        ],
+        "imports": [
+          "_bzero",
+          "_elden_wcn_cpr_adjust",
+          "_elden_wcn_cpr_pdc_name",
+          "_elden_wcn_cpr_plan_details",
+          "_elden_wcn_cpr_rail_name"
+        ],
+        "scalar": true,
+        "command": [
+          "xcrun",
+          "--sdk",
+          "iphoneos",
+          "clang",
+          "-target",
+          "arm64-apple-ios17.0",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-ffreestanding",
+          "-fno-builtin",
+          "-fno-stack-protector",
+          "-mgeneral-regs-only",
+          "-I/Users/ciscohe/Desktop/UniXNU_elden/lab/wcn-shared-power-20261115/source/drivers/EldenBluetooth",
+          "-I/Users/ciscohe/Desktop/UniXNU_elden/lab/wcn-shared-power-20261115/source/drivers/EldenWifi",
+          "-c",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/wcn-shared-power-20261115/source/drivers/EldenWifi/OlCprPlan.c",
+          "-o",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/wcn-shared-power-20261115/native1/OlCprPlan.o"
+        ]
+      }
+    },
+    "headers_sha256": {
+      "WcnPower.h": "2047193ec2337bf0ef83f4308c0a83d879fdd6738e80f422a6c1907111a6fff3",
+      "OlCprPlan.h": "613fb15e96cbf51c43fe0dcafc652c23059a5eed943020fa22578268552e4911",
+      "WcnSharedPower.h": "baed706c552b563c23ff1b5dfe202278899eb24330eeb80c726625d7b0ace5c0",
+      "WcnSharedPower.inc": "f42c2285fcdb36c540d6db83aeb9f6948ab0e3d1e338e52b8a74a7442799a9a2"
+    },
+    "provider_archive_sha256": "eac298061bea11dc39fbe7ed98b9952b019d9b143723d02d222f6c29d42c1c81",
+    "shared_provider_bound": true,
+    "remaining_imports": [
+      "_bzero",
+      "_strcmp"
+    ],
+    "legacy_exports_preserved": true,
+    "integration_rule": "Link libEldenWcnPower.a once and OlCprPlan.o; omit any duplicate WcnPower.o from Bluetooth/Wi-Fi archives.",
+    "shared_consumer_controller": true,
+    "native_runtime_gateway_added": false,
+    "kernel_linked": false,
+    "hardware_operations": false
+  },
+  "status": {
+    "component_complete": true,
+    "native_gateway_connected": false,
+    "kernel_linked": false,
+    "boot_packaged": false,
+    "hardware_tested": false
+  },
+  "prior_attempts": {
+    "host1": "initial188cases passed",
+    "host2": "expanded test fixed command-index assertion failed; preserved",
+    "host3": "expanded330cases passed",
+    "host4": "same330cases plus full callback order/argument trace and uncommitted-on-failure checks passed"
+  },
+  "next": "Platform-lifetime adapter; migrate BT/WLAN together, exact WLAN GPIO/device/epoch/QMI binding and recovery before hardware",
+  "gpu_worktree_accessed": false,
+  "existing_candidates_changed": false,
+  "goal_complete": false
+}
