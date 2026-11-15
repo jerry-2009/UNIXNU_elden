@@ -1,5 +1,11 @@
 # 当前状态 · 2026-11-16
 
+v163已在真机建立Wi-Fi专用128MiB NC内存/SMMU映射，66页表/32768叶和故障IRQ通过，
+并与触控DMA共存。修复IOPL段边界、静态缓存映射重用和alias缺少prefault，未放宽逐页检查。
+端点command2禁BM，尚未执行Wi-Fi DMA/MSI/MHI或联网；下一步arena/回调/中断和真实排空。
+同步返回fastboot、全SHA恢复stock Android/root/green/原设置及熄屏完成。
+[当前完整证据](../profiles/smmu-prefault-memory/README.md)。下方旧轮次保留历史范围。
+
 v158已经在真机读到Peach40210200/major2，BAR0/2尺寸与映射、禁BM和原生身份确认均通过。
 同步回程及完整stock/Android/充电无线设置恢复通过；日志drop21，必需记录齐，不冒称完整无丢字。
 [本轮完整证据](../profiles/pcie-endpoint-trial/README.md)。下一步SMMU/DMA/MSI与MHI；Wi-Fi尚未联网。

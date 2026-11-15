@@ -3,10 +3,17 @@
 #include "DmaTables.h"
 class IOBufferMemoryDescriptor;
 class IOMemoryMap;
+struct EldenWifiDmaMemoryReport {
+    uint32_t version=1,stage=1,reason=0,access=0,expected_attribute=0,cleanup_attempted=0;
+    int32_t initialize_status=0,cleanup_status=0,return_status=0;
+    uint64_t offset=0,physical=0,expected_physical=0,segment_bytes=0,par=0;
+    uint64_t data_base=0,data_segment_bytes=0,table_base=0,table_segment_bytes=0,data_cpu=0,table_cpu=0;
+};
 /* One serialized kernel owner. No copy, static initializer or device writes. */
 class EldenWifiDmaMemory final {
 public:
     static int create(EldenWifiDmaMemory **out,uint32_t id0,uint32_t id2);
+    static int createWithReport(EldenWifiDmaMemory **out,uint32_t id0,uint32_t id2,EldenWifiDmaMemoryReport *report);
     /* A failed complete keeps *out and all still-owned references. Once
      * claimed, proof must verify DMA stopped + context/translation withdrawn
      * for the same owner/epoch before any buffer/table reference is released. */
@@ -35,4 +42,5 @@ private:
     bool data_prepared_=false,table_prepared_=false,claimed_=false,ready_=false,cleanup_uncertain_=false;
     const void *owner_=nullptr;
     EldenWifiDmaTables tables_={};
+    EldenWifiDmaMemoryReport report_={};
 };

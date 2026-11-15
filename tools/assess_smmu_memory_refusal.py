@@ -10,7 +10,8 @@ def main():
     raw=files[0].read_bytes();meta=read(files[0].with_suffix('.json'));text=raw.decode('ascii',errors='replace')
     assert len(raw)==meta['bytes'] and hashlib.sha256(raw).hexdigest()==meta['raw_sha256']
     assert meta['candidate_session']==audit['session'] and meta['bound_startup_milestone_observed'] and not meta['discontinuities'] and not meta['reconnections']
-    assert audit['accepted_static'] and audit['bluetooth_runtime']['profile']=='smmu-domain-trial' and audit['bluetooth_runtime']['smmu_domain']
+    profile=audit['bluetooth_runtime']['profile'];unique=profile=='smmu-unique-memory';segmented=unique or profile=='smmu-segmented-memory';detail=segmented or profile=='smmu-memory-detail'
+    assert audit['accepted_static'] and profile in ('smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory') and audit['bluetooth_runtime']['smmu_domain']
     assert (audit['rollback_index'],audit['footer_location'],audit['parent_boot_chain_location'])==(1738713600,0,3)
     statuses=meta['statuses'];assert statuses and all(s['session']==audit['session'] and s['boot']==meta['boot_nonce'] for s in statuses)
     assert [int(n) for n in re.findall(r'ELDEN_SMMU read-context bank=(\d+) ',text)]==list(range(83))
@@ -44,5 +45,25 @@ def main():
             'reported_drop_max':max(int(s['dropped']) for s in statuses),'session':audit['session'],'image_sha256':audit['image_sha256'],
             'scope':'Read-only SMMU selection and guarded refusal/recovery; no mapped Wi-Fi domain, IRQ/DMA/MHI/network acceptance',
             'next':'Expose exact allocation/physical-segment/PAR failure before changing a gate or retrying hardware'}
+    if detail:
+        assert ('ELDEN_DMA_MEMORY stage=11 reason=3 rc=-71 init=-71 cleanup=1/0 offset=0 access=0 attr=44' if unique else 'ELDEN_DMA_MEMORY stage=11 reason=4 rc=-71 init=-71 cleanup=1/0 offset=0 access=0 attr=44' if segmented else 'ELDEN_DMA_MEMORY stage=6 reason=2 rc=-71 init=-71 cleanup=1/0 offset=0 access=0 attr=0') in text
+        geometry=re.findall(r'ELDEN_DMA_MEMORY geometry data=([0-9a-f]+)/([0-9a-f]+) table=([0-9a-f]+)/([0-9a-f]+) cpu=([0-9a-f]+)/([0-9a-f]+)',text)
+        assert len(geometry)==1;values=[int(x,16) for x in geometry[0]]
+        assert all(values[i] for i in [0,2,4,5]) and values[1]==0x4000000 and values[3]==0x42000
+        if not segmented:assert 'ELDEN_DMA_MEMORY page expected=0 physical=0 span=0 par=0' in text
+        result.update(allocator_stage_detail_unknown=False,allocator_stage=6,allocator_reason=2,cleanup_passed=True,
+                      first_data_segment_bytes=values[1],requested_data_allocation_bytes=130<<20,first_table_segment_bytes=values[3],
+                      first_data_physical=hex(values[0]),first_table_physical=hex(values[2]),
+                      next='Replace whole-first-segment assumption with existing full page-by-page physical/PAR proof; actual later continuity remains to be tested')
+        if segmented:
+            pages=re.findall(r'ELDEN_DMA_MEMORY page expected=([0-9a-f]+) physical=([0-9a-f]+) span=([0-9a-f]+) par=([0-9a-f]+)',text)
+            assert len(pages)==1;pa,physical,span,par=[int(x,16) for x in pages[0]]
+            assert pa==physical==values[0] and span==0x4000000
+            if unique:assert par==0x80d
+            else:assert not par&1 and (par&0x0000fffffffff000)==pa and par>>56==0xff
+            result.update(allocator_stage=11,allocator_reason=4,whole_backing_pages_verified=True,expected_nc_attribute=0x44,observed_attribute=0xff,observed_par=hex(par),
+                          next='Force a unique mapping to bypass same-task static reuse; retain NC44 and full physical/PAR requirements')
+            if unique:result.update(allocator_reason=3,observed_attribute=None,unique_alias_par_fault=True,
+                                   next='Use IOKit prefault for the already-wired unique mapping; retain full PA and NC44 checks')
     a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8');print(json.dumps(result))
 if __name__=='__main__':main()

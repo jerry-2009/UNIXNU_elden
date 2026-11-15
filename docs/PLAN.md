@@ -30,19 +30,12 @@ WLAN/NoC原生提供者与worker已实跑，128对象QMI链接仍属离线结果
 整核/签包和真实40210200/major2、BAR0/2、禁BM、同步回程。采用stock更窄61MiB窗口。
 下一步执行第二项，MHI启动前必须有真实DMA所有权和排空；不重复已通过的身份诊断。
 
-第二项先解决了一处实际源码冲突：[SMMU共存组件](../drivers/EldenSmmu/README.md)证明原触控
-会拒绝新增Wi-Fi路由；现只接受早期已登记、逐项验证并永久封存的精确路由。122场景及两个
-ARM64组件通过，但尚无真实早期分配器/bank-ASID/fault处理/页表/翻译提供者，未整核上机。
-下一步必须在UFS/Data发布前完成这些，再允许touch封存；不能在v158晚期worker中随意加路由。
-
-[内存/页表与bank-ASID组件](../drivers/EldenSmmu/MEMORY.md)现已编译：真实IOKit申请/保持128MiB、
-4KiB页表、逐页CPU PA/cache检查、独立遍历和只读选择器。host故障模型通过，仍未在真机执行。
-下一步接早期wrapper、故障IRQ、真实context/ATOS与注册发布，再进入MHI；当前候选保持v158。
-
-上述入口已在[v159](../profiles/smmu-domain-trial/README.md)整合并上机：601次选择读取通过，
-bank7/ASID1成立，但分配器-71使流程停在SMMU写入之前。立即下一步是精确记录物理段长度/地址/
-PAR拒绝值；不要重复独立bank扫描，也不要猜改充电/电压。ATOSNS已证实不支持硬件ATOS，
-相应步骤改为实际context＋完整物理页表核验，之后以受控MHI传输验证DMA。自动回程/stock已恢复。
+第二项的[SMMU映射已在v163实机通过](../profiles/smmu-prefault-memory/README.md)：
+专有128MiB NC映射、66页表/32768叶、bank7/slot8/ASID1、真实context/故障IRQ及触控DMA共存通过。
+前几轮确认IOPL段边界、IOKit静态映射重用和缺少prefault，修复保留所有逐页物理/cache检查。
+ATOSNS明确不支持硬件ATOS；当前通过的是实际寄存器回读和完整物理页表遍历。
+端点command2仍禁bus-master，尚无Wi-Fi设备DMA。下一步接自有arena/运行回调、MSI所有权和
+真实排空，再允许MHI/Peach/QMI使用；不重复选择/映射-only诊断。完整stock Android及设置已恢复。
 
 不重复v157/v158诊断，也不复制其它设备未保留的低地址DMA内存。power_ready/CPR/QMI仍必须
 核对当前确认代际，不能沿用历史实机结果。更详细的边界见[原生worker](../drivers/EldenPcie/NATIVE.md)。

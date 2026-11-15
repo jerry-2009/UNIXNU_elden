@@ -1,5 +1,5 @@
 """Compile real IOKit allocation and pinned 4K table code; no device activation."""
-import argparse,hashlib,json,re,subprocess
+import argparse,hashlib,importlib.util,json,re,subprocess
 from pathlib import Path
 from replay_xnu_objects import global_symbols,sections
 ROOT=Path(__file__).resolve().parents[1]
@@ -11,8 +11,20 @@ def refs(p):return {n for n,v in global_symbols(p).items() if not v[0]&0x0e}
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['clean-build','reference-kernel','llvm','output']:p.add_argument('--'+n,type=Path,required=True)
+    p.add_argument('--segmented',action='store_true')
+    p.add_argument('--unique-map',action='store_true')
+    p.add_argument('--prefault',action='store_true')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);d=ROOT/'drivers/EldenSmmu';up=d/'upstream';base=a.clean_build.resolve()
-    manifest=read(up/'source.json')
+    manifest=read(up/'source.json');allocator_source=d/'DmaMemory.cpp'
+    if a.prefault:a.unique_map=True
+    if a.unique_map:a.segmented=True
+    if a.segmented:
+        spec=importlib.util.spec_from_file_location('segments',d/'SegmentSource.py');mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
+        allocator_source=out/'DmaMemory.cpp';allocator_source.write_bytes(mod.source())
+    if a.unique_map:
+        import sys;sys.path.insert(0,str(d));from UniqueSource import source as unique_source;allocator_source.write_bytes(unique_source())
+    if a.prefault:
+        from PrefaultSource import source as prefault_source;allocator_source.write_bytes(prefault_source())
     for row in manifest['files'].values():assert sha(up/row['output'])==row['output_sha256']
     row=read(base/'units/result.json')['units']['WcnPowerNative'];command=list(row['command']);overlay=read(Path(command[command.index('-ivfsoverlay')+1]));assert overlay['fallthrough'] is False
     directories=set();inherited={}
@@ -20,7 +32,7 @@ def main():
         path=Path(item['external-contents']);h=sha(path);inherited[str(path)]=h
         if item['name'].endswith('/WcnPowerNative.cpp'):
             assert h=='5c16106e90622150686b90706fcfc8c674cf3c4d563ed782fd7d57fc864e2c72'
-            directories.add(str(Path(item['name']).parent));item['external-contents']=str(d/'DmaMemory.cpp')
+            directories.add(str(Path(item['name']).parent));item['external-contents']=str(allocator_source)
     assert directories
     files={'DmaMemory.h':d/'DmaMemory.h','DmaTables.h':d/'DmaTables.h'}
     files.update({'upstream/'+r['output']:up/r['output'] for r in manifest['files'].values() if r['output'].endswith('.h')})
@@ -46,8 +58,12 @@ def main():
     assert pending<=defs(a.reference_kernel),sorted(pending-defs(a.reference_kernel))
     for path,h in inherited.items():assert sha(Path(path))==h,path
     own=[d/'DmaMemory.cpp',d/'DmaMemory.h',d/'DmaTables.c',d/'DmaTables.h',up/'source.json']+[up/r['output'] for r in manifest['files'].values()]
+    if a.segmented:own.append(d/'SegmentSource.py')
+    if a.unique_map:own.append(d/'UniqueSource.py')
+    if a.prefault:own.append(d/'PrefaultSource.py')
     result={'compiled':True,'objects':records,'binding_sha256':sha(target),'remaining_kernel_imports':sorted(pending),'kernel_imports_verified':True,
             'source_inputs':{str(f.relative_to(ROOT)):sha(f) for f in own},'inherited_sdk_inputs':len(inherited),'scalar':True,
+            'allocator_variant':'prefault' if a.prefault else 'unique' if a.unique_map else 'segmented' if a.segmented else 'detail','allocator_source_sha256':sha(allocator_source),
             'kernel_linked':False,'native_allocator_run':False,'smmu_enabled':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','binding_sha256','remaining_kernel_imports','kernel_linked']}))
 if __name__=='__main__':main()

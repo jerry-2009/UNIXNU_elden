@@ -1,13 +1,12 @@
 # Owned Wi-Fi DMA memory and domain selection
 
-The real IOKit allocator, upstream page-table code and read-only bank/ASID
-selector compile for ARM64/iOS17. Host fault tests run the actual methods with
-physical mappings/cache/IOKit services modeled. [v159](../../profiles/smmu-domain-trial/README.md)
-then ran the selector successfully on Y700 and entered the allocator, which
-refused with-71 before SMMU writes. The full build/boot and return are verified;
-allocation and the SMMU domain are not accepted. Investigate exact segment/PAR
-values next. ID0.ATOSNS forbids hardware translation queries here; use audited
-tables and eventual real DMA evidence.
+The complete [v163 candidate](../../profiles/smmu-prefault-memory/README.md) now
+establishes the owned NC mapping and early SMMU domain on Y700. Context/fault
+IRQ registration and touch DMA coexistence pass; Wi-Fi device DMA has not run.
+The v159 refusal was traced through descriptor segmentation, IOKit's same-task
+static mapping shortcut and an unpopulated alias. The explicit prefault variant
+retains every per-page PA/PAR/attribute check. ID0.ATOSNS forbids hardware ATOS;
+the independent table walk is not end-to-end DMA acceptance.
 
 ## Memory and tables
 
@@ -18,7 +17,7 @@ pool. Both descriptors are prepared and held. Every4KiB page is checked through
 must be normal WB and the complete physical allocations must not overlap.
 
 After zeroing and clean/invalidation, data gets a normal-NC write-combined CPU
-mapping. Its pages must match the owned PA range and PAR attribute0x44. The
+mapping using Unique + Prefault. Its pages must match the owned PA range and PAR attribute0x44. The
 original cached data mapping is no longer accessed. Tables remain cached and
 are cleaned before publication and independently walked through their actual
 mapping. No fixed physical memory or device-memory mapping of RAM is used.
@@ -61,7 +60,7 @@ reported stage/register/error and prevent programming.
 
 - 14 table cases include a complete128MiB build/walk, bad widths, overlap,
   overflow, corrupted descriptors and one-shot build state.
-- 13 allocator/lifetime cases and232501 checks cover creation/claim/destruction,
+- Original 13 allocator/lifetime cases and232501 checks cover creation/claim/destruction,
   failed allocation/prepare/map, bad physical extents/cache attributes, overlap,
   denied release proofs and uncertain cleanup. Production methods ran with
   explicit host models for kernel services and ARM cache/PAR effects.
@@ -76,6 +75,10 @@ reported stage/register/error and prevent programming.
 Allocator object: `9ecb8671b33639781c0105d29a2493ae44f9d81d455fa6a86e6ab18524c3137c`.
 Allocator/table binding: `6bed391205de7edbba579e9f324fa4291e4679c1286d946dfacd9ac25ec31b6a`.
 Selector: `9d7254246ef20ad5ae907f45983a553988200736e4b80d2b719f935d0674a5c6`.
+
+The prefault variant adds segment-boundary/gap, static-cache-reuse and lazy-map
+models: 17 allocator cases/447346 checks pass. These remain host models; actual
+hardware evidence and updated object hashes are in the v163 profile.
 
 ## Reproduce and continue
 
@@ -93,11 +96,10 @@ model. The allocator host test needs Clang; the first WSL attempt found no Clang
 and stopped before compilation. The successful run used the Mac; both records
 remain. No compiler was installed as a workaround.
 
-Next wire the real early provider before UFS/Data publication: exclusive phase
-and endpoint-quiescence checks, register maps, selection/allocation, context and
-global fault IRQ ownership, real context programming, hardware translation
-verification, then immutable route publication. Only then bind the late PCIe/
-MHI caller. Real DMA draining, MSI, MHI/firmware and networking still remain.
+The early provider, IRQ/context programming and immutable route publication
+are integrated and hardware-qualified in v163. Next connect the owned arena to
+runtime DMA callbacks, MSI and actual stopping/draining before bus mastering.
+MHI/Peach firmware, QMI and networking remain. Do not rerun mapping-only trials.
 
 [Evidence](../../docs/evidence/wifi-dma-memory-20261116.json). Workbench outputs:
 `edl_work/wifi-dma-memory-20261116/{host1,native1,selection1}` and

@@ -7,9 +7,17 @@ from charge_verification_boot import qualify_shared_assets
 ROOT=Path(__file__).resolve().parents[1]
 def qualify(report_path,entry_path,runtime):
     report_path=Path(report_path);r=json.loads(report_path.read_text());folder=report_path.parent
-    smmu=r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
-    if r.get('profile') not in ('pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(16 if smmu else 4+int(endpoint)):
+    prefault=r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
+    if r.get('profile') not in ('pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(16 if smmu else 4+int(endpoint)):
         raise ValueError('Wrong root kernel build')
+    if detail and r.get('memory_report_version')!=1:raise ValueError('Memory report not qualified')
+    if segmented:
+        sys.path.insert(0,str(ROOT/'drivers/EldenSmmu'));from SegmentSource import source as segmented_source
+        if unique:
+            from UniqueSource import source as segmented_source
+        if prefault:
+            from PrefaultSource import source as segmented_source
+        if r.get('allocator_variant')!=('prefault' if prefault else 'unique' if unique else 'segmented') or r.get('allocator_source_sha256')!=hashlib.sha256(segmented_source()).hexdigest():raise ValueError('Allocator input differs')
     if not all(r.get(k) is True for k in ['core_filelist_unchanged','scalar','ufs_diagnostic_removed','ufs_ah8_retained','root_worker_bound']):
         raise ValueError('Root/idle integration contract missing')
     components={'Native.o','Root.o','Phy.o','Power.o','WcnPowerNative.o','WcnPower.o'}
@@ -42,10 +50,22 @@ def qualify(report_path,entry_path,runtime):
         raise ValueError('Root UFS dependencies differ')
     hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu)
     result=qualify_shared_assets(report_path,entry_path,runtime)
-    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu)
+    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault)
     return result
 
 def menu(qualification):
+    if qualification.get('profile')=='smmu-prefault-memory':
+        if qualification.get('prefault_memory') is not True:raise ValueError('Explicit prefault mapping required')
+        return menu(dict(qualification,profile='smmu-unique-memory')).replace('Wi-Fi NC memory + USB - TEST','Wi-Fi DMA setup + USB - TEST',1)
+    if qualification.get('profile')=='smmu-unique-memory':
+        if qualification.get('unique_memory') is not True:raise ValueError('Explicit unique mapping required')
+        return menu(dict(qualification,profile='smmu-segmented-memory')).replace('Wi-Fi mapped memory + USB - TEST','Wi-Fi NC memory + USB - TEST',1)
+    if qualification.get('profile')=='smmu-segmented-memory':
+        if qualification.get('segmented_memory') is not True:raise ValueError('Explicit segmented allocator required')
+        return menu(dict(qualification,profile='smmu-memory-detail')).replace('Wi-Fi DMA memory details - TEST','Wi-Fi mapped memory + USB - TEST',1)
+    if qualification.get('profile')=='smmu-memory-detail':
+        if qualification.get('memory_detail') is not True:raise ValueError('Explicit memory detail required')
+        return menu(dict(qualification,profile='smmu-domain-trial')).replace('Wi-Fi DMA mapping + USB - TEST','Wi-Fi DMA memory details - TEST',1)
     if qualification.get('profile')=='smmu-domain-trial':
         if qualification.get('smmu_domain') is not True:raise ValueError('Explicit qualified SMMU intent required')
         base=menu(dict(qualification,profile='pcie-endpoint-trial'));old=tomllib.loads(base);args=old['entry'][0]['args'];value=args+' esm'

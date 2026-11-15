@@ -1,5 +1,22 @@
 # UniXNU elden — authoritative source repository
 
+Latest v16320261116: owned128MiB NC mapping and early SMMU domain PASS hardware.
+v160 first64MiB descriptor segment was an IOPL boundary; v161 preserves every4KiB PA/PAR check,
+v162 Unique avoids same-task cached map reuse, v163 Prefault populates the prepared/wired alias.
+Final PAR44,66tables/32768leaves,bank7/slot8/ASID1/data8eb800000/tables8f3a00000 verified.
+CBAR1f300/CBA2R1/TCR80802020/TCR238071/SCTLR67/TTBR010008f3a00000/MAIRff44.
+FSR400 is FORMAT2, fault maskc00001fe=0; upstream allows TBI bits/cleared ASIDPNE.
+IRQ97/136 flagsa003/router0, touch DMA transfers/attach/detach/release coexist; PCIe Gen3x2/Peach2.
+Endpoint command2: NO Wi-Fi DMA/MSI/MHI/firmware/network yet. ATOSNS means no hardware ATOS.
+Typed sync/PERST-low/physical fastboot/full stock8b8e72da/Android root green boot1/original settings/sleep restored.
+Image59d05105/sessionc583623b4517c495/rawkernelf823af26;145603B/raw3902d920/dropmax0/no reconnect, floor1738713600/0/3.
+17host allocator cases447346checks+14table cases ASan/UBSan;40rehashed capture negatives. Kernel5existing/16added,
+core/other members/init/Apple30/entry7124 preserved;137source inputs match. Final Mac source2/native2/kernel2,
+Windows edl_work/smmu-prefault-v163-20261116, smmu-boot-v163-20261116/package1, live-smmu-v163-20261116.
+profiles/smmu-prefault-memory/README.md and docs/evidence/smmu-prefault-v163-20261116.json current.
+Do not repeat mapping-only trials. Next owned DMA arena/runtime callbacks+MSI+actual drain before bus master/MHI.
+All jobs terminal/device stock; Goal/charging incomplete. GPU worktree/QRTR/AnyRouter preserved.
+
 Latest v15920261116: real early SMMU wrapper+fault handlers/domain/programmer/immutable route integrated and signed.
 Hardware601selection reads pass bank7/slot8/ASID1/CB0a9f00e0, but allocator returns-71 at native stage3 BEFORE IRQ
 registration, registry reserve or SMMU writes. Exact segment/PAR rejection unknown; next instrument those values,

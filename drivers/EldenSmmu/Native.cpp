@@ -116,6 +116,7 @@ static int attach_irqs(Context *c){
     for(unsigned i=0;i<2;i++){
         uint32_t observed=0;uint64_t router=0;
         IOReturn rc=armcpu_spi_attach(c->irq[i].intid,false,fault,&c->irq[i],&observed,&router);
+        log("\nELDEN_SMMU irq-request kind=%u intid=%u rc=%d\n",i,c->irq[i].intid,(int)rc);
         if(rc)return (int)rc;
         __atomic_store_n(&c->attached[i],1u,__ATOMIC_RELEASE);
         log("\nELDEN_SMMU irq kind=%u intid=%u flags=%08x router=%llx\n",i,c->irq[i].intid,observed,(unsigned long long)router);
@@ -150,12 +151,20 @@ static int initialize(Context *c){
     c->stage=2;EldenSmmuSelectIo select={c,basic,select_read};rc=elden_smmu_select_boot_domain(&select,&c->selection);
     log("\nELDEN_SMMU selection rc=%d stage=%u last=%x:%x reads=%u bank=%u asid=%u cb0=%x\n",rc,c->selection.stage,c->selection.last_offset,
         c->selection.last_value,c->selection.reads,c->selection.route.bank,c->selection.asid,c->selection.cb0_sctlr);if(rc)return rc;
-    c->stage=3;rc=EldenWifiDmaMemory::create(&c->memory,c->selection.id0,c->selection.id2);if(rc)return rc;
+    c->stage=3;EldenWifiDmaMemoryReport memory={};rc=EldenWifiDmaMemory::createWithReport(&c->memory,c->selection.id0,c->selection.id2,&memory);
+    log("\nELDEN_DMA_MEMORY stage=%u reason=%u rc=%d init=%d cleanup=%u/%d offset=%llx access=%u attr=%x\n",memory.stage,memory.reason,rc,memory.initialize_status,memory.cleanup_attempted,memory.cleanup_status,(unsigned long long)memory.offset,memory.access,memory.expected_attribute);
+    log("\nELDEN_DMA_MEMORY geometry data=%llx/%llx table=%llx/%llx cpu=%llx/%llx\n",(unsigned long long)memory.data_base,(unsigned long long)memory.data_segment_bytes,(unsigned long long)memory.table_base,(unsigned long long)memory.table_segment_bytes,(unsigned long long)memory.data_cpu,(unsigned long long)memory.table_cpu);
+    log("\nELDEN_DMA_MEMORY page expected=%llx physical=%llx span=%llx par=%llx\n",(unsigned long long)memory.expected_physical,(unsigned long long)memory.physical,(unsigned long long)memory.segment_bytes,(unsigned long long)memory.par);
+    if(rc)return rc;
     if((rc=basic(c)))return rc;
     c->stage=4;if((rc=attach_irqs(c)))return rc;
     c->stage=5;rc=c->memory->claimForContext(c,1);if(rc)return rc;c->memory_claimed=true;
     EldenSmmuDomainOps ops={c,domain_admit,now,delay,progress,{c,0x100000,read32,read64,write32,write64,barrier}};
-    return elden_smmu_domain_start(&c->domain,&ops,&c->selection,c->memory->tables());
+    rc=elden_smmu_domain_start(&c->domain,&ops,&c->selection,c->memory->tables());
+    const auto &r=c->domain.program;const auto &v=r.readback;
+    log("\nELDEN_SMMU context phase=%u writes=%u readback=%u fault=%x cbar=%x cba2r=%x tcr=%x tcr2=%x sctlr=%x\n",r.phase,r.writes,r.readback_valid,r.fault_status,v.cbar,v.cba2r,v.tcr,v.tcr2,v.sctlr);
+    log("\nELDEN_SMMU context ttbr=%llx/%llx mair=%x/%x\n",(unsigned long long)v.ttbr0,(unsigned long long)v.ttbr1,v.mair0,v.mair1);
+    return rc;
 }
 }
 extern "C" int elden_wifi_smmu_early_initialize(void){

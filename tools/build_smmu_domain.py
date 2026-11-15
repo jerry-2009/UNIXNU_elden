@@ -49,6 +49,8 @@ def main():
     for p,h in inherited.items():assert sha(Path(p))==h
     for f in [d/'Native.cpp',d/'Domain.c',*files.values()]:source_inputs[str(f.relative_to(ROOT))]=sha(f)
     result={'compiled':True,'objects':records,'binding_sha256':sha(target),'input_objects':{str(p):sha(p) for p in objects},'component_count':len(objects),
-            'remaining_imports':sorted(pending),'requires_ufs_guard':True,'source_inputs':source_inputs,'kernel_linked':False,'hardware':False}
+            'remaining_imports':sorted(pending),'requires_ufs_guard':True,'source_inputs':source_inputs,
+            'allocator_variant':memory.get('allocator_variant','legacy'),'allocator_source_sha256':memory.get('allocator_source_sha256'),
+            'memory_report_version':1 if b'ELDEN_DMA_MEMORY stage=' in (out/'Native.o').read_bytes() else 0,'kernel_linked':False,'hardware':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','binding_sha256','component_count','remaining_imports']}))
 if __name__=='__main__':main()

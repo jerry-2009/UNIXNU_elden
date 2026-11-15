@@ -16,8 +16,16 @@ def main():
     p.add_argument('--endpoint-build',type=Path,help='Add the explicitly built BAR/Peach transaction')
     p.add_argument('--smmu-build',type=Path,help='Add the concrete early DMA/SMMU owner')
     p.add_argument('--route-build',type=Path,help='Matched boot registry and derived touch route')
+    p.add_argument('--memory-detail',action='store_true',help='Explicit allocator diagnostics profile')
+    p.add_argument('--segmented-memory',action='store_true',help='Verify all pages across descriptor segments')
+    p.add_argument('--unique-memory',action='store_true',help='Require a distinct NC alias')
+    p.add_argument('--prefault-memory',action='store_true',help='Populate the wired alias before PAR checks')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
     if bool(a.smmu_build)!=bool(a.route_build) or (a.smmu_build and not a.endpoint_build):raise ValueError('SMMU needs endpoint and route builds together')
+    if a.memory_detail and not a.smmu_build:raise ValueError('Memory diagnostics require SMMU build')
+    if a.segmented_memory and not a.memory_detail:raise ValueError('Segmented memory requires diagnostics')
+    if a.unique_memory and not a.segmented_memory:raise ValueError('Unique memory requires segmented proof')
+    if a.prefault_memory and not a.unique_memory:raise ValueError('Prefault memory requires a unique mapping')
     contract=read(ROOT/'profiles/ufs-idle-trial/native-contract.json');assert native_identity(parent/'native.macho')==(contract['sections'],contract['commands'],contract['symbols'])
     previous=read(parent/'result.json');assert previous['profile']=='ufs-idle-trial' and sha(parent/'kernel.macho')==previous['kernel_sha256']
     out.mkdir(parents=True,exist_ok=False);(out/'source').mkdir()
@@ -44,6 +52,8 @@ def main():
     smmu_sources={};smmu_count=0
     if a.smmu_build:
         sr=read(a.smmu_build/'result.json');tr=read(a.route_build/'result.json');smmu_count=sr['component_count'];assert smmu_count==11
+        if a.memory_detail:assert sr.get('memory_report_version')==1
+        if a.segmented_memory:assert sr.get('allocator_variant')==('prefault' if a.prefault_memory else 'unique' if a.unique_memory else 'segmented')
         supplied['SmmuNativeBinding.o']=(a.smmu_build/'SmmuNativeBinding.o',sr['binding_sha256'])
         supplied['EldenNvtDmaRoute.o']=(a.route_build/'DmaRoute.o',tr['objects']['DmaRoute']['object_sha256'])
         for report in [sr,tr]:
@@ -108,7 +118,7 @@ def main():
     own={**nr['source_inputs'],**wr['source_inputs'],**{'drivers/EldenPcie/'+n:h for n,h in rr['source_sha256'].items()},**pr['source_sha256'],**shared_sources,**endpoint_sources,**smmu_sources}
     for path in ['tools/build_pcie_root_kernel.py','tools/build_ufs_wait_objects.py','drivers/EldenUfsIdle/IdleSource.py']:own[path]=sha(ROOT/path)
     sources={**previous['source_inputs'],**own}
-    report={'profile':'smmu-domain-trial' if a.smmu_build else 'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
+    report={'profile':'smmu-prefault-memory' if a.prefault_memory else 'smmu-unique-memory' if a.unique_memory else 'smmu-segmented-memory' if a.segmented_memory else 'smmu-memory-detail' if a.memory_detail else 'smmu-domain-trial' if a.smmu_build else 'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
             'source_inputs':sources,'optional_runtime':previous['optional_runtime'],'core_filelist_unchanged':True,'changed_core_objects':0,'scalar':True,
             'changed_native_objects':5 if a.smmu_build else 3,'added_native_objects':len(pcie_members)+(smmu_count-1 if a.smmu_build else 0),'native_objects':records,'archive_members':member_hashes,
             'component_objects':{n:{'path':str(p),'sha256':h} for n,(p,h) in supplied.items()},
@@ -116,6 +126,9 @@ def main():
             'ufs_diagnostic_removed':True,'ufs_ah8_retained':True,'root_worker_bound':True,
             'endpoint_worker_bound':bool(a.endpoint_build),'endpoint_generated_sources':nr.get('generated_sources',{}),
             'smmu_domain_bound':bool(a.smmu_build),'smmu_component_count':smmu_count,'owned_sgi_guard':bool(a.smmu_build),
+            'memory_report_version':1 if a.memory_detail else 0,
+            'allocator_variant':sr.get('allocator_variant') if a.smmu_build else None,
+            'allocator_source_sha256':sr.get('allocator_source_sha256') if a.smmu_build else None,
             'boot_packaged':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['profile','kernel_sha256','changed_native_objects','added_native_objects','original_apple_executables_hashed','boot_packaged']}))
 if __name__=='__main__':main()

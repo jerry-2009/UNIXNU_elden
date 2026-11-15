@@ -34,5 +34,26 @@ def main():
     try:menu(dict(smmu,smmu_domain=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified SMMU accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':8}))
+    detail=dict(smmu,profile='smmu-memory-detail',memory_detail=True)
+    detail_menu=tomllib.loads(bt_runtime_boot.menu(detail))
+    assert detail_menu['entry'][0]['args']==smmu_menu['entry'][0]['args'] and detail_menu['entry'][1:]==smmu_menu['entry'][1:]
+    try:menu(dict(detail,memory_detail=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified memory report accepted')
+    segmented=dict(detail,profile='smmu-segmented-memory',segmented_memory=True)
+    assert tomllib.loads(bt_runtime_boot.menu(segmented))['entry'][0]['args']==smmu_menu['entry'][0]['args']
+    try:menu(dict(segmented,segmented_memory=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified segmented allocator accepted')
+    unique=dict(segmented,profile='smmu-unique-memory',unique_memory=True)
+    assert tomllib.loads(bt_runtime_boot.menu(unique))['entry'][0]['args']==smmu_menu['entry'][0]['args']
+    try:menu(dict(unique,unique_memory=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified unique mapping accepted')
+    prefault=dict(unique,profile='smmu-prefault-memory',prefault_memory=True)
+    assert tomllib.loads(bt_runtime_boot.menu(prefault))['entry'][0]['args']==smmu_menu['entry'][0]['args']
+    try:menu(dict(prefault,prefault_memory=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified prefault mapping accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':12}))
 if __name__=='__main__':main()

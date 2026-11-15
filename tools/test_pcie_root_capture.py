@@ -6,6 +6,7 @@ import argparse
 import copy
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from assess_pcie_root_capture import assess, read
@@ -16,8 +17,10 @@ def main():
     for name in ('run', 'audit', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--endpoint', action='store_true')
+    parser.add_argument('--smmu', action='store_true')
     args = parser.parse_args()
-    baseline = assess(args.run, args.audit, args.endpoint)
+    args.endpoint = args.endpoint or args.smmu
+    baseline = assess(args.run, args.audit, args.endpoint, args.smmu)
     args.output.mkdir(parents=True, exist_ok=False)
     capture, = (args.run / 'usb').glob('*.bin')
     raw = capture.read_bytes()
@@ -60,6 +63,33 @@ def main():
             ('wrong-bar-size', replace(b'bar2=40600000/8000 ', b'bar2=40600000/10000 '), None),
             ('window-not-restored', replace(b'remap-restored=1 confirmed=', b'remap-restored=0 confirmed='), None),
         ]
+    if args.smmu:
+        def change_line(prefix, old, new):
+            line, = [line for line in raw.splitlines() if line.startswith(prefix)]
+            assert line.count(old) == 1
+            return replace(line, line.replace(old, new, 1))
+
+        cases += [
+            ('wrong-cache-attribute', replace(b'access=1 attr=44', b'access=1 attr=ff'), None),
+            ('faulted-par', change_line(b'ELDEN_DMA_MEMORY page ', b'b00', b'b01'), None),
+            ('wrong-ttbr', change_line(b'ELDEN_SMMU context ttbr=', b'ttbr=1', b'ttbr=2'), None),
+            ('context-fault', replace(b'readback=1 fault=400', b'readback=1 fault=402'), None),
+            ('context-disabled', change_line(b'ELDEN_SMMU context phase=', b'sctlr=67', b'sctlr=66'), None),
+            ('wrong-asid', replace(b'bank=7 slot=8 asid=1 translations=', b'bank=7 slot=8 asid=2 translations='), None),
+            ('wrong-page-count', replace(b'software-pages=32768', b'software-pages=32767'), None),
+            ('false-hardware-atos', replace(b'translation-mode=2', b'translation-mode=1'), None),
+            ('missing-domain-stage', replace(b'domain-stage=4 translations=0', b'domain-stage=4 translations=1'), None),
+            ('wrong-global-irq', replace(b'irq-request kind=0 intid=97 rc=0', b'irq-request kind=0 intid=98 rc=0'), None),
+            ('failed-context-irq', replace(b'irq-request kind=1 intid=136 rc=0', b'irq-request kind=1 intid=136 rc=-5'), None),
+            ('wrong-irq-owner', replace(b'intid=136 flags=0000a003 router=0', b'intid=136 flags=0000a003 router=1'), None),
+            ('unpublished-route', replace(b'late status=0 ready=1 fault=0', b'late status=0 ready=0 fault=0'), None),
+            ('touch-attach-failed', replace(b'ELDEN_TOUCH_DMA attach=0 stage=5', b'ELDEN_TOUCH_DMA attach=-5 stage=5'), None),
+            ('touch-transfers-absent', raw.replace(b'ELDEN_TOUCH_DMA xfer=', b'OMITTED_TOUCH_DMA xfer='), None),
+            ('touch-transfer-error', re.sub(rb'(ELDEN_TOUCH_DMA xfer=\d+ bytes=\d+ error=)0', rb'\g<1>-5', raw, count=1), None),
+            ('touch-release-failed', replace(b'ELDEN_TOUCH_DMA memory-release=0', b'ELDEN_TOUCH_DMA memory-release=-5'), None),
+            ('irq-mask-failed', replace(b'stop irq-mask=0/0', b'stop irq-mask=0/-5'), None),
+            ('dma-unexpectedly-started', replace(b'resources-retained=1 dma-started=0', b'resources-retained=1 dma-started=1'), None),
+        ]
     rejected = []
     for name, mutated, edit in cases:
         folder = args.output / name
@@ -75,7 +105,7 @@ def main():
             destination.write_text(json.dumps(doc, indent=2) + '\n', encoding='utf-8')
         (folder / 'usb/capture.bin').write_bytes(mutated)
         try:
-            assess(folder, folder / 'audit.json', args.endpoint)
+            assess(folder, folder / 'audit.json', args.endpoint, args.smmu)
         except AssertionError:
             rejected.append(name)
         else:

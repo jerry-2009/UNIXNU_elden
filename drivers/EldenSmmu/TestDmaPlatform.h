@@ -5,14 +5,14 @@
 using IOOptionBits=uint64_t;
 using IOByteCount=uint64_t;
 enum {kIODirectionInOut=3,kIOMemoryPhysicallyContiguous=0x100,kIOMemoryMapperNone=0x200,
-      kIOMapAnywhere=1,kIOMapWriteCombineCache=2,kIOReturnSuccess=0};
+      kIOMapAnywhere=1,kIOMapWriteCombineCache=2,kIOMapUnique=4,kIOMapPrefault=8,kIOReturnSuccess=0};
 extern void *kernel_task;
 void *IOMalloc(size_t);
 void IOFree(void *,size_t);
 class IOMemoryMap;
 class IOGeneralMemoryDescriptor {
 public:
-    unsigned index=0;uint8_t *cpu=nullptr;size_t bytes=0;uint64_t pa=0;bool prepared=false,nc=false;
+    unsigned index=0;uint8_t *cpu=nullptr;size_t bytes=0;uint64_t pa=0;bool prepared=false,nc=false,present=true;
     int prepare(unsigned);
     int complete(unsigned);
     uint64_t getPhysicalSegment(size_t,IOByteCount *,unsigned);

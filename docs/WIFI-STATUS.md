@@ -6,24 +6,19 @@ v157在TB322FC实机上训练到Gen3 ×2，读到root17cb:011c和endpoint17cb:11
 
 v158随后通过[BAR/芯片身份实机](../profiles/pcie-endpoint-trial/README.md)：BAR0/2实测与映射，
 芯片40210200/major2/minor0、MEM-only/禁BM，真实WLAN epoch确认、同步回程及完整Android恢复。
-Wi-Fi仍不能联网：SMMU/DMA/MSI/MHI/固件上传、en0、扫描、关联和流量均未验收。
+Wi-Fi仍不能联网：设备DMA/MSI/MHI/固件上传、en0、扫描、关联和流量均未验收。
 128对象QMI可重定位链接尚未接入此候选。下一步有所有权的DMA/MSI及MHI，已通过的身份诊断不重跑。
 
-v159[早期SMMU候选](../profiles/smmu-domain-trial/README.md)完成601次实读，选出bank7/ASID1；
-内存校验随后返回-71，尚未配置SMMU/故障IRQ，后续PCIe正确拒绝上电。UFS、CPU、触控DMA和完整
-Android回程通过。下一步记录分配器物理段长度/地址/PAR的具体失败值，不猜测原因或放宽门槛。
-本机ID0的ATOSNS表示不支持硬件翻译查询，已按Linux改用完整页表遍历；实际DMA仍待MHI验证。
-显式full-on预算不是日用电源策略，日用净充及完整保护周期仍欠。
+v163已通过[早期SMMU实机](../profiles/smmu-prefault-memory/README.md)：128MiB普通NC映射、
+逐页PA/PAR核验、66页表/32768叶、bank7/slot8/ASID1、context回读和IRQ97/136注册均通过。
+新路由与触控DMA传输/释放共存。FSR400是格式字段，实际故障位为0；本机不支持硬件ATOS。
+v160–v162的拒绝分别定位到IOPL段边界、静态WB映射重用与尚未prefault的alias，保留逐页检查后修复。
+下一步自有DMA arena/实际运行回调、MSI和真实排空，之后才允许bus-master及MHI；当前command2禁BM。
+完整stock Android及原设置恢复通过。显式full-on预算仍非日用电源策略，充电验收缺口不变。
 
 [BAR/Peach事务](../drivers/EldenPcie/ENDPOINT.md)采用stock61MiB与Linux573MiB窗口的较窄交集。
-组件模拟测试与上述实机验收分别归档；后续QMI仍须绑定实际消费者、相同有效epoch，不用模拟身份值准入。
-
-下一层[SMMU共存准备](../drivers/EldenSmmu/README.md)已用原触控源码复现新增Wi-Fi路由被拒，
-修复后的注册/封存与精确检查完成host及ARM64组件验证。它尚未配置SMMU；早期真实bank/ASID/
-内存页/IRQ及翻译提供者仍须实现，完整候选保持v158。固定本机Linux的PCI DMA掩码为36位。
-
-[真实API内存分配与选择组件](../drivers/EldenSmmu/MEMORY.md)随后已编译：自有128MiB、4KiB页表/
-独立遍历与逐页PA/cache核验、bank/ASID只读选择；host模型通过，尚未原生执行或建立实际SMMU映射。
+[SMMU共存](../drivers/EldenSmmu/README.md)和[自有内存](../drivers/EldenSmmu/MEMORY.md)已经整合到上述候选。
+后续QMI须绑定真实消费者和有效epoch，不能用历史身份或模拟值代替；PCI DMA掩码为36位。
 
 已具备的源码链为[共享WCN](WCN-SHARED-POWER.md)→[原生WLAN](WLAN-POWER-NATIVE.md)
 →[本机PHY/root](../drivers/EldenPcie/README.md)→[原生worker](../drivers/EldenPcie/NATIVE.md)。
