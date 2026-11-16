@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest v16620261116 hardware: control start0; all12 Linux init calls0; MHI firmware download enters
+Mission Mode, actual DMA/MSI/QRTR/QMI respond with Peach40210200/firmware version. AUX_UC succeeds.
+Runtime stage2 then stops at missing exact qdss_trace_config.bin (-2), no scans/network acceptance.
+Stop0/stage6 RESET1/1/status101, bus-master off command2/transactions10/consumer0 now observed hardware.
+Typed return/physical fastboot/full stock8b8e72da and Android/root/green/original charging+radio+scan settings
+restored/sleep requested, all jobs terminal. Image8d4917a3/session401a0d3a1b943912, floor1738713600/0/3.
+Evidence docs/evidence/wifi-control-v166-20261116.json; Mac source4/host3/native2/kernel2, package1.
+Next map exact OEM6237B QDSS (SHA94251904) into verified firmware cache; do not bypass its QMI stage.
+Full Goal/charging incomplete; GPU/QRTR/AnyRouter separate; v165 data and previous failed fixtures retained.
+
 Latest v165/control20261116: v165 localizes Linux -16 to nl80211_init: actual nw_cfg80211_control shim
 binds nw_control, but Elden never installed its native transport. Production queue reproduces
 NOT_READY3 -> EBUSY-16; do not modify clocks/heap/FW or fake bind success. v165 raw168563B/

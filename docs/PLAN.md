@@ -1,5 +1,9 @@
 # Elden 基本可用实施计划
 
+**v166实机进展**：控制socket修复生效，DMA/MSI/MHI/QRTR/QMI已实际工作，原厂AUX_UC成功。
+当前精确阻塞为未映射QDSS配置；下一轮补原厂6237B文件映射及摘要核验，不再重复初始化探针。
+真MHI复位与全SHA恢复Android已通过，尚未扫描/联网。下方v165/v164保留历史。
+
 当前 v165 已定位：未安装控制socket transport，导致实际 `nl80211_init` 返回-16。
 真实Sheng控制通道已完成组件/整核，下一步一次完整签包和实机验证，观察MHI真实进展。
 [控制通道方案与复现](../profiles/wifi-control-transport/README.md)。下方v164记录为历史基线。

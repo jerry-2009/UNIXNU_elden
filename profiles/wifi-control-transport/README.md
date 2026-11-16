@@ -62,3 +62,10 @@ aliases (native1) and a helper's stale native1 path (kernel1) remain as failures
 Signed boot: `8d4917a338cbfc087c817cfdb5ba13882174917d2afba63aa8acb18adb9a261c`; session `401a0d3a1b943912`.
 Full independent boot/asset/AVB audit passes, floor1738713600/footer0/parent3.
 No hardware result yet.
+
+Hardware v166 now passes all12 init returns, MHI download/Mission Mode and
+real MSI/QRTR/QMI exchange. AUX_UC succeeds. Stage2 then waits because the exact
+QDSS configuration is missing from the cache resolver. No scan/interface/network
+claim. Real RESET1/1 and PCI master-off are observed, followed by typed return,
+physical fastboot, full stock SHA and Android/root/green/settings restoration.
+See [hardware evidence](../../docs/evidence/wifi-control-v166-20261116.json).
