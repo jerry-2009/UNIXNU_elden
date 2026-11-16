@@ -1,5 +1,10 @@
 # Wi-Fi：固件已就绪，平台回程通过，下一步用户态与网络桥
 
+**v177：扫描准入保持关闭，暴露了 MAC 启动中的 WMI 命令超时。** INFO 返回 DRIVER_FAILED9，
+WMI_PDEV_SET_PARAM 超时、credits0；v175有同样错误，v176只是一次成功。下一步定位 MSI/CE 完成
+处理链路，不把 stage4 当作接口已启动，也不把固件 DDR 比较差异当成 RAM 损坏。
+完整自动回程与 Android 恢复通过。[本轮证据](../profiles/wifi-service-scan/README.md)。
+
 **v176：第二次 INFO 已返回成功，服务初始化继续完成，保留到自动回程。** 首次未就绪的连接
 已经收走诊断扫描事件，现有一次性测试标记没有给新连接重发；本轮没有观察到真正 SCAN 命令，BSS0。
 下一步按当前会话的成功 INFO 应答安排诊断扫描，不修改认证或硬件逻辑。完整恢复 Android 已通过。

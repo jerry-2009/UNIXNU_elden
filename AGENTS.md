@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17720261116 HARDWARE: session-qualified diagnostic scan remained CLOSED. First INFO3, later9;
+WMI_PDEV_SET_PARAM16387/0x4003 timeout30times, MAC start-11, credits0. Source/CE ring positions differ,
+but exact missed completion stage NOT proved. v175 has same30timeouts; v176none/INFO0, so not a stable fix.
+Next consolidate native MSI HW/status/enable/mask/pending/error plus CE logical completion state at first
+failure. No fake credits/timeout extensions/guess clocks. DDR-vs-file diagnostics are not RAM-corruption proof.
+Scan/BSS/network unaccepted. Physical fence/MSI4/PERST/WCN-stop/typed reset/fastboot/full stock8b8e72da/
+Android/root/green/original charge+radio+scan settings/sleep restored. All jobs terminal. Capture285382B/
+4ae980b0/drop8/no reconnect/no post-disconnect counter. Image634bff5e/session1eaf78095c2e49fd/floor1738713600/0/3;
+kernelb6b0d1b8/nativebfc91443, corev175 unchanged,1native warning.7actual queue/native scenarios with scan
+block/failed+stale reply/reconnect/stop/three-attempt tests pass. Mac wifi-service-scan-v177 source1/host1/native1/
+kernel1; boot-v177/package1. profiles/wifi-service-scan. Full Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v17620261116 HARDWARE: native control getter0/8B; first INFO returnsNOT_READY3, second INFO0/116B;
 SET_KEY replies8, SET_OPERSTATE0, SET_PORT0.2connections/1disconnect; second stays until controlled return.
 Diagnostic scan event267 was delivered to the first failed session; no observed SCAN opcode2 on second/BSS0.

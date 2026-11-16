@@ -34,7 +34,9 @@ def main():
     for n in ['parent-native','clean-build','service-core','factory-mac','reference-kernel','llvm','output']:
         p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--control-trace',action='store_true')
+    p.add_argument('--service-scan',action='store_true',help='Bind the diagnostic scan to a delivered successful INFO reply')
     a=p.parse_args();parent=a.parent_native.resolve();out=a.output.resolve();prior=read(parent/'result.json')
+    if a.service_scan and not a.control_trace:raise ValueError('Session scan requires control trace')
     assert prior['platform_physical_fence'] and prior['runtime_platform_budget'] and prior['control_transport_bound']
     assert sha(parent/'Native.o')==prior['object_sha256']
     core=read(a.service_core/'result.json');assert core['compiled'] and sha(a.service_core/'kern_exec.o')==core['object_sha256']
@@ -45,6 +47,9 @@ def main():
     if a.control_trace:
         spec=importlib.util.spec_from_file_location('service_control_trace',ROOT/'drivers/EldenWifi/ServiceControlTraceSource.py')
         trace=importlib.util.module_from_spec(spec);spec.loader.exec_module(trace);new=trace.generated()
+    if a.service_scan:
+        spec=importlib.util.spec_from_file_location('service_scan_source',ROOT/'drivers/EldenWifi/ServiceScanSource.py')
+        scan=importlib.util.module_from_spec(spec);spec.loader.exec_module(scan);new=scan.generated()
     for name,data in old.items():assert (parent/'source'/name).read_bytes()==data,name
     assert sha(ROOT/'drivers/EldenPcie/ControlNative.inc')==prior['source_inputs']['drivers/EldenPcie/ControlNative.inc']
     private,private_report=private_input(a.factory_mac)
@@ -66,7 +71,7 @@ def main():
     for directory in directories:
         overlay['roots'].append({'type':'file','name':str(Path(directory)/'EldenWifiFactoryMac.h'),'external-contents':str(private_header)})
         if a.control_trace:
-            for name in ['ControlTrace.inc','ControlTraceApi.h']:
+            for name in ['ControlTrace.inc','ControlTraceApi.h']+(['ControlScan.inc'] if a.service_scan else []):
                 overlay['roots'].append({'type':'file','name':str(Path(directory)/name),'external-contents':str(ROOT/'drivers/EldenWifi'/name)})
     overlay['roots'].append({'type':'file','name':str(folder/'EldenWifiFactoryMac.h'),'external-contents':str(private_header)})
     vfs=out/'overlay.json';write(vfs,overlay);command[command.index('-ivfsoverlay')+1]=str(vfs)
@@ -85,11 +90,13 @@ def main():
         sources[name]=sha(ROOT/name)
     if a.control_trace:
         for name in ['drivers/EldenWifi/ServiceControlTraceSource.py','drivers/EldenWifi/ControlTrace.inc','drivers/EldenWifi/ControlTraceApi.h']:sources[name]=sha(ROOT/name)
+    if a.service_scan:
+        for name in ['drivers/EldenWifi/ServiceScanSource.py','drivers/EldenWifi/ControlScan.inc']:sources[name]=sha(ROOT/name)
     for name,h in sources.items():assert sha(ROOT/name)==h,name
     result={'compiled':True,'object_sha256':sha(obj),'base_object_sha256':prior['object_sha256'],'command':command,
         'changed_bindings':bindings,'source_inputs':sources,'generated_sources':{n:hashlib.sha256(b).hexdigest() for n,b in new.items()},
         'private_assets':private_report,'inherited_sources':inherited,'scalar':True,'warnings':r.stderr.count(b'warning:'),
         'platform_physical_fence_preserved':True,'factory_mac_input':True,'service_admission':True,
-        'control_trace':a.control_trace,'full_kernel_linked':False,'hardware_tested':False}
+        'service_scan':a.service_scan,'control_trace':a.control_trace,'full_kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','object_sha256','warnings']}))
 if __name__=='__main__':main()

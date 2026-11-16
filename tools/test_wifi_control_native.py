@@ -8,7 +8,8 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['runtime-build','component-repository','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--service-control-trace',action='store_true')
-    a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);module=a.runtime_build/'component'
+    p.add_argument('--service-scan',action='store_true')
+    a=p.parse_args();a.service_control_trace|=a.service_scan;out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);module=a.runtime_build/'component'
     def run(cmd,name):
         r=subprocess.run(cmd,capture_output=True,timeout=90);(out/(name+'.log')).write_bytes(r.stdout+r.stderr);r.check_returncode();return r.stdout.decode()
     names=['src/nw_control.c','src/nw_control_wire.c','shim/src/lx_rt.c','include/nw_control.h','include/nw_control_endpoint.h','tests/control_endpoint_test.c']
@@ -64,13 +65,45 @@ unsigned fixture_requests(void){return dispatched;}
     if a.service_control_trace:
         spec=importlib.util.spec_from_file_location('service_trace',ROOT/'drivers/EldenWifi/ServiceControlTraceSource.py')
         tr=importlib.util.module_from_spec(spec);spec.loader.exec_module(tr)
-        (out/'ControlNative.inc').write_bytes(tr.generated()['ControlNative.inc'])
+        if a.service_scan:
+            spec=importlib.util.spec_from_file_location('service_scan',ROOT/'drivers/EldenWifi/ServiceScanSource.py')
+            tr=importlib.util.module_from_spec(spec);spec.loader.exec_module(tr)
+        generated=tr.generated();(out/'ControlNative.inc').write_bytes(generated['ControlNative.inc'])
         text=fixture_source.read_text();fixture_source=out/'TestControl.cpp'
         text=text.replace('#include "ControlNative.inc"','#include <cstdarg>\nstatic void log(const char *fmt,...){va_list args;va_start(args,fmt);vprintf(fmt,args);va_end(args);}\n#include "ControlNative.inc"')
         text=text.replace('puts("PASS native socket callbacks', '''unsigned char secret[64]={0};memcpy(secret,"NWC1",4);secret[4]=1;secret[6]=1;secret[8]=1;secret[16]=64;
     memcpy(secret+40,"SHOULD_NOT_LOG",14);wifi_trace_meta("privacy",7,0,secret,sizeof(secret));
     for(unsigned i=0;i<150;i++)wifi_trace_meta("bounded",7,0,nullptr,0);
     puts("PASS native socket callbacks''')
+        if a.service_scan:
+            runtime=generated['MhiRuntime.inc'].decode();start=runtime.index('        uint64_t current_session=wifi_service_info_session();');end=runtime.index('        if(t>=report_at)',start)
+            block=runtime[start:end]
+            helper='''static uint64_t scan_session,scan_at;static bool scan;static unsigned scan_attempts,scan_calls;
+static struct {unsigned stage;} nw_wifi_stats={4};
+static int nw_wifi_scan(const uint8_t *,size_t){scan_calls++;return 0;}
+static void scan_tick(uint64_t t){
+'''+block+'''}
+static void delivered(uint64_t session){unsigned char reply[128]={};size_t n=fixture_packet(reply,sizeof(reply),session);reply[6]=2;
+    wifi_note_info_delivery(ENOBUFS,session,reply,n);assert(!wifi_service_info_session());
+    reply[20]=3;wifi_note_info_delivery(0,session,reply,n);assert(!wifi_service_info_session());reply[20]=0;
+    reply[4]=2;wifi_note_info_delivery(0,session,reply,n);assert(!wifi_service_info_session());reply[4]=1;
+    wifi_note_info_delivery(0,session+1,reply,n);assert(!wifi_service_info_session());
+    wifi_note_info_delivery(0,session,reply,n);assert(wifi_service_info_session()==session);
+}
+'''
+            text=text.replace('int main(int argc,char **argv){',helper+'int main(int argc,char **argv){')
+            text=text.replace('enqueue_error=ENOBUFS;assert(!registered.ctl_send', 'assert(!wifi_service_info_session());scan_tick(0);assert(!scan_calls);\n    enqueue_error=ENOBUFS;assert(!registered.ctl_send',1)
+            text=text.replace('assert(fixture_requests()==1&&queues==1);','assert(fixture_requests()==1&&queues==1);assert(!wifi_service_info_session());',1)
+            text=text.replace('fixture_pump();assert(queues==2);','fixture_pump();assert(queues==2);assert(wifi_service_info_session()==session);scan_tick(0);scan_tick(1);assert(scan_calls==1);',1)
+            text=text.replace('client=nullptr;fixture_pump();assert(!allocations);','client=nullptr;fixture_pump();assert(!allocations);assert(!wifi_service_info_session());scan_tick(2);assert(scan_calls==1);',1)
+            text=text.replace('control_stop_begin();assert(!wifi_control_open());assert(registered.ctl_send',
+                '''assert(!wifi_service_info_session());scan_tick(3);assert(scan_calls==1);
+    unsigned char old_reply[128]={};size_t old_n=fixture_packet(old_reply,sizeof(old_reply),session);old_reply[6]=2;
+    wifi_note_info_delivery(0,session,old_reply,old_n);assert(!wifi_service_info_session());
+    delivered(next);scan_tick(4);scan_tick(5);assert(scan_calls==2);
+    scan_attempts=3;scan=false;scan_tick(6);assert(scan_calls==2);
+    control_stop_begin();assert(!wifi_service_info_session());scan_tick(7);assert(scan_calls==2);
+    assert(!wifi_control_open());assert(registered.ctl_send''',1)
         fixture_source.write_text(text)
     run(['clang++','-std=c++17',*flags,'-I'+str(ROOT/'drivers/EldenWifi'),str(fixture_source),str(out/'Fixture.o'),*map(str,objects),'-o',str(out/'native')],'native-build')
     for i in range(7):run([str(out/'native'),str(i)],'native-'+str(i))
@@ -82,6 +115,7 @@ unsigned fixture_requests(void){return dispatched;}
     code=generated['MhiRuntime.inc'].decode();assert code.index('nw_wifi_set_platform(')<code.index('rc=control_start();')<code.index('if(!rc)rc=nw_wifi_start(')
     files=[ROOT/'drivers/EldenPcie'/n for n in ['ControlNative.inc','ControlNativeSource.py','TestControl.cpp']]+[ROOT/'drivers/EldenWifi/ControlApi.h',Path(__file__)]
     if a.service_control_trace:files+=[ROOT/'drivers/EldenWifi'/n for n in ['ServiceNativeSource.py','ServiceControlTraceSource.py','ControlTrace.inc','ControlTraceApi.h']]
-    result={'passed':True,'scenarios':7,'service_control_trace':a.service_control_trace,'trace_payload_redaction_checked':a.service_control_trace,'sanitizers':['address','undefined'],'upstream_output':official,'upstream_sha256':upstream,'source_inputs':{str(f.relative_to(ROOT)):sha(f) for f in files},'kernel_socket_services_modeled':True,'actual_control_queue':True,'abi_checked':True,'hardware_tested':False}
+    if a.service_scan:files+=[ROOT/'drivers/EldenWifi'/n for n in ['ServiceScanSource.py','ControlScan.inc']]
+    result={'passed':True,'scenarios':7,'service_scan':a.service_scan,'actual_scan_block_tested':a.service_scan,'service_control_trace':a.service_control_trace,'trace_payload_redaction_checked':a.service_control_trace,'sanitizers':['address','undefined'],'upstream_output':official,'upstream_sha256':upstream,'source_inputs':{str(f.relative_to(ROOT)):sha(f) for f in files},'kernel_socket_services_modeled':True,'actual_control_queue':True,'abi_checked':True,'hardware_tested':False}
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))
 if __name__=='__main__':main()
