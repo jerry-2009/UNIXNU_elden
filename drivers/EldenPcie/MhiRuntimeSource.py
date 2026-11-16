@@ -19,7 +19,7 @@ def generated():
     text=files['NativeRuntime.inc'].decode()
     marker='    unsigned transport_stage=0,transport_wake=0,transport_gate=0;int transport_result=-11;'
     extra='''
-    void *runtime_consumer=nullptr;
+    void *runtime_consumer=nullptr;thread_t runtime_thread=nullptr;uint64_t runtime_cleanup_deadline=0;
     bool runtime_prepared=false,runtime_entered=false,runtime_returned=false,runtime_stack_started=false,runtime_quiesced=false;
     unsigned runtime_stage=0,runtime_irq_seen=0,runtime_log_cursor=0,runtime_log_repeats=0;
     int runtime_error=0,runtime_start_error=0,runtime_stop_error=0,runtime_bss=0;
@@ -58,7 +58,7 @@ def generated():
     text=replace(text,'extern "C" void elden_pcie_native_stop_begin(void){__atomic_store_n(&stop_requested,1u,__ATOMIC_RELEASE);}',
         '''extern "C" void elden_pcie_native_stop_begin(void){
     __atomic_store_n(&stop_requested,1u,__ATOMIC_RELEASE);
-    elden_wifi_firmware_stop_begin();elden_wifi_dma_stop_begin();
+    elden_wifi_firmware_stop_begin();elden_wifi_dma_close_admission();
 }''')
     files['NativeExports.inc']=(text+'\n#include "MhiRuntimeExports.inc"\n').encode()
     return files

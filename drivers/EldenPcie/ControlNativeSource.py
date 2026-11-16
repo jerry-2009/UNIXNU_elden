@@ -17,5 +17,5 @@ def generated():
         'rc=control_start();log("\\nELDEN_WIFI_CONTROL start=%d\\n",rc);\n    if(!rc)rc=nw_wifi_start(&c->runtime_platform,&c->runtime_board);')
     files['MhiRuntime.inc']=text.encode()
     text=files['NativeExports.inc'].decode()
-    text=replace(text,'    elden_wifi_firmware_stop_begin();elden_wifi_dma_stop_begin();','    control_stop_begin();elden_wifi_firmware_stop_begin();elden_wifi_dma_stop_begin();')
+    text=replace(text,'    elden_wifi_firmware_stop_begin();elden_wifi_dma_close_admission();','    control_stop_begin();elden_wifi_firmware_stop_begin();elden_wifi_dma_close_admission();')
     files['NativeExports.inc']=text.encode();return files

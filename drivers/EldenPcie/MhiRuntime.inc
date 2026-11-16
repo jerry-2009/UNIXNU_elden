@@ -80,9 +80,19 @@ static int runtime_quiesced(Context *c){
 }
 static int runtime_finish(Context *c){
     c->runtime_stage=4;c->transport_cleanup=true;c->transport_ready=false;
-    elden_wifi_firmware_stop_begin();elden_wifi_dma_stop_begin();
+    elden_wifi_firmware_stop_begin();elden_wifi_dma_close_admission();
     /* nw_wifi_start() already calls its stop path when it returns an error. */
-    if(c->runtime_stack_started)nw_wifi_stop();
+    if(c->runtime_stack_started){
+        /* No new clients/traffic. Only this original worker may use retained
+         * DMA for Linux's QMI/HTC/MHI shutdown. The WLAN provider keeps the
+         * hardware on until this worker and its quiesce callback finish. */
+        c->runtime_cleanup_deadline=now(nullptr)+5000000;
+        int permission=elden_wifi_dma_cleanup_begin(c,c->wlan_epoch);
+        log("\nELDEN_WIFI_RUNTIME cleanup=%d budget-us=5000000\n",permission);
+        if(permission){c->runtime_stop_error=permission;return permission;}
+        nw_wifi_stop();
+    }
+    elden_wifi_dma_stop_begin();c->runtime_cleanup_deadline=0;
     c->runtime_returned=true;
     EldenMhiStopIo io={c,&c->config,runtime_stop_admit,runtime_bar_read,runtime_bar_write,now,delay};
     int rc=elden_mhi_stop(&c->mhi_stop,&io,now(nullptr)+3000000);
@@ -104,7 +114,7 @@ static void runtime_run(Context *c){
         log("\nELDEN_WIFI_RUNTIME firmware=%s rc=%d bytes=%llu\n",files[i],rc,(unsigned long long)bytes);
     }
     if(rc){c->runtime_error=rc;return;}
-    runtime_context=c;c->runtime_prepared=true;
+    runtime_context=c;c->runtime_thread=current_thread();c->runtime_prepared=true;
     c->runtime_platform={runtime_ms,runtime_sleep,runtime_poll,runtime_log,runtime_halt,runtime_alloc,runtime_free,
         elden_wifi_dma_alloc,elden_wifi_dma_free,elden_wifi_dma_map,elden_wifi_dma_sync,elden_wifi_firmware_get,
         runtime_ns,runtime_ns,runtime_busy,runtime_preempt_off,runtime_preempt_on};

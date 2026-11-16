@@ -13,6 +13,13 @@ static unsigned checks,cases,alloc_calls,fail_alloc,barriers,power_calls,drop_po
 static std::atomic<bool> smmu_ready{true},power_ready{true};
 static thread_local bool in_irq;
 static int owner_token,other_token;
+static bool cleanup_allowed;
+static thread_local int thread_token;
+static void *cleanup_thread;
+static uint64_t cleanup_clock,cleanup_deadline;
+extern "C" int elden_pcie_dma_cleanup_admit(const void *p,uint64_t epoch){
+    return cleanup_allowed&&p==&owner_token&&epoch==7&&cleanup_thread==&thread_token&&cleanup_clock<cleanup_deadline?0:-19;
+}
 static std::vector<void *> allocations;
 using IOLock=std::mutex;
 static std::vector<IOLock *> locks;
@@ -39,7 +46,8 @@ static void host_order(){++barriers;}
 static void reset(){
     for(auto p:locks)delete p;locks.clear();
     for(auto p:allocations)free(p);allocations.clear();
-    dma_owner=nullptr;dma_run=dma_stopping=dma_calls=0;dma_first_error=0;
+    dma_owner=nullptr;dma_run=dma_stopping=dma_calls=dma_closed=0;dma_first_error=0;
+    cleanup_allowed=false;cleanup_thread=&thread_token;cleanup_clock=1;cleanup_deadline=5000001;
     alloc_calls=fail_alloc=barriers=power_calls=drop_power_at=0;in_irq=false;smmu_ready=true;power_ready=true;
     ++cases;
 }
@@ -91,6 +99,25 @@ int main(){
     EldenWifiDmaStatus pending={};CHECK(elden_wifi_dma_status(&pending)==-11);
     elden_wifi_dma_stop_begin();CHECK(__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE)==1);
     release=true;blocker.join();waiter.join();CHECK(!p&&bus==0&&status().calls==0&&status().live==0);
+    reset();bind();elden_wifi_dma_close_admission();power_ready=false;
+    CHECK(!elden_wifi_dma_alloc(64,&bus)&&!bus);
+    CHECK(elden_wifi_dma_cleanup_begin(&owner_token,7)==-19);
+    cleanup_allowed=true;
+    CHECK(elden_wifi_dma_cleanup_begin(&other_token,7)==-19);
+    CHECK(elden_wifi_dma_cleanup_begin(&owner_token,8)==-19);
+    CHECK(!elden_wifi_dma_cleanup_begin(&owner_token,7));
+    CHECK(elden_wifi_dma_cleanup_begin(&owner_token,7)==-16); // no renewal
+    p=elden_wifi_dma_alloc(64,&bus);CHECK(p&&bus);CHECK(elden_wifi_dma_map(p,64,1)==bus);
+    bool other_rejected=false;
+    std::thread other([&]{uint64_t b=1;other_rejected=!elden_wifi_dma_alloc(64,&b)&&!b&&elden_wifi_dma_map(p,64,1)==0;});
+    other.join();CHECK(other_rejected);CHECK(elden_wifi_dma_map(p,64,1)==bus);
+    cleanup_clock=cleanup_deadline;CHECK(!elden_wifi_dma_map(p,64,1));
+    elden_wifi_dma_free(0,p,0);CHECK(status().live==0);
+    reset();bind();cleanup_allowed=true;CHECK(!elden_wifi_dma_cleanup_begin(&owner_token,7));
+    elden_wifi_dma_stop_begin();CHECK(!elden_wifi_dma_alloc(64,&bus));
+    CHECK(elden_wifi_dma_cleanup_begin(&owner_token,7)==-16);
+    reset();bind();cleanup_allowed=true;CHECK(!elden_wifi_dma_cleanup_begin(&owner_token,7));
+    smmu_ready=false;CHECK(!elden_wifi_dma_alloc(64,&bus));CHECK(status().stopping);
     unsigned completed=cases;reset();free(memory.cpu);
     printf("%u actual native callback scenarios / %u checks passed; IOKit, power, SMMU and barriers modeled\n",completed,checks);
 }

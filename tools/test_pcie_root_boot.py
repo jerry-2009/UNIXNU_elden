@@ -78,5 +78,10 @@ def main():
     try:menu(dict(qdss,firmware_qdss_config=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified QDSS config accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':16}))
+    drain=dict(qdss,profile='wifi-drain-lifetime',runtime_owned_cleanup=True)
+    assert tomllib.loads(bt_runtime_boot.menu(drain))['entry'][0]['args']==mhi_menu['entry'][0]['args']
+    try:menu(dict(drain,runtime_owned_cleanup=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified cleanup accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':17}))
 if __name__=='__main__':main()

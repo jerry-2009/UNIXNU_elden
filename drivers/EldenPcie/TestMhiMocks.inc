@@ -4,6 +4,7 @@ static void *IOMalloc(size_t n){return malloc(n);}
 static void IOFree(void *p,size_t){free(p);}
 static void IODelay(unsigned us){clock_us+=us;}
 static unsigned fw_loaded,fw_stops,step_calls,scan_calls,stop_calls,irq_bits,preempt_depth;
+static unsigned shutdown_dma_calls;static int shutdown_dma_error;
 static int fw_error,start_error;static bool hang_reset,bad_bar,hold_transactions;
 static uint64_t reset_due;static uint32_t mhi_bar[1024];
 static int fake_device;
@@ -17,10 +18,6 @@ int elden_wifi_firmware_get(const char *,const uint8_t **data,size_t *bytes){
     static const uint8_t payload[16]={};if(fw_error)return fw_error;fw_loaded++;*data=payload;*bytes=sizeof(payload);return 0;
 }
 int elden_wifi_firmware_status(EldenWifiFirmwareStatus *s){*s={};s->version=1;s->run=2;s->loaded=fw_loaded;s->epoch=7;s->stopping=fw_stops;return 0;}
-void *elden_wifi_dma_alloc(size_t n,uint64_t *bus){static uint8_t payload[4096];if(dma_stops||n>sizeof(payload))return nullptr;*bus=0x10001000;return payload;}
-void elden_wifi_dma_free(size_t,void *,uint64_t){}
-uint64_t elden_wifi_dma_map(void *,size_t,int){return dma_stops?0:0x10001000;}
-void elden_wifi_dma_sync(uint64_t,size_t,int){}
 struct nw_wifi_stats nw_wifi_stats;
 void nw_wifi_set_platform(const lx_platform *p){platform_api=p;}
 void nw_wifi_irq_mode(int){}
@@ -31,6 +28,22 @@ int nw_wifi_scan(const uint8_t *,size_t){scan_calls++;return 0;}
 int nw_wifi_bss_count(void){return 3;}
 void nw_wifi_stop(void){
     stop_calls++;
+    if(active->runtime_stack_started){
+#ifndef ELDEN_EXPECT_OLD_STOP
+        CHECK(!elden_pcie_dma_cleanup_admit(active,active->wlan_epoch));
+        CHECK(elden_pcie_dma_cleanup_admit(&fake_device,active->wlan_epoch)==-19);
+        CHECK(elden_pcie_dma_cleanup_admit(active,active->wlan_epoch+1)==-19);
+        active->msi.irq_error=-5;CHECK(elden_pcie_dma_cleanup_admit(active,active->wlan_epoch)==-5);active->msi.irq_error=0;
+        bool wrong_thread=false;std::thread foreign([&]{wrong_thread=elden_pcie_dma_cleanup_admit(active,active->wlan_epoch)==-19;});
+        foreign.join();CHECK(wrong_thread);
+        uint64_t deadline=active->runtime_cleanup_deadline;active->runtime_cleanup_deadline=clock_us;
+        CHECK(elden_pcie_dma_cleanup_admit(active,active->wlan_epoch)==-19);active->runtime_cleanup_deadline=deadline;
+#endif
+        uint64_t bus=0;void *packet=platform_api->dma_alloc(256,&bus);
+        if(!packet){shutdown_dma_error=-12;return;}
+        CHECK(platform_api->dma_map(packet,256,1)==bus);platform_api->dma_sync(bus,256,1);
+        platform_api->dma_free(256,packet,bus);shutdown_dma_calls++;
+    }
     if(active->runtime_consumer){
         CHECK(!board_api->cfg_write(0x80,4,cfg[0x80/4]&~(1u<<16)));
         CHECK(!elden_wifi_runtime_unbind(&fake_device));
@@ -50,7 +63,9 @@ int nw_wifi_start(const lx_platform *p,const nw_board *b){
     dbi[EldenMsiStatus/4]=3;in_irq=true;irq_handler(irq_cookie);in_irq=false;
     nw_wifi_stats.stage=4;return 0;
 }
-int nw_wifi_step(void){platform_api->poll();if(++step_calls==2)stop_requested=1;return 0;}
+/* powered models public WLAN admission here; the register model remains on
+ * until successful native quiescence, just as WlanPower's callback contract. */
+int nw_wifi_step(void){platform_api->poll();if(++step_calls==2){stop_requested=1;powered=false;elden_wifi_dma_close_admission();}return 0;}
 }
 static void _disable_preemption(){preempt_depth++;}
 static void _enable_preemption(){CHECK(preempt_depth);preempt_depth--;}

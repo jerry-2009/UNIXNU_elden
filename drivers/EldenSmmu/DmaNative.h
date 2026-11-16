@@ -17,7 +17,13 @@ void elden_wifi_dma_free(size_t bytes,void *cpu,uint64_t bus);
 uint64_t elden_wifi_dma_map(void *cpu,size_t bytes,int direction);
 void elden_wifi_dma_sync(uint64_t bus,size_t bytes,int direction);
 int elden_wifi_dma_msi_sink(uint64_t *bus);
-/* Nonblocking admission withdrawal, callable before the worker drains. */
+/* Close new traffic while preserving a bounded cleanup window for the original
+ * PCIe worker. The native worker authorizes its retained owner/epoch/thread and
+ * deadline. This API never reopens a stopped or faulted arena. */
+void elden_wifi_dma_close_admission(void);
+int elden_wifi_dma_cleanup_begin(const void *provider,uint64_t epoch);
+int elden_pcie_dma_cleanup_admit(const void *provider,uint64_t epoch);
+/* Final/fault withdrawal: no allocation or mapping, including cleanup. */
 void elden_wifi_dma_stop_begin(void);
 int elden_wifi_dma_status(EldenWifiDmaStatus *);
 #ifdef __cplusplus

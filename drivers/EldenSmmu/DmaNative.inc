@@ -10,17 +10,19 @@ struct DmaOwner {
     IOLock *lock=nullptr;
     EldenWifiDmaBlock *blocks=nullptr;
     EldenWifiDmaArena arena={};
+    bool cleanup=false;
 };
 static DmaOwner *dma_owner;
-static unsigned dma_run,dma_stopping,dma_calls;
+static unsigned dma_run,dma_stopping,dma_calls,dma_closed;
 static int dma_first_error;
 static void dma_error(int rc){
     int expected=0;if(rc)__atomic_compare_exchange_n(&dma_first_error,&expected,rc,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE);
     __atomic_store_n(&dma_stopping,1u,__ATOMIC_RELEASE);
 }
 static bool dma_accepts(const DmaOwner *d){
-    return d&&!__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE)&&elden_wifi_smmu_ready()&&
-        elden_wlan_power_ready(d->arena.owner,d->arena.epoch)==0;
+    if(!d||__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE)||!elden_wifi_smmu_ready())return false;
+    if(d->cleanup)return elden_pcie_dma_cleanup_admit(d->arena.owner,d->arena.epoch)==0;
+    return !__atomic_load_n(&dma_closed,__ATOMIC_ACQUIRE)&&elden_wlan_power_ready(d->arena.owner,d->arena.epoch)==0;
 }
 static void dma_order(){__asm__ volatile("dsb sy":::"memory");}
 class DmaCall final {
@@ -43,7 +45,7 @@ public:
 }
 extern "C" int elden_wifi_dma_bind(const void *provider,uint64_t epoch){
     if(!provider||!epoch||ml_at_interrupt_context())return -22;
-    if(__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE)||!elden_wifi_smmu_ready()||elden_wlan_power_ready(provider,epoch))return -19;
+    if(__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE)||__atomic_load_n(&dma_closed,__ATOMIC_ACQUIRE)||!elden_wifi_smmu_ready()||elden_wlan_power_ready(provider,epoch))return -19;
     unsigned expected=0;if(!__atomic_compare_exchange_n(&dma_run,&expected,1u,false,__ATOMIC_ACQ_REL,__ATOMIC_ACQUIRE))return -16;
     Context *c=__atomic_load_n(&active,__ATOMIC_ACQUIRE);DmaOwner *d=new DmaOwner;int rc=-12;
     if(d){
@@ -93,15 +95,23 @@ extern "C" int elden_wifi_dma_msi_sink(uint64_t *bus){
     if(!dma_accepts(call.d))return -19;*bus=call.d->arena.iova;return 0;
 }
 extern "C" void elden_wifi_dma_stop_begin(void){__atomic_store_n(&dma_stopping,1u,__ATOMIC_RELEASE);}
+extern "C" void elden_wifi_dma_close_admission(void){__atomic_store_n(&dma_closed,1u,__ATOMIC_RELEASE);}
+extern "C" int elden_wifi_dma_cleanup_begin(const void *provider,uint64_t epoch){
+    DmaCall call;DmaOwner *d=call.d;
+    if(!d||!provider||provider!=d->arena.owner||!epoch||epoch!=d->arena.epoch)return -19;
+    if(d->cleanup||__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE)||__atomic_load_n(&dma_first_error,__ATOMIC_ACQUIRE)||!elden_wifi_smmu_ready())return -16;
+    int rc=elden_pcie_dma_cleanup_admit(provider,epoch);if(rc)return rc;
+    __atomic_store_n(&dma_closed,1u,__ATOMIC_RELEASE);d->cleanup=true;return 0;
+}
 extern "C" int elden_wifi_dma_status(EldenWifiDmaStatus *out){
     if(!out||ml_at_interrupt_context())return -22;
     unsigned state=__atomic_load_n(&dma_run,__ATOMIC_ACQUIRE);if(state==1)return -11;
     /* A binder can publish dma_owner after this load of state 0. Do not
      * inspect that pointer until the terminal state has acquired its fields. */
-    if(state==0){EldenWifiDmaStatus empty={};empty.version=1;empty.stopping=__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE);*out=empty;return 0;}
+    if(state==0){EldenWifiDmaStatus empty={};empty.version=1;empty.stopping=__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE)||__atomic_load_n(&dma_closed,__ATOMIC_ACQUIRE);*out=empty;return 0;}
     DmaOwner *d=__atomic_load_n(&dma_owner,__ATOMIC_ACQUIRE);
     if(d&&d->lock&&!IOLockTryLock(d->lock))return -11;
-    EldenWifiDmaStatus s={};s.version=1;s.run=state;s.stopping=__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE);
+    EldenWifiDmaStatus s={};s.version=1;s.run=state;s.stopping=__atomic_load_n(&dma_stopping,__ATOMIC_ACQUIRE)||__atomic_load_n(&dma_closed,__ATOMIC_ACQUIRE);
     s.calls=__atomic_load_n(&dma_calls,__ATOMIC_ACQUIRE);s.first_error=__atomic_load_n(&dma_first_error,__ATOMIC_ACQUIRE);
     if(d){s.blocks=d->arena.count;s.live=d->arena.live;s.used=d->arena.used;s.peak=d->arena.peak;
         s.epoch=d->arena.epoch;s.allocation_failures=d->arena.allocation_failures;if(d->lock)IOLockUnlock(d->lock);}

@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest v16820261116 signed: separate normal DMA admission closure from final/fault stop; only retained
+original worker/provider/epoch gets <=5s cleanup, with real root/BAR/PERST and SMMU/MSI checks. Public
+WLAN lease stays withdrawn, physical power retained by original quiesce contract. No timer/power extension.
+Actual DMA adapter/arena16scenarios127checks, composed6scenarios135checks ASan/UBSan pass; old480960b4
+runtime reproduces DMA refusal. Linux protocol/XNU services modeled; not exact live -12 site proof.
+Native59b373ef/SMMU7339a041/kernel087306d0, WCN86cd7057 unchanged;178source pins/Apple30/entry7124/23calls pass.
+Worker1shadow/SMMU1existing signedness warning retained. Final Mac source3/dma-host2/mhi-host3/wcn1/smmu2/native2/kernel2,
+boot package1. Image29a91935/sessionde78ea6f9db8e66d/floor1738713600/0/3 signed/audited, NOT hardware-tested yet.
+Next one stage4 shutdown trial must prove protocol stop/master-off/IRQ/PERST and full stock restore.
+Device last restored Android afterv167; full Goal/charging incomplete. GPU/QRTR/AnyRouter unchanged.
+
 Latest v16720261116 hardware: QDSS fixed; FW_INIT_DONE and Linux stage4/error0 reached, IRQ80/vectors7f.
 scan0 is a queued UI request only: BSS0, native supplicant not installed, no actual scan/network acceptance.
 Shutdown regresses after full ready: QMI mode-off -12, WCN stop0/9s bounded expiry; typed platform reset,

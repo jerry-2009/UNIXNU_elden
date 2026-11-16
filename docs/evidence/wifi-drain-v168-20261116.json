@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-16",
+  "profile": "wifi-drain-lifetime",
+  "stage": "signed-unflashed",
+  "kernel_sha256": "087306d055f4483cb32173ad032cb8bd4bb107b90536a1d9acf9ea691bb113b6",
+  "native_sha256": "3672430e25797252463a626ea6da8d34267681a2ababd8ee24fc8b49bccaa2a1",
+  "native_worker_sha256": "59b373efe04f6723b9bafd797024be2b9f3fda2a1af6224be1da20c554a3313e",
+  "binding_sha256": "f351acfdaf2afe96bf55a2fbba3894a3d55f05fdb6e54b7a44fb9a6941f745f9",
+  "smmu_binding_sha256": "7339a041be80071fa1af294d94296b8eec186fa8cee8ff2462315c5017e61d9b",
+  "wcn_sha256": "86cd7057eab3842f83ffcc21a5698354ec654ed7b97b42d6207689d5f62c5cdf",
+  "host_dma": "16 actual native callback scenarios / 127 checks passed; IOKit, power, SMMU and barriers modeled",
+  "host_composed": "6 native MHI runtime scenarios / 135 checks passed; actual DMA arena/adapter/QMI binding/config/MSI/reset, Linux protocol and hardware modeled",
+  "original_reproduction": "PASS original shutdown reproduces DMA refusal after public power withdrawal",
+  "model_scope": "Actual DMA/QMI-binding/config/MSI/reset; Linux shutdown request and XNU/physical services modeled",
+  "native_warnings": 1,
+  "smmu_warnings": {
+    "Native": 1,
+    "Domain": 0
+  },
+  "source_inputs": 178,
+  "original_apple_regions": 30,
+  "direct_calls": 23,
+  "original_runtime_sha256": "480960b4e5e954151dcc6481fbd938a0e594de414df0e7d97c8535df38daf8cb",
+  "cleanup_budget_us": 5000000,
+  "hardware_tested": false,
+  "image_sha256": "29a919357feceb6d3d5fbd1c42e077e6a4119f1be29ed211f4cb2a2c5dfaf40f",
+  "session": "de78ea6f9db8e66d",
+  "rollback": 1738713600,
+  "footer": 0,
+  "parent_location": 3,
+  "audit_sha256": "ee5d41c6ad75a57858e853617773c52dfc551658a8a93ff33f5acac9f7f44a1b"
+}

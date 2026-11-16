@@ -103,7 +103,7 @@ def main():
     expected_defs={'_elden_pcie_native_start','_elden_pcie_native_stop_begin','_elden_pcie_native_status','_sm8750_gcc_vote_owner'}
     if a.endpoint_build:expected_defs.add('_elden_pcie_endpoint_status')
     if transport:expected_defs.add('_elden_pcie_transport_status')
-    if mhi:expected_defs|={'_elden_wifi_runtime_bind','_elden_wifi_runtime_unbind','_elden_wifi_runtime_enable_master'}
+    if mhi:expected_defs|={'_elden_wifi_runtime_bind','_elden_wifi_runtime_unbind','_elden_wifi_runtime_enable_master','_elden_pcie_dma_cleanup_admit'}
     assert defs(obj)==expected_defs
     assert not any(n.endswith('/__mod_init_func') for n in sections(obj))
     asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',str(obj)],text=True);(out/'Native.asm').write_text(asm,encoding='utf-8')
@@ -123,6 +123,7 @@ def main():
         objects.append(a.endpoint_build/'Endpoint.o');expected.append(endpoint['object_sha256'])
     if a.smmu_build:
         smmu=read(a.smmu_build/'result.json')
+        if mhi:assert smmu.get('cleanup_worker_required') is True
         for name,h in smmu['source_inputs'].items():assert sha(ROOT/name)==h,name
         objects.append(a.smmu_build/'SmmuNativeBinding.o');expected.append(smmu['binding_sha256'])
     extra_sources={}
@@ -154,7 +155,7 @@ def main():
     if a.smmu_build:required|={'_elden_wifi_smmu_ready','_elden_wifi_smmu_status','_elden_wifi_smmu_stop_begin'}
     if transport:required|={'_elden_pcie_transport_status','_elden_wifi_dma_bind','_elden_wifi_dma_msi_sink','_elden_wifi_dma_stop_begin','_elden_pcie_cfg_open','_elden_pcie_msi_prepare','_elden_pcie_msi_arm','_elden_pcie_msi_stop'}
     if a.firmware_cache_build:required|={'_elden_wifi_firmware_bind','_elden_wifi_firmware_get','_elden_wifi_firmware_stop_begin'}
-    if mhi:required|={'_nw_wifi_start','_nw_wifi_stop','_nw_wifi_step','_elden_mhi_stop','_elden_wlan_qmi_bind','_elden_wlan_qmi_unbind','_pwrseq_qcom_wcn_set_ol_cpr','_elden_wifi_runtime_enable_master'}
+    if mhi:required|={'_nw_wifi_start','_nw_wifi_stop','_nw_wifi_step','_elden_mhi_stop','_elden_wlan_qmi_bind','_elden_wlan_qmi_unbind','_pwrseq_qcom_wcn_set_ol_cpr','_elden_wifi_runtime_enable_master','_elden_pcie_dma_cleanup_admit','_elden_wifi_dma_cleanup_begin','_elden_wifi_dma_close_admission'}
     if a.control_transport:required|={'_nw_wifi_control_transport_set','_nw_wifi_control_attach','_nw_wifi_control_detach','_nw_wifi_control_receive','_nw_wifi_control_writable'}
     assert required<=union and not required&pending
     target=out/'PcieNativeBinding.o';link=['xcrun','ld','-r','-arch','arm64','-platform_version','ios','17.0','17.0','-o',str(target),*map(str,objects)]
@@ -178,6 +179,7 @@ def main():
             'runtime_init_trace':bool(mhi and runtime.get('init_trace')),
             'control_transport_bound':a.control_transport,'socket_sdk_inputs':socket_inputs,
             'firmware_qdss_config':bool(a.firmware_cache_build and firmware.get('qdss_config_available')),
+            'runtime_owned_cleanup':mhi,
             'kernel_linked':False,'boot_created':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['compiled','object_sha256','binding_sha256','warnings','kernel_linked']}))
 if __name__=='__main__':main()
