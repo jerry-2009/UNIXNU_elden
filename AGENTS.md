@@ -1,5 +1,18 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17020261116 hardware: MODE_OFF init38/send0/52B queued, but no MHI UL/DL or QMI RX completion.
+Soft used/enabled1fc0ff/disabled0/pending0, HW pending0/enableffffffff/mask0/count80/error0, MHI201.
+Do not infer descriptor consumption or firmware/clock root cause. Trace-only caveat: qmi_txn_init returns
+allocated ID38, so ret?0:txn.id wrongly shows snapshottxn0; actual send/waittxn38 is authoritative. Fix before
+future trace reuse; historical candidate pins stay frozen. No native shutdown/drain completion; typed fallback,
+physical fastboot/full stock8b8e72da/Android/root/green/original charge+radio+scan settings/sleep restored, all jobs terminal.
+Next use actual registered PCI shutdown callback for PLATFORM reset, matching Linux pci_device_shutdown;
+current remove path sends MODE_OFF and is for unload. Preserve remove for errors/unload, retain objects until reset,
+require real unbind and native reset/master/transactions/IRQ/PERST proof. See docs/WIFI-PLATFORM-SHUTDOWN.md.
+Image0b2608e5/sessiondda874c589629554/floor1738713600/0/3. Raw266413B/69d5d52f/dropmax0/no reconnect;
+no post-disconnect counter. Mac source2/runtime1/native2/kernel1/package1; docs/evidence/wifi-qmi-v170-20261116.json.
+Full Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v17020261116 signed: MODE_OFF init/send/wait + bounded IPCR UL/DL/QMI-header/completion metadata,
 logical IRQ masks and retained MSI status/enable/mask/MHI status reads. No payload logging, no IRQ writes,
 no timeout changes.4Cunits rebuilt;116original+5prior units retained. Warnings152/14/26/32; native1oldshadow.

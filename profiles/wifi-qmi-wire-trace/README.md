@@ -36,4 +36,16 @@ No hardware result or new networking acceptance is claimed at this component sta
 
 Signed candidate `0b2608e540e9814f00515e3f30bdda0b514a978faf823f8c9794b065fab4cb11`, session `dda874c589629554`.
 All186 source inputs match Git index; entry/asset/FAT/AVB checks pass
-(1738713600/0/3). Hardware diagnostic not yet run.
+(1738713600/0/3). Hardware queues MODE_OFF (send0/txn38/52B) but observes no UL completion,
+DL callback or QMI RX. Software and native IRQs remain enabled; hardware pending0,
+count80/error0 and MHI201. No native drain completion. Typed fallback and full
+stock Android/root/green/settings restore pass. Capture266413B/SHA69d5d52f,
+maximum reported drop0/no reconnect; no final post-disconnect counter.
+
+Observation correction: qmi_txn_init returns its nonnegative allocated ID38.
+The trace ternary incorrectly renders snapshot txn0 when ret>0; send/wait lines
+identify38. This does not fabricate the absent UL/DL callbacks. Correct before
+reuse; do not rewrite the tested v170 pins.
+
+Next [platform shutdown integration](../../docs/WIFI-PLATFORM-SHUTDOWN.md) uses
+the actual upstream shutdown callback with independent native drain checks.

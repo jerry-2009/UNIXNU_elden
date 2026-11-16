@@ -1,5 +1,10 @@
 # Elden 基本可用实施计划
 
+v170确认MODE_OFF入队成功，但未见MHI发送完成/接收应答，中断仍使能。下一步对接Linux平台
+重启专用的PCI `shutdown` 回调，保留真实MHI复位、bus-master关闭、事务/IRQ排空和PERST检查。
+不把卸载路径的MODE_OFF等待当作平台重启的必经步骤；也不伪造应答。设备已完整恢复Android。
+[具体源代码依据与约束](WIFI-PLATFORM-SHUTDOWN.md)。
+
 v169已定位到 `ath12k_qmi_firmware_stop()` 的MODE_OFF事务。前面的工作队列/PCI/核心清理均已返回，
 调度循环在等待期间仍返回。QMI/MHI队列已经标记为IO完成类，不应重复改flag。下一步核对该请求
 的TX完成、RX及MSI状态；不延长9秒回程掩盖问题。设备已完整恢复Android，仍未联网。
