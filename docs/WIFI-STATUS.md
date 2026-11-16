@@ -1,5 +1,10 @@
 # Wi-Fi：固件已就绪，先修停机再接用户态服务
 
+v169已定位到 `ath12k_qmi_firmware_stop()` 的MODE_OFF事务。前面的工作队列/PCI/核心清理均已返回，
+调度循环在等待期间仍返回。QMI/MHI队列已经标记为IO完成类，不应重复改flag。下一步核对该请求
+的TX完成、RX及MSI状态；不延长9秒回程掩盖问题。设备已完整恢复Android，仍未联网。
+[本轮定位证据](../profiles/wifi-stop-trace/README.md)。
+
 v168已修正建模确认的DMA清理生命周期，并实机记录`cleanup=0`；stage4保持。原QMI−12未再记录，
 但没有QMI关闭成功或`nw_wifi_stop`返回证据，仍在9秒后兜底复位。完整Android恢复通过。
 当前下一步是统一定位停止子调用，不能把本轮准入成功当作正常停机验收。详[v168](../profiles/wifi-drain-lifetime/README.md)。

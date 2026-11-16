@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest v16920261116 hardware: consolidated trace localizes shutdown to core.c:7 = ath12k_qmi_firmware_stop(ab).
+Mainline/control, PCI reset/dump cancellation, group MAC cleanup/destroy and core-lock acquisition all returned.
+The stop call sends MODE_OFF and waits for QMI; exact request TX/RX completion remains unknown. Four where
+samples kind0/depth0 with advancing ms show dispatcher returning while waiting, NOT a thread backtrace.
+Actual qmi_msg_handler and mhi_hiprio_wq ALREADY have LX_WQ_IO_COMPLETION; no guessed flag patch.
+QMI timeout10000ms vs WCN bound9000ms recorded, do not merely lengthen it. Next observe mode transaction
+TX/RX/MSI and then fix its actual delivery issue. Stage4 preserved; no native complete/reset/master/IRQ/PERST.
+Typed fallback/physical fastboot/full stock8b8e72da/Android/root/green/original settings/sleep restored; all jobs terminal.
+Imageb5c5177a/session4487394d1c0b2db3/floor1738713600/0/3. Capture and exact trace in docs/evidence/wifi-stop-v169-20261116.json,
+workbench lab/records/wifi-stop-v169-20261116/{closure,where,trace-sites}.json. Mac source1/runtime1/native1/kernel1/package1.
+Full Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved. Current image is diagnostic, not stable promotion.
+
 Latest v16920261116 signed: consolidated45 shutdown call wrappers (nw_wifi/pci/core), reversible to
 exact prior statements incl unbraced-if semantics; existing4-word dispatcher observation sampled up to5times
 in unchanged9s quiesce window. Repeated-equal is not atomic coherence/backtrace. No timeout/power change.

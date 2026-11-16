@@ -1,5 +1,10 @@
 # Elden 基本可用实施计划
 
+v169已定位到 `ath12k_qmi_firmware_stop()` 的MODE_OFF事务。前面的工作队列/PCI/核心清理均已返回，
+调度循环在等待期间仍返回。QMI/MHI队列已经标记为IO完成类，不应重复改flag。下一步核对该请求
+的TX完成、RX及MSI状态；不延长9秒回程掩盖问题。设备已完整恢复Android，仍未联网。
+[本轮定位证据](../profiles/wifi-stop-trace/README.md)。
+
 **v168更新**：有界清理准入已实机通过，stage4保持，原QMI−12未再记录；但不能据此说关闭成功。
 `nw_wifi_stop`仍未在9秒窗口内返回，继续通过平台复位恢复Android。下一轮统一标记停止子调用并
 采样现成`nw_wifi_where`，定位具体等待，不延长超时；之后再接supplicant。下方v167为历史。

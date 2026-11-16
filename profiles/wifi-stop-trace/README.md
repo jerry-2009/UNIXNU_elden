@@ -36,4 +36,15 @@ as a new stable daily image or extend the shutdown deadline to mask a stall.
 
 Signed candidate `b5c5177a2d0898e220195e04a86fabe090394d57f746b5d877d87c8c87bc8a31`, session `4487394d1c0b2db3`.
 All182 source inputs match Git index; entry/asset/FAT/AVB checks pass
-(1738713600/0/3). Hardware diagnostic not yet run.
+(1738713600/0/3). Hardware localizes the unfinished call to `ath12k_qmi_firmware_stop(ab)`
+(core.c:7). Its preceding mainline/control/PCI reset+dump cancellation/group MAC
+cleanup and core-lock steps return. Four dispatcher samples are idle kind0,
+depth0 with advancing timestamps; this is not a backtrace. The MODE_OFF send
+and reply-completion details are not yet observed. Prepared QMI and MHI workqueues
+already have the IO-completion flag, so a guessed flag change would be redundant.
+The configured QMI wait is10s and the WCN return bound9s; do not just extend it.
+
+Stage4 remains intact. No native shutdown/reset/master-off/IRQ/PERST completion.
+The typed platform-reset fallback and full stock Android/root/green/settings
+restoration passed. [Hardware evidence](../../docs/evidence/wifi-stop-v169-20261116.json)
+contains the complete trace and capture limits.
