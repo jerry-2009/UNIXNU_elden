@@ -1,0 +1,38 @@
+{
+  "profile": "wifi-stop-trace",
+  "date": "2026-11-16",
+  "stage": "signed-unflashed",
+  "kernel_sha256": "c46fd07612053981fd375ba7180f8d83710fe287ac7e03583f1cf15255cfb111",
+  "native_sha256": "7ac1a0f0d9098bbec7c0b85b14d63aefb5f2c13c6ee0d36e81cfa91a8d2a91b3",
+  "native_worker_sha256": "12892a55da2f493abc48845fe9cb7377fb1352ca91ef66e9634a3746d4da21a7",
+  "runtime_binding_sha256": "6c4fd40ac332bbb23dc7e534cca14a30b7d03f2ee265485de9e7970c9ee3633d",
+  "reversible_stop_call_wrappers": 45,
+  "rebuilt_linux_units": [
+    "nw_wifi.o",
+    "ath12k_core.o",
+    "ath12k_pci.o"
+  ],
+  "retained_original_units": 120,
+  "retained_init_and_lifecycle": {
+    "cfg80211_core.o": "68d3a59ea612d14cd68ce4973d237b466e0fb6bab302a1a7fba539d5f4e94835",
+    "nw_pci.o": "8a37dba58112261f535b28d6deb519ab5f9e5159e0e805dc60b970466f640f9b"
+  },
+  "warnings": {
+    "nw_wifi.o": 83,
+    "ath12k_core.o": 157,
+    "ath12k_pci.o": 120
+  },
+  "native_warnings": 1,
+  "source_inputs": 182,
+  "original_apple_regions": 30,
+  "direct_calls": 23,
+  "where_samples_maximum": 5,
+  "where_scope": "Two repeated reads of existing4-word array; not an atomic coherent snapshot or a backtrace",
+  "hardware_tested": false,
+  "image_sha256": "b5c5177a2d0898e220195e04a86fabe090394d57f746b5d877d87c8c87bc8a31",
+  "session": "4487394d1c0b2db3",
+  "rollback": 1738713600,
+  "footer": 0,
+  "parent_location": 3,
+  "audit_sha256": "71fb88e3c55b7fa7a2f5865f55268f0cb2ba2bc42ccbb4b209deb8f242d4a74c"
+}

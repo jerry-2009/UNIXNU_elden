@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest v16920261116 signed: consolidated45 shutdown call wrappers (nw_wifi/pci/core), reversible to
+exact prior statements incl unbraced-if semantics; existing4-word dispatcher observation sampled up to5times
+in unchanged9s quiesce window. Repeated-equal is not atomic coherence/backtrace. No timeout/power change.
+3Cunits rebuilt (83/157/120warnings),120original+2prior init/lifecycle objects retained; native1old shadow warning.
+Kernelc46fd076/182source-index pins/Apple30/entry7124/23calls pass. Mac source1/runtime1/native1/kernel1/package1;
+imageb5c5177a/session4487394d1c0b2db3/floor1738713600/0/3 signed/audited, NOT hardware-tested yet.
+Next one diagnostic stop trial, resolve where offset against this exact native image. Device last restored
+Android afterv168. Full Goal/charging/network unfinished; GPU/QRTR/AnyRouter preserved.
+
 Latest v16820261116 hardware: stage4/FW_INIT_DONE preserved; cleanup0 admits only the original bounded
 worker. Prior QMI mode-off -12 is NOT recorded, but mode-off success is also NOT proved: no nw_wifi_stop
 return/native RESET/master-off/IRQ/PERST completion. WCN still expires at9s; typed platform reset,

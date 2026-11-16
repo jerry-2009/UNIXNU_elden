@@ -83,5 +83,10 @@ def main():
     try:menu(dict(drain,runtime_owned_cleanup=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified cleanup accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':17}))
+    stop_trace=dict(drain,profile='wifi-stop-trace',runtime_stop_trace=True)
+    assert tomllib.loads(bt_runtime_boot.menu(stop_trace))['entry'][0]['args']==mhi_menu['entry'][0]['args']
+    try:menu(dict(stop_trace,runtime_stop_trace=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified stop trace accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':18}))
 if __name__=='__main__':main()
