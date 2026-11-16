@@ -18,9 +18,11 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--endpoint', action='store_true')
     parser.add_argument('--smmu', action='store_true')
+    parser.add_argument('--mhi-refusal', action='store_true')
     args = parser.parse_args()
+    args.smmu = args.smmu or args.mhi_refusal
     args.endpoint = args.endpoint or args.smmu
-    baseline = assess(args.run, args.audit, args.endpoint, args.smmu)
+    baseline = assess(args.run, args.audit, args.endpoint, args.smmu, args.mhi_refusal)
     args.output.mkdir(parents=True, exist_ok=False)
     capture, = (args.run / 'usb').glob('*.bin')
     raw = capture.read_bytes()
@@ -90,6 +92,14 @@ def main():
             ('irq-mask-failed', replace(b'stop irq-mask=0/0', b'stop irq-mask=0/-5'), None),
             ('dma-unexpectedly-started', replace(b'resources-retained=1 dma-started=0', b'resources-retained=1 dma-started=1'), None),
         ]
+    if args.mhi_refusal:
+        cases += [
+            ('false-runtime-success', replace(b'start=-16 linux-stage=0',b'start=0 linux-stage=0'),None),
+            ('missing-firmware',replace(b'firmware=m3.bin rc=0',b'firmware=m3.bin rc=-5'),None),
+            ('wrong-firmware-size',replace(b'bytes=290816',b'bytes=290815'),None),
+            ('invented-reset',replace(b'stop=0 stage=6 reset=0/0',b'stop=0 stage=6 reset=1/1'),None),
+            ('mhi-bus-master',replace(b'linux-stage=0 master=0 command=2',b'linux-stage=0 master=1 command=6'),None),
+        ]
     rejected = []
     for name, mutated, edit in cases:
         folder = args.output / name
@@ -105,7 +115,7 @@ def main():
             destination.write_text(json.dumps(doc, indent=2) + '\n', encoding='utf-8')
         (folder / 'usb/capture.bin').write_bytes(mutated)
         try:
-            assess(folder, folder / 'audit.json', args.endpoint, args.smmu)
+            assess(folder, folder / 'audit.json', args.endpoint, args.smmu, args.mhi_refusal)
         except AssertionError:
             rejected.append(name)
         else:

@@ -1,23 +1,25 @@
 # UniXNU elden — authoritative source repository
 
-Latest FW-cache/lifecycle20261116 offline: six exact stock blobs7,517,874B via original ModemFiles/FAT,
-full size/SHA before publication, cached pointers, owner/epoch/cancellation, no retries and buffers retained to reset.
-Only canonical PEACH/basename requests; no data20-as-M3/dummy/MAC fallback. Actual original367001600B modem FAT
-and real SHA256 host8scenarios55checks ASan/UBSan; kernel services modeled. NativeFW5f8bad02/reader2a6ce236,
-binding14f5fbda, scalar/no init/0warnings; all UFS/FAT/SHA/lock imports in v163. FirmwareNativeSource now binds
-the cache in the native PCIe worker and withdraws on stop;75modeled transport scenarios391checks pass.
-Workerb66a202f/12object-bindingf863780a,0warnings;82imports in v163. No new full kernel/boot/hardware operation.
-PciLifecyclePatch adds actual &g_dev.dev bind before probe/unbind on failure/remove, config I/O propagation,
-and native master-enable call after verified MSI setup.19actual-entrypoint scenarios111checks ASan/UBSan.
-One PCI object8a37dba5+124 unchanged gives125binding493ea717;24inherited warnings,0in MSI functions.
-Three strong native runtime-hook imports are still UNIMPLEMENTED, not fake successes; real pwrseq also external.
-Full runtime --native-lifecycle recipe/auditor updated, not rerun from empty. Next hook bodies + clock/poll/heap/FW ABI,
-MHI start/cancel/RESET proof, PCI master-off and IRQ drain; only then allow BM. MHI common.h at frozen458c6079:
-CTRL38 resetbit1/STATUS48 state15:8/SYSERR2/READY0; host/pm.c waits reset clear. Existing master readiness remains-95.
-Change old SMMU fault-IRQ stop order for real DMA; no mapping-only hardware trial. No tablet/charging access this round.
-Mac lab/wifi-firmware-cache-20261116/{source2,host1,native1,pci-host1,pci-native1,transport-host1,transport-native1};
-workbench matching edl/lab. drivers/EldenWifi/FIRMWARE.md + docs/evidence/wifi-firmware-cache-20261116.json current.
-All jobs terminal; v163/stock remains last hardware evidence. Full Goal/charging incomplete, GPU/QRTR/AnyRouter preserved.
+Latest v16420261116 hardware: native DMA/MSI/config and all six original firmware files PASS, but
+Linux nw_wifi_start returns-16/stage0 BEFORE PCI bind/master/DMA. Exact init subcall unknown; next inspect prepared
+mainline/cfg80211/mac80211/MHI/QRTR init chain and collect all return values once. Do not guess heap/clock/FW cause.
+No device DMA/MHI upload/reset/MSI delivery/scan/network acceptance. Reset0/0 is skipped because master0, not hardware reset proof.
+Receiver stop state4/IRQ-active0, owned PERST-low, deferred SMMU mask, typed sync, physical fastboot and full stock8b8e72da
+restore all pass. Android/root/green/boot1/original charge/radio/scans restored, sleep requested; all jobs terminal.
+Capture149377B/SHA8c4645c4/dropmax0/no reconnect; no post-disconnect counter. PD interrupted by return/restored1,
+not charging acceptance. Image40261a3a/session4afa1ad04324c09f; floor1738713600/0/3 unchanged.
+Full kernel7c37ee2b:5native replacements+147added (125Linux), unchanged core/other members/Apple30/entry7124,
+original modem reader reused once.17direct call targets/prelink bytes and173source inputs verified. Menu1023B keeps
+8s/default/fallback/guards, original56MiB FAT/96MiB boot. Package1 caught missing new-profile trust routing;
+package2 preserves original trust and passes full audit.45rehashed capture negatives pass.
+Real runtime hooks/QMI binding, native poll/heap/clock/FW and RESET/master-off/IRQ stop are now implemented.
+Startup polling switches only after actual nonzero MSI bits.6composed scenarios112checks ASan/UBSan use actual
+QMI/config/MSI/reset code, Linux/physical/DMA/FW modeled; exact upstream ABI fields checked. Host1/2 fixture
+compile errors retained. Initial native1 refused stale QmiPower; native2 uses current cold-owner/qmi1 and binds fully.
+Mac lab/wifi-mhi-runtime-20261116/{source4,host3,stop1,wcn1,native2,kernel1}; package source2/package2 under
+wifi-mhi-boot-v164-20261116; workbench corresponding edl/lab. Native work committed e6b8c45 before hardware.
+profiles/wifi-mhi-runtime/README.md and docs/evidence/wifi-mhi-v164-20261116.json current. Don't repeat passed
+control-plane probes. Full Goal/charging incomplete; GPU/QRTR/AnyRouter preserved; device last restored stock.
 
 Latest v16320261116: owned128MiB NC mapping and early SMMU domain PASS hardware.
 v160 first64MiB descriptor segment was an IOPL boundary; v161 preserves every4KiB PA/PAR check,

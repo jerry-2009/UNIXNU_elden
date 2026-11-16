@@ -1,7 +1,7 @@
 # Wi-Fi：PCIe根链路已通过，联网仍未验收
 
-[原厂固件缓存和PCI生命周期调用点](../drivers/EldenWifi/FIRMWARE.md)已完成真实FAT/SHA测试与组件链接；
-下一步三个原生运行钩子、MHI执行/取消/RESET及DMA/IRQ排空，再开BM。尚未硬件MSI或联网，v163仍是实机基线。
+[v164完整运行栈首轮实机](../profiles/wifi-mhi-runtime/README.md)已通过控制路径及原厂固件校验，
+但Linux初始化stage0返回-16，未启master/上传固件。已完整恢复Android；下一步定位具体初始化调用，不重测已通过项。
 
 v157在TB322FC实机上训练到Gen3 ×2，读到root17cb:011c和endpoint17cb:110e；
 127项PHY与真实WLAN/NoC调用通过，端点IO/MEM/BM关闭。完整回程、stock Android及

@@ -3,7 +3,8 @@ import argparse,hashlib,json,re
 from pathlib import Path
 STOCK='8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890'
 def read(p):return json.loads(p.read_text(encoding='utf-8'))
-def assess(run,audit,endpoint=False,smmu=False):
+def assess(run,audit,endpoint=False,smmu=False,mhi_refusal=False):
+    smmu=smmu or mhi_refusal
     endpoint=endpoint or smmu
     run=Path(run);audit=read(Path(audit));files=list((run/'usb').glob('*.bin'));assert len(files)==1
     raw=files[0].read_bytes();meta=read(files[0].with_suffix('.json'));text=raw.decode('ascii',errors='replace')
@@ -13,7 +14,7 @@ def assess(run,audit,endpoint=False,smmu=False):
     statuses=meta['statuses'];assert statuses and all(s['session']==audit['session'] and s['boot']==meta['boot_nonce'] for s in statuses)
     assert any(s.get('fastboot')=='ready' and s.get('charge_control')=='1' for s in statuses)
     assert audit['accepted_static'] and (audit['rollback_index'],audit['footer_location'],audit['parent_boot_chain_location'])==(1738713600,0,3)
-    assert audit['bluetooth_runtime']['profile']==('smmu-prefault-memory' if smmu else 'pcie-endpoint-trial' if endpoint else 'pcie-root-trial') and audit['bluetooth_runtime']['mode']==0
+    assert audit['bluetooth_runtime']['profile']==('wifi-mhi-runtime' if mhi_refusal else 'smmu-prefault-memory' if smmu else 'pcie-endpoint-trial' if endpoint else 'pcie-root-trial') and audit['bluetooth_runtime']['mode']==0
     stage=[int(v) for v in re.findall(r'ELDEN_PCIE stage=(\d+) ',text)];assert stage==list(range(1,12 if endpoint else 11))
     pattern=r'ELDEN_PCIE end rc=(-?\d+) state=(\d+) stage=(\d+) root=([0-9a-f]+) ep=([0-9a-f]+) link=([0-9a-f]+) last=(\d+):([0-9a-f]+)=([0-9a-f]+) writes=(\d+) phy=(\d+) gcc-held=(\d+)'
     rows=re.findall(pattern,text);assert len(rows)==1
@@ -33,7 +34,7 @@ def assess(run,audit,endpoint=False,smmu=False):
               'BSD root: disk5s1','ELDEN_BOOT init exec accepted','ELDEN_VDOG EARLY_ARM','ELDEN_VDOG SMP_ADOPT',
               'expected=ff online=ff work=ff timers=ff ipis=ff error=0',
               'ELDEN_RPC ACK_COMMITTED','ELDEN_UFS_IDLE stop=0 phase=4 error=0 active=0',
-              'ELDEN_PCIE quiesced=1 perst-low=1 dma-enabled-by-driver=0','ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7']
+              'ELDEN_PCIE quiesced=1 perst-low=1 dma-attempted=0 protocol-reset=0' if mhi_refusal else 'ELDEN_PCIE quiesced=1 perst-low=1 dma-enabled-by-driver=0','ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7']
     positions={key:text.find(key) for key in required};assert all(v>=0 for v in positions.values())
     end=text.find('ELDEN_PCIE end ');ack=positions['ELDEN_RPC ACK_COMMITTED'];reset=positions[required[-1]]
     assert end<ack<positions[required[-3]]<positions[required[-2]]<reset
@@ -114,11 +115,26 @@ def assess(run,audit,endpoint=False,smmu=False):
                       touch_successful_transfer_records=len(transfers),
                       hardware_atos_supported=False,hardware_dma_transfers_tested=False,
                       scope='Owned NC memory, programmed/audited SMMU domain, fault IRQ registration, touch coexistence and full return; no device DMA/MSI/MHI/network acceptance')
+    if mhi_refusal:
+        assert audit['bluetooth_runtime']['mhi_runtime']
+        firmware=re.findall(r'ELDEN_WIFI_RUNTIME firmware=(\S+) rc=(-?\d+) bytes=(\d+)',text)
+        assert firmware==[(name,'0',str(size)) for name,size in [('amss.bin',6959168),('m3.bin',290816),('aux_ucode.bin',61440),('tmel.bin',56752),('regdb.bin',24278),('board.bin',125420)]]
+        assert 'ELDEN_WIFI_TRANSPORT rc=0 stage=4 cfg=70/50 msi=3 BM=0 MHI=0' in text
+        assert re.findall(r'ELDEN_WIFI_RUNTIME start=(-?\d+) linux-stage=(\d+) master=(\d+) command=(\d+)',text)==[('-16','0','0','2')]
+        assert 'ELDEN_WIFI_RUNTIME stop=0 stage=6 reset=0/0 ctl=0 status=0 command=2 transactions=0 consumer=0' in text
+        assert 'ELDEN_WIFI_TRANSPORT stop=0 msi=4 irq-active=0 master-attempted=0' in text
+        assert 'ELDEN_WIFI_RUNTIME bind=' not in text
+        assert text.index('ELDEN_WIFI_RUNTIME firmware=board.bin')<text.index('ELDEN_WIFI_RUNTIME start=-16')<text.index('ELDEN_WIFI_RUNTIME stop=0')<ack
+        result.update(firmware_files_verified=6,firmware_bytes=7517874,native_transport_setup_passed=True,
+                      linux_start_error=-16,linux_start_stage=0,wifi_runtime_started=False,device_bus_master_enabled=False,
+                      hardware_mhi_reset_exercised=False,device_msi_delivery_tested=False,
+                      scope='v164 control-plane/firmware cache and no-DMA return accepted; Linux initialization refused -16 before PCI/MHI, no device DMA/firmware upload/scan/network acceptance')
     return result
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['run','audit','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--endpoint',action='store_true')
     p.add_argument('--smmu',action='store_true')
-    a=p.parse_args();result=assess(a.run,a.audit,a.endpoint or a.smmu,a.smmu);a.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8');print(json.dumps(result))
+    p.add_argument('--mhi-refusal',action='store_true')
+    a=p.parse_args();result=assess(a.run,a.audit,a.endpoint or a.smmu,a.smmu,a.mhi_refusal);a.output.write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8');print(json.dumps(result))
 if __name__=='__main__':main()

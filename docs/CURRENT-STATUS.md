@@ -1,5 +1,7 @@
 # 当前状态 · 2026-11-16
 
+v164已完成完整Wi-Fi运行栈候选实机：控制路径与六份原厂固件通过，Linux初始化stage0返回-16，尚未设备DMA或联网。同步回fastboot及原厂Android/root/原设置恢复通过。详[当前证据](../profiles/wifi-mhi-runtime/README.md)。下一步定位初始化链，完整Goal仍active。
+
 v163已在真机建立Wi-Fi专用128MiB NC内存/SMMU映射，66页表/32768叶和故障IRQ通过，
 并与触控DMA共存。修复IOPL段边界、静态缓存映射重用和alias缺少prefault，未放宽逐页检查。
 端点command2禁BM，尚未执行Wi-Fi DMA/MSI/MHI或联网；下一步arena/回调/中断和真实排空。

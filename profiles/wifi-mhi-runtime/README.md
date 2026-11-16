@@ -2,7 +2,10 @@
 
 This candidate includes the real Linux runtime, native DMA/MSI/config/firmware
 callbacks, actual QMI consumer binding and native bus-master admission. It is
-not a mapping-only probe. Hardware validation is pending at this commit.
+not a mapping-only probe. The first hardware run completed on 2026-11-16.
+Control-plane setup and all six firmware files passed, but the Linux runtime
+returned `-16` at stage0, before PCI binding or bus-master enable. No device
+DMA, firmware upload, hardware MHI reset, MSI delivery or scan is accepted.
 
 Six original firmware files are checked before entering the runtime. The PCI
 adapter binds its real device, verifies MSI programming and only then requests
@@ -58,6 +61,33 @@ variant and the reviewed source-built parent. Then run entry, boot packaging
 and independent audit using the resulting runtime report. The saved native
 contract qualifies this complete kernel; do not flash a raw component.
 
-Next run one supervised hardware trial and distinguish firmware/MHI state,
-actual MSI delivery, scan results, clean protocol stop and full stock restore.
+The first supervised run is recorded below. Subsequent acceptance must still
+distinguish MHI state, actual MSI delivery, scan results and protocol stop.
 The full peripheral Goal and charging validation remain incomplete.
+
+## First hardware result
+
+The 149,377-byte session-bound capture has SHA
+`8c4645c4aea9e416e6d84a7fbc4a249f748ef4b19cc3287f820f361135ab9054`,
+reported maximum drops0 and no reconnect/discontinuity. No final counter after
+disconnect is available. Actual config capabilities were PCIe70/MSI50; the
+native transport reached receiver state3, and all six firmware reads returned0
+with their expected sizes. Runtime start returned `-16`, stage0, master0,
+command2, with no native consumer-bind record.
+
+The stop returned0 because no master operation had been attempted; reset0/0
+is a skipped hardware-reset path, not proof that device MHI reset works.
+Receiver state4, zero entered handlers, owned PERST-low, SMMU IRQ masking,
+typed sync reset, physical fastboot and complete original boot SHA all passed.
+Android/root/green/boot completion and original charge/radio/background-scan
+settings were restored, then sleep was requested. PD bootstrap was interrupted
+by the requested return and reported restored1; no new charging acceptance.
+
+The capture assessor's `--mhi-refusal` mode rejects45 rehashed negative records,
+including invented runtime success/reset or changed firmware status/size.
+[Hardware evidence](../../docs/evidence/wifi-mhi-v164-20261116.json).
+Next inspect the *prepared* `nw_wifi_start` init chain (mainline, cfg80211,
+mac80211, MHI bus and QRTR registration), then collect their actual return
+values in one diagnostic run. The present log does not identify which call
+returned16; do not infer a clock, heap or firmware defect from that number.
+Do not repeat the already-passed PCIe/mapping/firmware-only checks.
