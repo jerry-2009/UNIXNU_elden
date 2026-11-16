@@ -1,5 +1,19 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17820261116 HARDWARE first WMI timeout: MSI HW0/enableffffffff/mask0, logical/native pending0,
+error0/inflight0/Armed3/count79; used+enabled1fc0ff, disabled0/running0/depth1/active1/mutexes3/polling0.
+All reads0; MHI201; current DAIF200 (IRQ unmasked), MPIDR80010100 vs target0: not target-CPU DAIF proof.
+No visible host pending backlog; missing first credit/completion origin still unknown. Upstream wmi_stuck
+subsequently forces RDDM; later repeated errors are NOT independent. DDR offset comparison is not Peach
+corruption proof; CE status TP==HP, do not infer backlog from sw_index alone. HTC C/wifi7 CE C match exact
+Armada6f97250e vs7.0.14 after EOL normalization; no direct protocol patch found. Next inspect first HTC
+command/credit and CE enabled/completion path before forced RDDM; no guessed polling/clock/credit changes.
+Physical fence/typed reset/fastboot/full stock8b8e72da/Android/root/green/original charge+radio+scans/sleep pass.
+All jobs terminal. Capture296668B/2fa94914/dropmax0/no reconnect/no post-disconnect counter. Image696de7f4/
+session21772f7b6f2189a0/floor1738713600/0/3; kerneldd3c817e. Mac wifi-wmi-snapshot-v178 source1/host1/runtime1/
+native3/kernel3; boot-v178/package1.1C observer+124 retained,1native object; runtime32/native1 warnings;
+actual IRQ-table/queue tests/Apple30/entry7124 pass. Goal/charging/network incomplete; GPU/QRTR/AnyRouter kept.
+
 Latest v17720261116 HARDWARE: session-qualified diagnostic scan remained CLOSED. First INFO3, later9;
 WMI_PDEV_SET_PARAM16387/0x4003 timeout30times, MAC start-11, credits0. Source/CE ring positions differ,
 but exact missed completion stage NOT proved. v175 has same30timeouts; v176none/INFO0, so not a stable fix.

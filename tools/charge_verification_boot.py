@@ -89,7 +89,7 @@ def qualify_shared_assets(report_path,entry_path,runtime,*,wifi_service=False):
     """Common immutable runtime/entry/assets checks after profile-specific qualification."""
     folder=Path(report_path).parent;r=json.loads(Path(report_path).read_text());e=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     profile=r['profile']
-    if wifi_service and profile not in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan']:raise ValueError('Wi-Fi assets require the explicit service profile')
+    if wifi_service and profile not in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot']:raise ValueError('Wi-Fi assets require the explicit service profile')
     trace=json.loads((runtime/'trace-runtime.json').read_text())
     optional=r['optional_runtime']
     fixed_rules=json.loads((ROOT/'profiles/bt-address17/runtime-report.json').read_text())

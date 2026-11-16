@@ -1,0 +1,67 @@
+{
+  "profile": "wifi-wmi-snapshot",
+  "hardware_tested": true,
+  "image_sha256": "696de7f4c07fe327031e57a2cc0492753b5dde950a59f06a38cb708fe1f2e716",
+  "session": "21772f7b6f2189a0",
+  "kernel_sha256": "dd3c817e7d208cbe2906bd8057903b8f4aff66713fd6c99b4c56e57d85123a30",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "snapshot": {
+    "logical_line": "ELDEN_WMI_IRQ used=1fc0ff enabled=1fc0ff pending=0 strict=7 disabled=0 running=0 depth=1 active=1 mutexes=3 polling=0",
+    "native_line": "ELDEN_WMI_NATIVE admit=0 HW=0/ffffffff/0 MHI=201 reads=0/0/0/0 count=79 pending=0 error=0 inflight=0 state=3 DAIF=200 MPIDR=80010100 target=0",
+    "before_upstream_forced_rddm": true,
+    "hardware_status": 0,
+    "hardware_enable": "ffffffff",
+    "hardware_mask": 0,
+    "software_pending": 0,
+    "native_error": 0,
+    "native_irq_count": 79,
+    "current_cpu_daif": "200",
+    "current_cpu_mpidr": "80010100",
+    "configured_target_affinity": 0
+  },
+  "conclusion": "No visible pending IRQ in sampled host receiver/software queue; first missing WMI credit/completion origin remains unknown.",
+  "next": "Inspect original HTC command and credit-report path with actual CE completion/driver enable state before any forced-RDDM diagnostic; retain real errors and avoid guessed polling/clock changes.",
+  "diagnostic_limitations": [
+    "Reads are not an atomic cross-register snapshot",
+    "DAIF belongs to the current CPU, not necessarily the configured IRQ target",
+    "Subsequent WMI errors follow an upstream forced-RDDM attempt and are not independent failures",
+    "Fixed-offset DDR/file comparison does not establish Peach memory corruption"
+  ],
+  "scanning_accepted": false,
+  "networking_accepted": false,
+  "capture": {
+    "bytes": 296668,
+    "sha256": "2fa949143e0e03319d8ce3893891169c21a199b7fedcebe34015d73f6d60cc0b",
+    "reported_drop_max": 0,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false
+  },
+  "physical_fence_and_wcn_stop": true,
+  "typed_return_and_physical_fastboot": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_restored": true,
+  "charging_settings_restored": true,
+  "radio_settings_restored": true,
+  "scan_preferences_restored": true,
+  "sleep_requested": true,
+  "build": {
+    "native_output": "native3",
+    "kernel_output": "kernel3",
+    "runtime_output": "runtime1",
+    "host_output": "host1",
+    "source_inputs": 211,
+    "runtime_rebuilt_units": 1,
+    "runtime_retained_units": 124,
+    "native_warnings": 1,
+    "runtime_warnings": 32,
+    "apple_executable_regions": 30
+  },
+  "actual_irq_observer_host_tested": true,
+  "all_jobs_terminal": true,
+  "full_goal_complete": false
+}

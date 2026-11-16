@@ -9,7 +9,8 @@ def main():
     for n in ['runtime-build','component-repository','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--service-control-trace',action='store_true')
     p.add_argument('--service-scan',action='store_true')
-    a=p.parse_args();a.service_control_trace|=a.service_scan;out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);module=a.runtime_build/'component'
+    p.add_argument('--irq-snapshot',action='store_true')
+    a=p.parse_args();a.service_control_trace|=a.service_scan or a.irq_snapshot;out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);module=a.runtime_build/'component'
     def run(cmd,name):
         r=subprocess.run(cmd,capture_output=True,timeout=90);(out/(name+'.log')).write_bytes(r.stdout+r.stderr);r.check_returncode();return r.stdout.decode()
     names=['src/nw_control.c','src/nw_control_wire.c','shim/src/lx_rt.c','include/nw_control.h','include/nw_control_endpoint.h','tests/control_endpoint_test.c']
@@ -41,7 +42,10 @@ def main():
     objects=[]
     for name in names[:3]:
         obj=out/(Path(name).stem+'.o');objects.append(obj)
-        run(['clang','-std=gnu11',*flags,*includes,'-c',str(module/name),'-o',str(obj)],Path(name).stem)
+        selected=module/name
+        if a.irq_snapshot and name=='shim/src/lx_rt.c':
+            selected=out/'lx_rt.c';selected.write_bytes((module/name).read_bytes()+b'\n'+(ROOT/'drivers/EldenWifi/IrqSnapshot.inc').read_bytes())
+        run(['clang','-std=gnu11',*flags,*includes,'-c',str(selected),'-o',str(obj)],Path(name).stem)
     original=(module/'tests/control_endpoint_test.c').read_text();anchor='  assert(!nw_wifi_control_transport_set(&transport) && !nw_wifi_control_bind(&dispatch));'
     assert original.count(anchor)==1
     fixture=original.replace(anchor,'  assert(nw_wifi_control_bind(&dispatch) == NW_CONTROL_NOT_READY);\n'+anchor)
@@ -58,6 +62,25 @@ void fixture_pump(void){drain();}
 void fixture_shutdown(void){nw_wifi_control_shutdown();}
 size_t fixture_packet(void *bytes,size_t capacity,uint64_t id){struct nw_control_builder b;assert(!nw_control_begin(&b,bytes,capacity,NW_CONTROL_REQUEST,NW_CONTROL_INFO,1,id,7,0));return b.length;}
 unsigned fixture_requests(void){return dispatched;}
+'''
+    if a.irq_snapshot:
+        prefix+='''
+void elden_wifi_irq_snapshot(uint32_t,uint32_t [10]);
+static unsigned irq_sample_calls;
+static irqreturn_t sample_irq(int irq,void *cookie){(void)cookie;uint32_t s[10];elden_wifi_irq_snapshot(1000,s);
+  assert(s[5]&(1u<<(irq-1000)));assert(s[6]&&s[7]);irq_sample_calls++;return IRQ_HANDLED;}
+void fixture_irq_check(void){
+  int one,two;uint32_t a[10],b[10];
+  assert(!lx_request_irq(1003,sample_irq,NULL,0,"mhi",&one));
+  assert(!lx_request_irq(1005,sample_irq,NULL,0,"ce",&two));
+  lx_disable_irq(1003);lx_disable_irq(1005);lx_irq_raise(1003);lx_irq_raise(1005);
+  elden_wifi_irq_snapshot(1000,a);elden_wifi_irq_snapshot(1000,b);assert(!memcmp(a,b,sizeof(a)));
+  assert(a[0]==40&&a[1]==32&&a[2]==40&&a[3]==8&&a[4]==8&&!a[5]&&!a[6]&&!a[7]&&!a[8]&&!a[9]);
+  assert(lx_pump());assert(irq_sample_calls==1);elden_wifi_irq_snapshot(1000,a);assert(a[2]==8&&!a[5]);
+  lx_enable_irq(1003);assert(lx_pump());assert(irq_sample_calls==2);elden_wifi_irq_snapshot(1000,a);assert(!a[2]&&a[1]==40);
+  elden_wifi_irq_snapshot(UINT32_MAX,b);for(unsigned i=0;i<6;i++)assert(!b[i]);
+  lx_free_irq(1003,&one);lx_free_irq(1005,&two);elden_wifi_irq_snapshot(1000,a);for(unsigned i=0;i<6;i++)assert(!a[i]);
+}
 '''
     (out/'Fixture.c').write_text(prefix)
     run(['clang','-std=gnu11',*flags,*includes,'-c',str(out/'Fixture.c'),'-o',str(out/'Fixture.o')],'fixture')
@@ -104,6 +127,9 @@ static void delivered(uint64_t session){unsigned char reply[128]={};size_t n=fix
     scan_attempts=3;scan=false;scan_tick(6);assert(scan_calls==2);
     control_stop_begin();assert(!wifi_service_info_session());scan_tick(7);assert(scan_calls==2);
     assert(!wifi_control_open());assert(registered.ctl_send''',1)
+        if a.irq_snapshot:
+            text=text.replace('void fixture_init();','void fixture_init();void fixture_irq_check();',1)
+            text=text.replace('fixture_init();\n','fixture_init();fixture_irq_check();\n',1)
         fixture_source.write_text(text)
     run(['clang++','-std=c++17',*flags,'-I'+str(ROOT/'drivers/EldenWifi'),str(fixture_source),str(out/'Fixture.o'),*map(str,objects),'-o',str(out/'native')],'native-build')
     for i in range(7):run([str(out/'native'),str(i)],'native-'+str(i))
@@ -116,6 +142,7 @@ static void delivered(uint64_t session){unsigned char reply[128]={};size_t n=fix
     files=[ROOT/'drivers/EldenPcie'/n for n in ['ControlNative.inc','ControlNativeSource.py','TestControl.cpp']]+[ROOT/'drivers/EldenWifi/ControlApi.h',Path(__file__)]
     if a.service_control_trace:files+=[ROOT/'drivers/EldenWifi'/n for n in ['ServiceNativeSource.py','ServiceControlTraceSource.py','ControlTrace.inc','ControlTraceApi.h']]
     if a.service_scan:files+=[ROOT/'drivers/EldenWifi'/n for n in ['ServiceScanSource.py','ControlScan.inc']]
-    result={'passed':True,'scenarios':7,'service_scan':a.service_scan,'actual_scan_block_tested':a.service_scan,'service_control_trace':a.service_control_trace,'trace_payload_redaction_checked':a.service_control_trace,'sanitizers':['address','undefined'],'upstream_output':official,'upstream_sha256':upstream,'source_inputs':{str(f.relative_to(ROOT)):sha(f) for f in files},'kernel_socket_services_modeled':True,'actual_control_queue':True,'abi_checked':True,'hardware_tested':False}
+    if a.irq_snapshot:files.append(ROOT/'drivers/EldenWifi/IrqSnapshot.inc')
+    result={'passed':True,'scenarios':7,'irq_snapshot_actual_table_checked':a.irq_snapshot,'service_scan':a.service_scan,'actual_scan_block_tested':a.service_scan,'service_control_trace':a.service_control_trace,'trace_payload_redaction_checked':a.service_control_trace,'sanitizers':['address','undefined'],'upstream_output':official,'upstream_sha256':upstream,'source_inputs':{str(f.relative_to(ROOT)):sha(f) for f in files},'kernel_socket_services_modeled':True,'actual_control_queue':True,'abi_checked':True,'hardware_tested':False}
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))
 if __name__=='__main__':main()

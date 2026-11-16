@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+**v178：首次 WMI 超时时，采样的硬件/软件待处理中断均为0，MSI仍启用且无错误。**
+尚不能确定第一笔 credit/completion 丢在哪；不再将旧 CE sw_index 直接视作积压。上游随后
+会请求固件 RAM dump，后续失败受此影响，应以首次失败前的数据为准。HTC/实际 wifi7 CE 与
+Armada固定源码一致，没有可直接照搬的协议差异。完整恢复 Android 通过。
+[快照与限制](../profiles/wifi-wmi-snapshot/README.md)。
+
 **v177：扫描准入保持关闭，暴露了 MAC 启动中的 WMI 命令超时。** INFO 返回 DRIVER_FAILED9，
 WMI_PDEV_SET_PARAM 超时、credits0；v175有同样错误，v176只是一次成功。下一步定位 MSI/CE 完成
 处理链路，不把 stage4 当作接口已启动，也不把固件 DDR 比较差异当成 RAM 损坏。

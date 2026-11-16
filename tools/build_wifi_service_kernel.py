@@ -14,12 +14,18 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['parent-build','service-core','service-native','service-assets','clean-build','original-kernelcache','output']:
         p.add_argument('--'+n,type=Path,required=True)
+    p.add_argument('--irq-snapshot-build',type=Path)
     a=p.parse_args();parent=a.parent_build.resolve();out=a.output.resolve();prior=read(parent/'result.json')
     assert prior['profile']=='wifi-platform-fence' and prior['platform_physical_fence']
     for name in ['native','kernel']:assert sha(parent/(name+'.macho'))==prior[name+'_sha256']
     core=read(a.service_core/'result.json');native=read(a.service_native/'result.json');assets=read(a.service_assets/'result.json')
     assert sha(a.service_core/'kern_exec.o')==core['object_sha256'] and sha(a.service_native/'Native.o')==native['object_sha256']
     assert assets==core['assets'] and native['platform_physical_fence_preserved'] and native['service_admission']
+    snapshot=read(a.irq_snapshot_build/'result.json') if a.irq_snapshot_build else None
+    assert bool(snapshot)==bool(native.get('wmi_snapshot'))
+    if snapshot:
+        assert snapshot['append_only_observer'] and snapshot['base_binding_sha256']==prior['component_objects']['WifiRuntimeMsiBinding.o']['sha256']
+        assert sha(a.irq_snapshot_build/'WifiRuntimeMsiBinding.o')==snapshot['binding_sha256']==native['irq_snapshot_binding']
     inputs={**prior['source_inputs'],**core['source_inputs'],**native['source_inputs']}
     for name,h in inputs.items():assert sha(ROOT/name)==h,name
     out.mkdir(parents=True,exist_ok=False);folder=out/'pcie';folder.mkdir()
@@ -30,6 +36,7 @@ def main():
     for name in names:
         old=subprocess.check_output(['ar','p',oldar,name]);original_members[name]=hashlib.sha256(old).hexdigest()
         data=(a.service_native/'Native.o').read_bytes() if name=='Native.o' else old
+        if snapshot and name=='WifiRuntimeMsiBinding.o':data=(a.irq_snapshot_build/name).read_bytes()
         if name=='Native.o':assert sha(Path(prior['component_objects'][name]['path']))==native['base_object_sha256']
         (folder/name).write_bytes(data);members[name]=hashlib.sha256(data).hexdigest()
     archive=folder/'libEldenPcie.a';subprocess.run(['ar','rcs',str(archive),*names],cwd=folder,env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
@@ -47,7 +54,8 @@ def main():
     cmd=[x.replace(str(parent/'native.macho'),str(out/'native.macho')).replace(str(oldar),str(archive)).replace(oldlists[0],str(filelist)) for x in cmd]
     write(out/'link-command.json',cmd);env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as f:subprocess.run(cmd,cwd=out,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
-    assert defs(out/'native.macho')==defs(parent/'native.macho')|{'_elden_wifi_assets_ready'}
+    additions={'_elden_wifi_assets_ready'}|({'_elden_wifi_irq_snapshot'} if snapshot else set())
+    assert defs(out/'native.macho')==defs(parent/'native.macho')|additions
     for name,h in inherited.items():assert sha(Path(name))==h,name
     pre=read(ROOT/'profiles/v91/image-build/plan.json')['prelink'];assert sha(a.original_kernelcache)==pre['original_kernelcache_sha256']
     kit=out/'prelink-tool';kit.mkdir()
@@ -67,12 +75,13 @@ def main():
     for name in ['tools/build_wifi_service_kernel.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py']:
         inputs[name]=sha(ROOT/name)
     if native.get('control_trace') and not core.get('owner_launch_required'):raise ValueError('Control trace requires the qualified owner rule')
-    result=dict(prior);result.update(profile='wifi-service-scan' if native.get('service_scan') else 'wifi-service-control-trace' if native.get('control_trace') else 'wifi-service-owner' if core.get('owner_launch_required') else 'wifi-service',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
-        source_inputs=inputs,changed_core_objects=1,changed_native_objects=1,added_native_objects=0,core_filelist_unchanged=False,
+    result=dict(prior);result.update(profile='wifi-wmi-snapshot' if snapshot else 'wifi-service-scan' if native.get('service_scan') else 'wifi-service-control-trace' if native.get('control_trace') else 'wifi-service-owner' if core.get('owner_launch_required') else 'wifi-service',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
+        source_inputs=inputs,changed_core_objects=1,changed_native_objects=2 if snapshot else 1,added_native_objects=0,core_filelist_unchanged=False,
         core=core,service_native=native,service_assets=assets,base_report=prior,
         service_archive_members=members,base_archive_members=original_members,inherited_inputs=inherited,
         parent_kernel_sha256=prior['kernel_sha256'],entry_return_target=hex(after[1]),
-        endpoint_generated_sources=native['generated_sources'],boot_packaged=False,hardware_tested=False)
+        endpoint_generated_sources=native['generated_sources'],runtime_snapshot=snapshot,boot_packaged=False,hardware_tested=False)
     result['component_objects']=dict(prior['component_objects']);result['component_objects']['Native.o']={'path':str(a.service_native/'Native.o'),'sha256':native['object_sha256']}
+    if snapshot:result['component_objects']['WifiRuntimeMsiBinding.o']={'path':str(a.irq_snapshot_build/'WifiRuntimeMsiBinding.o'),'sha256':snapshot['binding_sha256']}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['profile','kernel_sha256','original_apple_executables_hashed']}))
 if __name__=='__main__':main()

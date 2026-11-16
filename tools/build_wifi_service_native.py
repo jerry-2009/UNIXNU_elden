@@ -35,8 +35,10 @@ def main():
         p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--control-trace',action='store_true')
     p.add_argument('--service-scan',action='store_true',help='Bind the diagnostic scan to a delivered successful INFO reply')
+    p.add_argument('--wmi-snapshot-build',type=Path)
     a=p.parse_args();parent=a.parent_native.resolve();out=a.output.resolve();prior=read(parent/'result.json')
     if a.service_scan and not a.control_trace:raise ValueError('Session scan requires control trace')
+    if a.wmi_snapshot_build and not a.service_scan:raise ValueError('WMI snapshot requires the qualified service scan')
     assert prior['platform_physical_fence'] and prior['runtime_platform_budget'] and prior['control_transport_bound']
     assert sha(parent/'Native.o')==prior['object_sha256']
     core=read(a.service_core/'result.json');assert core['compiled'] and sha(a.service_core/'kern_exec.o')==core['object_sha256']
@@ -50,6 +52,13 @@ def main():
     if a.service_scan:
         spec=importlib.util.spec_from_file_location('service_scan_source',ROOT/'drivers/EldenWifi/ServiceScanSource.py')
         scan=importlib.util.module_from_spec(spec);spec.loader.exec_module(scan);new=scan.generated()
+    snapshot=None
+    if a.wmi_snapshot_build:
+        snapshot=read(a.wmi_snapshot_build/'result.json')
+        assert snapshot['append_only_observer'] and snapshot['rebuilt_units']==1 and snapshot['retained_units']==124
+        assert sha(a.wmi_snapshot_build/'WifiRuntimeMsiBinding.o')==snapshot['binding_sha256']
+        spec=importlib.util.spec_from_file_location('service_wmi_source',ROOT/'drivers/EldenWifi/ServiceWmiSource.py')
+        wmi=importlib.util.module_from_spec(spec);spec.loader.exec_module(wmi);new=wmi.generated()
     for name,data in old.items():assert (parent/'source'/name).read_bytes()==data,name
     assert sha(ROOT/'drivers/EldenPcie/ControlNative.inc')==prior['source_inputs']['drivers/EldenPcie/ControlNative.inc']
     private,private_report=private_input(a.factory_mac)
@@ -71,7 +80,7 @@ def main():
     for directory in directories:
         overlay['roots'].append({'type':'file','name':str(Path(directory)/'EldenWifiFactoryMac.h'),'external-contents':str(private_header)})
         if a.control_trace:
-            for name in ['ControlTrace.inc','ControlTraceApi.h']+(['ControlScan.inc'] if a.service_scan else []):
+            for name in ['ControlTrace.inc','ControlTraceApi.h']+(['ControlScan.inc'] if a.service_scan else [])+(['WmiSnapshot.inc'] if snapshot else []):
                 overlay['roots'].append({'type':'file','name':str(Path(directory)/name),'external-contents':str(ROOT/'drivers/EldenWifi'/name)})
     overlay['roots'].append({'type':'file','name':str(folder/'EldenWifiFactoryMac.h'),'external-contents':str(private_header)})
     vfs=out/'overlay.json';write(vfs,overlay);command[command.index('-ivfsoverlay')+1]=str(vfs)
@@ -79,8 +88,11 @@ def main():
     r=subprocess.run(command,cwd=a.clean_build/'units/working/WcnPowerNative',capture_output=True)
     (out/'compile.log').write_bytes(r.stdout+r.stderr);r.check_returncode()
     extra={'_nw_wifi_control_stats_get'} if a.control_trace else set()
+    if snapshot:extra|={'_elden_wifi_irq_snapshot','_strncmp','_memcmp'} # bounded timeout-line filter
     assert defs(obj)==defs(parent/'Native.o') and refs(obj)-refs(parent/'Native.o')=={'_elden_wifi_assets_ready'}|extra
-    assert refs(obj)<=defs(a.reference_kernel)|defs(a.service_core/'kern_exec.o')
+    available=defs(a.reference_kernel)|defs(a.service_core/'kern_exec.o')
+    if snapshot:available|=defs(a.wmi_snapshot_build/'WifiRuntimeMsiBinding.o')
+    assert refs(obj)<=available
     assert not any(n.endswith('/__mod_init_func') for n in sections(obj))
     asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',obj],text=True);(out/'Native.asm').write_text(asm)
     assert not re.search(r'^\s*[0-9a-f]+:\s+[0-9a-f]{8}\s+.*\b[qvdshb]\d+(?:\b|\.)',asm,re.M)
@@ -92,11 +104,15 @@ def main():
         for name in ['drivers/EldenWifi/ServiceControlTraceSource.py','drivers/EldenWifi/ControlTrace.inc','drivers/EldenWifi/ControlTraceApi.h']:sources[name]=sha(ROOT/name)
     if a.service_scan:
         for name in ['drivers/EldenWifi/ServiceScanSource.py','drivers/EldenWifi/ControlScan.inc']:sources[name]=sha(ROOT/name)
+    if snapshot:
+        sources.update(snapshot['source_inputs'])
+        for name in ['drivers/EldenWifi/ServiceWmiSource.py','drivers/EldenWifi/WmiSnapshot.inc']:sources[name]=sha(ROOT/name)
     for name,h in sources.items():assert sha(ROOT/name)==h,name
     result={'compiled':True,'object_sha256':sha(obj),'base_object_sha256':prior['object_sha256'],'command':command,
         'changed_bindings':bindings,'source_inputs':sources,'generated_sources':{n:hashlib.sha256(b).hexdigest() for n,b in new.items()},
         'private_assets':private_report,'inherited_sources':inherited,'scalar':True,'warnings':r.stderr.count(b'warning:'),
         'platform_physical_fence_preserved':True,'factory_mac_input':True,'service_admission':True,
+        'wmi_snapshot':bool(snapshot),'irq_snapshot_binding':snapshot['binding_sha256'] if snapshot else None,
         'service_scan':a.service_scan,'control_trace':a.control_trace,'full_kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','object_sha256','warnings']}))
 if __name__=='__main__':main()
