@@ -51,9 +51,9 @@ One local-name shadow warning remains, not a type/conversion warning.
 Kernel `f847af90b826f2fc57f74ea3569b2cb6f597587177b3da99662ca0cc8d925f3b`.
 The complete kernel preserves 30 original Apple executable ranges, core/other
 archive inputs and entry relation7124; 178 source inputs match and 21 direct
-call targets retain prelink bytes. Boot/hardware results will be recorded after
-qualification. No device DMA, firmware readiness, scans or networking is yet
-claimed for this revision.
+call targets retain prelink bytes. The signed candidate has completed a hardware trial: DMA/MSI/MHI/QRTR/QMI
+work through AUX_UC, then the QDSS file lookup fails. Scans and networking remain
+unverified.
 
 Mac output: `lab/wifi-control-v166-20261116/{source4,host3,native2,kernel2}`.
 Workbench: matching `edl_work/wifi-control-v166-20261116`. Earlier missing header
@@ -61,7 +61,6 @@ aliases (native1) and a helper's stale native1 path (kernel1) remain as failures
 
 Signed boot: `8d4917a338cbfc087c817cfdb5ba13882174917d2afba63aa8acb18adb9a261c`; session `401a0d3a1b943912`.
 Full independent boot/asset/AVB audit passes, floor1738713600/footer0/parent3.
-No hardware result yet.
 
 Hardware v166 now passes all12 init returns, MHI download/Mission Mode and
 real MSI/QRTR/QMI exchange. AUX_UC succeeds. Stage2 then waits because the exact
@@ -69,3 +68,8 @@ QDSS configuration is missing from the cache resolver. No scan/interface/network
 claim. Real RESET1/1 and PCI master-off are observed, followed by typed return,
 physical fastboot, full stock SHA and Android/root/green/settings restoration.
 See [hardware evidence](../../docs/evidence/wifi-control-v166-20261116.json).
+
+Capture:251027 bytes, SHA `7b174e6c86ee409ed73d51ecb9453cc3fb9db9c025a6a8c305645c72d3096cb0`,
+maximum reported drop22, no reconnect/discontinuity. The critical phase/stop
+records are present; the complete console stream is not lossless. No final
+post-disconnect counter is available. No real userland socket client was tested.
