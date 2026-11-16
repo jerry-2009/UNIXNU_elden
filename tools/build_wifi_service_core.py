@@ -19,6 +19,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for name in ['core-build','clean-build','service-assets','llvm','output']:
         p.add_argument('--'+name,type=Path,required=True)
+    p.add_argument('--owner-launch',action='store_true',help='Exact signed-helper rule for the observed category6 RAM-overlay launch failure')
     a=p.parse_args(); core=a.core_build.resolve(); assets=a.service_assets.resolve(); out=a.output.resolve()
     row=read(core/'result.json')['objects']['kern_exec']
     old=core/'kern_exec.o'; assert sha(old)==row['sha256']==CORE
@@ -37,9 +38,17 @@ def main():
     rt=out/'EldenBtRuntime.inc'; rt.write_bytes(mod.source())
     header=out/'EldenBtLaunchCache.h'; header.write_bytes(mod.cache_header())
     cmd=list(row['command']); ov=read(Path(cmd[cmd.index('-ivfsoverlay')+1])); assert ov['fallthrough'] is False
-    inherited={}; changes=[]; additions={}; replaced_runtime=0; replaced_header=0
+    inherited={}; changes=[]; additions={}; replaced_runtime=0; replaced_header=0;owner_common=None
+    if a.owner_launch:
+        spec=importlib.util.spec_from_file_location('wifi_owner_source',ROOT/'drivers/EldenWifi/OwnerLaunchSource.py')
+        owner=importlib.util.module_from_spec(spec);spec.loader.exec_module(owner)
     for item in ov['roots']:
         f=Path(item['external-contents']); inherited[str(f)]=sha(f)
+        if a.owner_launch and item['name'].endswith('/EldenIconCpuCommon.inc'):
+            owner_common=out/'EldenIconCpuCommon.inc';data=owner.common(f.read_bytes())
+            if owner_common.exists():assert owner_common.read_bytes()==data
+            else:owner_common.write_bytes(data)
+            item['external-contents']=str(owner_common);changes.append(item['name'])
         if item['name'].endswith('/EldenBtRuntime.inc'):
             assert sha(f)==RUNTIME
             item['external-contents']=str(rt); changes.append(item['name']); replaced_runtime+=1
@@ -49,6 +58,7 @@ def main():
             virtual=str(Path(item['name']).parent/'EldenWifiServiceAssets.h')
             additions[virtual]={'type':'file','name':virtual,'external-contents':str(assets/'EldenWifiServiceAssets.h')}
     assert replaced_runtime and replaced_header
+    assert bool(owner_common)==a.owner_launch
     # Include lookup also uses the physical directory of the replacement.
     virtual=str(out/'EldenWifiServiceAssets.h')
     additions[virtual]={'type':'file','name':virtual,'external-contents':str(assets/'EldenWifiServiceAssets.h')}
@@ -66,10 +76,12 @@ def main():
         'drivers/EldenWifi/ServiceRuntimeSource.py','drivers/EldenWifi/ServiceRuntime.inc',
         'drivers/EldenBluetooth/runtime/LaunchCacheSource.py','drivers/EldenBluetooth/runtime/LaunchCache.inc',
         'drivers/EldenBluetooth/runtime/Runtime.inc']
+    if a.owner_launch:sources+=['drivers/EldenWifi/OwnerLaunchSource.py','drivers/EldenBluetooth/runtime/OwnerLaunch.inc']
     result={'compiled':True,'object_sha256':sha(obj),'base_object_sha256':CORE,'command':cmd,
         'runtime_sha256':sha(rt),'changed_bindings':changes,'inherited_sources':inherited,
         'source_inputs':{name:sha(ROOT/name) for name in sources},'assets':report,
         'new_export':'_elden_wifi_assets_ready','scalar':True,'warnings':r.stderr.count(b'warning:'),
+        'owner_launch_required':a.owner_launch,'owner_common_sha256':sha(owner_common) if owner_common else None,
         'full_kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','object_sha256','warnings']}))
 if __name__=='__main__':main()

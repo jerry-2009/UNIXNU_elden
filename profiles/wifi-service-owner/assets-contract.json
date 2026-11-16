@@ -1,0 +1,47 @@
+{
+  "prepared": true,
+  "base_cache_sha256": "d258da13c01861a229fe64153e239750d5e9253ff53b692c2db76e782bbfc98d",
+  "input_trust_sha256": "68a56a47a546df3b2d89031dd929c9e196b10d04b2680be0e2c3eb36576ed8d5",
+  "helper_sha256": "f54eb63475c7f3b3cb0d1d1ed78728a941fb8c07e363f88cf8c5095a69adecb7",
+  "helper_cdhash": "b02572b5f0fd9e79790645ad33df708b24530295",
+  "target": {
+    "architecture": "arm64",
+    "minimum_os": "17.0",
+    "sha256": "f54eb63475c7f3b3cb0d1d1ed78728a941fb8c07e363f88cf8c5095a69adecb7"
+  },
+  "cache_sha256": "b42b6861657100d4c562bd9ca25f061de0a8cf4bf4aeef7decc89cda4b704e2b",
+  "cache_bytes": 925624,
+  "signature_sha256": "c550a70e74e92d15f3adb2e10475310016e418b8ab068620be15bab2912b9616",
+  "cache_cdhash": "845f3c34f719c2c18fc206e84d4afe19c48ae047",
+  "trust_sha256": "4c924ac5b999ea2a091a5f5f063e358a7861604cd8d69e0cc872600ea3861546",
+  "old_jobs_unchanged": 561,
+  "jobs": 562,
+  "other_top_level_entries_unchanged": true,
+  "old_trust_modules_unchanged": true,
+  "new_trust_entries": 2,
+  "job": {
+    "KeepAlive": true,
+    "Label": "org.unixnu.wifi.supplicant",
+    "ProcessType": "Interactive",
+    "ProgramArguments": [
+      "/usr/libexec/unixnu-wpa_supplicant",
+      "-Dsheng",
+      "-ien0",
+      "-c/private/var/ngpu/etc/wifi/wpa_supplicant.conf",
+      "-q",
+      "-s"
+    ],
+    "RunAtLoad": true,
+    "ThrottleInterval": 3,
+    "Umask": 63,
+    "UserName": "root"
+  },
+  "config_sha256": "c18936105445cf6a6ab1a5b2078a248dcd1874a96d7b2b43bf332a99f1fa7036",
+  "header_sha256": "285d77eaea3611b62dd5e09faca21780d3b1e07ea018d6272b251f3b8455346c",
+  "host_xpc_passed": true,
+  "signatures_verified": true,
+  "credentials_included": false,
+  "installed": false,
+  "hardware_tested": false,
+  "source_sha256": "6383771b6c75b1a66fad8b1b6d2272bda18835bc21532984f5fc8726613f9fc9"
+}

@@ -21,7 +21,7 @@ def trust_append(original,digests):
     return result
 
 def qualify_assets(report,runtime,native,base_trust_sha):
-    fixed=read(ROOT/'profiles/wifi-service/assets-contract.json');actual=read(runtime/'wifi-service-assets.json')
+    fixed=read(ROOT/'profiles'/report['profile']/'assets-contract.json');actual=read(runtime/'wifi-service-assets.json')
     for key,value in fixed.items():
         if actual.get(key)!=value:raise ValueError('Service asset contract differs: '+key)
     if actual!=report['service_assets'] or actual!=report['core']['assets']:raise ValueError('Service/core assets differ')
@@ -42,7 +42,11 @@ def qualify(report_path,entry_path,runtime):
     from charge_verification_boot import qualify_shared_assets
     from audit_pcie_kernel_hooks import audit
     r=read(Path(report_path));folder=Path(report_path).parent;base=r['base_report']
-    if r['profile']!='wifi-service' or r['parent_kernel_sha256']!=PARENT or base['kernel_sha256']!=PARENT:raise ValueError('Wrong service parent')
+    if r['profile'] not in ['wifi-service','wifi-service-owner'] or r['parent_kernel_sha256']!=PARENT or base['kernel_sha256']!=PARENT:raise ValueError('Wrong service parent')
+    if bool(r['core'].get('owner_launch_required'))!=(r['profile']=='wifi-service-owner'):raise ValueError('Wrong service launch rule')
+    if r['profile']=='wifi-service-owner':
+        expected=read(ROOT/'profiles/wifi-service-owner/owner-contract.json')
+        if r['core']['owner_common_sha256']!=expected['common_sha256'] or sha(ROOT/'drivers/EldenWifi/OwnerLaunchSource.py')!=expected['generator_sha256']:raise ValueError('Owner rule differs')
     if (r['changed_core_objects'],r['changed_native_objects'],r['added_native_objects'],r['core_filelist_unchanged'])!=(1,1,0,False):raise ValueError('Wrong service object delta')
     for key in ['platform_physical_fence','runtime_platform_budget','runtime_platform_shutdown','runtime_owned_cleanup',
         'firmware_qdss_config','control_transport_bound','mhi_runtime_bound','ufs_ah8_retained','ufs_diagnostic_removed','root_worker_bound','smmu_domain_bound','owned_sgi_guard','scalar']:
@@ -68,7 +72,8 @@ def qualify(report_path,entry_path,runtime):
 def menu(q):
     from pcie_root_boot import menu as root_menu
     if not q.get('wifi_service'):raise ValueError('Service assets not qualified')
-    return root_menu(dict(q,profile='wifi-platform-fence')).replace('Wi-Fi physical reset + USB - TEST','Wi-Fi service + USB - TEST',1)
+    title='Wi-Fi signed service + USB - TEST' if q['profile']=='wifi-service-owner' else 'Wi-Fi service + USB - TEST'
+    return root_menu(dict(q,profile='wifi-platform-fence')).replace('Wi-Fi physical reset + USB - TEST',title,1)
 
 def augment_trust(original,q):
     from bt_runtime_boot import augment_trust as augment_base

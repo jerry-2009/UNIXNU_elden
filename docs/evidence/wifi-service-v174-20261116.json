@@ -47,9 +47,11 @@
     "path": "edl_work/live-service-v174-20261116/usb/20261116-074428.bin",
     "bytes": 260144,
     "sha256": "114250e7c6780b095099ebb61c132f7ad5c672c201f6d5294671d3f1add32c1c",
-    "reported_drop_max": null,
+    "reported_drop_max": 14,
     "files": 1,
-    "post_disconnect_counter_available": false
+    "post_disconnect_counter_available": false,
+    "reconnections": 0,
+    "discontinuities": 0
   },
   "tests": {
     "runtime_cases": 44,

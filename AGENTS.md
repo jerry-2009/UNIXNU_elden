@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17520261116 HARDWARE: exact signed supplicant RAM-overlay rule works (33accepted),31real control
+connections/30disconnects; service repeatedly exits/restarts, BSS0. No stable handshake/scan/network acceptance.
+Next inspect original client then collect actual getsockopt/INFO/receive/send codes; no payload/key logging,
+no guessed hardware changes. MAC and service/cache staging pass. Physical fence/BM-off/sampled-idle/MSI4/
+PERST/WCN-stop, typed reset, physical fastboot and full stock8b8e72da/Android/root/green/original charge+radio+
+scan settings/sleep restore pass. All jobs terminal. Capture272969B/a016a513/dropmax40/no reconnect;
+no post-disconnect counter. Image d987408e/session30c581a7d308aafe/floor1738713600/0/3; kernel7d5d0069,
+core2f1ccae7/native56790a0e, Apple30/entry7124; actual predicate+11asset tests pass, core91/native1 warnings.
+Mac wifi-service-owner-v175/{source1,host1,core1,kernel1}; boot-v175/package1. Exact profile docs:
+profiles/wifi-service-owner. Full Goal/charging/network incomplete; GPU/QRTR/AnyRouter untouched.
+
 Latest v17420261116 HARDWARE: real service assets stage5/status0/cache-ready1 and factory MAC supplied;
 firmware stage4/error0 preserved. AMFI rejects exact supplicant launch c[8]p[1]m[1]e[6]; no control connection,
 scan or networking accepted (BSS0). Next reuse the narrow exact-CDHash RAM-overlay owner-launch rule,
