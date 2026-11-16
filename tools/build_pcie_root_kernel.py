@@ -20,12 +20,14 @@ def main():
     p.add_argument('--segmented-memory',action='store_true',help='Verify all pages across descriptor segments')
     p.add_argument('--unique-memory',action='store_true',help='Require a distinct NC alias')
     p.add_argument('--prefault-memory',action='store_true',help='Populate the wired alias before PAR checks')
+    p.add_argument('--mhi-runtime',action='store_true',help='Include qualified native runtime, firmware and protocol stop')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
     if bool(a.smmu_build)!=bool(a.route_build) or (a.smmu_build and not a.endpoint_build):raise ValueError('SMMU needs endpoint and route builds together')
     if a.memory_detail and not a.smmu_build:raise ValueError('Memory diagnostics require SMMU build')
     if a.segmented_memory and not a.memory_detail:raise ValueError('Segmented memory requires diagnostics')
     if a.unique_memory and not a.segmented_memory:raise ValueError('Unique memory requires segmented proof')
     if a.prefault_memory and not a.unique_memory:raise ValueError('Prefault memory requires a unique mapping')
+    if a.mhi_runtime and not a.prefault_memory:raise ValueError('MHI requires the verified prefault DMA mapping')
     contract=read(ROOT/'profiles/ufs-idle-trial/native-contract.json');assert native_identity(parent/'native.macho')==(contract['sections'],contract['commands'],contract['symbols'])
     previous=read(parent/'result.json');assert previous['profile']=='ufs-idle-trial' and sha(parent/'kernel.macho')==previous['kernel_sha256']
     out.mkdir(parents=True,exist_ok=False);(out/'source').mkdir()
@@ -37,6 +39,7 @@ def main():
     assert nr['native_root_worker_bound'] and wr['root_worker_hooks'] and wr['root_power_provider']
     assert bool(nr.get('endpoint_worker_bound'))==bool(a.endpoint_build)
     assert bool(nr.get('smmu_domain_required'))==bool(a.smmu_build) and bool(wr.get('smmu_stop_hook'))==bool(a.smmu_build)
+    assert bool(nr.get('mhi_runtime_bound'))==a.mhi_runtime and bool(wr.get('mhi_deferred_smmu_stop'))==a.mhi_runtime
     supplied={'Native.o':(a.native_build/'Native.o',nr['object_sha256']),
               'Root.o':(a.root_build/'Root.o',rr['objects']['Root']['object_sha256']),
               'Phy.o':(a.root_build/'Phy.o',rr['objects']['Phy']['object_sha256']),
@@ -51,7 +54,7 @@ def main():
         for name,h in endpoint_sources.items():assert sha(ROOT/name)==h,name
     smmu_sources={};smmu_count=0
     if a.smmu_build:
-        sr=read(a.smmu_build/'result.json');tr=read(a.route_build/'result.json');smmu_count=sr['component_count'];assert smmu_count==11
+        sr=read(a.smmu_build/'result.json');tr=read(a.route_build/'result.json');smmu_count=sr['component_count'];assert smmu_count==(12 if a.mhi_runtime else 11)
         if a.memory_detail:assert sr.get('memory_report_version')==1
         if a.segmented_memory:assert sr.get('allocator_variant')==('prefault' if a.prefault_memory else 'unique' if a.unique_memory else 'segmented')
         supplied['SmmuNativeBinding.o']=(a.smmu_build/'SmmuNativeBinding.o',sr['binding_sha256'])
@@ -59,6 +62,24 @@ def main():
         for report in [sr,tr]:
             for path,h in report['source_inputs'].items():assert sha(ROOT/path)==h,path;smmu_sources[path]=h
         smmu_sources['drivers/EldenSmmu/EarlySource.py']=sha(ROOT/'drivers/EldenSmmu/EarlySource.py')
+    mhi_members=[];reused_reader=False
+    if a.mhi_runtime:
+        assert nr['transport_worker_bound'] and nr['firmware_cache_bound'] and sr['dma_provider_bound']
+        def component(name):
+            found=[(Path(p),h) for p,h in nr['input_objects'].items() if Path(p).name==name];assert len(found)==1,name
+            path,h=found[0];assert sha(path)==h;return path,h
+        for name in ['Config.o','Msi.o','MhiStop.o','WifiRuntimeMsiBinding.o','QmiPower.o']:
+            supplied[name]=component(name);mhi_members.append(name)
+        fw_binding,_=component('FirmwareCacheBinding.o');fw=read(fw_binding.parent/'result.json')
+        fw_obj=fw_binding.parent/'FirmwareCache.o';assert sha(fw_obj)==fw['objects']['FirmwareCache']['sha256']
+        supplied['FirmwareCache.o']=(fw_obj,sha(fw_obj));mhi_members.append('FirmwareCache.o')
+        # The parent already contains the exact original reader. Do not force
+        # a second ModemFiles copy into the kernel through the cache binding.
+        for name in ['ModemFiles.c','ModemFiles.h']:
+            h=sha(ROOT/'drivers/EldenWifi'/name)
+            assert h==sha(ROOT/'profiles/v91/sources/tree/drivers/EldenWifi'/name)
+        required_reader={'_elden_wifi_file_open','_elden_wifi_file_read','_elden_wifi_files_init'}
+        assert required_reader<=exports(parent/'native.macho');reused_reader=True
     for file,h in supplied.values():assert sha(file)==h,file
     for report,key,prefix in [(nr,'source_inputs',ROOT),(wr,'source_inputs',ROOT),(rr,'source_sha256',ROOT/'drivers/EldenPcie'),(pr,'source_sha256',ROOT)]:
         for file,h in report[key].items():assert sha(prefix/file)==h,file
@@ -87,6 +108,7 @@ def main():
         replacements[str(old)]=str(target);member_hashes[archive_name]=members
     pcie_members=['Native.o','Root.o','Phy.o','Power.o']+(['Endpoint.o'] if a.endpoint_build else [])
     if a.smmu_build:pcie_members.append('SmmuNativeBinding.o')
+    pcie_members+=mhi_members
     pcie=out/'libEldenPcie.a';subprocess.run(['ar','rcs',str(pcie),*[str(supplied[n][0]) for n in pcie_members]],env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
     inherited_inputs={str(parent/'link.filelist'):sha(parent/'link.filelist')}
     for file in (parent/'link.filelist').read_text().splitlines():inherited_inputs[file]=sha(Path(file))
@@ -118,9 +140,9 @@ def main():
     own={**nr['source_inputs'],**wr['source_inputs'],**{'drivers/EldenPcie/'+n:h for n,h in rr['source_sha256'].items()},**pr['source_sha256'],**shared_sources,**endpoint_sources,**smmu_sources}
     for path in ['tools/build_pcie_root_kernel.py','tools/build_ufs_wait_objects.py','drivers/EldenUfsIdle/IdleSource.py']:own[path]=sha(ROOT/path)
     sources={**previous['source_inputs'],**own}
-    report={'profile':'smmu-prefault-memory' if a.prefault_memory else 'smmu-unique-memory' if a.unique_memory else 'smmu-segmented-memory' if a.segmented_memory else 'smmu-memory-detail' if a.memory_detail else 'smmu-domain-trial' if a.smmu_build else 'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
+    report={'profile':'wifi-mhi-runtime' if a.mhi_runtime else 'smmu-prefault-memory' if a.prefault_memory else 'smmu-unique-memory' if a.unique_memory else 'smmu-segmented-memory' if a.segmented_memory else 'smmu-memory-detail' if a.memory_detail else 'smmu-domain-trial' if a.smmu_build else 'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
             'source_inputs':sources,'optional_runtime':previous['optional_runtime'],'core_filelist_unchanged':True,'changed_core_objects':0,'scalar':True,
-            'changed_native_objects':5 if a.smmu_build else 3,'added_native_objects':len(pcie_members)+(smmu_count-1 if a.smmu_build else 0),'native_objects':records,'archive_members':member_hashes,
+            'changed_native_objects':5 if a.smmu_build else 3,'added_native_objects':len(pcie_members)+(smmu_count-1 if a.smmu_build else 0)+(124 if a.mhi_runtime else 0),'native_objects':records,'archive_members':member_hashes,
             'component_objects':{n:{'path':str(p),'sha256':h} for n,(p,h) in supplied.items()},
             'parent_kernel_sha256':previous['kernel_sha256'],'original_apple_executables_hashed':30,'entry_return_target':hex(after[1]),
             'ufs_diagnostic_removed':True,'ufs_ah8_retained':True,'root_worker_bound':True,
@@ -129,6 +151,7 @@ def main():
             'memory_report_version':1 if a.memory_detail else 0,
             'allocator_variant':sr.get('allocator_variant') if a.smmu_build else None,
             'allocator_source_sha256':sr.get('allocator_source_sha256') if a.smmu_build else None,
+            'mhi_runtime_bound':a.mhi_runtime,'modem_reader_reused':reused_reader,'linux_runtime_objects':125 if a.mhi_runtime else 0,
             'boot_packaged':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['profile','kernel_sha256','changed_native_objects','added_native_objects','original_apple_executables_hashed','boot_packaged']}))
 if __name__=='__main__':main()

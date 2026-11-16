@@ -2,7 +2,7 @@
 import argparse,json,struct
 from pathlib import Path
 from replay_xnu_objects import global_symbols
-def audit(native,kernel,endpoint=False,smmu=False):
+def audit(native,kernel,endpoint=False,smmu=False,mhi=False):
     data=Path(native).read_bytes();after=Path(kernel).read_bytes();at=32;sections={};code=[]
     for _ in range(struct.unpack_from('<I',data,16)[0]):
         cmd,size=struct.unpack_from('<II',data,at)
@@ -28,8 +28,12 @@ def audit(native,kernel,endpoint=False,smmu=False):
     targets=[('_elden_pcie_native_start','_elden_wcn_power_start',256),('_elden_pcie_native_stop_begin','_elden_wcn_request_stop',512),
              ('_elden_pcie_root_start',None,0),('_elden_wlan_root_power',None,0)]
     if endpoint:targets+=[('_elden_pcie_endpoint_identify',None,0),('_elden_wlan_power_confirm_endpoint',None,0)]
-    if smmu:targets+=[('_elden_wifi_smmu_early_initialize','_elden_wifi_smmu_early_invoke',256),('_elden_wifi_smmu_early_invoke',None,0),('_elden_wifi_smmu_stop_begin','_elden_wcn_request_stop',512),
+    if smmu:targets+=[('_elden_wifi_smmu_early_initialize','_elden_wifi_smmu_early_invoke',256),('_elden_wifi_smmu_early_invoke',None,0),('_elden_wifi_smmu_stop_begin',None if mhi else '_elden_wcn_request_stop',0 if mhi else 512),
                       ('_elden_smmu_domain_start',None,0),('_elden_smmu_select_boot_domain',None,0)]
+    expected_counts={}
+    if mhi:
+        for name,count in [('_nw_wifi_start',1),('_nw_wifi_stop',2),('_elden_mhi_stop',1),('_elden_wifi_runtime_enable_master',1),('_elden_wlan_qmi_bind',1),('_elden_wlan_qmi_unbind',1)]:
+            targets.append((name,None,0));expected_counts[name]=count
     for target,caller,bound in targets:
         dest=address(target);calls=[]
         for base,size,off in code:
@@ -39,7 +43,7 @@ def audit(native,kernel,endpoint=False,smmu=False):
                 delta=ins&0x3ffffff
                 if delta&(1<<25):delta-=1<<26
                 if base+p+(delta<<2)==dest:calls.append(base+p)
-        if len(calls)!=1:raise ValueError('Expected one actual call to '+target)
+        if len(calls)!=expected_counts.get(target,1):raise ValueError('Unexpected actual call count to '+target+': '+str(len(calls)))
         if caller and not address(caller)<=calls[0]<address(caller)+bound:raise ValueError('Wrong caller '+target)
         for va in [dest,*calls]:
             if word(data,va)!=word(after,va):raise ValueError('Prelink changed branch/provider')
@@ -50,5 +54,6 @@ def main():
     for n in ['native','kernel','output']:p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--endpoint',action='store_true')
     p.add_argument('--smmu',action='store_true')
-    a=p.parse_args();r=audit(a.native,a.kernel,a.endpoint,a.smmu);a.output.write_text(json.dumps(r,indent=2)+'\n',encoding='utf-8');print(json.dumps(r))
+    p.add_argument('--mhi',action='store_true')
+    a=p.parse_args();r=audit(a.native,a.kernel,a.endpoint,a.smmu,a.mhi);a.output.write_text(json.dumps(r,indent=2)+'\n',encoding='utf-8');print(json.dumps(r))
 if __name__=='__main__':main()

@@ -7,8 +7,8 @@ from charge_verification_boot import qualify_shared_assets
 ROOT=Path(__file__).resolve().parents[1]
 def qualify(report_path,entry_path,runtime):
     report_path=Path(report_path);r=json.loads(report_path.read_text());folder=report_path.parent
-    prefault=r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
-    if r.get('profile') not in ('pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(16 if smmu else 4+int(endpoint)):
+    mhi=r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
+    if r.get('profile') not in ('wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
         raise ValueError('Wrong root kernel build')
     if detail and r.get('memory_report_version')!=1:raise ValueError('Memory report not qualified')
     if segmented:
@@ -23,6 +23,9 @@ def qualify(report_path,entry_path,runtime):
     components={'Native.o','Root.o','Phy.o','Power.o','WcnPowerNative.o','WcnPower.o'}
     if endpoint:components.add('Endpoint.o')
     if smmu:components|={'SmmuNativeBinding.o','EldenNvtDmaRoute.o'}
+    if mhi:
+        components|={'Config.o','Msi.o','MhiStop.o','WifiRuntimeMsiBinding.o','QmiPower.o','FirmwareCache.o'}
+        if not r.get('mhi_runtime_bound') or not r.get('modem_reader_reused') or r.get('linux_runtime_objects')!=125:raise ValueError('MHI runtime not qualified')
     if set(r['native_objects'])!=({'ArmCpu','ShengUfs'} if smmu else {'ShengUfs'}) or set(r['component_objects'])!=components:
         raise ValueError('Wrong root object set')
     if endpoint:
@@ -30,8 +33,10 @@ def qualify(report_path,entry_path,runtime):
         if smmu:
             sys.path.insert(0,str(ROOT/'drivers/EldenSmmu'));import EarlySource
             generated=EarlySource.pcie_generated
-            if not r.get('smmu_domain_bound') or r.get('smmu_component_count')!=11 or not r.get('owned_sgi_guard'):raise ValueError('SMMU owner/CPU guard not qualified')
+            if not r.get('smmu_domain_bound') or r.get('smmu_component_count')!=(12 if mhi else 11) or not r.get('owned_sgi_guard'):raise ValueError('SMMU owner/CPU guard not qualified')
             if hashlib.sha256(EarlySource.cpu()).hexdigest()!=r['native_objects']['ArmCpu']['source_sha256']:raise ValueError('Owned SGI source differs')
+        if mhi:
+            from MhiRuntimeSource import generated
         if not r.get('endpoint_worker_bound') or r['endpoint_generated_sources']!={n:hashlib.sha256(b).hexdigest() for n,b in generated().items()}:
             raise ValueError('Endpoint worker source/qualification differs')
     sys.path.insert(0,str(ROOT/'drivers/EldenUfsIdle'));import IdleSource as ah8
@@ -48,12 +53,17 @@ def qualify(report_path,entry_path,runtime):
         raise ValueError('Root UFS source/initializer differs')
     if {k:hashlib.sha256(v).hexdigest() for k,v in expected.items()}!=row['generated_sources']:
         raise ValueError('Root UFS dependencies differ')
-    hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu)
+    hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu,mhi)
     result=qualify_shared_assets(report_path,entry_path,runtime)
-    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault)
+    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi)
     return result
 
 def menu(qualification):
+    if qualification.get('profile')=='wifi-mhi-runtime':
+        if qualification.get('mhi_runtime') is not True:raise ValueError('Explicit MHI runtime qualification required')
+        base=menu(dict(qualification,profile='smmu-prefault-memory'));old=tomllib.loads(base);args=old['entry'][0]['args'];value=args+' ewt'
+        if len(value.replace('@SESSION@','0'*16).encode())>1023:raise ValueError('MHI menu exceeds parser contract')
+        return base.replace('args = "'+args+'"','args = "'+value+'"',1).replace('Wi-Fi DMA setup + USB - TEST','Wi-Fi MHI + USB - TEST',1)
     if qualification.get('profile')=='smmu-prefault-memory':
         if qualification.get('prefault_memory') is not True:raise ValueError('Explicit prefault mapping required')
         return menu(dict(qualification,profile='smmu-unique-memory')).replace('Wi-Fi NC memory + USB - TEST','Wi-Fi DMA setup + USB - TEST',1)

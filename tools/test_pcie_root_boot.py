@@ -55,5 +55,13 @@ def main():
     try:menu(dict(prefault,prefault_memory=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified prefault mapping accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':12}))
+    mhi=dict(prefault,profile='wifi-mhi-runtime',mhi_runtime=True)
+    mhi_menu=tomllib.loads(bt_runtime_boot.menu(mhi));mhi_args=arguments(mhi_menu['entry'][0]['args'])
+    assert mhi_args.pop('ewt')=='1' and mhi_args==arguments(smmu_menu['entry'][0]['args'])
+    assert len(mhi_menu['entry'][0]['args'].replace('@SESSION@','0'*16).encode())==1023
+    assert mhi_menu['boot']==actual['boot'] and mhi_menu['entry'][1:]==actual['entry'][1:]
+    try:menu(dict(mhi,mhi_runtime=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified MHI runtime accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':13}))
 if __name__=='__main__':main()
