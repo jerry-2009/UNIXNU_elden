@@ -103,5 +103,10 @@ def main():
     try:menu(dict(budget,runtime_platform_budget=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified platform budget accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':21}))
+    fence=dict(budget,profile='wifi-platform-fence',platform_physical_fence=True)
+    assert tomllib.loads(bt_runtime_boot.menu(fence))['entry'][0]['args']==mhi_menu['entry'][0]['args']
+    try:menu(dict(fence,platform_physical_fence=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified physical fence accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':22}))
 if __name__=='__main__':main()

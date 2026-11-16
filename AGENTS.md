@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17320261116 signed: distinct platform host-DMA fence then actual PERST proof; never treats ff04 asREADY.
+Only after callback return/config0/real unbind: fresh identity, BM clear/readback, sampled transaction idle,
+MSI disable/mask/inflight drain, fresh recheck and owned PERST low/1ms/readback, then WLAN release.
+Failed prerequisite refuses release; all memory/table mappings retained to reset. Legacy MHI path unchanged.
+26actual helper/config/MSI/PERST scenarios224checks ASan/UBSan pass; callback facts/MMIO are modeled.
+One newCobjectff4bd9d8, native115e8887/kernel f0771691;187source-index pins/Apple30/entry7124/27calls/148added pass.
+Mac source1/host1/fence1/native1/kernel1/package1; runtime reusedv172. Image23ade412/session2a72f6a2ab45140f,
+floor1738713600/0/3 signed/audited, NOT hardware-tested yet. Next one full physical stop/restoration trial.
+Device last restored stockv172; Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v17220261116 hardware: platform callback RETURNS, real unbind0/config-error0.2s aggregate polling
 reports actual RESET timeout then original chip-reset path runs. Final native protocol check rejects ctl2/statusff04
 (RESET held/SYSERR), rc-110; sampled command6 still BM-on. transactions0 is UNPOPULATED, not idle proof;

@@ -2,7 +2,7 @@
 import argparse,json,struct
 from pathlib import Path
 from replay_xnu_objects import global_symbols
-def audit(native,kernel,endpoint=False,smmu=False,mhi=False,control=False,cleanup=False,platform=False,budget=False):
+def audit(native,kernel,endpoint=False,smmu=False,mhi=False,control=False,cleanup=False,platform=False,budget=False,fence=False):
     data=Path(native).read_bytes();after=Path(kernel).read_bytes();at=32;sections={};code=[]
     for _ in range(struct.unpack_from('<I',data,16)[0]):
         cmd,size=struct.unpack_from('<II',data,at)
@@ -49,6 +49,9 @@ def audit(native,kernel,endpoint=False,smmu=False,mhi=False,control=False,cleanu
     if budget:
         if not platform:raise ValueError('Budget requires platform shutdown')
         targets.append(('_elden_wifi_platform_deadline_ms',None,0));expected_counts['_elden_wifi_platform_deadline_ms']=1
+    if fence:
+        if not platform:raise ValueError('Fence requires platform shutdown')
+        targets.append(('_elden_pcie_platform_fence',None,0));expected_counts['_elden_pcie_platform_fence']=1
     for target,caller,bound in targets:
         dest=address(target);calls=[]
         for base,size,off in code:

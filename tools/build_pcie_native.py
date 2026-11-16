@@ -20,6 +20,7 @@ def main():
     p.add_argument('--mhi-runtime-build',type=Path,help='Qualified lifecycle-patched 125-object runtime')
     p.add_argument('--mhi-stop-build',type=Path)
     p.add_argument('--qmi-build',type=Path)
+    p.add_argument('--platform-fence-build',type=Path,help='Require host DMA fence plus physical PERST proof')
     p.add_argument('--control-transport',action='store_true',help='Install the native privileged Wi-Fi control socket before Linux init')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);base=a.clean_build.resolve()
     transport=bool(a.config_build)
@@ -35,6 +36,7 @@ def main():
     if mhi!=bool(a.mhi_stop_build) or mhi!=bool(a.qmi_build) or (mhi and not a.firmware_cache_build):
         raise ValueError('MHI requires firmware, stop and actual QMI providers together')
     if a.control_transport and not mhi:raise ValueError('Control socket requires the real MHI runtime')
+    if a.platform_fence_build and not platform_shutdown:raise ValueError('Physical fence requires platform shutdown')
     generated={};native_source=ROOT/'drivers/EldenPcie/Native.cpp'
     if a.endpoint_build:
         spec=importlib.util.spec_from_file_location('endpoint_native',ROOT/'drivers/EldenPcie/EndpointNativeSource.py')
@@ -65,6 +67,9 @@ def main():
         if platform_shutdown:
             spec=importlib.util.spec_from_file_location('platform_native',ROOT/'drivers/EldenPcie/PlatformShutdownSource.py')
             platform_source=importlib.util.module_from_spec(spec);spec.loader.exec_module(platform_source);derive=platform_source.generated
+        if a.platform_fence_build:
+            spec=importlib.util.spec_from_file_location('physical_fence',ROOT/'drivers/EldenPcie/PlatformFenceSource.py')
+            fence_source=importlib.util.module_from_spec(spec);spec.loader.exec_module(fence_source);derive=fence_source.generated
         for name,data in derive().items():(folder/name).write_bytes(data);generated[name]=hashlib.sha256(data).hexdigest()
         native_source=folder/'Native.cpp'
     elif a.smmu_build:raise ValueError('SMMU requires endpoint stage')
@@ -104,6 +109,7 @@ def main():
     if a.control_transport:
         files['ControlApi.h']=ROOT/'drivers/EldenWifi/ControlApi.h'
         files['ControlNative.inc']=ROOT/'drivers/EldenPcie/ControlNative.inc'
+    if a.platform_fence_build:files.update({n:ROOT/'drivers/EldenPcie'/n for n in ['PlatformFence.h','PlatformFenceNative.inc']})
     if platform_shutdown:files['PlatformShutdownApi.h']=ROOT/'drivers/EldenWifi/PlatformShutdownApi.h'
     if qmi_trace:files['EldenQmiTrace.h']=ROOT/'drivers/EldenWifi/peach/EldenQmiTrace.h'
     if stop_trace:files['StopWhere.inc']=ROOT/'drivers/EldenPcie/StopWhere.inc'
@@ -163,6 +169,10 @@ def main():
         extra_sources['drivers/EldenWifi/QmiPower.c']=qmi['gateway_source_sha256']
         objects += [a.mhi_runtime_build/'WifiRuntimeMsiBinding.o',a.mhi_stop_build/'MhiStop.o',a.qmi_build/'QmiPower.o']
         expected += [runtime['binding_sha256'],stop['object_sha256'],qmi['gateway_object_sha256']]
+    if a.platform_fence_build:
+        fence=read(a.platform_fence_build/'result.json')
+        for name,h in fence['source_inputs'].items():assert sha(ROOT/name)==h,name;extra_sources[name]=h
+        objects.append(a.platform_fence_build/'PlatformFence.o');expected.append(fence['object_sha256'])
     for file,h in zip(objects,expected):
         if h:assert sha(file)==h,file
     rpmh=read(base/'units/result.json')['units']['Sm8750Rpmh'];rp=Path(rpmh['object']);assert sha(rp)==rpmh['sha256'];objects.append(rp)
@@ -177,6 +187,7 @@ def main():
     if stop_trace:required.add('_nw_wifi_where')
     if qmi_trace:required|={'_elden_wifi_qmi_trace','_elden_wifi_irq_trace'}
     if platform_shutdown:required|={'_nw_wifi_platform_shutdown','_elden_nw_pci_platform_shutdown'}
+    if a.platform_fence_build:required.add('_elden_pcie_platform_fence')
     assert required<=union and not required&pending
     target=out/'PcieNativeBinding.o';link=['xcrun','ld','-r','-arch','arm64','-platform_version','ios','17.0','17.0','-o',str(target),*map(str,objects)]
     linked=subprocess.run(link,capture_output=True);(out/'link.log').write_bytes(linked.stdout+linked.stderr);linked.check_returncode()
@@ -193,6 +204,7 @@ def main():
     if stop_trace:inputs['drivers/EldenPcie/StopTraceSource.py']=sha(ROOT/'drivers/EldenPcie/StopTraceSource.py')
     if qmi_trace:inputs['drivers/EldenPcie/QmiTraceSource.py']=sha(ROOT/'drivers/EldenPcie/QmiTraceSource.py')
     if platform_shutdown:inputs['drivers/EldenPcie/PlatformShutdownSource.py']=sha(ROOT/'drivers/EldenPcie/PlatformShutdownSource.py')
+    if a.platform_fence_build:inputs['drivers/EldenPcie/PlatformFenceSource.py']=sha(ROOT/'drivers/EldenPcie/PlatformFenceSource.py')
     report={'compiled':True,'object_sha256':sha(obj),'binding_sha256':sha(target),'command':cmd,'link':link,'source_inputs':inputs,'inherited_input_count':len(inherited),
             'input_objects':{str(f):sha(f) for f in objects},'remaining_imports':sorted(pending),'warnings':r.stderr.count(b'warning:'),'scalar':True,
             'native_root_worker_bound':True,'endpoint_worker_bound':bool(a.endpoint_build),'smmu_domain_required':bool(a.smmu_build),'generated_sources':generated,
@@ -203,6 +215,6 @@ def main():
             'control_transport_bound':a.control_transport,'socket_sdk_inputs':socket_inputs,
             'firmware_qdss_config':bool(a.firmware_cache_build and firmware.get('qdss_config_available')),
             'runtime_owned_cleanup':mhi,'runtime_stop_trace':stop_trace,'runtime_qmi_trace':qmi_trace,'runtime_platform_shutdown':platform_shutdown,'runtime_platform_budget':bool(mhi and runtime.get('platform_shutdown_budget')),
-            'kernel_linked':False,'boot_created':False,'hardware_tested':False}
+            'platform_physical_fence':bool(a.platform_fence_build),'kernel_linked':False,'boot_created':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['compiled','object_sha256','binding_sha256','warnings','kernel_linked']}))
 if __name__=='__main__':main()
