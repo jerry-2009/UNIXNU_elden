@@ -7,6 +7,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['runtime-build','component-repository','output']:p.add_argument('--'+n,type=Path,required=True)
+    p.add_argument('--service-control-trace',action='store_true')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);module=a.runtime_build/'component'
     def run(cmd,name):
         r=subprocess.run(cmd,capture_output=True,timeout=90);(out/(name+'.log')).write_bytes(r.stdout+r.stderr);r.check_returncode();return r.stdout.decode()
@@ -21,12 +22,18 @@ def main():
     abi='#include "ControlApi.h"\n#include <type_traits>\nnamespace reference {\n'
     for kind,name,text in [('enum','nw_control_status',wire),('enum','nw_control_send_result',endpoint),('struct','nw_control_transport',endpoint)]:
         abi+=re.search(kind+' '+name+r' \{.*?\};',text,re.S)[0]+'\n'
+    if a.service_control_trace:abi+=re.search(r'struct nw_control_stats \{.*?\};',endpoint,re.S)[0]+'\n'
     abi+='}\n'
     for n in ['NW_CONTROL_OK','NW_CONTROL_INVALID','NW_CONTROL_BUSY','NW_CONTROL_NOT_READY','NW_CONTROL_AUTH_FAILED','NW_CONTROL_TIMED_OUT','NW_CONTROL_UNSUPPORTED','NW_CONTROL_NO_MEMORY','NW_CONTROL_NOT_FOUND','NW_CONTROL_DRIVER_FAILED','NW_CONTROL_STALE','NW_CONTROL_SEND_OK','NW_CONTROL_SEND_AGAIN','NW_CONTROL_SEND_CLOSED']:
         abi+=f'static_assert(int({n})==int(reference::{n}));\n'
     for n in ['context','send','wake']:
         abi+=f'static_assert(offsetof(nw_control_transport,{n})==offsetof(reference::nw_control_transport,{n}));\nstatic_assert(std::is_same_v<decltype(nw_control_transport::{n}),decltype(reference::nw_control_transport::{n})>);\n'
     abi+='static_assert(sizeof(nw_control_transport)==sizeof(reference::nw_control_transport));\nint main(){}\n';(out/'Abi.cpp').write_text(abi)
+    if a.service_control_trace:
+        abi='#include "ControlTraceApi.h"\n'+abi
+        for name in ['accepted','dispatched','replies','events','malformed','stale_sessions','rx_full','tx_full','send_retries','rx_bytes','tx_bytes','rx_items','tx_items','connections','disconnections','active_session','last_operation','last_status']:
+            abi+=f'static_assert(offsetof(nw_control_stats,{name})==offsetof(reference::nw_control_stats,{name}));\n'
+        abi+='static_assert(sizeof(nw_control_stats)==sizeof(reference::nw_control_stats));\n';(out/'Abi.cpp').write_text(abi)
     run(['clang++','-std=c++17','-I'+str(ROOT/'drivers/EldenWifi'),str(out/'Abi.cpp'),'-o',str(out/'abi')],'abi')
     includes=['-I'+str(module/n) for n in ['shim/include','include','out/pinned']]
     flags=['-O1','-g','-pthread','-fsanitize=address,undefined','-fno-omit-frame-pointer']
@@ -53,11 +60,28 @@ unsigned fixture_requests(void){return dispatched;}
 '''
     (out/'Fixture.c').write_text(prefix)
     run(['clang','-std=gnu11',*flags,*includes,'-c',str(out/'Fixture.c'),'-o',str(out/'Fixture.o')],'fixture')
-    run(['clang++','-std=c++17',*flags,'-I'+str(ROOT/'drivers/EldenWifi'),str(ROOT/'drivers/EldenPcie/TestControl.cpp'),str(out/'Fixture.o'),*map(str,objects),'-o',str(out/'native')],'native-build')
+    fixture_source=ROOT/'drivers/EldenPcie/TestControl.cpp'
+    if a.service_control_trace:
+        spec=importlib.util.spec_from_file_location('service_trace',ROOT/'drivers/EldenWifi/ServiceControlTraceSource.py')
+        tr=importlib.util.module_from_spec(spec);spec.loader.exec_module(tr)
+        (out/'ControlNative.inc').write_bytes(tr.generated()['ControlNative.inc'])
+        text=fixture_source.read_text();fixture_source=out/'TestControl.cpp'
+        text=text.replace('#include "ControlNative.inc"','#include <cstdarg>\nstatic void log(const char *fmt,...){va_list args;va_start(args,fmt);vprintf(fmt,args);va_end(args);}\n#include "ControlNative.inc"')
+        text=text.replace('puts("PASS native socket callbacks', '''unsigned char secret[64]={0};memcpy(secret,"NWC1",4);secret[4]=1;secret[6]=1;secret[8]=1;secret[16]=64;
+    memcpy(secret+40,"SHOULD_NOT_LOG",14);wifi_trace_meta("privacy",7,0,secret,sizeof(secret));
+    for(unsigned i=0;i<150;i++)wifi_trace_meta("bounded",7,0,nullptr,0);
+    puts("PASS native socket callbacks''')
+        fixture_source.write_text(text)
+    run(['clang++','-std=c++17',*flags,'-I'+str(ROOT/'drivers/EldenWifi'),str(fixture_source),str(out/'Fixture.o'),*map(str,objects),'-o',str(out/'native')],'native-build')
     for i in range(7):run([str(out/'native'),str(i)],'native-'+str(i))
+    if a.service_control_trace:
+        data=(out/'native-0.log').read_text();assert 'SHOULD_NOT_LOG' not in data
+        assert re.search(r'where=privacy[^\n]*header=1',data)
+        assert len(re.findall(r'ELDEN_WIFI_CTL where=',data))==96
     spec=importlib.util.spec_from_file_location('control',ROOT/'drivers/EldenPcie/ControlNativeSource.py');mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod);generated=mod.generated()
     code=generated['MhiRuntime.inc'].decode();assert code.index('nw_wifi_set_platform(')<code.index('rc=control_start();')<code.index('if(!rc)rc=nw_wifi_start(')
     files=[ROOT/'drivers/EldenPcie'/n for n in ['ControlNative.inc','ControlNativeSource.py','TestControl.cpp']]+[ROOT/'drivers/EldenWifi/ControlApi.h',Path(__file__)]
-    result={'passed':True,'scenarios':7,'sanitizers':['address','undefined'],'upstream_output':official,'upstream_sha256':upstream,'source_inputs':{str(f.relative_to(ROOT)):sha(f) for f in files},'kernel_socket_services_modeled':True,'actual_control_queue':True,'abi_checked':True,'hardware_tested':False}
+    if a.service_control_trace:files+=[ROOT/'drivers/EldenWifi'/n for n in ['ServiceNativeSource.py','ServiceControlTraceSource.py','ControlTrace.inc','ControlTraceApi.h']]
+    result={'passed':True,'scenarios':7,'service_control_trace':a.service_control_trace,'trace_payload_redaction_checked':a.service_control_trace,'sanitizers':['address','undefined'],'upstream_output':official,'upstream_sha256':upstream,'source_inputs':{str(f.relative_to(ROOT)):sha(f) for f in files},'kernel_socket_services_modeled':True,'actual_control_queue':True,'abi_checked':True,'hardware_tested':False}
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))
 if __name__=='__main__':main()

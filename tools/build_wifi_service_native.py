@@ -33,6 +33,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['parent-native','clean-build','service-core','factory-mac','reference-kernel','llvm','output']:
         p.add_argument('--'+n,type=Path,required=True)
+    p.add_argument('--control-trace',action='store_true')
     a=p.parse_args();parent=a.parent_native.resolve();out=a.output.resolve();prior=read(parent/'result.json')
     assert prior['platform_physical_fence'] and prior['runtime_platform_budget'] and prior['control_transport_bound']
     assert sha(parent/'Native.o')==prior['object_sha256']
@@ -41,6 +42,9 @@ def main():
     spec=importlib.util.spec_from_file_location('service_native',ROOT/'drivers/EldenWifi/ServiceNativeSource.py')
     mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
     old=mod.base();new=mod.generated()
+    if a.control_trace:
+        spec=importlib.util.spec_from_file_location('service_control_trace',ROOT/'drivers/EldenWifi/ServiceControlTraceSource.py')
+        trace=importlib.util.module_from_spec(spec);spec.loader.exec_module(trace);new=trace.generated()
     for name,data in old.items():assert (parent/'source'/name).read_bytes()==data,name
     assert sha(ROOT/'drivers/EldenPcie/ControlNative.inc')==prior['source_inputs']['drivers/EldenPcie/ControlNative.inc']
     private,private_report=private_input(a.factory_mac)
@@ -61,12 +65,16 @@ def main():
     assert bindings
     for directory in directories:
         overlay['roots'].append({'type':'file','name':str(Path(directory)/'EldenWifiFactoryMac.h'),'external-contents':str(private_header)})
+        if a.control_trace:
+            for name in ['ControlTrace.inc','ControlTraceApi.h']:
+                overlay['roots'].append({'type':'file','name':str(Path(directory)/name),'external-contents':str(ROOT/'drivers/EldenWifi'/name)})
     overlay['roots'].append({'type':'file','name':str(folder/'EldenWifiFactoryMac.h'),'external-contents':str(private_header)})
     vfs=out/'overlay.json';write(vfs,overlay);command[command.index('-ivfsoverlay')+1]=str(vfs)
     obj=out/'Native.o';command[command.index('-o')+1]=str(obj)
     r=subprocess.run(command,cwd=a.clean_build/'units/working/WcnPowerNative',capture_output=True)
     (out/'compile.log').write_bytes(r.stdout+r.stderr);r.check_returncode()
-    assert defs(obj)==defs(parent/'Native.o') and refs(obj)-refs(parent/'Native.o')=={'_elden_wifi_assets_ready'}
+    extra={'_nw_wifi_control_stats_get'} if a.control_trace else set()
+    assert defs(obj)==defs(parent/'Native.o') and refs(obj)-refs(parent/'Native.o')=={'_elden_wifi_assets_ready'}|extra
     assert refs(obj)<=defs(a.reference_kernel)|defs(a.service_core/'kern_exec.o')
     assert not any(n.endswith('/__mod_init_func') for n in sections(obj))
     asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',obj],text=True);(out/'Native.asm').write_text(asm)
@@ -75,11 +83,13 @@ def main():
     sources=dict(prior['source_inputs'])
     for name in ['tools/build_wifi_service_native.py','drivers/EldenWifi/ServiceNativeSource.py','drivers/EldenWifi/FactoryMacRuntime.inc','tools/device/export_wifi_mac.py']:
         sources[name]=sha(ROOT/name)
+    if a.control_trace:
+        for name in ['drivers/EldenWifi/ServiceControlTraceSource.py','drivers/EldenWifi/ControlTrace.inc','drivers/EldenWifi/ControlTraceApi.h']:sources[name]=sha(ROOT/name)
     for name,h in sources.items():assert sha(ROOT/name)==h,name
     result={'compiled':True,'object_sha256':sha(obj),'base_object_sha256':prior['object_sha256'],'command':command,
         'changed_bindings':bindings,'source_inputs':sources,'generated_sources':{n:hashlib.sha256(b).hexdigest() for n,b in new.items()},
         'private_assets':private_report,'inherited_sources':inherited,'scalar':True,'warnings':r.stderr.count(b'warning:'),
         'platform_physical_fence_preserved':True,'factory_mac_input':True,'service_admission':True,
-        'full_kernel_linked':False,'hardware_tested':False}
+        'control_trace':a.control_trace,'full_kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','object_sha256','warnings']}))
 if __name__=='__main__':main()

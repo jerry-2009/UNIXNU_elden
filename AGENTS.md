@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17620261116 HARDWARE: native control getter0/8B; first INFO returnsNOT_READY3, second INFO0/116B;
+SET_KEY replies8, SET_OPERSTATE0, SET_PORT0.2connections/1disconnect; second stays until controlled return.
+Diagnostic scan event267 was delivered to the first failed session; no observed SCAN opcode2 on second/BSS0.
+Source nw_mainline.c clears queued UI event after delivery; native diagnostic scan flag never rearms.
+Next gate the diagnostic request on successful INFO reply delivery for current session; preserve bounds and
+normal UI semantics. This is not proof v175 timing-dependent restarts are fixed. No driver/clock guess.
+Physical fence/MSI4/PERST/WCN-stop/typed reset/physical fastboot/full stock8b8e72da/Android/root/green/original
+charge+radio+scan settings and sleep restored. All jobs terminal. Capture256107B/90d46ed2/dropmax0/no reconnect;
+no post-disconnect counter. Image8348b586/sessiona6d74017636b3f20/floor1738713600/0/3; kernel28ac7d9c.
+7native+real queue host scenarios/ABI/privacy/cap pass;1native warning; Apple30/entry7124. Mac wifi-service-trace-v176
+source1/host1/native1/kernel1; boot-v176/package1. Full Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v17520261116 HARDWARE: exact signed supplicant RAM-overlay rule works (33accepted),31real control
 connections/30disconnects; service repeatedly exits/restarts, BSS0. No stable handshake/scan/network acceptance.
 Next inspect original client then collect actual getsockopt/INFO/receive/send codes; no payload/key logging,

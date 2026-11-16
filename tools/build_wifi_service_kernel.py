@@ -66,7 +66,8 @@ def main():
     write(runtime/'wifi-service-assets.json',assets)
     for name in ['tools/build_wifi_service_kernel.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py']:
         inputs[name]=sha(ROOT/name)
-    result=dict(prior);result.update(profile='wifi-service-owner' if core.get('owner_launch_required') else 'wifi-service',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
+    if native.get('control_trace') and not core.get('owner_launch_required'):raise ValueError('Control trace requires the qualified owner rule')
+    result=dict(prior);result.update(profile='wifi-service-control-trace' if native.get('control_trace') else 'wifi-service-owner' if core.get('owner_launch_required') else 'wifi-service',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
         source_inputs=inputs,changed_core_objects=1,changed_native_objects=1,added_native_objects=0,core_filelist_unchanged=False,
         core=core,service_native=native,service_assets=assets,base_report=prior,
         service_archive_members=members,base_archive_members=original_members,inherited_inputs=inherited,
