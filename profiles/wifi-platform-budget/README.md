@@ -38,4 +38,14 @@ Full network and peripheral acceptance remains incomplete.
 
 Signed candidate `136a8e092f41341bf74d84cd4e25e7ef3c5f5497c4d6e655b5f7ab34bff824c6`, session `340c4cbb73e913b5`.
 All182 source inputs match Git index; entry/asset/FAT/AVB checks pass
-(1738713600/0/3). Hardware validation pending.
+(1738713600/0/3). Hardware returned from the actual PCI shutdown callback, unbound the consumer
+successfully and reported config-error0. The bounded MHI wait reports a real
+RESET timeout; the driver then executes its remaining chip-reset path. Final
+native polling still sees MHICTRL2/MHISTATUSff04 and correctly refuses protocol
+reset success. Command6 still has bus-master enabled; transactions0 was never
+sampled. MSI remains armed, PERST was not asserted. Do not count this as full
+native shutdown. The cached EP-end command0002 belongs to the initial probe.
+
+Typed fallback and full stock SHA/Android/root/green/settings restoration pass.
+The next platform-specific path needs fresh master-off/transaction/MSI/PERST
+proof, preserving this failed MHI protocol reset as a separate result.

@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17220261116 hardware: platform callback RETURNS, real unbind0/config-error0.2s aggregate polling
+reports actual RESET timeout then original chip-reset path runs. Final native protocol check rejects ctl2/statusff04
+(RESET held/SYSERR), rc-110; sampled command6 still BM-on. transactions0 is UNPOPULATED, not idle proof;
+MSI remains Armed3, no PERST assertion. Do NOT use cached EP end command0002 as final register evidence.
+Typed fallback/physical fastboot/full stock8b8e72da/Android/root/green/original settings/sleep restored, all jobs terminal.
+Next platform-specific proof: after returned callback and real unbind, clear/read BM and wait transactions,
+mask/drain MSI, assert/read owned PERST low, then allow WLAN release. Keep MHI protocol error separate;
+do not whitelist ff04 as READY or allow resource release without those real hardware checks. Standard PCI shutdown
+already uses master-off for handoff; PERST is the stronger physical reset proof. Full Goal/charging/network incomplete.
+Image136a8e09/session340c4cbb73e913b5/floor1738713600/0/3. See docs/evidence/wifi-platform-v172-20261116.json,
+Mac source1/route-host1/budget-host1/runtime1/native1/kernel1/package1; GPU/QRTR/AnyRouter preserved.
+
 Latest v17220261116 signed: v171 entered actual PCI shutdown and MHI reset, but controller polling default
 90000ms exceeds9s WCN window. v171 had no callback return/native drain proof; full Android restoration passed.
 New explicit platform-only aggregate2s MHI register-poll deadline preserves real observed success/read errors/

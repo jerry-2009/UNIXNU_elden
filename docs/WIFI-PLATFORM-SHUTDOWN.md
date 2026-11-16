@@ -39,3 +39,20 @@ Trace caveat: qmi_txn_init returns a nonnegative allocated ID. v170's diagnostic
 used `ret ? 0 : txn.id` and therefore displayed snapshot txn0; actual send/wait
 records say38. Fix that observation-only expression before reuse, without
 rewriting historical v170 source pins. No transport completion was observed.
+
+
+v172 hardware now returns from the registered callback (unbind0/config-error0).
+MHI RESET remains asserted, statusff04; the existing warm-reset check rejects it.
+This is not READY. The final runtime sample is command6 (master still on);
+transaction status was not read. Do not substitute the cached EP probe command2.
+
+For the platform handoff, implement a separate host-DMA/physical-reset proof:
+require the callback returned and real unbind succeeded, clear and reread PCI
+bus-master against fresh identity, wait for transaction-pending clear, disable
+and drain the native MSI receiver, assert/read the owned PERST low with its
+existing settling bound, then allow WLAN power release. Keep all DMA backing
+and tables retained to platform reset. Preserve MHI protocol reset failure in
+its own status; successful physical reset must not be called warm-reset success.
+Any failed or missing step still refuses release. This follows PCI handoff's
+master-off requirement and adds actual reset-line proof. Do not extend waits or
+merely accept a particular unrecognized MHISTATUS value.

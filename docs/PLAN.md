@@ -1,5 +1,10 @@
 # Elden 基本可用实施计划
 
+v172的上游平台回调已返回，解绑和配置结果为0；但MHI RESET仍置位、状态ff04，现有协议复位
+检查拒绝通过。下一步使用独立的主机DMA停稳与PERST物理复位证明，保留MHI异常，绝不把ff04当READY。
+需要实读BM关闭/事务排空/MSI停稳/PERST低后才能释放电源；平板本轮已完整恢复Android。
+[当前证据](../profiles/wifi-platform-budget/README.md)。
+
 v170确认MODE_OFF入队成功，但未见MHI发送完成/接收应答，中断仍使能。下一步对接Linux平台
 重启专用的PCI `shutdown` 回调，保留真实MHI复位、bus-master关闭、事务/IRQ排空和PERST检查。
 不把卸载路径的MODE_OFF等待当作平台重启的必经步骤；也不伪造应答。设备已完整恢复Android。

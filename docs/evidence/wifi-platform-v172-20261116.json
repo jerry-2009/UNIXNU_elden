@@ -1,7 +1,7 @@
 {
   "profile": "wifi-platform-budget",
   "date": "2026-11-16",
-  "stage": "signed-unflashed",
+  "stage": "hardware-callback-returned-protocol-reset-held-stock-restored",
   "kernel_sha256": "628082699447e16decc2a94786b0be0aef0231bbab47e35c426766c5723551ec",
   "native_sha256": "b42b52c56e7ff037f8603f6a7dabdad13fbfe406c2867439684ecb85e59643ad",
   "native_worker_sha256": "d4fe65c21edaa06ef19960e1a746bd6c3f07a38545bce82615b0293ae1968919",
@@ -30,11 +30,52 @@
   "source_inputs": 182,
   "original_apple_regions": 30,
   "direct_calls": 26,
-  "hardware_tested": false,
+  "hardware_tested": true,
   "image_sha256": "136a8e092f41341bf74d84cd4e25e7ef3c5f5497c4d6e655b5f7ab34bff824c6",
   "session": "340c4cbb73e913b5",
   "rollback": 1738713600,
   "footer": 0,
   "parent_location": 3,
-  "audit_sha256": "d9771a9368ef5f4e7c52713c64fc4453aa94a3a5d9d843255558267243cbd02a"
+  "audit_sha256": "d9771a9368ef5f4e7c52713c64fc4453aa94a3a5d9d843255558267243cbd02a",
+  "capture": {
+    "file": "edl_work\\live-platform-v172-20261116\\usb\\20261116-045704.bin",
+    "bytes": 252662,
+    "sha256": "1c14abbd1fe25c45c1603ecc00c6a2405425e894c589d723bfd26ac38d55c57a",
+    "drop_max": 3,
+    "discontinuities": 0,
+    "reconnections": 0,
+    "post_disconnect_counter_available": false
+  },
+  "key_lines": [
+    "ELDEN_ATH12K level=3 ELDEN_PCI_PLATFORM callback enter",
+    "ELDEN_ATH12K level=3 ELDEN_MHI_PLATFORM timeout off=38 mask=2 want=0 got=1",
+    "ELDEN_ATH12K level=3 ELDEN_MHI_PLATFORM poll off=48 mask=1 want=1 got=1 rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_PCI_PLATFORM callback returned",
+    "ELDEN_ATH12K level=3 ELDEN_PCI_PLATFORM unbind=0",
+    "ELDEN_WIFI_PLATFORM shutdown=0 config-error=0",
+    "ELDEN_WIFI_RUNTIME stop=-110 stage=4 reset=0/0 ctl=2 status=ff04 command=6 transactions=0 consumer=0",
+    "ELDEN_WIFI_TRANSPORT stop=-16 msi=3 irq-active=0 master-attempted=1",
+    "ELDEN_WCN RPC stop=0; held or bounded wait expired, continuing reset",
+    "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+  ],
+  "platform_callback_returned": true,
+  "real_unbind_result": 0,
+  "config_error": 0,
+  "protocol_reset_verified": false,
+  "mhi_control": "0x2",
+  "mhi_status": "0xff04",
+  "last_sampled_command": "0x6",
+  "transaction_idle_verified": false,
+  "msi_mask_and_drain_verified": false,
+  "perst_verified": false,
+  "native_full_stop_verified": false,
+  "typed_fallback_stock_restore": true,
+  "android_root_green_settings_restored": true,
+  "jobs_terminal": true,
+  "notes": [
+    "MHI RESET remained asserted; do not reinterpret ff04 as READY.",
+    "transactions=0 is an unpopulated field: protocol failure prevented the later transaction-status read.",
+    "ELDEN_PCIE_EP end command0002 is the cached initial probe result, not final config evidence; fresh runtime sample is command6.",
+    "Next explicit platform path must clear/read PCI bus-master and drain transactions, mask/drain MSI, assert/read PERST low, then allow WLAN release. Preserve the failed MHI protocol reset as a separate result."
+  ]
 }
