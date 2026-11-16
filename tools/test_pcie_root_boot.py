@@ -63,5 +63,10 @@ def main():
     try:menu(dict(mhi,mhi_runtime=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified MHI runtime accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':13}))
+    trace=dict(mhi,profile='wifi-init-trace',runtime_init_trace=True)
+    assert tomllib.loads(bt_runtime_boot.menu(trace))['entry'][0]['args']==mhi_menu['entry'][0]['args']
+    try:menu(dict(trace,runtime_init_trace=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified init trace accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':14}))
 if __name__=='__main__':main()

@@ -7,9 +7,10 @@ from charge_verification_boot import qualify_shared_assets
 ROOT=Path(__file__).resolve().parents[1]
 def qualify(report_path,entry_path,runtime):
     report_path=Path(report_path);r=json.loads(report_path.read_text());folder=report_path.parent
-    mhi=r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
-    if r.get('profile') not in ('wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
+    trace=r.get('profile')=='wifi-init-trace';mhi=trace or r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
+    if r.get('profile') not in ('wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
         raise ValueError('Wrong root kernel build')
+    if trace and r.get('runtime_init_trace') is not True:raise ValueError('Init trace not qualified')
     if detail and r.get('memory_report_version')!=1:raise ValueError('Memory report not qualified')
     if segmented:
         sys.path.insert(0,str(ROOT/'drivers/EldenSmmu'));from SegmentSource import source as segmented_source
@@ -55,10 +56,13 @@ def qualify(report_path,entry_path,runtime):
         raise ValueError('Root UFS dependencies differ')
     hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu,mhi)
     result=qualify_shared_assets(report_path,entry_path,runtime)
-    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi)
+    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi,runtime_init_trace=trace)
     return result
 
 def menu(qualification):
+    if qualification.get('profile')=='wifi-init-trace':
+        if qualification.get('runtime_init_trace') is not True:raise ValueError('Explicit init trace qualification required')
+        return menu(dict(qualification,profile='wifi-mhi-runtime')).replace('Wi-Fi MHI + USB - TEST','Wi-Fi initialization + USB - TEST',1)
     if qualification.get('profile')=='wifi-mhi-runtime':
         if qualification.get('mhi_runtime') is not True:raise ValueError('Explicit MHI runtime qualification required')
         base=menu(dict(qualification,profile='smmu-prefault-memory'));old=tomllib.loads(base);args=old['entry'][0]['args'];value=args+' ewt'

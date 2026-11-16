@@ -152,6 +152,7 @@ def main():
             'transport_worker_bound':transport,'device_dma_enabled':False,'mhi_started':False,
             'firmware_cache_bound':bool(a.firmware_cache_build),
             'mhi_runtime_bound':mhi,'allows_device_dma_after_runtime_admission':mhi,
+            'runtime_init_trace':bool(mhi and runtime.get('init_trace')),
             'kernel_linked':False,'boot_created':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['compiled','object_sha256','binding_sha256','warnings','kernel_linked']}))
 if __name__=='__main__':main()
