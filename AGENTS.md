@@ -1,5 +1,18 @@
 # UniXNU elden — authoritative source repository
 
+Latest v16720261116 hardware: QDSS fixed; FW_INIT_DONE and Linux stage4/error0 reached, IRQ80/vectors7f.
+scan0 is a queued UI request only: BSS0, native supplicant not installed, no actual scan/network acceptance.
+Shutdown regresses after full ready: QMI mode-off -12, WCN stop0/9s bounded expiry; typed platform reset,
+physical fastboot/full stock8b8e72da/Android/root/green/original charge+radio+scan settings/sleep restored.
+NO native runtime-stop/reset/master-off/IRQ/PERST completion in this capture; do not copy v166 reset1/1.
+Raw261567B/8e608813/dropmax0/no reconnect; no post-disconnect counter. Image432fd688/session1e5fdb6c5d47aa36,
+floor1738713600/0/3. All jobs terminal. Next PRIORITY: fix graceful teardown admission/lifetime before more
+live runtime expansion. MhiRuntime closes DMA/FW before nw_wifi_stop, and WlanPower revokes platform/epoch;
+exact -12 source branch not traced. Permit only bounded, same-owner cleanup while preserving fault guards,
+then drain/reset/master-off/IRQ/PERST. After that install real supplicant/network bridge and original MAC input.
+Evidence docs/evidence/wifi-qdss-v167-20261116.json; Mac source1/host1/firmware1/native1/kernel1/package1.
+Full Goal/charging incomplete; GPU/QRTR/AnyRouter preserved. v167 is diagnostic, not a promoted daily baseline.
+
 Latest v16720261116 signed: exact Linux QDSS request maps to stock6237B qdss_trace_config_v2.cfg,
 SHA94251904 verified by original modem/FAT/real hash and Android.9cache scenarios72 ASan/UBSan checks,
 including targeted QDSS corruption/latched rejection; no QMI bypass or firmware modification.

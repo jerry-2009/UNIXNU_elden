@@ -1,5 +1,10 @@
 # Elden 基本可用实施计划
 
+**v167当前优先级**：QDSS已修，实机FW_INIT_DONE/stage4通过；但停机QMI mode-off=-12，
+9秒WCN等待到期后靠平台复位恢复Android。先修复同owner停机期的DMA/电源准入和真实排空，
+再安装现成supplicant服务/网络接口。scan=0只是入队，BSS0；不得说已扫描联网。
+[实机记录与限制](../profiles/wifi-qdss-config/README.md)。下方均为对应版本历史。
+
 **v166实机进展**：控制socket修复生效，DMA/MSI/MHI/QRTR/QMI已实际工作，原厂AUX_UC成功。
 当前精确阻塞为未映射QDSS配置；下一轮补原厂6237B文件映射及摘要核验，不再重复初始化探针。
 真MHI复位与全SHA恢复Android已通过，尚未扫描/联网。下方v165/v164保留历史。

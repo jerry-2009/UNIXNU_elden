@@ -1,33 +1,27 @@
-# Wi-Fi：PCIe根链路已通过，联网仍未验收
+# Wi-Fi：固件已就绪，先修停机再接用户态服务
 
-[v164完整运行栈首轮实机](../profiles/wifi-mhi-runtime/README.md)已通过控制路径及原厂固件校验，
-但Linux初始化stage0返回-16，未启master/上传固件。已完整恢复Android；下一步定位具体初始化调用，不重测已通过项。
+v167已收到原厂 `FW_INIT_DONE`，Linux进入stage4/error0，MSI计数80；已完成真实
+PCIe/SMMU/DMA/MHI/QRTR/QMI链路。QDSS文件名缺口已补，使用原厂6237B配置并核全SHA。
+[当前实机与复现](../profiles/wifi-qdss-config/README.md)。
 
-v157在TB322FC实机上训练到Gen3 ×2，读到root17cb:011c和endpoint17cb:110e；
-127项PHY与真实WLAN/NoC调用通过，端点IO/MEM/BM关闭。完整回程、stock Android及
-原充电/无线/后台扫描设置恢复通过。[硬件范围与原始证据](../profiles/pcie-root-trial/HARDWARE.md)。
+**联网仍未验收。** `nw_wifi_scan=0`只是把UI请求排队；BSS保持0。固定上游的
+`nw_mainline.c`会通过控制socket把请求送给真实supplicant，而该服务尚未安装。
+原厂MAC文件尚未接入，当前保留上游本地地址fallback，不能声称已采用本机原地址。
 
-v158随后通过[BAR/芯片身份实机](../profiles/pcie-endpoint-trial/README.md)：BAR0/2实测与映射，
-芯片40210200/major2/minor0、MEM-only/禁BM，真实WLAN epoch确认、同步回程及完整Android恢复。
-Wi-Fi仍不能联网：设备DMA/MSI/MHI/固件上传、en0、扫描、关联和流量均未验收。
-128对象QMI可重定位链接尚未接入此候选。下一步有所有权的DMA/MSI及MHI，已通过的身份诊断不重跑。
+**下一步优先修停机。** stage4后mode-off QMI返回-12，WCN在9秒上限后未完成原生排空，
+由已建立的平台复位兜底回fastboot。完整stock SHA、Android/root/green和原充电/无线/
+后台扫描设置均恢复，但这一轮没有RESET/master-off/IRQ/PERST完成证据。v166较早状态的
+reset1/1不能代替v167。源码显示DMA/FW停止过早，WLAN的platform/epoch也在排空前撤回；
+要实现有界、同owner的清理期准入，保留故障/身份/撤映射保护，再验证真实排空。
 
-v163已通过[早期SMMU实机](../profiles/smmu-prefault-memory/README.md)：128MiB普通NC映射、
-逐页PA/PAR核验、66页表/32768叶、bank7/slot8/ASID1、context回读和IRQ97/136注册均通过。
-新路由与触控DMA传输/释放共存。FSR400是格式字段，实际故障位为0；本机不支持硬件ATOS。
-v160–v162的拒绝分别定位到IOPL段边界、静态WB映射重用与尚未prefault的alias，保留逐页检查后修复。
-下一步自有DMA arena/实际运行回调、MSI和真实排空，之后才允许bus-master及MHI；当前command2禁BM。
-完整stock Android及原设置恢复通过。显式full-on预算仍非日用电源策略，充电验收缺口不变。
+之后接入已编译的上游arm64/iOS17 supplicant、实际IOKit网络桥及原厂MAC输入，验证
+服务会话→真实扫描→关联→DHCP→双向流量和断线重连。不得用模拟成功回调替代。
 
-[BAR/Peach事务](../drivers/EldenPcie/ENDPOINT.md)采用stock61MiB与Linux573MiB窗口的较窄交集。
-[SMMU共存](../drivers/EldenSmmu/README.md)和[自有内存](../drivers/EldenSmmu/MEMORY.md)已经整合到上述候选。
-后续QMI须绑定真实消费者和有效epoch，不能用历史身份或模拟值代替；PCI DMA掩码为36位。
+v166修复真实控制socket漏注册，v163完成SMMU与触控共存，v158完成BAR/Peach身份，
+v157完成Gen3×2根链路；各版本证据在相应profiles中。当前显式full-on预算仍非日用
+电源策略；双口取电/完整保护周期/持久设置的充电验收缺口见[充电状态](CHARGING-STATUS.md)。
 
-已具备的源码链为[共享WCN](WCN-SHARED-POWER.md)→[原生WLAN](WLAN-POWER-NATIVE.md)
-→[本机PHY/root](../drivers/EldenPcie/README.md)→[原生worker](../drivers/EldenPcie/NATIVE.md)。
-[QMI桥接](../drivers/EldenWifi/QMI-POWER.md)要求实读端点+major确认后的epoch，不能伪造成功。
-蓝牙已通过原生初始化和BLE报告接收；设备列表、配对及稳定重连仍未验收。
-下方旧构建记录保留各自版本与范围，历史步骤也可查Git。
+以下为前置组件的历史记录，不能覆盖上述最新实机边界。
 
 ## 已完成的前置项
 

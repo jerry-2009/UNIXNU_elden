@@ -40,8 +40,17 @@ source inputs match. No new combined empty clean build was claimed.
 Mac final components: `lab/wifi-qdss-v167-20261116/{source1,host1,firmware1,native1,kernel1}`.
 Workbench mirrors them under `edl_work/wifi-qdss-v167-20261116`.
 [Current evidence](../../docs/evidence/wifi-qdss-v167-20261116.json).
-Boot and hardware qualification follow this component stage.
+Full boot qualification and the hardware result are recorded below.
 
 Signed candidate `432fd68822dc7fe31c87ff097d96082286beb43727285c84d3e9b3bf0986e703`, session `1e5fdb6c5d47aa36`.
 Entry/asset/FAT/AVB independent audit passes (1738713600/0/3).
-Hardware results pending.
+Hardware reached FW_INIT_DONE and Linux stage4/error0. A native scan request
+was queued, but BSS remained0; the real supplicant service is not yet installed.
+The original no-address warning also remains (upstream local-address fallback).
+
+Graceful teardown is NOT accepted: mode-off QMI returned-12 and WCN exceeded
+its9s wait, then the established typed platform-reset fallback restored stock
+with the full SHA. Unlike v166, this capture has no native runtime-stop,
+RESET/master-off/IRQ/PERST completion. Fix cleanup lifetime before the next
+expanded hardware trial. Capture261567B/SHA8e608813/dropmax0/no reconnect;
+post-disconnect counter unavailable. Android/root/green/settings restored.
