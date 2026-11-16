@@ -38,8 +38,15 @@ is changed. Source187 pins, Apple30, entry7124 and27 direct call targets pass.
 Mac/workbench `wifi-fence-v173-20261116/{source1,host1,fence1,native1,kernel1}`.
 Kernel `f0771691887fced6a21ae6357b659560414bcbeacee2540a9a2896c89339a5d0`.
 [Evidence](../../docs/evidence/wifi-fence-v173-20261116.json).
-Actual hardware shutdown and the full peripheral Goal are not yet accepted.
+Physical platform shutdown is now hardware-verified below; the full peripheral Goal remains incomplete.
 
 Signed candidate `23ade412dae130f6377c83ff6248a77c4e6d3dc181bd8df8336f107fc3357b26`, session `2a72f6a2ab45140f`.
 All187 source inputs match Git index; entry/asset/FAT/AVB checks pass
-(1738713600/0/3). Hardware validation pending.
+(1738713600/0/3). Hardware PASS for this physical platform-return path: actual callback/unbind/
+config0; fresh command2/master-off1/transaction sampled+idle1 (Device Status10);
+MSI stopped4/IRQ in-flight0; owned PERST-low confirmed; WCN stop1. Typed reset,
+physical fastboot, full stock SHA and Android/root/green/original settings restore
+also pass. MHI remains snapshot2/ff04 and warm reset is explicitly unverified.
+Capture253193B/SHA13027044/dropmax0/no reconnect, no post-disconnect counter.
+This proves platform return, not scanning, networking, hot module unload or sleep.
+Next integrate the real supplicant and network bridge; do not repeat return-only smoke tests.

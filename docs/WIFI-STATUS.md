@@ -1,46 +1,19 @@
-# Wi-Fi：固件已就绪，先修停机再接用户态服务
+# Wi-Fi：固件已就绪，平台回程通过，下一步用户态与网络桥
 
-v172的上游平台回调已返回，解绑和配置结果为0；但MHI RESET仍置位、状态ff04，现有协议复位
-检查拒绝通过。下一步使用独立的主机DMA停稳与PERST物理复位证明，保留MHI异常，绝不把ff04当READY。
-需要实读BM关闭/事务排空/MSI停稳/PERST低后才能释放电源；平板本轮已完整恢复Android。
-[当前证据](../profiles/wifi-platform-budget/README.md)。
+v167起已经进入真实固件 `FW_INIT_DONE`/Linux stage4，PCIe/SMMU/DMA/MHI/QRTR/QMI
+均实际运行。v173又完成平台回程：真实回调返回/解绑0/配置0，bus-master实读关闭，事务
+已采样为空闲，MSI停止且无在途处理，PERST低确认，WLAN停机成功，完整恢复stock Android。
+[当前回程基线](../profiles/wifi-platform-fence/README.md)。这不代表MHI暖复位成功：2/ff04仍保留。
 
-v170确认MODE_OFF入队成功，但未见MHI发送完成/接收应答，中断仍使能。下一步对接Linux平台
-重启专用的PCI `shutdown` 回调，保留真实MHI复位、bus-master关闭、事务/IRQ排空和PERST检查。
-不把卸载路径的MODE_OFF等待当作平台重启的必经步骤；也不伪造应答。设备已完整恢复Android。
-[具体源代码依据与约束](WIFI-PLATFORM-SHUTDOWN.md)。
+**联网还未验收。** `nw_wifi_scan=0`只是UI请求入队；BSS仍为0。上游框架需要真实
+supplicant通过控制socket处理请求，目前服务尚未安装。原厂MAC文件和实际IOKit网络接口
+也仍待接入。下一步依次整合已编译的arm64/iOS17 supplicant、自己的launchd任务与签名/
+信任缓存、网络桥及本机MAC，再验证扫描、关联、DHCP、双向流量和重连。
 
-v169已定位到 `ath12k_qmi_firmware_stop()` 的MODE_OFF事务。前面的工作队列/PCI/核心清理均已返回，
-调度循环在等待期间仍返回。QMI/MHI队列已经标记为IO完成类，不应重复改flag。下一步核对该请求
-的TX完成、RX及MSI状态；不延长9秒回程掩盖问题。设备已完整恢复Android，仍未联网。
-[本轮定位证据](../profiles/wifi-stop-trace/README.md)。
+不再重复只测回程的镜像；后续真实功能候选沿用同一已验回程链。充电双口取电、持续净充、
+完整保护周期和持久设置仍欠验，见[充电状态](CHARGING-STATUS.md)。蓝牙配对和睡眠也未完整完成。
 
-v168已修正建模确认的DMA清理生命周期，并实机记录`cleanup=0`；stage4保持。原QMI−12未再记录，
-但没有QMI关闭成功或`nw_wifi_stop`返回证据，仍在9秒后兜底复位。完整Android恢复通过。
-当前下一步是统一定位停止子调用，不能把本轮准入成功当作正常停机验收。详[v168](../profiles/wifi-drain-lifetime/README.md)。
-
-v167已收到原厂 `FW_INIT_DONE`，Linux进入stage4/error0，MSI计数80；已完成真实
-PCIe/SMMU/DMA/MHI/QRTR/QMI链路。QDSS文件名缺口已补，使用原厂6237B配置并核全SHA。
-[当前实机与复现](../profiles/wifi-qdss-config/README.md)。
-
-**联网仍未验收。** `nw_wifi_scan=0`只是把UI请求排队；BSS保持0。固定上游的
-`nw_mainline.c`会通过控制socket把请求送给真实supplicant，而该服务尚未安装。
-原厂MAC文件尚未接入，当前保留上游本地地址fallback，不能声称已采用本机原地址。
-
-**下一步优先修停机。** stage4后mode-off QMI返回-12，WCN在9秒上限后未完成原生排空，
-由已建立的平台复位兜底回fastboot。完整stock SHA、Android/root/green和原充电/无线/
-后台扫描设置均恢复，但这一轮没有RESET/master-off/IRQ/PERST完成证据。v166较早状态的
-reset1/1不能代替v167。源码显示DMA/FW停止过早，WLAN的platform/epoch也在排空前撤回；
-要实现有界、同owner的清理期准入，保留故障/身份/撤映射保护，再验证真实排空。
-
-之后接入已编译的上游arm64/iOS17 supplicant、实际IOKit网络桥及原厂MAC输入，验证
-服务会话→真实扫描→关联→DHCP→双向流量和断线重连。不得用模拟成功回调替代。
-
-v166修复真实控制socket漏注册，v163完成SMMU与触控共存，v158完成BAR/Peach身份，
-v157完成Gen3×2根链路；各版本证据在相应profiles中。当前显式full-on预算仍非日用
-电源策略；双口取电/完整保护周期/持久设置的充电验收缺口见[充电状态](CHARGING-STATUS.md)。
-
-以下为前置组件的历史记录，不能覆盖上述最新实机边界。
+以下为前置组件的历史记录，不能覆盖上述最新范围。
 
 ## 已完成的前置项
 

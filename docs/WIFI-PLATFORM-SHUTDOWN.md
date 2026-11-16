@@ -56,3 +56,11 @@ its own status; successful physical reset must not be called warm-reset success.
 Any failed or missing step still refuses release. This follows PCI handoff's
 master-off requirement and adds actual reset-line proof. Do not extend waits or
 merely accept a particular unrecognized MHISTATUS value.
+
+
+v173 completes that separate physical proof on hardware: callback/unbind/config0,
+fresh PCI command2 and sampled transaction-idle (Device Status10), MSIStopped4,
+IRQ in-flight0, owned PERST-low/readback and WCN stop1. Full stock Android restore
+passes. MHI snapshot2/ff04 remains recorded; no warm-reset success is asserted.
+This is the current platform-return baseline. No repeat-only trial is needed;
+subsequent real network integration will exercise the return path again.

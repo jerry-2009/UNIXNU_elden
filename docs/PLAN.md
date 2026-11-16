@@ -1,5 +1,10 @@
 # Elden 基本可用实施计划
 
+**v173已完成平台回程实机验证**：BM实读关闭、事务已采样为空闲、MSI停止、PERST低和WLAN停机均通过，
+随后完整恢复Android。MHI暖复位仍未验证，不能混称。下一步接入真实supplicant/launchd/trust、IOKit网络桥
+及本机MAC输入，推进实际扫描和连接；不再重复仅验证回程的冒烟。充电与完整外设Goal仍未完成。
+[当前基线](../profiles/wifi-platform-fence/README.md)。下方为各历史版本记录。
+
 v172的上游平台回调已返回，解绑和配置结果为0；但MHI RESET仍置位、状态ff04，现有协议复位
 检查拒绝通过。下一步使用独立的主机DMA停稳与PERST物理复位证明，保留MHI异常，绝不把ff04当READY。
 需要实读BM关闭/事务排空/MSI停稳/PERST低后才能释放电源；平板本轮已完整恢复Android。

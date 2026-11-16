@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17320261116 HARDWARE platform return accepted: real callback returned/unbind0/config0, fresh fence0/
+master-off1/transactions-sampled1/idle1/command2/device-status10, MSIStopped4/IRQ-active0, PERSTlow/readback1,
+WCN stop1. Physical reset proof is separate: MHI snapshot stillctrl2/statusff04; warm reset NOT accepted.
+Typed sync/physical fastboot/full stock8b8e72da/Android/root/green/original charge+radio+scan settings/sleep restored.
+All jobs terminal. Capture253193B/raw13027044/dropmax0/no reconnect; no post-disconnect counter.
+Image23ade412/session2a72f6a2ab45140f/floor1738713600/0/3. Source187pins/Apple30/entry7124/27calls and
+26host224checks remain; Mac source1/host1/fence1/native1/kernel1/package1; runtime usesv172.
+Do not repeat this same return-only test. NEXT: install the already-built real iOS17 supplicant/job/trust and
+connect the actual IOKit network bridge/original MAC input; no scan/network claim yet. Full peripherals,
+charging dual-port/net/cycles/persistence and Bluetooth pairing/sleep remain incomplete. GPU/QRTR/AnyRouter preserved.
+profiles/wifi-platform-fence and docs/evidence/wifi-fence-v173-20261116.json are the current return baseline.
+
 Latest v17320261116 signed: distinct platform host-DMA fence then actual PERST proof; never treats ff04 asREADY.
 Only after callback return/config0/real unbind: fresh identity, BM clear/readback, sampled transaction idle,
 MSI disable/mask/inflight drain, fresh recheck and owned PERST low/1ms/readback, then WLAN release.
