@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17220261116 signed: v171 entered actual PCI shutdown and MHI reset, but controller polling default
+90000ms exceeds9s WCN window. v171 had no callback return/native drain proof; full Android restoration passed.
+New explicit platform-only aggregate2s MHI register-poll deadline preserves real observed success/read errors/
+ETIMEDOUT and later original chip-reset path; startup polling/timeout stays original. Native5s/9s safety and
+reset/master/transactions/IRQ/PERST gates unchanged. 6routing45checks and8old/new actual-poll checks ASan/UBSan
+pass (clock/MMIO/callback modeled). 3Cunits+native/full kernel62808269,182source-index pins/Apple30/entry7124/26calls pass.
+Mac source1/route-host1/budget-host1/runtime1/native1/kernel1/package1; Config/stop fromv171. Image136a8e09/session340c4cbb73e913b5,
+floor1738713600/0/3 signed/audited, NOT hardware-tested yet. Next full platform shutdown trial; no fake timeout success.
+Device last restored stock afterv171, all previous jobs terminal. Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v17120261116 signed: real registered PCI shutdown callback for platform reset; original removal/error
 path unchanged, objects retained until reset, real consumer unbind. Native hardware drain gates remain.
 Peach supportsASPM=true: capture initialLinkControl and allow only those2ASPM bits restored in cleanup,

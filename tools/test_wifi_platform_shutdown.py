@@ -22,18 +22,19 @@ static struct pci_driver driver={ids,probe,remove_device,shutdown_device};
 static bool pci_started;
 static void nw_mainline_shutdown(void){event('L');}
 static void nw_wifi_control_shutdown(void){event('C');}
+static uint64_t lx_now_ms(void){return 100;}
 '''+WIFI)
-    source=source.replace('    cases++;g_drv=0;', '    cases++;g_drv=0;shutdowns=0;pci_started=false;driver.shutdown=shutdown_device;elden_shutdown_started=elden_platform_started=0;elden_shutdown_result=elden_platform_result=-EINPROGRESS;')
+    source=source.replace('    cases++;g_drv=0;', '    cases++;g_drv=0;shutdowns=0;pci_started=false;driver.shutdown=shutdown_device;elden_shutdown_started=elden_platform_started=0;elden_platform_deadline=0;elden_shutdown_result=elden_platform_result=-EINPROGRESS;')
     source+='''
 int main(void){
- reset();CHECK(nw_wifi_platform_shutdown()==-ENODEV&&!events);
+ reset();CHECK(!elden_wifi_platform_deadline_ms());CHECK(nw_wifi_platform_shutdown()==-ENODEV&&!events);
  CHECK(elden_nw_pci_platform_shutdown()==-ENODEV&&!events);
  reset();CHECK(!pci_register_driver(&driver));pci_started=true;driver.shutdown=NULL;
  CHECK(nw_wifi_platform_shutdown()==-ENODEV&&shutdowns==0&&removes==0&&bound);
  reset();CHECK(!pci_register_driver(&driver));g_dev.dev.driver_data=NULL;
  CHECK(elden_nw_pci_platform_shutdown()==-ENODEV&&shutdowns==0&&bound);
  reset();CHECK(!pci_register_driver(&driver));pci_started=true;
- CHECK(!nw_wifi_platform_shutdown());CHECK(!strcmp(order,"BPMLCSU"));
+ CHECK(!nw_wifi_platform_shutdown());CHECK(!strcmp(order,"BPMLCSU"));CHECK(elden_wifi_platform_deadline_ms()==2100);
  CHECK(shutdowns==1&&removes==0&&unbinds==1&&!bound&&g_drv==&driver);
  CHECK(!nw_wifi_platform_shutdown()&&!elden_nw_pci_platform_shutdown());CHECK(shutdowns==1&&unbinds==1);
  reset();CHECK(!pci_register_driver(&driver));pci_started=true;unbind_error=-EBUSY;

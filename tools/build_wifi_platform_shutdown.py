@@ -21,7 +21,7 @@ def main():
     header=ROOT/'drivers/EldenWifi/PlatformShutdownApi.h'
     rename=dict(line.split() for line in (base/'objects/rename.txt').read_text().splitlines())
     changes={};records={};dependencies={}
-    for objname,source_name in [('nw_wifi.o','nw_wifi.c'),('nw_pci.o','nw_pci.c')]:
+    for objname,source_name in [('nw_wifi.o','nw_wifi.c'),('nw_pci.o','nw_pci.c'),('mhi_main.o','main.c')]:
         row,=[r for r in manifest['objects'] if Path(r['path']).name==objname]
         original=Path(row['source']);assert sha(original)==row['source_sha256']
         data=platform_patch(source_name,original.read_bytes());source=out/source_name;source.write_bytes(data)
@@ -37,7 +37,7 @@ def main():
         for f in inputs:assert sha(Path(f))==(sha(source) if f==str(source) else sha(header) if f==str(header) else identity['dependencies'][f]);dependencies[f]=sha(Path(f))
         subprocess.run([str(a.llvm/'llvm-objcopy'),'--redefine-syms='+str(base/'objects/rename.txt'),str(raw),str(obj)],check=True)
         assert global_symbols(obj)=={rename.get(n,n):v for n,v in global_symbols(raw).items()}
-        extra={'_nw_wifi_platform_shutdown'} if objname=='nw_wifi.o' else {'_elden_nw_pci_platform_shutdown'}
+        extra={'_nw_wifi_platform_shutdown','_elden_wifi_platform_deadline_ms'} if objname=='nw_wifi.o' else {'_elden_nw_pci_platform_shutdown'} if objname=='nw_pci.o' else set()
         assert sections(raw)==sections(obj) and defs(obj)==defs(Path(row['path']))|extra
         assert not any(n.endswith('/__mod_init_func') for n in sections(obj))
         asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',str(obj)],text=True);(out/(objname+'.asm')).write_text(asm,encoding='utf-8')
@@ -56,7 +56,7 @@ def main():
     assert defs(target)==definitions and refs(target)==imports-definitions==set(lr['imports'])
     for f,h in baseline['consumed_inputs'].items():assert sha(Path(f))==h,f
     own={**lr['source_sha256'],**initial['source_sha256'],**{n:sha(ROOT/n) for n in ['drivers/EldenWifi/peach/PlatformShutdownPatch.py','drivers/EldenWifi/PlatformShutdownApi.h','tools/build_wifi_platform_shutdown.py']}}
-    result={'compiled':True,'units':125,'native_lifecycle_required':True,'init_trace':True,'platform_shutdown':True,'removal_unchanged':True,'retained_cfg_init':sha(cfg),'prior_lifecycle_reference':sha(pci),'rebuilt_units':records,'retained_objects':kept,
+    result={'compiled':True,'units':125,'native_lifecycle_required':True,'init_trace':True,'platform_shutdown':True,'platform_shutdown_budget':True,'removal_unchanged':True,'retained_cfg_init':sha(cfg),'prior_lifecycle_reference':sha(pci),'rebuilt_units':records,'retained_objects':kept,
             'binding_sha256':sha(target),'imports':sorted(refs(target)),'source_sha256':own,'compile_inputs':dependencies,'hardware':False}
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'compiled':True,'binding':result['binding_sha256'],'kept':len(kept),'warnings':{n:r['warnings'] for n,r in records.items()}}))
 if __name__=='__main__':main()

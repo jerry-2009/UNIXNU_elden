@@ -202,7 +202,7 @@ def main():
             'runtime_init_trace':bool(mhi and runtime.get('init_trace')),
             'control_transport_bound':a.control_transport,'socket_sdk_inputs':socket_inputs,
             'firmware_qdss_config':bool(a.firmware_cache_build and firmware.get('qdss_config_available')),
-            'runtime_owned_cleanup':mhi,'runtime_stop_trace':stop_trace,'runtime_qmi_trace':qmi_trace,'runtime_platform_shutdown':platform_shutdown,
+            'runtime_owned_cleanup':mhi,'runtime_stop_trace':stop_trace,'runtime_qmi_trace':qmi_trace,'runtime_platform_shutdown':platform_shutdown,'runtime_platform_budget':bool(mhi and runtime.get('platform_shutdown_budget')),
             'kernel_linked':False,'boot_created':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['compiled','object_sha256','binding_sha256','warnings','kernel_linked']}))
 if __name__=='__main__':main()

@@ -7,9 +7,10 @@ from charge_verification_boot import qualify_shared_assets
 ROOT=Path(__file__).resolve().parents[1]
 def qualify(report_path,entry_path,runtime):
     report_path=Path(report_path);r=json.loads(report_path.read_text());folder=report_path.parent
-    platform=r.get('profile')=='wifi-platform-shutdown';qmi_trace=r.get('profile')=='wifi-qmi-wire-trace';stop_trace=qmi_trace or r.get('profile')=='wifi-stop-trace';drain=platform or stop_trace or r.get('profile')=='wifi-drain-lifetime';qdss=drain or r.get('profile')=='wifi-qdss-config';control=qdss or r.get('profile')=='wifi-control-transport';trace=bool(r.get('runtime_init_trace')) if control else r.get('profile')=='wifi-init-trace';mhi=control or trace or r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
-    if r.get('profile') not in ('wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
+    budget=r.get('profile')=='wifi-platform-budget';platform=budget or r.get('profile')=='wifi-platform-shutdown';qmi_trace=r.get('profile')=='wifi-qmi-wire-trace';stop_trace=qmi_trace or r.get('profile')=='wifi-stop-trace';drain=platform or stop_trace or r.get('profile')=='wifi-drain-lifetime';qdss=drain or r.get('profile')=='wifi-qdss-config';control=qdss or r.get('profile')=='wifi-control-transport';trace=bool(r.get('runtime_init_trace')) if control else r.get('profile')=='wifi-init-trace';mhi=control or trace or r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
+    if r.get('profile') not in ('wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
         raise ValueError('Wrong root kernel build')
+    if budget and r.get('runtime_platform_budget') is not True:raise ValueError('Platform budget not qualified')
     if platform and r.get('runtime_platform_shutdown') is not True:raise ValueError('Platform shutdown not qualified')
     if qmi_trace and r.get('runtime_qmi_trace') is not True:raise ValueError('QMI trace not qualified')
     if stop_trace and r.get('runtime_stop_trace') is not True:raise ValueError('Stop trace not qualified')
@@ -68,12 +69,15 @@ def qualify(report_path,entry_path,runtime):
         raise ValueError('Root UFS source/initializer differs')
     if {k:hashlib.sha256(v).hexdigest() for k,v in expected.items()}!=row['generated_sources']:
         raise ValueError('Root UFS dependencies differ')
-    hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu,mhi,control,drain,platform)
+    hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu,mhi,control,drain,platform,budget)
     result=qualify_shared_assets(report_path,entry_path,runtime)
-    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi,runtime_init_trace=trace,control_transport_bound=control,firmware_qdss_config=qdss,runtime_owned_cleanup=drain,runtime_stop_trace=stop_trace,runtime_qmi_trace=qmi_trace,runtime_platform_shutdown=platform)
+    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi,runtime_init_trace=trace,control_transport_bound=control,firmware_qdss_config=qdss,runtime_owned_cleanup=drain,runtime_stop_trace=stop_trace,runtime_qmi_trace=qmi_trace,runtime_platform_shutdown=platform,runtime_platform_budget=budget)
     return result
 
 def menu(qualification):
+    if qualification.get('profile')=='wifi-platform-budget':
+        if qualification.get('runtime_platform_budget') is not True:raise ValueError('Explicit platform budget qualification required')
+        return menu(dict(qualification,profile='wifi-platform-shutdown')).replace('Wi-Fi platform reset + USB - TEST','Wi-Fi bounded reset + USB - TEST',1)
     if qualification.get('profile')=='wifi-platform-shutdown':
         if qualification.get('runtime_platform_shutdown') is not True:raise ValueError('Explicit platform shutdown qualification required')
         return menu(dict(qualification,profile='wifi-drain-lifetime')).replace('Wi-Fi shutdown + USB - TEST','Wi-Fi platform reset + USB - TEST',1)

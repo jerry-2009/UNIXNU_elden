@@ -98,5 +98,10 @@ def main():
     try:menu(dict(platform,runtime_platform_shutdown=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified platform shutdown accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':20}))
+    budget=dict(platform,profile='wifi-platform-budget',runtime_platform_budget=True)
+    assert tomllib.loads(bt_runtime_boot.menu(budget))['entry'][0]['args']==mhi_menu['entry'][0]['args']
+    try:menu(dict(budget,runtime_platform_budget=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified platform budget accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':21}))
 if __name__=='__main__':main()

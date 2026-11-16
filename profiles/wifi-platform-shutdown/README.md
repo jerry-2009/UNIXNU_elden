@@ -44,4 +44,12 @@ Full peripherals, network and charging acceptance remain incomplete.
 
 Signed candidate `851ee98471fde6081bdc1382d4d243a53bdf69ee87986e1739c5595cef1b0d60`, session `d9cddb9af79a73a1`.
 All182 source inputs match Git index; entry/asset/FAT/AVB checks pass
-(1738713600/0/3). Hardware validation pending.
+(1738713600/0/3). Hardware reached stage4, entered the actual PCI shutdown callback, and reached
+MHI reset handling. It did not return within9s; the configured MHI default is90s
+per polling wait. The exact register value was not captured, so do not infer a
+firmware defect. No ASPM/hardware-drain completion is accepted. Typed fallback,
+full stock SHA and Android/root/green/settings restoration passed. See evidence.
+
+The next explicit budget profile bounds only platform-reset polling and keeps
+the original timeout return and later chip-reset path, followed by independent
+native hardware checks. The tested v171 image remains tied to commit acbfaf5.

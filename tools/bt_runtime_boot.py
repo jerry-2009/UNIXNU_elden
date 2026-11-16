@@ -11,7 +11,7 @@ def qualify(report_path,entry_path,runtime):
     if not report_path or not entry_path or not runtime:raise ValueError('Complete v99 build, entry and runtime inputs required')
     report=json.loads(Path(report_path).read_text());entry=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     name=report.get('profile')
-    if name in ('wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
+    if name in ('wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
         from pcie_root_boot import qualify as qualify_pcie
         return qualify_pcie(report_path,entry_path,runtime)
     if name in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
@@ -113,7 +113,7 @@ def early_stall(qualification):
     return dict(qualification,profile='early-storage-stall',native_profile='early-storage-guard',controlled_stall=True)
 
 def menu(qualification=None):
-    if qualification and qualification.get('profile') in ('wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
+    if qualification and qualification.get('profile') in ('wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
         from pcie_root_boot import menu as pcie_menu
         return pcie_menu(qualification)
     before=battery_template(framebuffer_template(True));config=tomllib.loads(before)
@@ -168,7 +168,7 @@ def menu(qualification=None):
     if new['entry'][1:]!=config['entry'][1:] or new['boot']!=config['boot']:raise ValueError('Fallback/menu behavior changed')
     return text
 def adt(base,qualification=None):
-    if qualification and qualification.get('profile') in ('wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
+    if qualification and qualification.get('profile') in ('wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
         qualification=dict(qualification,profile='ufs-idle-trial') # unchanged v156 ADT/runtime only
     result=copy.deepcopy(base);found=[]
     def visit(n):
@@ -190,7 +190,7 @@ def adt(base,qualification=None):
         result=registry_adt(result)
     return result
 def augment_trust(original,qualification):
-    if qualification.get('profile') in ('wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
+    if qualification.get('profile') in ('wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
         qualification=dict(qualification,profile='ufs-idle-trial') # identical qualified cache/trust assets
     if qualification.get('profile') not in ('bluetool-lifecycle','bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):return original
     if hashlib.sha256(original).hexdigest()!=qualification['cache_input_trust_sha256']:raise ValueError('Unexpected trust before cache')
