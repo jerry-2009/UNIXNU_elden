@@ -7,9 +7,10 @@ from charge_verification_boot import qualify_shared_assets
 ROOT=Path(__file__).resolve().parents[1]
 def qualify(report_path,entry_path,runtime):
     report_path=Path(report_path);r=json.loads(report_path.read_text());folder=report_path.parent
-    control=r.get('profile')=='wifi-control-transport';trace=bool(r.get('runtime_init_trace')) if control else r.get('profile')=='wifi-init-trace';mhi=control or trace or r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
-    if r.get('profile') not in ('wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
+    qdss=r.get('profile')=='wifi-qdss-config';control=qdss or r.get('profile')=='wifi-control-transport';trace=bool(r.get('runtime_init_trace')) if control else r.get('profile')=='wifi-init-trace';mhi=control or trace or r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
+    if r.get('profile') not in ('wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
         raise ValueError('Wrong root kernel build')
+    if qdss and r.get('firmware_qdss_config') is not True:raise ValueError('QDSS config not qualified')
     if control and r.get('control_transport_bound') is not True:raise ValueError('Control transport not qualified')
     if trace and r.get('runtime_init_trace') is not True:raise ValueError('Init trace not qualified')
     if detail and r.get('memory_report_version')!=1:raise ValueError('Memory report not qualified')
@@ -59,10 +60,13 @@ def qualify(report_path,entry_path,runtime):
         raise ValueError('Root UFS dependencies differ')
     hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu,mhi,control)
     result=qualify_shared_assets(report_path,entry_path,runtime)
-    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi,runtime_init_trace=trace,control_transport_bound=control)
+    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi,runtime_init_trace=trace,control_transport_bound=control,firmware_qdss_config=qdss)
     return result
 
 def menu(qualification):
+    if qualification.get('profile')=='wifi-qdss-config':
+        if qualification.get('firmware_qdss_config') is not True:raise ValueError('Explicit QDSS config qualification required')
+        return menu(dict(qualification,profile='wifi-control-transport')).replace('Wi-Fi control + USB - TEST','Wi-Fi firmware + USB - TEST',1)
     if qualification.get('profile')=='wifi-control-transport':
         if qualification.get('control_transport_bound') is not True:raise ValueError('Explicit control transport qualification required')
         return menu(dict(qualification,profile='wifi-mhi-runtime')).replace('Wi-Fi MHI + USB - TEST','Wi-Fi control + USB - TEST',1)

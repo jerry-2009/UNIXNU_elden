@@ -73,5 +73,10 @@ def main():
     try:menu(dict(control,control_transport_bound=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified control transport accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':15}))
+    qdss=dict(control,profile='wifi-qdss-config',firmware_qdss_config=True)
+    assert tomllib.loads(bt_runtime_boot.menu(qdss))['entry'][0]['args']==mhi_menu['entry'][0]['args']
+    try:menu(dict(qdss,firmware_qdss_config=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified QDSS config accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':16}))
 if __name__=='__main__':main()

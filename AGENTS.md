@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest v16720261116 signed: exact Linux QDSS request maps to stock6237B qdss_trace_config_v2.cfg,
+SHA94251904 verified by original modem/FAT/real hash and Android.9cache scenarios72 ASan/UBSan checks,
+including targeted QDSS corruption/latched rejection; no QMI bypass or firmware modification.
+Initial six files/master gate and native worker1dd01bae are unchanged; QDSS loads on demand.
+Firmware binding5483cc1a, kernel3465762a/Apple30/178source pins/entry7124/21calls pass; same guards.
+Image432fd688/session1e5fdb6c5d47aa36/floor1738713600/0/3 signed and audited, NOT hardware-tested yet.
+Mac lab/wifi-qdss-v167-20261116/{source1,host1,firmware1,native1,kernel1}, package1. Originalv166 restore
+is latest device result. Full Goal/charging remain incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v16620261116 hardware: control start0; all12 Linux init calls0; MHI firmware download enters
 Mission Mode, actual DMA/MSI/QRTR/QMI respond with Peach40210200/firmware version. AUX_UC succeeds.
 Runtime stage2 then stops at missing exact qdss_trace_config.bin (-2), no scans/network acceptance.

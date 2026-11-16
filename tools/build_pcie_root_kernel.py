@@ -140,7 +140,7 @@ def main():
     own={**nr['source_inputs'],**wr['source_inputs'],**{'drivers/EldenPcie/'+n:h for n,h in rr['source_sha256'].items()},**pr['source_sha256'],**shared_sources,**endpoint_sources,**smmu_sources}
     for path in ['tools/build_pcie_root_kernel.py','tools/build_ufs_wait_objects.py','drivers/EldenUfsIdle/IdleSource.py']:own[path]=sha(ROOT/path)
     sources={**previous['source_inputs'],**own}
-    report={'profile':'wifi-control-transport' if nr.get('control_transport_bound') else 'wifi-init-trace' if a.mhi_runtime and nr.get('runtime_init_trace') else 'wifi-mhi-runtime' if a.mhi_runtime else 'smmu-prefault-memory' if a.prefault_memory else 'smmu-unique-memory' if a.unique_memory else 'smmu-segmented-memory' if a.segmented_memory else 'smmu-memory-detail' if a.memory_detail else 'smmu-domain-trial' if a.smmu_build else 'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
+    report={'profile':'wifi-qdss-config' if nr.get('control_transport_bound') and nr.get('firmware_qdss_config') else 'wifi-control-transport' if nr.get('control_transport_bound') else 'wifi-init-trace' if a.mhi_runtime and nr.get('runtime_init_trace') else 'wifi-mhi-runtime' if a.mhi_runtime else 'smmu-prefault-memory' if a.prefault_memory else 'smmu-unique-memory' if a.unique_memory else 'smmu-segmented-memory' if a.segmented_memory else 'smmu-memory-detail' if a.memory_detail else 'smmu-domain-trial' if a.smmu_build else 'pcie-endpoint-trial' if a.endpoint_build else 'pcie-root-trial','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),
             'source_inputs':sources,'optional_runtime':previous['optional_runtime'],'core_filelist_unchanged':True,'changed_core_objects':0,'scalar':True,
             'changed_native_objects':5 if a.smmu_build else 3,'added_native_objects':len(pcie_members)+(smmu_count-1 if a.smmu_build else 0)+(124 if a.mhi_runtime else 0),'native_objects':records,'archive_members':member_hashes,
             'component_objects':{n:{'path':str(p),'sha256':h} for n,(p,h) in supplied.items()},
@@ -154,6 +154,7 @@ def main():
             'mhi_runtime_bound':a.mhi_runtime,'modem_reader_reused':reused_reader,'linux_runtime_objects':125 if a.mhi_runtime else 0,
             'runtime_init_trace':bool(a.mhi_runtime and nr.get('runtime_init_trace')),
             'control_transport_bound':bool(nr.get('control_transport_bound')),
+            'firmware_qdss_config':bool(nr.get('firmware_qdss_config')),
             'boot_packaged':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['profile','kernel_sha256','changed_native_objects','added_native_objects','original_apple_executables_hashed','boot_packaged']}))
 if __name__=='__main__':main()

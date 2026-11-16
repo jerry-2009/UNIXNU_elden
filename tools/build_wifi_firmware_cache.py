@@ -45,6 +45,7 @@ def main():
     for n,h in inherited.items():assert sha(Path(n))==h,n
     inputs={str(f.relative_to(ROOT)):sha(f) for f in [d/'FirmwareCache.cpp',d/'ModemFiles.c',*files.values(),Path(__file__)]}
     result={'compiled':True,'objects':records,'binding_sha256':sha(target),'remaining_imports':sorted(pending),'kernel_imports_verified':True,
+            'qdss_config_available':True,
             'reference_kernel_sha256':sha(a.reference_kernel),'source_inputs':inputs,'scalar':True,'kernel_linked':False,'hardware':False}
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:result[k] for k in ['compiled','binding_sha256','remaining_imports','kernel_imports_verified']}))
 if __name__=='__main__':main()

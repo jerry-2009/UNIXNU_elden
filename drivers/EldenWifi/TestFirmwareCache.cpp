@@ -16,6 +16,7 @@ static void SHA256_Update(SHA256_CTX *c,const void *p,size_t n){assert(n<=65536)
 static void SHA256_Final(uint8_t *p,SHA256_CTX *c){CC_SHA256_Final(p,c);}
 static unsigned checks,cases,allocations_count,fail_alloc,reads,fail_read,corruptions;
 static bool live=true,in_irq=false,corrupt=false;
+static uint64_t corrupt_at=UINT64_MAX;
 static std::atomic<bool> block_read{false},read_entered{false},release_read{false};
 static int owner;static FILE *disk;
 static std::vector<void *> allocations;static std::vector<IOLock *> locks;
@@ -37,6 +38,8 @@ extern "C" int native_ufs_part_read(uint32_t lun,uint64_t first,uint32_t blocks,
     if(fail_read&&reads==fail_read)return 0;
     if(fseeko(disk,(off_t)((first-4870)*4096),SEEK_SET)||fread(data,4096,blocks,disk)!=blocks)return 0;
     if(corrupt&&blocks>1){((uint8_t *)data)[0]^=1;corruptions++;}
+    uint64_t offset=(first-4870)*4096;
+    if(corrupt_at>=offset&&corrupt_at-offset<(uint64_t)blocks*4096){((uint8_t *)data)[corrupt_at-offset]^=1;corruptions++;}
     return 1;
 }
 #include "FirmwareCacheHost.inc"
@@ -44,6 +47,7 @@ static void reset(){
     for(auto p:locks)delete p;locks.clear();for(auto p:allocations)free(p);allocations.clear();
     cache=nullptr;run=stopping=0;setup_error=0;allocations_count=fail_alloc=reads=fail_read=corruptions=0;
     live=true;in_irq=corrupt=false;block_read=false;read_entered=false;release_read=false;++cases;
+    corrupt_at=UINT64_MAX;
 }
 static EldenWifiFirmwareStatus status(){EldenWifiFirmwareStatus s={};CHECK(!elden_wifi_firmware_status(&s));return s;}
 static void bind(){CHECK(elden_wifi_firmware_bind(&owner,7)==0);}
@@ -58,11 +62,16 @@ int main(int argc,char **argv){
         const uint8_t *saved=data;unsigned old_reads=reads;CHECK(elden_wifi_firmware_get(names[i],&data,&bytes)==0&&data==saved&&reads==old_reads);
     }
     CHECK(status().loaded==6&&status().bytes==7517874);
+    for(const char *name:{"qdss_trace_config.bin","ath12k/PEACH/hw2.0/qdss_trace_config.bin","PEACH/hw2.0/qdss_trace_config.bin"}){
+        CHECK(elden_wifi_firmware_get(name,&data,&bytes)==0&&data&&bytes==6237);
+    }
+    CHECK(status().loaded==7&&status().bytes==7524111);
     unsigned old_reads=reads;
-    for(const char *bad:{"../m3.bin","ath12k/WCN7850/hw2.0/m3.bin","firmware-2.bin","data20.msc"})
+    for(const char *bad:{"../m3.bin","ath12k/WCN7850/hw2.0/m3.bin","firmware-2.bin","data20.msc",
+                        "../qdss_trace_config.bin","ath12k/WCN7850/hw2.0/qdss_trace_config.bin","qdss_trace_config_v2.cfg"})
         CHECK(elden_wifi_firmware_get(bad,&data,&bytes)==-2&&!data&&!bytes&&reads==old_reads);
     elden_wifi_firmware_stop_begin();CHECK(elden_wifi_firmware_get("m3.bin",&data,&bytes)==-108&&!data&&!bytes);
-    CHECK(status().loaded==6&&allocations.size()==7);
+    CHECK(status().loaded==7&&allocations.size()==8);
     for(unsigned n=1;n<=2;n++){
         reset();fail_alloc=n;CHECK(elden_wifi_firmware_bind(&owner,7)==-12);CHECK(status().run==3&&status().error==-12);
     }
@@ -71,6 +80,12 @@ int main(int argc,char **argv){
     old_reads=reads;CHECK(elden_wifi_firmware_get("amss.bin",&data,&bytes)!=0&&reads==old_reads);
     reset();bind();corrupt=true;CHECK(elden_wifi_firmware_get("amss.bin",&data,&bytes)==-74&&!data&&!bytes&&corruptions>0);
     CHECK(status().loaded==0&&status().error==-74&&allocations.size()==2);
+    reset();bind();EldenWifiFile qdss={};CHECK(!elden_wifi_file_open(&cache->files,"image/peach/qdss_trace_config_v2.cfg",&qdss));
+    corrupt_at=cache->files.fat.data_offset+(uint64_t)(qdss.file.first_cluster-2)*cache->files.fat.cluster_bytes;
+    CHECK(qdss.file.size==6237);
+    CHECK(elden_wifi_firmware_get("qdss_trace_config.bin",&data,&bytes)==-74&&!data&&!bytes&&corruptions>0);
+    CHECK(status().loaded==0&&status().error==-74);old_reads=reads;
+    CHECK(elden_wifi_firmware_get("qdss_trace_config.bin",&data,&bytes)==-74&&!data&&!bytes&&reads==old_reads);
     reset();bind();block_read=true;int result=0;
     std::thread loader([&]{result=elden_wifi_firmware_get("m3.bin",&data,&bytes);});
     while(!read_entered)std::this_thread::yield();EldenWifiFirmwareStatus busy={};CHECK(elden_wifi_firmware_status(&busy)==-11);

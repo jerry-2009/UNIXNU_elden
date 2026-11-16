@@ -177,6 +177,7 @@ def main():
             'mhi_runtime_bound':mhi,'allows_device_dma_after_runtime_admission':mhi,
             'runtime_init_trace':bool(mhi and runtime.get('init_trace')),
             'control_transport_bound':a.control_transport,'socket_sdk_inputs':socket_inputs,
+            'firmware_qdss_config':bool(a.firmware_cache_build and firmware.get('qdss_config_available')),
             'kernel_linked':False,'boot_created':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['compiled','object_sha256','binding_sha256','warnings','kernel_linked']}))
 if __name__=='__main__':main()

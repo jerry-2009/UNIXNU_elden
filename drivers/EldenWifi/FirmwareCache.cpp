@@ -19,7 +19,7 @@ struct Cache {
     static void *operator new(size_t n) noexcept{return IOMalloc(n);}
     static void operator delete(void *p) noexcept{if(p)IOFree(p,sizeof(Cache));}
     const void *provider=nullptr;uint64_t epoch=0;
-    IOLock *lock=nullptr;EldenWifiFiles files={};Entry entries[7];
+    IOLock *lock=nullptr;EldenWifiFiles files={};Entry entries[sizeof(elden_wifi_firmware_inputs)/sizeof(elden_wifi_firmware_inputs[0])];
     unsigned loaded=0,slot=0;uint64_t bytes=0;int error=0;
 };
 static Cache *cache;
@@ -35,7 +35,8 @@ static int slot_for(const char *name){
     if(!strncmp(base,full,sizeof(full)-1))base+=sizeof(full)-1;
     else if(!strncmp(base,short_name,sizeof(short_name)-1))base+=sizeof(short_name)-1;
     static const struct {const char *name;unsigned slot;} names[]={
-        {"amss.bin",0},{"m3.bin",1},{"aux_ucode.bin",2},{"tmel.bin",3},{"regdb.bin",5},{"board.bin",6}};
+        {"amss.bin",0},{"m3.bin",1},{"aux_ucode.bin",2},{"tmel.bin",3},{"regdb.bin",5},{"board.bin",6},
+        {"qdss_trace_config.bin",7}};
     for(const auto &entry:names)if(!strcmp(base,entry.name))return (int)entry.slot;
     return -1;
 }
