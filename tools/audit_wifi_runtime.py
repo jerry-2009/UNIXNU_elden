@@ -21,6 +21,8 @@ def audit(build,llvm,kernel):
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'drivers/EldenWifi/peach'))
         from PciMsiPatch import patch as patch_pci
         pci_fix=json.loads((build/'pci-msi-fix.json').read_text())
+        if pci_fix.get('native_lifecycle'):
+            from PciLifecyclePatch import patch as patch_pci
         original=(module/'src/nw_pci.before-msi-fix').read_bytes();current=(module/'src/nw_pci.c').read_bytes()
         if (hashlib.sha256(original).hexdigest()!=pci_fix['original_sha256'] or
             hashlib.sha256(current).hexdigest()!=pci_fix['derived_sha256'] or patch_pci(original)!=current):

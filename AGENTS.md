@@ -1,23 +1,23 @@
 # UniXNU elden — authoritative source repository
 
-Latest native-transport20261116 offline: TransportNativeSource calls real DMA bind, config and MSI providers
-from confirmed PCIe worker; explicit ewt=1 intent requires epe1/esm1. Raw held DBI/config maps,
-native GIC attach/mask and IRQ-safe wake wired. Bounded Config rejects capability cycles/overlaps, foreign MSI
-targets and generic BM writes; W1C status preserved. Cleanup uses retained owner after admission withdrawal,
-MSI/inflight stop before PERST, try-lock status gate. Master readiness explicitly returns-95 until actual MHI
-execution/drain exists; NO hardware DMA or MHI success claim.74actual native/config/MSI scenarios315checks
-ASan/UBSan, physical services/DMA provider modeled. Initial fixture C/static linkage compile failure retained.
-Config0e822d7b/native8dd0e9e9/binding6ae33c50, scalar/no init/0warnings;11supplied bindings/objects,
-72remaining imports all found in v163 reference. Not a complete kernel/boot, no hardware transport test.
-Read-only stock CNSS modulefd8e10b2 matched device SHA. M3 selector maps PCI110e/major2 to phy_ucode20.elf;
-generic m3.bin is another branch. Exact ELF instructions/relocations/major diagnostic anchored by audit_oem_wifi_m3.py.
-Original modem manifest provides fullpath/SHA; binary stays local. No charge settings/boot/partition write.
-Next original FW cache + actual Linux QMI consumer + MHI execution/cancel/reset and IRQ/DMA drain, then BM.
-Change old reset-only/dma-started0/SMMU-IRQ stop order before DMA. No mapping/receiver-only test.
-Mac lab/wifi-transport-20261116/{source2,host2,config1,native1}; workbench matching edl/lab.
-drivers/EldenPcie/TRANSPORT.md + docs/evidence/wifi-transport-20261116.json current. Prior MSI7b31f720,
-PCI52291af3/runtime125 dfdba164 and DMA84e5a00a remain qualified offline components. All jobs terminal;
-v163/stock remains latest hardware evidence, full Goal/charging incomplete. GPU/QRTR/AnyRouter preserved.
+Latest FW-cache/lifecycle20261116 offline: six exact stock blobs7,517,874B via original ModemFiles/FAT,
+full size/SHA before publication, cached pointers, owner/epoch/cancellation, no retries and buffers retained to reset.
+Only canonical PEACH/basename requests; no data20-as-M3/dummy/MAC fallback. Actual original367001600B modem FAT
+and real SHA256 host8scenarios55checks ASan/UBSan; kernel services modeled. NativeFW5f8bad02/reader2a6ce236,
+binding14f5fbda, scalar/no init/0warnings; all UFS/FAT/SHA/lock imports in v163. FirmwareNativeSource now binds
+the cache in the native PCIe worker and withdraws on stop;75modeled transport scenarios391checks pass.
+Workerb66a202f/12object-bindingf863780a,0warnings;82imports in v163. No new full kernel/boot/hardware operation.
+PciLifecyclePatch adds actual &g_dev.dev bind before probe/unbind on failure/remove, config I/O propagation,
+and native master-enable call after verified MSI setup.19actual-entrypoint scenarios111checks ASan/UBSan.
+One PCI object8a37dba5+124 unchanged gives125binding493ea717;24inherited warnings,0in MSI functions.
+Three strong native runtime-hook imports are still UNIMPLEMENTED, not fake successes; real pwrseq also external.
+Full runtime --native-lifecycle recipe/auditor updated, not rerun from empty. Next hook bodies + clock/poll/heap/FW ABI,
+MHI start/cancel/RESET proof, PCI master-off and IRQ drain; only then allow BM. MHI common.h at frozen458c6079:
+CTRL38 resetbit1/STATUS48 state15:8/SYSERR2/READY0; host/pm.c waits reset clear. Existing master readiness remains-95.
+Change old SMMU fault-IRQ stop order for real DMA; no mapping-only hardware trial. No tablet/charging access this round.
+Mac lab/wifi-firmware-cache-20261116/{source2,host1,native1,pci-host1,pci-native1,transport-host1,transport-native1};
+workbench matching edl/lab. drivers/EldenWifi/FIRMWARE.md + docs/evidence/wifi-firmware-cache-20261116.json current.
+All jobs terminal; v163/stock remains last hardware evidence. Full Goal/charging incomplete, GPU/QRTR/AnyRouter preserved.
 
 Latest v16320261116: owned128MiB NC mapping and early SMMU domain PASS hardware.
 v160 first64MiB descriptor segment was an IOPL boundary; v161 preserves every4KiB PA/PAR check,

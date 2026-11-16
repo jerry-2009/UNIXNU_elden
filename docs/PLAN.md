@@ -1,7 +1,7 @@
 # Elden 基本可用实施计划
 
-[原生控制路径](../drivers/EldenPcie/TRANSPORT.md)已把DMA/Config/MSI接入PCIe worker并完成组件绑定；
-下一步原厂固件缓存、真实QMI consumer与MHI执行/排空，再开BM。尚未硬件MSI或联网，v163仍是实机基线。
+[原厂固件缓存和PCI生命周期调用点](../drivers/EldenWifi/FIRMWARE.md)已完成真实FAT/SHA测试与组件链接；
+下一步三个原生运行钩子、MHI执行/取消/RESET及DMA/IRQ排空，再开BM。尚未硬件MSI或联网，v163仍是实机基线。
 
 目标仍是如官方 Sheng 一样基本可用的 iPadOS 平板：基本外设、正常交互、可靠供电与
 恢复均需实机验收。GPU 最后；音频启用前先讨论衰减与保护。完整 Goal 尚未完成。

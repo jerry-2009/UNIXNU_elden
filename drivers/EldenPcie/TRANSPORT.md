@@ -1,5 +1,9 @@
 # Native PCIe control transport — compiled, MHI execution pending
 
+The [firmware cache and PCI lifecycle sites](../EldenWifi/FIRMWARE.md) are now
+compiled and verified offline. The cache is bound by the native worker; the
+three runtime-hook bodies and real MHI execution/drain still remain.
+
 The explicit `TransportNativeSource.py` variant now calls the real DMA bind,
 endpoint config and MSI providers from the existing PCIe worker, after BAR /
 Peach / WLAN epoch confirmation. It uses the worker's held config and DBI
