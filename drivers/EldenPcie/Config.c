@@ -48,6 +48,9 @@ int elden_pcie_cfg_open(EldenPcieConfigAccess *c,uint64_t sink){
     if(!c->pcie_cap||!c->msi_cap)return fail(c,-19);
     uint32_t msi_bytes=(c->msi_header&(1u<<23))?16:12;if(c->msi_header&(1u<<24))msi_bytes+=4;
     if(c->msi_cap<c->pcie_cap+20&&c->pcie_cap<c->msi_cap+msi_bytes)return fail(c,-71);
+    if((rc=read_word(c,c->pcie_cap+16,&v,false)))return rc;
+    if(v==UINT32_MAX)return fail(c,-19);
+    c->initial_link_control=v&0xffff;c->link_control_saved=true;
     c->ready=true;return 0;
 }
 int elden_pcie_cfg_read(EldenPcieConfigAccess *c,int input,int size,uint32_t *value,bool cleanup){
@@ -63,7 +66,10 @@ int elden_pcie_cfg_write(EldenPcieConfigAccess *c,int input,int size,uint32_t va
     unsigned shift=(off&3)*8;uint32_t mask=size==4?~0u:(size==2?0xffffu:0xffu)<<shift;
     uint32_t next=(old&~mask)|((value<<shift)&mask),verify_mask=mask;
     bool msi_control=word_off==c->msi_cap;
-    if(cleanup&&!msi_control)return -1;
+    bool aspm_restore=cleanup&&word_off==c->pcie_cap+16;
+    if(cleanup&&!msi_control&&!aspm_restore)return -1;
+    if(aspm_restore&&(!c->link_control_saved||size!=2||off!=word_off||
+       ((next^old)&0xfffcu)||(next&3u)!=(c->initial_link_control&3u)))return -1;
     if(msi_control){
         /* Only Enable/MME are writable. Keep the actual capability/next/MMC/
          * width/PVM fields, and never allow a cleanup call to enable MSI. */

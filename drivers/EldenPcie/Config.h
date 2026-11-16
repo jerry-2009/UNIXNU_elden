@@ -18,6 +18,8 @@ typedef struct {
     uint32_t pcie_cap,msi_cap,msi_header,command,reads,writes;
     int error;
     bool attempted,ready,master_attempted,master_known;
+    uint32_t initial_link_control;
+    bool link_control_saved;
 } EldenPcieConfigAccess;
 /* Serialized PCIe owner. No generic PCI enumerator: the cold, CPU-identified
  * Peach endpoint and its fixed owned MSI sink are mandatory. */

@@ -37,9 +37,9 @@ def patch(name,data):
     }''')
         insert('qmi_wlanfw_wlan_mode_resp_msg_v01_ei, &resp);','''
     if (mode == ATH12K_FIRMWARE_MODE_OFF) {
-        __atomic_store_n(&elden_wifi_qmi_trace[EldenQmiTxn],ret?0:txn.id,__ATOMIC_RELAXED);
+        __atomic_store_n(&elden_wifi_qmi_trace[EldenQmiTxn],ret<0?0:(unsigned)txn.id,__ATOMIC_RELAXED);
         __atomic_store_n(&elden_wifi_qmi_trace[EldenQmiPhase],2,__ATOMIC_RELAXED);
-        lx_log(3,"ELDEN_QMI_MODE init=%d txn=%u",ret,ret?0:txn.id);
+        lx_log(3,"ELDEN_QMI_MODE init=%d txn=%u",ret,ret<0?0:(unsigned)txn.id);
     }''')
         insert('qmi_wlanfw_wlan_mode_req_msg_v01_ei, &req);','''
     if (mode == ATH12K_FIRMWARE_MODE_OFF) {

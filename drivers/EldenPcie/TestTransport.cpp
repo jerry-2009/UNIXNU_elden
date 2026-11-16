@@ -96,5 +96,16 @@ int main(){
     reset();transport_run(active);active->transport_gate=1;CHECK(transport_snapshot(active,&s)==-11);
     unsigned before=calls;stop_requested=1;CHECK(transport_stop(active,clock_us+1000)==-110&&calls==before);
     active->transport_gate=0;CHECK(transport_stop(active,clock_us+1000)==0);
+    reset();cfg[0x50/4]=0xabcd0103;transport_run(active);CHECK(active->config.initial_link_control==0x103);
+    CHECK(elden_pcie_cfg_write(&active->config,(int)0x80000010,2,0x100,false)==0);
+    active->transport_cleanup=true;unsigned writes=active->config.writes;
+    CHECK(elden_pcie_cfg_write(&active->config,(int)0x80000010,2,0x102,true)==-1);
+    CHECK(elden_pcie_cfg_write(&active->config,(int)0x80000010,2,0x203,true)==-1);
+    CHECK(elden_pcie_cfg_write(&active->config,(int)0x80000010,4,0x103,true)==-1);
+    CHECK(active->config.writes==writes&&cfg[0x50/4]==0xabcd0100);
+    CHECK(elden_pcie_cfg_write(&active->config,(int)0x80000010,2,0x103,true)==0);
+    CHECK(cfg[0x50/4]==0xabcd0103); // restored ASPM only; status W1C preserved
+    active->config.link_control_saved=false;
+    CHECK(elden_pcie_cfg_write(&active->config,(int)0x80000010,2,0x103,true)==-1);
     printf("%u native transport/config/MSI scenarios / %u checks passed; physical services and DMA provider modeled\n",cases,checks);
 }

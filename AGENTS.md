@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17120261116 signed: real registered PCI shutdown callback for platform reset; original removal/error
+path unchanged, objects retained until reset, real consumer unbind. Native hardware drain gates remain.
+Peach supportsASPM=true: capture initialLinkControl and allow only those2ASPM bits restored in cleanup,
+other controls/W1C preserved; config callback errors propagate. Callback reset functions also used during power-on.
+6routing43checks/77transport334checks/6composed135checks ASan/UBSan pass (hardware/Linux protocol modeled).
+2Cunits+Config/MhiStop/native rebuilt; kernel f2c6f6ce,182source-index pins/Apple30/entry7124/25calls pass.
+C warnings83/24, native1oldshadow. Mac source1/route-host1/config-host1/mhi-host1/config1/stop1/runtime1/native1/kernel1/package1.
+Image851ee984/sessiond9cddb9af79a73a1/floor1738713600/0/3 signed/audited, NOT hardware-tested yet.
+Next one stage4 platform shutdown/full restoration trial. v170 traceID ternary corrected for future reuse,
+not included in this image. Device last stock-restored afterv170. Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v17020261116 hardware: MODE_OFF init38/send0/52B queued, but no MHI UL/DL or QMI RX completion.
 Soft used/enabled1fc0ff/disabled0/pending0, HW pending0/enableffffffff/mask0/count80/error0, MHI201.
 Do not infer descriptor consumption or firmware/clock root cause. Trace-only caveat: qmi_txn_init returns

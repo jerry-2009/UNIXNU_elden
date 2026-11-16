@@ -2,7 +2,7 @@
 import argparse,json,struct
 from pathlib import Path
 from replay_xnu_objects import global_symbols
-def audit(native,kernel,endpoint=False,smmu=False,mhi=False,control=False,cleanup=False):
+def audit(native,kernel,endpoint=False,smmu=False,mhi=False,control=False,cleanup=False,platform=False):
     data=Path(native).read_bytes();after=Path(kernel).read_bytes();at=32;sections={};code=[]
     for _ in range(struct.unpack_from('<I',data,16)[0]):
         cmd,size=struct.unpack_from('<II',data,at)
@@ -32,7 +32,7 @@ def audit(native,kernel,endpoint=False,smmu=False,mhi=False,control=False,cleanu
                       ('_elden_smmu_domain_start',None,0),('_elden_smmu_select_boot_domain',None,0)]
     expected_counts={}
     if mhi:
-        for name,count in [('_nw_wifi_start',1),('_nw_wifi_stop',2),('_elden_mhi_stop',1),('_elden_wifi_runtime_enable_master',1),('_elden_wlan_qmi_bind',1),('_elden_wlan_qmi_unbind',1)]:
+        for name,count in [('_nw_wifi_start',1),('_nw_wifi_stop',1 if platform else 2),('_elden_mhi_stop',1),('_elden_wifi_runtime_enable_master',1),('_elden_wlan_qmi_bind',1),('_elden_wlan_qmi_unbind',1)]:
             targets.append((name,None,0));expected_counts[name]=count
     if control:
         if not mhi:raise ValueError('Control endpoint requires MHI runtime')
@@ -42,6 +42,10 @@ def audit(native,kernel,endpoint=False,smmu=False,mhi=False,control=False,cleanu
         if not mhi:raise ValueError('Cleanup requires MHI runtime')
         for name,count in [('_elden_wifi_dma_cleanup_begin',1),('_elden_wifi_dma_close_admission',2)]:
             targets.append((name,None,0));expected_counts[name]=count
+    if platform:
+        if not cleanup:raise ValueError('Platform shutdown requires owned cleanup')
+        for name in ['_nw_wifi_platform_shutdown','_elden_nw_pci_platform_shutdown']:
+            targets.append((name,None,0));expected_counts[name]=1
     for target,caller,bound in targets:
         dest=address(target);calls=[]
         for base,size,off in code:

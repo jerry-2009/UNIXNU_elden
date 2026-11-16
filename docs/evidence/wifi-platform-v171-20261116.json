@@ -1,0 +1,39 @@
+{
+  "profile": "wifi-platform-shutdown",
+  "date": "2026-11-16",
+  "stage": "signed-unflashed",
+  "kernel_sha256": "f2c6f6ce4c14e2eb833f7415c4f828ab9447f37e69286c009b7d099d0f16fd10",
+  "native_sha256": "e9213ce0c76b2d8c8c562c2a58fa9a465cc410cae169c04073f1c38d158074f6",
+  "native_worker_sha256": "0ce20b47a66bd78cff0746e8d221ca11fa9aa56a3153faf624e2d9f687488182",
+  "runtime_binding_sha256": "86543f00d18b32f8b1f5120918e48ba57def35f3fc3cd981864bbcaac4200ecd",
+  "tests": {
+    "route-host1": "6 platform-routing scenarios / 43 checks passed; real entry/shim, driver hardware callback modeled",
+    "config-host1": "77 native transport/config/MSI scenarios / 334 checks passed; physical services and DMA provider modeled",
+    "mhi-host1": "6 native MHI runtime scenarios / 135 checks passed; actual DMA arena/adapter/QMI binding/config/MSI/reset, Linux protocol and hardware modeled"
+  },
+  "hardware_callbacks_and_mmio_modeled_in_host_tests": true,
+  "rebuilt_linux_units": [
+    "nw_wifi.o",
+    "nw_pci.o"
+  ],
+  "retained_original_units": 122,
+  "warnings": {
+    "nw_wifi.o": 83,
+    "nw_pci.o": 24
+  },
+  "native_warnings": 1,
+  "source_inputs": 182,
+  "original_apple_regions": 30,
+  "direct_calls": 25,
+  "remove_unchanged": true,
+  "objects_retained_until_platform_reset": true,
+  "aspm_restore_only_original_bits": true,
+  "source_audit_sha256": "c241c1a072cb542dc76ed34f6cea4a5fe9616a28cdb5fce1961ca3cae8650fdb",
+  "hardware_tested": false,
+  "image_sha256": "851ee98471fde6081bdc1382d4d243a53bdf69ee87986e1739c5595cef1b0d60",
+  "session": "d9cddb9af79a73a1",
+  "rollback": 1738713600,
+  "footer": 0,
+  "parent_location": 3,
+  "audit_sha256": "1f27886d8b3ba2ba0e1fe9da27968fd6e69be2b55f3665a501307c586d0e35a9"
+}

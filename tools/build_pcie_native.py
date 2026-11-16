@@ -29,6 +29,8 @@ def main():
     mhi=bool(a.mhi_runtime_build)
     stop_trace=bool(mhi and read(a.mhi_runtime_build/'result.json').get('stop_trace'))
     qmi_trace=bool(mhi and read(a.mhi_runtime_build/'result.json').get('qmi_trace'))
+    platform_shutdown=bool(mhi and read(a.mhi_runtime_build/'result.json').get('platform_shutdown'))
+    if platform_shutdown and (not a.control_transport or stop_trace or qmi_trace):raise ValueError('Platform shutdown requires plain qualified control/runtime')
     if stop_trace and not a.control_transport:raise ValueError('Stop trace requires qualified control/runtime')
     if mhi!=bool(a.mhi_stop_build) or mhi!=bool(a.qmi_build) or (mhi and not a.firmware_cache_build):
         raise ValueError('MHI requires firmware, stop and actual QMI providers together')
@@ -60,6 +62,9 @@ def main():
         if qmi_trace:
             spec=importlib.util.spec_from_file_location('qmi_native',ROOT/'drivers/EldenPcie/QmiTraceSource.py')
             qmi_source=importlib.util.module_from_spec(spec);spec.loader.exec_module(qmi_source);derive=qmi_source.generated
+        if platform_shutdown:
+            spec=importlib.util.spec_from_file_location('platform_native',ROOT/'drivers/EldenPcie/PlatformShutdownSource.py')
+            platform_source=importlib.util.module_from_spec(spec);spec.loader.exec_module(platform_source);derive=platform_source.generated
         for name,data in derive().items():(folder/name).write_bytes(data);generated[name]=hashlib.sha256(data).hexdigest()
         native_source=folder/'Native.cpp'
     elif a.smmu_build:raise ValueError('SMMU requires endpoint stage')
@@ -99,6 +104,7 @@ def main():
     if a.control_transport:
         files['ControlApi.h']=ROOT/'drivers/EldenWifi/ControlApi.h'
         files['ControlNative.inc']=ROOT/'drivers/EldenPcie/ControlNative.inc'
+    if platform_shutdown:files['PlatformShutdownApi.h']=ROOT/'drivers/EldenWifi/PlatformShutdownApi.h'
     if qmi_trace:files['EldenQmiTrace.h']=ROOT/'drivers/EldenWifi/peach/EldenQmiTrace.h'
     if stop_trace:files['StopWhere.inc']=ROOT/'drivers/EldenPcie/StopWhere.inc'
     existing={item['name']:item for item in ov['roots']}
@@ -170,6 +176,7 @@ def main():
     if a.control_transport:required|={'_nw_wifi_control_transport_set','_nw_wifi_control_attach','_nw_wifi_control_detach','_nw_wifi_control_receive','_nw_wifi_control_writable'}
     if stop_trace:required.add('_nw_wifi_where')
     if qmi_trace:required|={'_elden_wifi_qmi_trace','_elden_wifi_irq_trace'}
+    if platform_shutdown:required|={'_nw_wifi_platform_shutdown','_elden_nw_pci_platform_shutdown'}
     assert required<=union and not required&pending
     target=out/'PcieNativeBinding.o';link=['xcrun','ld','-r','-arch','arm64','-platform_version','ios','17.0','17.0','-o',str(target),*map(str,objects)]
     linked=subprocess.run(link,capture_output=True);(out/'link.log').write_bytes(linked.stdout+linked.stderr);linked.check_returncode()
@@ -185,6 +192,7 @@ def main():
     if a.control_transport:inputs['drivers/EldenPcie/ControlNativeSource.py']=sha(ROOT/'drivers/EldenPcie/ControlNativeSource.py')
     if stop_trace:inputs['drivers/EldenPcie/StopTraceSource.py']=sha(ROOT/'drivers/EldenPcie/StopTraceSource.py')
     if qmi_trace:inputs['drivers/EldenPcie/QmiTraceSource.py']=sha(ROOT/'drivers/EldenPcie/QmiTraceSource.py')
+    if platform_shutdown:inputs['drivers/EldenPcie/PlatformShutdownSource.py']=sha(ROOT/'drivers/EldenPcie/PlatformShutdownSource.py')
     report={'compiled':True,'object_sha256':sha(obj),'binding_sha256':sha(target),'command':cmd,'link':link,'source_inputs':inputs,'inherited_input_count':len(inherited),
             'input_objects':{str(f):sha(f) for f in objects},'remaining_imports':sorted(pending),'warnings':r.stderr.count(b'warning:'),'scalar':True,
             'native_root_worker_bound':True,'endpoint_worker_bound':bool(a.endpoint_build),'smmu_domain_required':bool(a.smmu_build),'generated_sources':generated,
@@ -194,7 +202,7 @@ def main():
             'runtime_init_trace':bool(mhi and runtime.get('init_trace')),
             'control_transport_bound':a.control_transport,'socket_sdk_inputs':socket_inputs,
             'firmware_qdss_config':bool(a.firmware_cache_build and firmware.get('qdss_config_available')),
-            'runtime_owned_cleanup':mhi,'runtime_stop_trace':stop_trace,'runtime_qmi_trace':qmi_trace,
+            'runtime_owned_cleanup':mhi,'runtime_stop_trace':stop_trace,'runtime_qmi_trace':qmi_trace,'runtime_platform_shutdown':platform_shutdown,
             'kernel_linked':False,'boot_created':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['compiled','object_sha256','binding_sha256','warnings','kernel_linked']}))
 if __name__=='__main__':main()
