@@ -1,0 +1,13 @@
+{
+  "stage": "signed-not-yet-flashed",
+  "image_sha256": "8d4917a338cbfc087c817cfdb5ba13882174917d2afba63aa8acb18adb9a261c",
+  "session": "401a0d3a1b943912",
+  "audit_sha256": "8925108696db95e1ad5322e0d8f7ec476ac424cee5128c63fb05032a7cd20aea",
+  "rollback": 1738713600,
+  "footer": 0,
+  "parent_location": 3,
+  "kernel_sha256": "f847af90b826f2fc57f74ea3569b2cb6f597587177b3da99662ca0cc8d925f3b",
+  "source_inputs": 178,
+  "direct_call_checks": 21,
+  "hardware_tested": false
+}

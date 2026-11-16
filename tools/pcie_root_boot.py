@@ -7,9 +7,10 @@ from charge_verification_boot import qualify_shared_assets
 ROOT=Path(__file__).resolve().parents[1]
 def qualify(report_path,entry_path,runtime):
     report_path=Path(report_path);r=json.loads(report_path.read_text());folder=report_path.parent
-    trace=r.get('profile')=='wifi-init-trace';mhi=trace or r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
-    if r.get('profile') not in ('wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
+    control=r.get('profile')=='wifi-control-transport';trace=bool(r.get('runtime_init_trace')) if control else r.get('profile')=='wifi-init-trace';mhi=control or trace or r.get('profile')=='wifi-mhi-runtime';prefault=mhi or r.get('profile')=='smmu-prefault-memory';unique=prefault or r.get('profile')=='smmu-unique-memory';segmented=unique or r.get('profile')=='smmu-segmented-memory';detail=segmented or r.get('profile')=='smmu-memory-detail';smmu=detail or r.get('profile')=='smmu-domain-trial';endpoint=smmu or r.get('profile')=='pcie-endpoint-trial'
+    if r.get('profile') not in ('wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory') or r['changed_core_objects']!=0 or r['changed_native_objects']!=(5 if smmu else 3) or r['added_native_objects']!=(147 if mhi else 16 if smmu else 4+int(endpoint)):
         raise ValueError('Wrong root kernel build')
+    if control and r.get('control_transport_bound') is not True:raise ValueError('Control transport not qualified')
     if trace and r.get('runtime_init_trace') is not True:raise ValueError('Init trace not qualified')
     if detail and r.get('memory_report_version')!=1:raise ValueError('Memory report not qualified')
     if segmented:
@@ -38,6 +39,8 @@ def qualify(report_path,entry_path,runtime):
             if hashlib.sha256(EarlySource.cpu()).hexdigest()!=r['native_objects']['ArmCpu']['source_sha256']:raise ValueError('Owned SGI source differs')
         if mhi:
             from MhiRuntimeSource import generated
+        if control:
+            from ControlNativeSource import generated
         if not r.get('endpoint_worker_bound') or r['endpoint_generated_sources']!={n:hashlib.sha256(b).hexdigest() for n,b in generated().items()}:
             raise ValueError('Endpoint worker source/qualification differs')
     sys.path.insert(0,str(ROOT/'drivers/EldenUfsIdle'));import IdleSource as ah8
@@ -54,12 +57,15 @@ def qualify(report_path,entry_path,runtime):
         raise ValueError('Root UFS source/initializer differs')
     if {k:hashlib.sha256(v).hexdigest() for k,v in expected.items()}!=row['generated_sources']:
         raise ValueError('Root UFS dependencies differ')
-    hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu,mhi)
+    hooks=audit_hooks(folder/'native.macho',folder/'kernel.macho',endpoint,smmu,mhi,control)
     result=qualify_shared_assets(report_path,entry_path,runtime)
-    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi,runtime_init_trace=trace)
+    result.update(mode=0,root_trial=True,root_hooks=hooks,endpoint_trial=endpoint,smmu_domain=smmu,memory_detail=detail,segmented_memory=segmented,unique_memory=unique,prefault_memory=prefault,mhi_runtime=mhi,runtime_init_trace=trace,control_transport_bound=control)
     return result
 
 def menu(qualification):
+    if qualification.get('profile')=='wifi-control-transport':
+        if qualification.get('control_transport_bound') is not True:raise ValueError('Explicit control transport qualification required')
+        return menu(dict(qualification,profile='wifi-mhi-runtime')).replace('Wi-Fi MHI + USB - TEST','Wi-Fi control + USB - TEST',1)
     if qualification.get('profile')=='wifi-init-trace':
         if qualification.get('runtime_init_trace') is not True:raise ValueError('Explicit init trace qualification required')
         return menu(dict(qualification,profile='wifi-mhi-runtime')).replace('Wi-Fi MHI + USB - TEST','Wi-Fi initialization + USB - TEST',1)

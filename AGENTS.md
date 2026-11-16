@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest v165/control20261116: v165 localizes Linux -16 to nl80211_init: actual nw_cfg80211_control shim
+binds nw_control, but Elden never installed its native transport. Production queue reproduces
+NOT_READY3 -> EBUSY-16; do not modify clocks/heap/FW or fake bind success. v165 raw168563B/
+041a2fe6/dropmax0/no reconnect, no DMA/master/upload; typed return/full stock8b8e72da and
+Android/root/green/original settings/sleep restored. Evidence docs/evidence/wifi-init-v165-20261116.json.
+New ControlNative follows Sheng privileged socket/session/mbuf/send+wake before nw_wifi_start,
+terminal stop/real queue shutdown. ABI+official thread test+7 adapter scenarios ASan/UBSan pass;
+XNU socket services modeled. Native1dd01bae (1 shadow warning), binding4ce7a39d, kernelf847af90,
+178source pins/Apple30/entry7124/21direct calls pass. Source4/host3/native2/kernel2 are final components;
+boot/hardware pending. Full Goal and charging incomplete; GPU/QRTR/AnyRouter kept separate.
+
 Latest v16420261116 hardware: native DMA/MSI/config and all six original firmware files PASS, but
 Linux nw_wifi_start returns-16/stage0 BEFORE PCI bind/master/DMA. Exact init subcall unknown; next inspect prepared
 mainline/cfg80211/mac80211/MHI/QRTR init chain and collect all return values once. Do not guess heap/clock/FW cause.

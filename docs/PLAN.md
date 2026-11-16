@@ -1,5 +1,9 @@
 # Elden 基本可用实施计划
 
+当前 v165 已定位：未安装控制socket transport，导致实际 `nl80211_init` 返回-16。
+真实Sheng控制通道已完成组件/整核，下一步一次完整签包和实机验证，观察MHI真实进展。
+[控制通道方案与复现](../profiles/wifi-control-transport/README.md)。下方v164记录为历史基线。
+
 [v164完整运行栈首轮实机](../profiles/wifi-mhi-runtime/README.md)已通过控制路径及原厂固件校验，
 但Linux初始化stage0返回-16，未启master/上传固件。已完整恢复Android；下一步定位具体初始化调用，不重测已通过项。
 

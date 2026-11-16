@@ -20,6 +20,7 @@ def main():
     p.add_argument('--mhi-runtime-build',type=Path,help='Qualified lifecycle-patched 125-object runtime')
     p.add_argument('--mhi-stop-build',type=Path)
     p.add_argument('--qmi-build',type=Path)
+    p.add_argument('--control-transport',action='store_true',help='Install the native privileged Wi-Fi control socket before Linux init')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);base=a.clean_build.resolve()
     transport=bool(a.config_build)
     if transport!=bool(a.msi_build) or (transport and (not a.smmu_build or not a.endpoint_build or not a.reference_kernel)):
@@ -28,6 +29,7 @@ def main():
     mhi=bool(a.mhi_runtime_build)
     if mhi!=bool(a.mhi_stop_build) or mhi!=bool(a.qmi_build) or (mhi and not a.firmware_cache_build):
         raise ValueError('MHI requires firmware, stop and actual QMI providers together')
+    if a.control_transport and not mhi:raise ValueError('Control socket requires the real MHI runtime')
     generated={};native_source=ROOT/'drivers/EldenPcie/Native.cpp'
     if a.endpoint_build:
         spec=importlib.util.spec_from_file_location('endpoint_native',ROOT/'drivers/EldenPcie/EndpointNativeSource.py')
@@ -46,6 +48,9 @@ def main():
         if mhi:
             spec=importlib.util.spec_from_file_location('mhi_runtime',ROOT/'drivers/EldenPcie/MhiRuntimeSource.py')
             mhi_source=importlib.util.module_from_spec(spec);spec.loader.exec_module(mhi_source);derive=mhi_source.generated
+        if a.control_transport:
+            spec=importlib.util.spec_from_file_location('control_native',ROOT/'drivers/EldenPcie/ControlNativeSource.py')
+            control_source=importlib.util.module_from_spec(spec);spec.loader.exec_module(control_source);derive=control_source.generated
         for name,data in derive().items():(folder/name).write_bytes(data);generated[name]=hashlib.sha256(data).hexdigest()
         native_source=folder/'Native.cpp'
     elif a.smmu_build:raise ValueError('SMMU requires endpoint stage')
@@ -57,6 +62,19 @@ def main():
             assert h=='5c16106e90622150686b90706fcfc8c674cf3c4d563ed782fd7d57fc864e2c72'
             item['external-contents']=str(native_source);directories.add(str(Path(item['name']).parent));bindings.append(item['name'])
     assert bindings
+    # Reuse verified kernel socket SDK entries from the existing NativeHost
+    # unit. Keep a closed overlay and reject differing contents at any alias.
+    socket_inputs={}
+    if a.control_transport:
+        host=read(base/'units/result.json')['units']['NativeHost']['command']
+        host_overlay=read(Path(host[host.index('-ivfsoverlay')+1]));assert host_overlay['fallthrough'] is False
+        aliases={item['name']:item for item in ov['roots']}
+        for item in host_overlay['roots']:
+            old=Path(item['external-contents'])
+            if Path(item['name']).suffix not in ('.h','.defs'):continue
+            h=sha(old);key=item['name'];socket_inputs[key]={'path':str(old),'sha256':h}
+            if key in aliases:assert sha(Path(aliases[key]['external-contents']))==h,'Socket SDK collision '+key
+            else:ov['roots'].append(dict(item));aliases[key]=item
     files={n:ROOT/'drivers/EldenPcie'/n for n in ['Native.h','NativeRuntime.inc','NativeExports.inc','Root.h','Phy.h','Power.h','Pins.h']}
     files.update({'WlanPower.h':ROOT/'drivers/EldenWifi/WlanPower.h','EldenWifiResources.h':ROOT/'soc/sm8750/include/EldenWifiResources.h'})
     if a.endpoint_build:
@@ -69,6 +87,9 @@ def main():
     if mhi:
         files.update({n:ROOT/'drivers/EldenPcie'/n for n in ['MhiStop.h','MhiRuntime.inc','MhiRuntimeExports.inc']})
         files.update({n:ROOT/'drivers/EldenWifi'/n for n in ['RuntimeApi.h','QmiPowerBinding.h']})
+    if a.control_transport:
+        files['ControlApi.h']=ROOT/'drivers/EldenWifi/ControlApi.h'
+        files['ControlNative.inc']=ROOT/'drivers/EldenPcie/ControlNative.inc'
     existing={item['name']:item for item in ov['roots']}
     for directory in directories:
         for n,original in files.items():
@@ -134,6 +155,7 @@ def main():
     if transport:required|={'_elden_pcie_transport_status','_elden_wifi_dma_bind','_elden_wifi_dma_msi_sink','_elden_wifi_dma_stop_begin','_elden_pcie_cfg_open','_elden_pcie_msi_prepare','_elden_pcie_msi_arm','_elden_pcie_msi_stop'}
     if a.firmware_cache_build:required|={'_elden_wifi_firmware_bind','_elden_wifi_firmware_get','_elden_wifi_firmware_stop_begin'}
     if mhi:required|={'_nw_wifi_start','_nw_wifi_stop','_nw_wifi_step','_elden_mhi_stop','_elden_wlan_qmi_bind','_elden_wlan_qmi_unbind','_pwrseq_qcom_wcn_set_ol_cpr','_elden_wifi_runtime_enable_master'}
+    if a.control_transport:required|={'_nw_wifi_control_transport_set','_nw_wifi_control_attach','_nw_wifi_control_detach','_nw_wifi_control_receive','_nw_wifi_control_writable'}
     assert required<=union and not required&pending
     target=out/'PcieNativeBinding.o';link=['xcrun','ld','-r','-arch','arm64','-platform_version','ios','17.0','17.0','-o',str(target),*map(str,objects)]
     linked=subprocess.run(link,capture_output=True);(out/'link.log').write_bytes(linked.stdout+linked.stderr);linked.check_returncode()
@@ -146,6 +168,7 @@ def main():
         inputs.update(extra_sources);inputs['drivers/EldenPcie/TransportNativeSource.py']=sha(ROOT/'drivers/EldenPcie/TransportNativeSource.py')
     if a.firmware_cache_build:inputs['drivers/EldenPcie/FirmwareNativeSource.py']=sha(ROOT/'drivers/EldenPcie/FirmwareNativeSource.py')
     if mhi:inputs['drivers/EldenPcie/MhiRuntimeSource.py']=sha(ROOT/'drivers/EldenPcie/MhiRuntimeSource.py')
+    if a.control_transport:inputs['drivers/EldenPcie/ControlNativeSource.py']=sha(ROOT/'drivers/EldenPcie/ControlNativeSource.py')
     report={'compiled':True,'object_sha256':sha(obj),'binding_sha256':sha(target),'command':cmd,'link':link,'source_inputs':inputs,'inherited_input_count':len(inherited),
             'input_objects':{str(f):sha(f) for f in objects},'remaining_imports':sorted(pending),'warnings':r.stderr.count(b'warning:'),'scalar':True,
             'native_root_worker_bound':True,'endpoint_worker_bound':bool(a.endpoint_build),'smmu_domain_required':bool(a.smmu_build),'generated_sources':generated,
@@ -153,6 +176,7 @@ def main():
             'firmware_cache_bound':bool(a.firmware_cache_build),
             'mhi_runtime_bound':mhi,'allows_device_dma_after_runtime_admission':mhi,
             'runtime_init_trace':bool(mhi and runtime.get('init_trace')),
+            'control_transport_bound':a.control_transport,'socket_sdk_inputs':socket_inputs,
             'kernel_linked':False,'boot_created':False,'hardware_tested':False}
     write(out/'result.json',report);print(json.dumps({k:v for k,v in report.items() if k in ['compiled','object_sha256','binding_sha256','warnings','kernel_linked']}))
 if __name__=='__main__':main()

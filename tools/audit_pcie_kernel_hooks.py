@@ -2,7 +2,7 @@
 import argparse,json,struct
 from pathlib import Path
 from replay_xnu_objects import global_symbols
-def audit(native,kernel,endpoint=False,smmu=False,mhi=False):
+def audit(native,kernel,endpoint=False,smmu=False,mhi=False,control=False):
     data=Path(native).read_bytes();after=Path(kernel).read_bytes();at=32;sections={};code=[]
     for _ in range(struct.unpack_from('<I',data,16)[0]):
         cmd,size=struct.unpack_from('<II',data,at)
@@ -34,6 +34,10 @@ def audit(native,kernel,endpoint=False,smmu=False,mhi=False):
     if mhi:
         for name,count in [('_nw_wifi_start',1),('_nw_wifi_stop',2),('_elden_mhi_stop',1),('_elden_wifi_runtime_enable_master',1),('_elden_wlan_qmi_bind',1),('_elden_wlan_qmi_unbind',1)]:
             targets.append((name,None,0));expected_counts[name]=count
+    if control:
+        if not mhi:raise ValueError('Control endpoint requires MHI runtime')
+        for name in ['_nw_wifi_control_transport_set','_nwk_nw_wifi_control_bind','_nw_wifi_control_attach','_nw_wifi_control_receive']:
+            targets.append((name,None,0));expected_counts[name]=1
     for target,caller,bound in targets:
         dest=address(target);calls=[]
         for base,size,off in code:
