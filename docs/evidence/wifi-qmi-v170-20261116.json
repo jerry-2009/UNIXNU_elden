@@ -1,0 +1,42 @@
+{
+  "profile": "wifi-qmi-wire-trace",
+  "date": "2026-11-16",
+  "stage": "signed-unflashed",
+  "kernel_sha256": "5ef8942835e980ba14a56ee371d63b073d2add93be0bfdd118feeb51a2f4fa11",
+  "native_sha256": "56e7025d34bd675280b1cb2e3974063ffd110189921ff627566507c646e8ec30",
+  "native_worker_sha256": "13868807cf25eacae4bba8d138610cbc507b4cd472c897ae821e2f71445ad1b4",
+  "runtime_binding_sha256": "3acfbbe343295c4293ec51440fa8e9ebc3a6441edfda3798a26f5da0cba21385",
+  "rebuilt_linux_units": [
+    "ath12k_qmi.o",
+    "nw_qrtr_mhi.o",
+    "qmi_qmi_interface.o",
+    "lx_rt.o"
+  ],
+  "retained_original_units": 116,
+  "retained_stop_units": {
+    "nw_wifi.o": "2a2a92a30ccb621e83a2be5301ef7338a4e33e3ebd9e6b818a1d08449cc96dd1",
+    "ath12k_core.o": "418f493ca89b0c06f5792ee87c850bf6b92fc9271f510ddacd0336419d974f70",
+    "ath12k_pci.o": "49c06a03916d3c32d1fec4c41e336dab7b33cb8dec0b5f79987f3e64e25ac374"
+  },
+  "warnings": {
+    "ath12k_qmi.o": 152,
+    "nw_qrtr_mhi.o": 14,
+    "qmi_qmi_interface.o": 26,
+    "lx_rt.o": 32
+  },
+  "native_warnings": 1,
+  "source_inputs": 186,
+  "original_apple_regions": 30,
+  "direct_calls": 23,
+  "mode_trace_latched_until_reset": true,
+  "per_direction_logs_maximum": 8,
+  "native_samples_maximum": 5,
+  "payloads_logged": false,
+  "hardware_tested": false,
+  "image_sha256": "0b2608e540e9814f00515e3f30bdda0b514a978faf823f8c9794b065fab4cb11",
+  "session": "dda874c589629554",
+  "rollback": 1738713600,
+  "footer": 0,
+  "parent_location": 3,
+  "audit_sha256": "338e72e0b2759704140a259f2442d919c17c9f297e8bad7685dc33a3c9921141"
+}

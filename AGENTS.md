@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17020261116 signed: MODE_OFF init/send/wait + bounded IPCR UL/DL/QMI-header/completion metadata,
+logical IRQ masks and retained MSI status/enable/mask/MHI status reads. No payload logging, no IRQ writes,
+no timeout changes.4Cunits rebuilt;116original+5prior units retained. Warnings152/14/26/32; native1oldshadow.
+Kernel5ef89428/186source-index pins/Apple30/entry7124/23calls pass. Mac source2/runtime1/native2/kernel1/package1;
+image0b2608e5/sessiondda874c589629554/floor1738713600/0/3 signed/audited, NOT hardware-tested yet.
+Native1 compile failure was a helper used before declaration; final native2 uses bounded Region reads directly.
+Next one MODE_OFF transaction trial; exact TX/response/MSI cause still unknown. Device last restored Androidv169.
+Full Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved.
+
 Latest v16920261116 hardware: consolidated trace localizes shutdown to core.c:7 = ath12k_qmi_firmware_stop(ab).
 Mainline/control, PCI reset/dump cancellation, group MAC cleanup/destroy and core-lock acquisition all returned.
 The stop call sends MODE_OFF and waits for QMI; exact request TX/RX completion remains unknown. Four where

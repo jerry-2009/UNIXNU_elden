@@ -88,5 +88,10 @@ def main():
     try:menu(dict(stop_trace,runtime_stop_trace=False))
     except ValueError:pass
     else:raise AssertionError('Unqualified stop trace accepted')
-    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':18}))
+    qmi_trace=dict(stop_trace,profile='wifi-qmi-wire-trace',runtime_qmi_trace=True)
+    assert tomllib.loads(bt_runtime_boot.menu(qmi_trace))['entry'][0]['args']==mhi_menu['entry'][0]['args']
+    try:menu(dict(qmi_trace,runtime_qmi_trace=False))
+    except ValueError:pass
+    else:raise AssertionError('Unqualified QMI trace accepted')
+    print(json.dumps({'passed':True,'bytes':1011,'endpoint_bytes':1015,'smmu_bytes':1019,'mhi_bytes':1023,'all_memory_args_unchanged':True,'guards_preserved':True,'fallbacks_preserved':True,'invalid_intents_rejected':19}))
 if __name__=='__main__':main()
