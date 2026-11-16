@@ -1,5 +1,19 @@
 # UniXNU elden — authoritative source repository
 
+Latest v179 + user GUI20261116: Wi-Fi first-failure counters show WMI EP2/service100, credit-size2176,
+ULCE3/DLCE2, allocated2+returned2,4accepted sends then2591 shortage retries. CE work returns; CE3HP16/TP8,
+do not use drained HTTCE4 as WMI evidence. Next CE3 head/shadow/notification audit. Timer/BH completion flags
+already present. Native/kernel/host passed; runtime HTC126/PCI120/WMI632 and native1 warnings retained.
+v179 diagnostic ended with full typed return/stock/root/green/settings restore; image64c35c43.
+User then operated verifiedv156: SpringBoard reload/PPT and About1GB/free9.9MB reported. Log proves repeated
+disk1s1 ENOSPC including SpringBoard/iconservicesagent; exact process-exit cause still unproved. Actual RAM6GiB,
+Data512MiB, SMPonlineff. Early32 full-copy median138.3ms, not continuousFPS. Capture drop975; user session
+fully restored stock/root/green/settings/sleep. All device jobs terminal. Prioritize the demonstrated Data
+space blocker with a qualified larger sparse seed while retaining Wi-Fi mainline work; persistent Data unfinished.
+Separate offline-peripheral-fixes STATUS0331cda reviewed: pen/haptics/RTC/sensors/camera still pending, nothing
+merge-ready. Do not alter that worktree or GPU codex/elden-gpu-offline; motor gain/boost/continuous output and
+speakers remain disabled pending hardware qualification. docs/USER-GUI-STORAGE.md. Full Goal remains active.
+
 Latest v17820261116 HARDWARE first WMI timeout: MSI HW0/enableffffffff/mask0, logical/native pending0,
 error0/inflight0/Armed3/count79; used+enabled1fc0ff, disabled0/running0/depth1/active1/mutexes3/polling0.
 All reads0; MHI201; current DAIF200 (IRQ unmasked), MPIDR80010100 vs target0: not target-CPU DAIF proof.

@@ -55,10 +55,15 @@ def main():
     snapshot=None
     if a.wmi_snapshot_build:
         snapshot=read(a.wmi_snapshot_build/'result.json')
-        assert snapshot['append_only_observer'] and snapshot['rebuilt_units']==1 and snapshot['retained_units']==124
+        credit=bool(snapshot.get('credit_trace'))
+        assert snapshot['append_only_observer'] and snapshot['rebuilt_units']==(4 if credit else 1) and snapshot['retained_units']==(121 if credit else 124)
         assert sha(a.wmi_snapshot_build/'WifiRuntimeMsiBinding.o')==snapshot['binding_sha256']
         spec=importlib.util.spec_from_file_location('service_wmi_source',ROOT/'drivers/EldenWifi/ServiceWmiSource.py')
         wmi=importlib.util.module_from_spec(spec);spec.loader.exec_module(wmi);new=wmi.generated()
+        if credit:
+            assert snapshot['reversible_counter_insertions'] and snapshot['inherited_irq_observer']
+            spec=importlib.util.spec_from_file_location('service_credit_source',ROOT/'drivers/EldenWifi/ServiceCreditSource.py')
+            ct=importlib.util.module_from_spec(spec);spec.loader.exec_module(ct);new=ct.generated()
     for name,data in old.items():assert (parent/'source'/name).read_bytes()==data,name
     assert sha(ROOT/'drivers/EldenPcie/ControlNative.inc')==prior['source_inputs']['drivers/EldenPcie/ControlNative.inc']
     private,private_report=private_input(a.factory_mac)
@@ -80,8 +85,9 @@ def main():
     for directory in directories:
         overlay['roots'].append({'type':'file','name':str(Path(directory)/'EldenWifiFactoryMac.h'),'external-contents':str(private_header)})
         if a.control_trace:
-            for name in ['ControlTrace.inc','ControlTraceApi.h']+(['ControlScan.inc'] if a.service_scan else [])+(['WmiSnapshot.inc'] if snapshot else []):
-                overlay['roots'].append({'type':'file','name':str(Path(directory)/name),'external-contents':str(ROOT/'drivers/EldenWifi'/name)})
+            for name in ['ControlTrace.inc','ControlTraceApi.h']+(['ControlScan.inc'] if a.service_scan else [])+(['WmiSnapshot.inc'] if snapshot else [])+(['CreditTrace.h','CreditSnapshot.inc'] if snapshot and credit else []):
+                file=folder/name if name in new else ROOT/'drivers/EldenWifi'/name
+                overlay['roots'].append({'type':'file','name':str(Path(directory)/name),'external-contents':str(file)})
     overlay['roots'].append({'type':'file','name':str(folder/'EldenWifiFactoryMac.h'),'external-contents':str(private_header)})
     vfs=out/'overlay.json';write(vfs,overlay);command[command.index('-ivfsoverlay')+1]=str(vfs)
     obj=out/'Native.o';command[command.index('-o')+1]=str(obj)
@@ -89,6 +95,7 @@ def main():
     (out/'compile.log').write_bytes(r.stdout+r.stderr);r.check_returncode()
     extra={'_nw_wifi_control_stats_get'} if a.control_trace else set()
     if snapshot:extra|={'_elden_wifi_irq_snapshot','_strncmp','_memcmp'} # bounded timeout-line filter
+    if snapshot and credit:extra.add('_elden_wifi_credit_trace')
     assert defs(obj)==defs(parent/'Native.o') and refs(obj)-refs(parent/'Native.o')=={'_elden_wifi_assets_ready'}|extra
     available=defs(a.reference_kernel)|defs(a.service_core/'kern_exec.o')
     if snapshot:available|=defs(a.wmi_snapshot_build/'WifiRuntimeMsiBinding.o')
@@ -107,12 +114,14 @@ def main():
     if snapshot:
         sources.update(snapshot['source_inputs'])
         for name in ['drivers/EldenWifi/ServiceWmiSource.py','drivers/EldenWifi/WmiSnapshot.inc']:sources[name]=sha(ROOT/name)
+        if credit:
+            for name in ['drivers/EldenWifi/ServiceCreditSource.py','drivers/EldenWifi/CreditSnapshot.inc']:sources[name]=sha(ROOT/name)
     for name,h in sources.items():assert sha(ROOT/name)==h,name
     result={'compiled':True,'object_sha256':sha(obj),'base_object_sha256':prior['object_sha256'],'command':command,
         'changed_bindings':bindings,'source_inputs':sources,'generated_sources':{n:hashlib.sha256(b).hexdigest() for n,b in new.items()},
         'private_assets':private_report,'inherited_sources':inherited,'scalar':True,'warnings':r.stderr.count(b'warning:'),
         'platform_physical_fence_preserved':True,'factory_mac_input':True,'service_admission':True,
-        'wmi_snapshot':bool(snapshot),'irq_snapshot_binding':snapshot['binding_sha256'] if snapshot else None,
+        'credit_trace':bool(snapshot and credit),'wmi_snapshot':bool(snapshot),'irq_snapshot_binding':snapshot['binding_sha256'] if snapshot else None,
         'service_scan':a.service_scan,'control_trace':a.control_trace,'full_kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','object_sha256','warnings']}))
 if __name__=='__main__':main()

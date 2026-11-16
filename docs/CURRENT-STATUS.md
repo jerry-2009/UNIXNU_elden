@@ -1,5 +1,11 @@
 # 当前状态 · 2026-11-16
 
+**v179与用户操作窗口已收尾。** Wi-Fi已确定 WMI 走CE3，实际收到过2个credit，随后发送环
+HP16/TP8未推进；下一步审计通知路径。用户操作另证实512MiB Data发生大量ENOSPC，
+SpringBoard重载和PPT已记录，实际RAM仍6GiB、八核onlineff。先补可用Data空间再复测，
+不将它当作Wi-Fi WMI故障的既定原因。两轮均完整恢复Android。
+[GUI/Data证据](USER-GUI-STORAGE.md) · [Wi-Fi证据](../profiles/wifi-credit-trace/README.md)。
+
 v164已完成完整Wi-Fi运行栈候选实机：控制路径与六份原厂固件通过，Linux初始化stage0返回-16，尚未设备DMA或联网。同步回fastboot及原厂Android/root/原设置恢复通过。详[当前证据](../profiles/wifi-mhi-runtime/README.md)。下一步定位初始化链，完整Goal仍active。
 
 v163已在真机建立Wi-Fi专用128MiB NC内存/SMMU映射，66页表/32768叶和故障IRQ通过，

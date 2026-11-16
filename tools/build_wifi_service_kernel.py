@@ -55,6 +55,7 @@ def main():
     write(out/'link-command.json',cmd);env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as f:subprocess.run(cmd,cwd=out,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
     additions={'_elden_wifi_assets_ready'}|({'_elden_wifi_irq_snapshot'} if snapshot else set())
+    if snapshot and snapshot.get('credit_trace'):additions.add('_elden_wifi_credit_trace')
     assert defs(out/'native.macho')==defs(parent/'native.macho')|additions
     for name,h in inherited.items():assert sha(Path(name))==h,name
     pre=read(ROOT/'profiles/v91/image-build/plan.json')['prelink'];assert sha(a.original_kernelcache)==pre['original_kernelcache_sha256']
@@ -75,7 +76,7 @@ def main():
     for name in ['tools/build_wifi_service_kernel.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py']:
         inputs[name]=sha(ROOT/name)
     if native.get('control_trace') and not core.get('owner_launch_required'):raise ValueError('Control trace requires the qualified owner rule')
-    result=dict(prior);result.update(profile='wifi-wmi-snapshot' if snapshot else 'wifi-service-scan' if native.get('service_scan') else 'wifi-service-control-trace' if native.get('control_trace') else 'wifi-service-owner' if core.get('owner_launch_required') else 'wifi-service',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
+    result=dict(prior);result.update(profile='wifi-credit-trace' if snapshot and snapshot.get('credit_trace') else 'wifi-wmi-snapshot' if snapshot else 'wifi-service-scan' if native.get('service_scan') else 'wifi-service-control-trace' if native.get('control_trace') else 'wifi-service-owner' if core.get('owner_launch_required') else 'wifi-service',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
         source_inputs=inputs,changed_core_objects=1,changed_native_objects=2 if snapshot else 1,added_native_objects=0,core_filelist_unchanged=False,
         core=core,service_native=native,service_assets=assets,base_report=prior,
         service_archive_members=members,base_archive_members=original_members,inherited_inputs=inherited,

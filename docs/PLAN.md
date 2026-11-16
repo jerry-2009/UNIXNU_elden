@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+**v179与用户操作窗口已收尾。** Wi-Fi已确定 WMI 走CE3，实际收到过2个credit，随后发送环
+HP16/TP8未推进；下一步审计通知路径。用户操作另证实512MiB Data发生大量ENOSPC，
+SpringBoard重载和PPT已记录，实际RAM仍6GiB、八核onlineff。先补可用Data空间再复测，
+不将它当作Wi-Fi WMI故障的既定原因。两轮均完整恢复Android。
+[GUI/Data证据](USER-GUI-STORAGE.md) · [Wi-Fi证据](../profiles/wifi-credit-trace/README.md)。
+
 **v178：首次 WMI 超时时，采样的硬件/软件待处理中断均为0，MSI仍启用且无错误。**
 尚不能确定第一笔 credit/completion 丢在哪；不再将旧 CE sw_index 直接视作积压。上游随后
 会请求固件 RAM dump，后续失败受此影响，应以首次失败前的数据为准。HTC/实际 wifi7 CE 与
