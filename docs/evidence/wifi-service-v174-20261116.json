@@ -1,0 +1,74 @@
+{
+  "profile": "wifi-service",
+  "hardware_tested": true,
+  "candidate_sha256": "525a271411f2fa39a49441d2cad576f8570945990cf1e70a48283a93e763a9a0",
+  "session": "798fac3070f4b0c1",
+  "kernel_sha256": "f5b85fd24fcb237014a37433eeb350e1d4f71bba2c29d0bca2b4b2a63d366fb2",
+  "native_sha256": "9c9c30a8f005473eb86953a5ed320c2705d37064d8a06b32ee9da1296da0b6de",
+  "rollback_index": 1738713600,
+  "footer_location": 0,
+  "parent_location": 3,
+  "asset_staging": {
+    "stage": 5,
+    "status": 0,
+    "helper_bytes": 779088,
+    "cache_bytes": 925624,
+    "cache_ready": true,
+    "factory_mac_supplied": true
+  },
+  "firmware_stage": 4,
+  "firmware_error": 0,
+  "control_connected": false,
+  "scanning_accepted": false,
+  "bss_count": 0,
+  "launch_failure": "AMFI Launch Constraint Violation c[8]p[1]m[1]e[6] /usr/libexec/unixnu-wpa_supplicant",
+  "next": "Exact signed-helper RAM-overlay owner-launch rule; then real control/scanning and network bridge",
+  "return": {
+    "fence_result": 0,
+    "bus_master_off": true,
+    "transactions_sampled": true,
+    "transactions_idle": true,
+    "msi_state": 4,
+    "perst_low_confirmed": true,
+    "wcn_stop": true,
+    "warm_reset_verified": false,
+    "typed_reset_after_sync": true,
+    "physical_fastboot": true
+  },
+  "restoration": {
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "android_root_green": true,
+    "charging_settings_equal": true,
+    "radios_equal": true,
+    "scan_settings_equal": true,
+    "sleep_requested": true
+  },
+  "capture": {
+    "path": "edl_work/live-service-v174-20261116/usb/20261116-074428.bin",
+    "bytes": 260144,
+    "sha256": "114250e7c6780b095099ebb61c132f7ad5c672c201f6d5294671d3f1add32c1c",
+    "reported_drop_max": null,
+    "files": 1,
+    "post_disconnect_counter_available": false
+  },
+  "tests": {
+    "runtime_cases": 44,
+    "mac_adapter_cases": 19,
+    "asset_cases": 11,
+    "v173_qualification_regression": true,
+    "hardware_services_modeled_in_host_tests": true
+  },
+  "build": {
+    "core_sha256": "017cdc84fce4c35f442a5e57c85024c8998dcaf35b76a32589a70a40834a4a8c",
+    "native_object_sha256": "56790a0e77c20e472b64fda78f154b67b4a3c0fa7e40b71c581508cf090fe26e",
+    "core_warnings": 91,
+    "native_warnings": 1,
+    "apple_executable_regions": 30,
+    "source_inputs": 200,
+    "changed_core_objects": 1,
+    "changed_native_objects": 1,
+    "private_identifier_published": false
+  },
+  "all_jobs_terminal": true,
+  "full_goal_complete": false
+}

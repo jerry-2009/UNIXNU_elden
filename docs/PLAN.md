@@ -1,5 +1,10 @@
 # Elden 基本可用实施计划
 
+**v174：服务资产和原厂 MAC 已实机接入，固件仍到 stage4。** 当前明确卡在 supplicant 的
+AMFI 启动约束 c[8]p[1]m[1]e[6]，没有控制连接或真实扫描结果。下一步复用既有、限定路径与
+精确 CDHash 的 RAM overlay 启动规则，再接网络桥；不为此改硬件时钟。完整自动回程和 Android
+恢复已通过，所有任务结束。[本轮证据](../profiles/wifi-service/README.md)。
+
 **v173已完成平台回程实机验证**：BM实读关闭、事务已采样为空闲、MSI停止、PERST低和WLAN停机均通过，
 随后完整恢复Android。MHI暖复位仍未验证，不能混称。下一步接入真实supplicant/launchd/trust、IOKit网络桥
 及本机MAC输入，推进实际扫描和连接；不再重复仅验证回程的冒烟。充电与完整外设Goal仍未完成。

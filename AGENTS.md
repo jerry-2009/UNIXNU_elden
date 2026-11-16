@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest v17420261116 HARDWARE: real service assets stage5/status0/cache-ready1 and factory MAC supplied;
+firmware stage4/error0 preserved. AMFI rejects exact supplicant launch c[8]p[1]m[1]e[6]; no control connection,
+scan or networking accepted (BSS0). Next reuse the narrow exact-CDHash RAM-overlay owner-launch rule,
+then test real supplicant/scanning and BSD/IOKit bridge. Do not change hardware/clock for this launch failure.
+Physical fence/BM-off/transaction sampled+idle/MSI4/PERST-low/WCN-stop, typed reset, physical fastboot,
+full stock8b8e72da/Android/root/green/original charge+radio+scan settings and sleep restored. All jobs terminal.
+Image525a2714/session798fac3070f4b0c1/floor1738713600/0/3. Kernel f5b85fd2; core017cdc84/native56790a0e;
+44staging/19MAC/11asset host cases and v173 qualification regression pass; core91/native1 warnings retained.
+Mac service-core/core2, service-native/native1, service-v174/kernel1, service-boot-v174/package1. Private MAC
+outside Git. Full Goal/charging/network incomplete; GPU/QRTR/AnyRouter preserved. profiles/wifi-service.
+
 Latest v17320261116 HARDWARE platform return accepted: real callback returned/unbind0/config0, fresh fence0/
 master-off1/transactions-sampled1/idle1/command2/device-status10, MSIStopped4/IRQ-active0, PERSTlow/readback1,
 WCN stop1. Physical reset proof is separate: MHI snapshot stillctrl2/statusff04; warm reset NOT accepted.

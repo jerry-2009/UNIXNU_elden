@@ -85,10 +85,11 @@ def qualify(report_path,entry_path,runtime):
             if hashlib.sha256(data).hexdigest()!=r['native_objects'][unit]['source_sha256']:raise ValueError('Window source differs from declared derivation')
     return qualify_shared_assets(report_path,entry_path,runtime)
 
-def qualify_shared_assets(report_path,entry_path,runtime):
+def qualify_shared_assets(report_path,entry_path,runtime,*,wifi_service=False):
     """Common immutable runtime/entry/assets checks after profile-specific qualification."""
     folder=Path(report_path).parent;r=json.loads(Path(report_path).read_text());e=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     profile=r['profile']
+    if wifi_service and profile!='wifi-service':raise ValueError('Wi-Fi assets require the explicit service profile')
     trace=json.loads((runtime/'trace-runtime.json').read_text())
     optional=r['optional_runtime']
     fixed_rules=json.loads((ROOT/'profiles/bt-address17/runtime-report.json').read_text())
@@ -96,7 +97,8 @@ def qualify_shared_assets(report_path,entry_path,runtime):
     for path,h in optional['source_inputs'].items():
         if sha(ROOT/path)!=h:raise ValueError('Optional source changed')
     for name,h in optional['files'].items():
-        if sha(runtime/name)!=h:raise ValueError('Optional runtime changed')
+        selected='base-'+name if wifi_service and name=='runtime.trustcache' else name
+        if sha(runtime/selected)!=h:raise ValueError('Optional runtime changed')
     for path,h in trace['helper_report']['source_inputs'].items():
         if sha(ROOT/path)!=h:raise ValueError('Helper source changed: '+path)
     for path,h in r['source_inputs'].items():
@@ -117,8 +119,14 @@ def qualify_shared_assets(report_path,entry_path,runtime):
     native=(folder/'native.macho').read_bytes()
     if native.count(bytes.fromhex(optional['table_hex']))!=1:raise ValueError('Full rule table not embedded exactly once')
     for name,key in [('launchd.plist','cache_sha256'),('launchd.plist.sig','signature_sha256'),('EldenBtLaunchCache.h','header_sha256')]:
-        if sha(runtime/name)!=cache[key]:raise ValueError('Lifecycle asset changed: '+name)
-        if name in ('launchd.plist','launchd.plist.sig') and native.count((runtime/name).read_bytes())!=1:raise ValueError('Cache asset not embedded exactly once')
-    if sha(runtime/'runtime.trustcache')!=trace['trust_sha256'] or native.count((runtime/'BlueTool').read_bytes())!=1:raise ValueError('Helper/trust embedding differs')
-    return {'profile':profile,'profile_sha256':sha(contract),'trust_sha256':trace['trust_sha256'],'cache_cdhash':cache['cdhash'],'cache_input_trust_sha256':trace['cache_input_trust_sha256'],'helper_sha256':trace['helper_sha256'],
+        selected='base-'+name if wifi_service else name
+        if sha(runtime/selected)!=cache[key]:raise ValueError('Lifecycle asset changed: '+name)
+        if not wifi_service and name in ('launchd.plist','launchd.plist.sig') and native.count((runtime/name).read_bytes())!=1:raise ValueError('Cache asset not embedded exactly once')
+    selected='base-runtime.trustcache' if wifi_service else 'runtime.trustcache'
+    if sha(runtime/selected)!=trace['trust_sha256'] or native.count((runtime/'BlueTool').read_bytes())!=1:raise ValueError('Helper/trust embedding differs')
+    result={'profile':profile,'profile_sha256':sha(contract),'trust_sha256':trace['trust_sha256'],'cache_cdhash':cache['cdhash'],'cache_input_trust_sha256':trace['cache_input_trust_sha256'],'helper_sha256':trace['helper_sha256'],
             'entry_return_target':hex(target),'entry_assembly_sha256':'818ed81e39f38ee6f13bdbf4f166e9e7a5d72f4b7a652d52872e2ba85ea53cc1','mode':4,'key_state':2,'text_fixups_hex':optional['table_hex'],'table_count':59,'hardware_tested':False}
+    if wifi_service:
+        from wifi_service_boot import qualify_assets
+        result.update(qualify_assets(r,runtime,native,trace['trust_sha256']))
+    return result

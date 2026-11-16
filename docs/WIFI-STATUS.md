@@ -1,5 +1,10 @@
 # Wi-Fi：固件已就绪，平台回程通过，下一步用户态与网络桥
 
+**v174：服务资产和原厂 MAC 已实机接入，固件仍到 stage4。** 当前明确卡在 supplicant 的
+AMFI 启动约束 c[8]p[1]m[1]e[6]，没有控制连接或真实扫描结果。下一步复用既有、限定路径与
+精确 CDHash 的 RAM overlay 启动规则，再接网络桥；不为此改硬件时钟。完整自动回程和 Android
+恢复已通过，所有任务结束。[本轮证据](../profiles/wifi-service/README.md)。
+
 v167起已经进入真实固件 `FW_INIT_DONE`/Linux stage4，PCIe/SMMU/DMA/MHI/QRTR/QMI
 均实际运行。v173又完成平台回程：真实回调返回/解绑0/配置0，bus-master实读关闭，事务
 已采样为空闲，MSI停止且无在途处理，PERST低确认，WLAN停机成功，完整恢复stock Android。
