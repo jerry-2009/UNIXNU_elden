@@ -1,5 +1,9 @@
 # Elden 基本可用实施计划
 
+**v168更新**：有界清理准入已实机通过，stage4保持，原QMI−12未再记录；但不能据此说关闭成功。
+`nw_wifi_stop`仍未在9秒窗口内返回，继续通过平台复位恢复Android。下一轮统一标记停止子调用并
+采样现成`nw_wifi_where`，定位具体等待，不延长超时；之后再接supplicant。下方v167为历史。
+
 **v167当前优先级**：QDSS已修，实机FW_INIT_DONE/stage4通过；但停机QMI mode-off=-12，
 9秒WCN等待到期后靠平台复位恢复Android。先修复同owner停机期的DMA/电源准入和真实排空，
 再安装现成supplicant服务/网络接口。scan=0只是入队，BSS0；不得说已扫描联网。

@@ -1,7 +1,7 @@
 {
   "date": "2026-11-16",
   "profile": "wifi-drain-lifetime",
-  "stage": "signed-unflashed",
+  "stage": "hardware-cleanup-admitted-stop-incomplete-stock-restored",
   "kernel_sha256": "087306d055f4483cb32173ad032cb8bd4bb107b90536a1d9acf9ea691bb113b6",
   "native_sha256": "3672430e25797252463a626ea6da8d34267681a2ababd8ee24fc8b49bccaa2a1",
   "native_worker_sha256": "59b373efe04f6723b9bafd797024be2b9f3fda2a1af6224be1da20c554a3313e",
@@ -22,11 +22,36 @@
   "direct_calls": 23,
   "original_runtime_sha256": "480960b4e5e954151dcc6481fbd938a0e594de414df0e7d97c8535df38daf8cb",
   "cleanup_budget_us": 5000000,
-  "hardware_tested": false,
+  "hardware_tested": true,
   "image_sha256": "29a919357feceb6d3d5fbd1c42e077e6a4119f1be29ed211f4cb2a2c5dfaf40f",
   "session": "de78ea6f9db8e66d",
   "rollback": 1738713600,
   "footer": 0,
   "parent_location": 3,
-  "audit_sha256": "ee5d41c6ad75a57858e853617773c52dfc551658a8a93ff33f5acac9f7f44a1b"
+  "audit_sha256": "ee5d41c6ad75a57858e853617773c52dfc551658a8a93ff33f5acac9f7f44a1b",
+  "capture": {
+    "file": "edl_work\\live-drain-v168-20261116\\usb\\20261116-025438.bin",
+    "bytes": 259020,
+    "sha256": "3edd240ece8bb361c9514131a1ca7519353efda5b7aa8f99e8bc4f5747887fcf",
+    "drop_max": 0,
+    "discontinuities": 0,
+    "reconnections": 0,
+    "post_disconnect_counter_available": false
+  },
+  "cleanup_admitted": true,
+  "firmware_ready_stage4": true,
+  "graceful_stop_completed": false,
+  "mode_off_completed": false,
+  "previous_mode_off_minus12_recorded": false,
+  "native_reset_master_irq_perst_completion_recorded": false,
+  "typed_platform_reset_and_stock_sha_restore": true,
+  "android_root_green_settings_restored": true,
+  "network_accepted": false,
+  "jobs_terminal": true,
+  "scope": [
+    "The original worker passed the new cleanup admission; this is not evidence that QMI mode-off completed.",
+    "No further Linux shutdown progress line occurred between cleanup=0 and bounded WCN stop expiry. The exact nw_wifi_stop subcall remains unknown.",
+    "No native MHI RESET/master-off/IRQ/PERST completion, so retain platform reset fallback and do not promote this as a daily networking baseline.",
+    "Next trace all nw_wifi_stop subcalls together and sample existing nw_wifi_where during the bounded wait; keep deadlines unchanged."
+  ]
 }

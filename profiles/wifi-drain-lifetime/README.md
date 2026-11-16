@@ -59,4 +59,12 @@ audit limits.
 
 Signed candidate `29a919357feceb6d3d5fbd1c42e077e6a4119f1be29ed211f4cb2a2c5dfaf40f`, session `de78ea6f9db8e66d`.
 Entry/asset/FAT/AVB independent audit passes (1738713600/0/3).
-Hardware results pending.
+Hardware preserves FW_INIT_DONE/stage4 and records cleanup=0. The earlier
+QMI mode-off -12 is absent, but no mode-off completion is observed either.
+`nw_wifi_stop` does not return within the bounded WCN window; no native
+RESET/master-off/IRQ/PERST completion is recorded. Typed platform-reset fallback,
+physical fastboot, full stock SHA and Android/root/green/settings restoration pass.
+Thus this is not accepted as graceful shutdown. Next locate the exact subcall
+with one consolidated stop trace, keeping the9s reset contract unchanged.
+Capture259020B/SHA3edd240e/dropmax0/no reconnect; no post-disconnect counter.
+[Evidence](../../docs/evidence/wifi-drain-v168-20261116.json).

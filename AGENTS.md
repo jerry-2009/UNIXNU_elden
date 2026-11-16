@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest v16820261116 hardware: stage4/FW_INIT_DONE preserved; cleanup0 admits only the original bounded
+worker. Prior QMI mode-off -12 is NOT recorded, but mode-off success is also NOT proved: no nw_wifi_stop
+return/native RESET/master-off/IRQ/PERST completion. WCN still expires at9s; typed platform reset,
+physical fastboot/full stock8b8e72da/Android/root/green/original charging+radio+scan settings/sleep restored.
+Capture259020B/raw3edd240e/dropmax0/no reconnect, no post-disconnect counter. Image29a91935/sessionde78ea6f9db8e66d,
+floor1738713600/0/3. All jobs terminal. Exact stop subcall unknown; next consolidated nw_wifi_stop entry/exit
+trace plus existing nw_wifi_where sample during wait. Do not prolong deadlines or bypass real shutdown.
+Bounded cleanup fixes a modeled lifetime defect, not yet full graceful hardware stop. See profiles/wifi-drain-lifetime
+and docs/evidence/wifi-drain-v168-20261116.json; Mac source3/dma-host2/mhi-host3/wcn1/smmu2/native2/kernel2/package1.
+After graceful stop, install actual supplicant and network bridge/original MAC. Full Goal/charging incomplete;
+GPU/QRTR/AnyRouter untouched; v168 remains diagnostic, not promoted stable.
+
 Latest v16820261116 signed: separate normal DMA admission closure from final/fault stop; only retained
 original worker/provider/epoch gets <=5s cleanup, with real root/BAR/PERST and SMMU/MSI checks. Public
 WLAN lease stays withdrawn, physical power retained by original quiesce contract. No timer/power extension.

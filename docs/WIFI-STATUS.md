@@ -1,5 +1,9 @@
 # Wi-Fi：固件已就绪，先修停机再接用户态服务
 
+v168已修正建模确认的DMA清理生命周期，并实机记录`cleanup=0`；stage4保持。原QMI−12未再记录，
+但没有QMI关闭成功或`nw_wifi_stop`返回证据，仍在9秒后兜底复位。完整Android恢复通过。
+当前下一步是统一定位停止子调用，不能把本轮准入成功当作正常停机验收。详[v168](../profiles/wifi-drain-lifetime/README.md)。
+
 v167已收到原厂 `FW_INIT_DONE`，Linux进入stage4/error0，MSI计数80；已完成真实
 PCIe/SMMU/DMA/MHI/QRTR/QMI链路。QDSS文件名缺口已补，使用原厂6237B配置并核全SHA。
 [当前实机与复现](../profiles/wifi-qdss-config/README.md)。
