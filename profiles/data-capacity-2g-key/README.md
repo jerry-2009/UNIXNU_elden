@@ -12,6 +12,14 @@ mounted Data, registered the software KeyStore and reached CRC-verified lockscre
 frames. Settings, live available space, runtime memory growth and longer stability
 have not yet been accepted. See [GUI evidence](../../docs/USER-GUI-STORAGE.md).
 
+Current v184 hardware again mounted2GiB Data, registered software KeyStore and
+held a CRC-verified lockscreen until typed return/full stock restoration. The
+capture had no observed ENOSPC/panic, with127 dropped bytes. Software swipe was
+refused: the inherited Bluetooth menu deliberately removes `elden-ui-replay`.
+This is not evidence of a broken physical touch controller. Settings/About and
+interaction/load acceptance remain pending; next explicitly qualify the UI
+diagnostic option before repeating the automated gesture trial.
+
 The earlier v182 audit's `keystore_capacity_updated` field contained the string
 `requested_size_mib` because a loop overwrote its boolean. The historical report
 is preserved. Current qualification emits literal booleans and rejects incomplete

@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest v18420261118 HARDWARE rerun: Data2147483648 mount0 and actual software KeyStore
+registration0 pass;2CRC frames visibly lockscreen clock/gesture bar. Captured1460099B/
+a11723f7/drop127/no reconnect or discontinuity; no observed ENOSPC/panic, not lossless.
+Software swipe refused: BT menu explicitly removes elden-ui-replay. Physical input was
+not tested and Settings/space/load acceptance remains pending; qualify an explicit UI
+option next rather than changing HID controller/size guards. Typed sync/physical fastboot/
+full stock8b8e72da/Android/root/green/original charging+radio+scan settings/sleep restored.
+All device jobs terminal. clean-fresh2/source2 is a new pure-Git95445ba empty-output run;
+XNU/native/current-units and all stages through2GiB kernel pass, firmware currently running.
+Confirm the live process/handle before resuming; do not restart from a timeout alone.
+Wi-Fi CE3 notification and charging/persistent Data remain incomplete; full Goal active.
+
 Latest v18420261118 first live attempt ended BEFORE port open/programmer/NAND write:
 pyserial exposes physical1-5 as1-5:x.3 (USBMI3); old exact string guard rejected it.
 Strictly admit only that proven COM7/05c6:9008 spelling plus1-5; unknown paths/interfaces

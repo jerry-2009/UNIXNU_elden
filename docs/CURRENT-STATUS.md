@@ -1,4 +1,8 @@
-# 当前状态 · 2026-11-16
+# 当前状态 · 2026-11-18
+
+v184实机重跑已到锁屏：2GiB Data和实际KeyStore均成功，完整自动回程及原厂Android/root/
+原设置恢复通过。日志未观察到ENOSPC/panic，drop127限制结论；BT菜单关闭了软件UI重放，
+所以Settings/可用空间/交互负载验收仍待进行。[实机范围](evidence/data-capacity-v184-hardware-20261118.json)。
 
 v184已从已提交Git对象导出，30份代码输入逐字一致并完成重新构建/打包审核，
 解决v183工作区一份旧Python工具的CRLF/LF差异；历史记录保留。新包尚未上机，
