@@ -14,7 +14,7 @@ def qualify(report_path,entry_path,runtime):
     if name in ('data-capacity-2g','data-capacity-2g-key'):
         from data_capacity_boot import qualify as capacity_qualify
         return capacity_qualify(report_path,entry_path,runtime)
-    if name in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace']:
+    if name in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace']:
         from wifi_service_boot import qualify as service_qualify
         return service_qualify(report_path,entry_path,runtime)
     if name in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
@@ -122,7 +122,7 @@ def menu(qualification=None):
     if qualification and qualification.get('profile') in ('data-capacity-2g','data-capacity-2g-key'):
         from data_capacity_boot import menu as capacity_menu
         return capacity_menu(qualification)
-    if qualification and qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace']:
+    if qualification and qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace']:
         from wifi_service_boot import menu as service_menu
         return service_menu(qualification)
     if qualification and qualification.get('profile') in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
@@ -185,7 +185,7 @@ def adt(base,qualification=None):
             from data_capacity_boot import packed_adt
             return packed_adt(base,qualification)
         qualification=dict(qualification,profile='ufs-idle-trial')
-    if qualification and qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace']:
+    if qualification and qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace']:
         qualification=dict(qualification,profile='ufs-idle-trial')
     if qualification and qualification.get('profile') in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
         qualification=dict(qualification,profile='ufs-idle-trial') # unchanged v156 ADT/runtime only
@@ -211,7 +211,7 @@ def adt(base,qualification=None):
 def augment_trust(original,qualification):
     if qualification.get('profile') in ('data-capacity-2g','data-capacity-2g-key'):
         qualification=dict(qualification,profile='ufs-idle-trial')
-    if qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace']:
+    if qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace']:
         from wifi_service_boot import augment_trust as service_trust
         return service_trust(original,qualification)
     if qualification.get('profile') in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):

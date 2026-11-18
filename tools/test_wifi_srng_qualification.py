@@ -8,20 +8,28 @@ from build_wifi_service_kernel import relocated_baseline_plan
 
 class RuntimeBoundary(unittest.TestCase):
     def snapshot(self, profile):
-        srng = profile == "wifi-srng-trace"
+        window=profile=="wifi-pci-window-trace"
+        srng = profile in ("wifi-srng-trace","wifi-pci-window-trace")
         credit = profile != "wifi-wmi-snapshot"
         return dict(append_only_observer=True, base_binding_sha256="a" * 64,
                     credit_trace=credit, srng_trace=srng,
-                    rebuilt_units=5 if srng else 4 if credit else 1,
-                    retained_units=120 if srng else 121 if credit else 124,
-                    compiled_this_step=2 if srng else 3 if credit else 1,
+                    pci_window_trace=window,
+                    rebuilt_units=6 if window else 5 if srng else 4 if credit else 1,
+                    retained_units=119 if window else 120 if srng else 121 if credit else 124,
+                    compiled_this_step=3 if window else 2 if srng else 3 if credit else 1,
                     reversible_counter_insertions=True, inherited_irq_observer=True,
                     reversible_srng_insertions=True, producer_credit_timeout_changes=False)
 
     def test_all_three_profiles_keep_their_own_boundary(self):
-        for profile in ("wifi-wmi-snapshot", "wifi-credit-trace", "wifi-srng-trace"):
+        for profile in ("wifi-wmi-snapshot", "wifi-credit-trace", "wifi-srng-trace","wifi-pci-window-trace"):
             snap = self.snapshot(profile)
-            qualify_runtime_snapshot(snap, dict(credit_trace=snap["credit_trace"], srng_trace=snap["srng_trace"]), "a" * 64, profile)
+            qualify_runtime_snapshot(snap, dict(credit_trace=snap["credit_trace"], srng_trace=snap["srng_trace"],pci_window_trace=snap['pci_window_trace']), "a" * 64, profile)
+
+    def test_pci_window_mode_rejects_wrong_units_and_native(self):
+        snapshot=self.snapshot('wifi-pci-window-trace')
+        for changes in ({'rebuilt_units':5},{'retained_units':120},{'compiled_this_step':2},{'pci_window_trace':False}):
+            with self.subTest(changes=changes),self.assertRaises(ValueError):
+                qualify_runtime_snapshot(dict(snapshot,**changes),dict(credit_trace=True,srng_trace=True,pci_window_trace=True),'a'*64,'wifi-pci-window-trace')
 
     def test_srng_rejects_unqualified_or_mixed_inputs(self):
         for change in ({"rebuilt_units": 4}, {"retained_units": 121}, {"compiled_this_step": 3},

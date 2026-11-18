@@ -1,6 +1,12 @@
 /* SPDX-License-Identifier: BSD-3-Clause-Clear */
 /* Included only in the hash-bound common HAL unit. No producer/credit writes. */
 #include "wifi7/hal.h"
+#include "SrngTrace.h"
+#if defined(ELDEN_SRNG_PCI_WINDOW) && ELDEN_SRNG_PCI_WINDOW
+#define ESN_READ(ab,off) elden_wifi_pci_diag_read((ab),(off))
+#else
+#define ESN_READ(ab,off) ath12k_hif_read32((ab),(off))
+#endif
 struct esn_record { u64 enter, exit, timer, hp, offset; };
 static struct esn_record esn_records[HAL_SRNG_RING_ID_MAX];
 static unsigned esn_captured;
@@ -70,8 +76,8 @@ void elden_wifi_srng_first_wmi(struct ath12k_base *ab)
     /* Read the documented real HP/TP only. Shadow registers may be write-only;
      * their last software notification is observed above, never read here.
      * HIF may perform its existing window selection/wakeup for these accesses. */
-    hw_hp = ath12k_hif_read32(ab, direct);
-    hw_tp = ath12k_hif_read32(ab, direct + HAL_OFFSET_FROM_HP_TO_TP);
+    hw_hp = ESN_READ(ab, direct);
+    hw_tp = ESN_READ(ab, direct + HAL_OFFSET_FROM_HP_TO_TP);
     ath12k_warn(ab, "ELDEN_SRNG CFG ce=3 id=%u flags=%x shadow=%u idx=%d off=%x target=%x direct=%x maps=%u\n",
                 id, srng->flags, ab->hw_params->supports_shadow_regs,
                 index, shadow, target, direct, n);

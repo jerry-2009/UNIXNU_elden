@@ -21,7 +21,7 @@ def main():
     args = parser.parse_args()
     kernel, clean, output = args.kernel_build.resolve(), args.clean_build.resolve(), args.output.resolve()
     result = json.loads((kernel / "result.json").read_text())
-    if result["profile"] != "wifi-srng-trace" or result["runtime_snapshot"].get("srng_trace") is not True:
+    if result["profile"] not in ("wifi-srng-trace","wifi-pci-window-trace") or result["runtime_snapshot"].get("srng_trace") is not True:
         raise ValueError("Complete qualified SRNG kernel required")
     output.mkdir(parents=True, exist_ok=False)
     originals = json.loads((ROOT / "profiles/v91/image-build/plan.json").read_text())["prelink"]["original_executable_sha256"]
@@ -49,7 +49,7 @@ def main():
         *variant, "--output", output / "boot/audit.json")
     audit = json.loads((output / "boot/audit.json").read_text())
     image_hash = hashlib.sha256((output / "boot/boot-signed.img").read_bytes()).hexdigest()
-    if not audit["accepted_static"] or audit["image_sha256"] != image_hash or audit["bluetooth_runtime"]["profile"] != "wifi-srng-trace":
+    if not audit["accepted_static"] or audit["image_sha256"] != image_hash or audit["bluetooth_runtime"]["profile"] != result["profile"]:
         raise ValueError("SRNG image audit failed")
     if (audit["rollback_index"], audit["footer_location"], audit["parent_boot_chain_location"]) != (1738713600, 0, 3):
         raise ValueError("Boot floor changed")

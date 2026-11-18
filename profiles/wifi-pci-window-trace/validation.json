@@ -1,0 +1,6 @@
+{
+  "evidence": "../../docs/evidence/wifi-pci-window-v188-signed-20261118.json",
+  "candidate_sha256": "c4aa5d1f4a1fc7567735097b0b02436471c589179c883925acaf6f862a2784d0",
+  "kernel_package_passed": true,
+  "hardware_tested": false
+}
