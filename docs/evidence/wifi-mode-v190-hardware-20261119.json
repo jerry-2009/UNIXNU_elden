@@ -1,0 +1,1082 @@
+{
+  "date": "2026-11-19",
+  "version": "v190",
+  "profile": "wifi-ce3-flow-trace",
+  "mode_metadata_variant": true,
+  "candidate_sha256": "d5926009d31893fd5d2d7db146f3af42b3fd7de51c28dd345a6b4a92d5684452",
+  "session": "721e3faaecb953da",
+  "kernel_sha256": "5234afcdc869f9b43868fb94771f9b3e374ad485c1de3ec594b8870b3a973e3b",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "source_commit": "3a037e9",
+  "flow": {
+    "events": [
+      {
+        "seq": 0,
+        "ms": 59119,
+        "kind": "firmware-event",
+        "fields": [
+          3,
+          64,
+          1163284052,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "event_id": 3,
+        "frame_bytes": 64,
+        "preferred_mode": 0
+      },
+      {
+        "seq": 1,
+        "ms": 59119,
+        "kind": "firmware-event",
+        "fields": [
+          1,
+          344,
+          1163284052,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "event_id": 1,
+        "frame_bytes": 344,
+        "preferred_mode": 0
+      },
+      {
+        "seq": 2,
+        "ms": 59119,
+        "kind": "firmware-event",
+        "fields": [
+          16393,
+          1084,
+          1163284052,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "event_id": 16393,
+        "frame_bytes": 1084,
+        "preferred_mode": 0
+      },
+      {
+        "seq": 3,
+        "ms": 59119,
+        "kind": "firmware-mode-cap",
+        "fields": [
+          0,
+          1,
+          1128353875,
+          0,
+          2
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "mode_id": 0,
+        "phy_map": 1,
+        "config_type": 0,
+        "advertised_modes": 2
+      },
+      {
+        "seq": 4,
+        "ms": 59119,
+        "kind": "firmware-mode-cap",
+        "fields": [
+          5,
+          3,
+          1128353875,
+          5,
+          2
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "mode_id": 5,
+        "phy_map": 3,
+        "config_type": 5,
+        "advertised_modes": 2
+      },
+      {
+        "seq": 5,
+        "ms": 59119,
+        "kind": "firmware-pdev-cap",
+        "fields": [
+          1,
+          5,
+          1346651478,
+          0,
+          1
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "pdev_id": 1,
+        "mode_id": 5,
+        "phy_id": 0,
+        "supported_bands": 1
+      },
+      {
+        "seq": 6,
+        "ms": 59119,
+        "kind": "firmware-pdev-cap",
+        "fields": [
+          2,
+          5,
+          1346651478,
+          1,
+          2
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "pdev_id": 2,
+        "mode_id": 5,
+        "phy_id": 1,
+        "supported_bands": 2
+      },
+      {
+        "seq": 7,
+        "ms": 59119,
+        "kind": "firmware-event",
+        "fields": [
+          16418,
+          984,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "event_id": 16418,
+        "frame_bytes": 984,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 8,
+        "ms": 59120,
+        "kind": "wmi-request",
+        "fields": [
+          1,
+          328,
+          0,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "command": 1
+      },
+      {
+        "seq": 9,
+        "ms": 59120,
+        "kind": "ce3-post",
+        "fields": [
+          0,
+          4,
+          0,
+          340,
+          268491872
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "slot": 0,
+        "hp": 4,
+        "cached_tp": 0
+      },
+      {
+        "seq": 10,
+        "ms": 59120,
+        "kind": "wmi-result",
+        "fields": [
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "command": 1,
+        "result": 0
+      },
+      {
+        "seq": 11,
+        "ms": 59121,
+        "kind": "ce3-reap",
+        "fields": [
+          0,
+          4,
+          4,
+          340,
+          268491872
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "slot": 0,
+        "hp": 4,
+        "cached_tp": 4
+      },
+      {
+        "seq": 12,
+        "ms": 59121,
+        "kind": "ce3-empty",
+        "fields": [
+          1,
+          4,
+          4,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "slot": 1,
+        "hp": 4,
+        "cached_tp": 4
+      },
+      {
+        "seq": 13,
+        "ms": 59126,
+        "kind": "firmware-event",
+        "fields": [
+          90117,
+          16,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 90117,
+        "frame_bytes": 16,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 14,
+        "ms": 59257,
+        "kind": "firmware-event",
+        "fields": [
+          45067,
+          12,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 45067,
+        "frame_bytes": 12,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 15,
+        "ms": 59269,
+        "kind": "firmware-event",
+        "fields": [
+          237571,
+          792,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 237571,
+        "frame_bytes": 792,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 16,
+        "ms": 59269,
+        "kind": "firmware-event",
+        "fields": [
+          237571,
+          792,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 237571,
+        "frame_bytes": 792,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 17,
+        "ms": 59269,
+        "kind": "firmware-event",
+        "fields": [
+          2,
+          96,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 2,
+        "frame_bytes": 96,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 18,
+        "ms": 59269,
+        "kind": "firmware-event",
+        "fields": [
+          118817,
+          80,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 118817,
+        "frame_bytes": 80,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 19,
+        "ms": 59269,
+        "kind": "mode-request",
+        "fields": [
+          1,
+          5,
+          1297040453,
+          2,
+          1
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "requested_mode": 1,
+        "preferred_mode": 5,
+        "advertised_modes": 2,
+        "decoded_dbs": true,
+        "decoded_sbs": false
+      },
+      {
+        "seq": 20,
+        "ms": 59269,
+        "kind": "wmi-request",
+        "fields": [
+          16414,
+          16,
+          0,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "command": 16414
+      },
+      {
+        "seq": 21,
+        "ms": 59269,
+        "kind": "ce3-post",
+        "fields": [
+          1,
+          8,
+          4,
+          28,
+          268467872
+        ],
+        "credit": 0,
+        "credit_reports": 0,
+        "slot": 1,
+        "hp": 8,
+        "cached_tp": 4
+      },
+      {
+        "seq": 22,
+        "ms": 59269,
+        "kind": "wmi-result",
+        "fields": [
+          16414,
+          0,
+          0,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 0,
+        "command": 16414,
+        "result": 0
+      },
+      {
+        "seq": 23,
+        "ms": 59270,
+        "kind": "ce3-reap",
+        "fields": [
+          1,
+          8,
+          8,
+          28,
+          268467872
+        ],
+        "credit": 0,
+        "credit_reports": 0,
+        "slot": 1,
+        "hp": 8,
+        "cached_tp": 8
+      },
+      {
+        "seq": 24,
+        "ms": 59270,
+        "kind": "ce3-empty",
+        "fields": [
+          2,
+          8,
+          8,
+          4,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 0,
+        "slot": 2,
+        "hp": 8,
+        "cached_tp": 8
+      },
+      {
+        "seq": 25,
+        "ms": 59292,
+        "kind": "firmware-event",
+        "fields": [
+          16400,
+          24,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 2,
+        "credit_reports": 2,
+        "event_id": 16400,
+        "frame_bytes": 24,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 26,
+        "ms": 62825,
+        "kind": "pdev-selector",
+        "fields": [
+          34,
+          0,
+          16387,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 2,
+        "parameter_id": 34,
+        "pdev_id": 0
+      },
+      {
+        "seq": 27,
+        "ms": 62825,
+        "kind": "wmi-request",
+        "fields": [
+          16387,
+          16,
+          0,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 2,
+        "command": 16387
+      },
+      {
+        "seq": 28,
+        "ms": 62825,
+        "kind": "ce3-post",
+        "fields": [
+          2,
+          12,
+          8,
+          28,
+          311167008
+        ],
+        "credit": 1,
+        "credit_reports": 2,
+        "slot": 2,
+        "hp": 12,
+        "cached_tp": 8
+      },
+      {
+        "seq": 29,
+        "ms": 62825,
+        "kind": "wmi-result",
+        "fields": [
+          16387,
+          0,
+          0,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 2,
+        "command": 16387,
+        "result": 0
+      },
+      {
+        "seq": 30,
+        "ms": 62825,
+        "kind": "pdev-selector",
+        "fields": [
+          10,
+          0,
+          16387,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 2,
+        "parameter_id": 10,
+        "pdev_id": 0
+      },
+      {
+        "seq": 31,
+        "ms": 62825,
+        "kind": "wmi-request",
+        "fields": [
+          16387,
+          16,
+          0,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 2,
+        "command": 16387
+      },
+      {
+        "seq": 32,
+        "ms": 62825,
+        "kind": "ce3-post",
+        "fields": [
+          3,
+          16,
+          8,
+          28,
+          311167264
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "slot": 3,
+        "hp": 16,
+        "cached_tp": 8
+      },
+      {
+        "seq": 33,
+        "ms": 62825,
+        "kind": "wmi-result",
+        "fields": [
+          16387,
+          0,
+          0,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "command": 16387,
+        "result": 0
+      },
+      {
+        "seq": 34,
+        "ms": 62825,
+        "kind": "pdev-selector",
+        "fields": [
+          35,
+          0,
+          16387,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "parameter_id": 35,
+        "pdev_id": 0
+      },
+      {
+        "seq": 35,
+        "ms": 62825,
+        "kind": "wmi-request",
+        "fields": [
+          16387,
+          16,
+          0,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "command": 16387
+      },
+      {
+        "seq": 36,
+        "ms": 65825,
+        "kind": "wmi-result",
+        "fields": [
+          16387,
+          4294967285,
+          0,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "command": 16387,
+        "result": -11
+      }
+    ],
+    "claimed": 37,
+    "emitted": 37,
+    "dropped": 0,
+    "fully_published": true,
+    "bounded_trace_complete": true,
+    "independent_fields_not_atomic_snapshot": true,
+    "network_accepted": false,
+    "mode_events": [
+      {
+        "seq": 0,
+        "ms": 59119,
+        "kind": "firmware-event",
+        "fields": [
+          3,
+          64,
+          1163284052,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "event_id": 3,
+        "frame_bytes": 64,
+        "preferred_mode": 0
+      },
+      {
+        "seq": 1,
+        "ms": 59119,
+        "kind": "firmware-event",
+        "fields": [
+          1,
+          344,
+          1163284052,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "event_id": 1,
+        "frame_bytes": 344,
+        "preferred_mode": 0
+      },
+      {
+        "seq": 2,
+        "ms": 59119,
+        "kind": "firmware-event",
+        "fields": [
+          16393,
+          1084,
+          1163284052,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "event_id": 16393,
+        "frame_bytes": 1084,
+        "preferred_mode": 0
+      },
+      {
+        "seq": 3,
+        "ms": 59119,
+        "kind": "firmware-mode-cap",
+        "fields": [
+          0,
+          1,
+          1128353875,
+          0,
+          2
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "mode_id": 0,
+        "phy_map": 1,
+        "config_type": 0,
+        "advertised_modes": 2
+      },
+      {
+        "seq": 4,
+        "ms": 59119,
+        "kind": "firmware-mode-cap",
+        "fields": [
+          5,
+          3,
+          1128353875,
+          5,
+          2
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "mode_id": 5,
+        "phy_map": 3,
+        "config_type": 5,
+        "advertised_modes": 2
+      },
+      {
+        "seq": 5,
+        "ms": 59119,
+        "kind": "firmware-pdev-cap",
+        "fields": [
+          1,
+          5,
+          1346651478,
+          0,
+          1
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "pdev_id": 1,
+        "mode_id": 5,
+        "phy_id": 0,
+        "supported_bands": 1
+      },
+      {
+        "seq": 6,
+        "ms": 59119,
+        "kind": "firmware-pdev-cap",
+        "fields": [
+          2,
+          5,
+          1346651478,
+          1,
+          2
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "pdev_id": 2,
+        "mode_id": 5,
+        "phy_id": 1,
+        "supported_bands": 2
+      },
+      {
+        "seq": 7,
+        "ms": 59119,
+        "kind": "firmware-event",
+        "fields": [
+          16418,
+          984,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "event_id": 16418,
+        "frame_bytes": 984,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 13,
+        "ms": 59126,
+        "kind": "firmware-event",
+        "fields": [
+          90117,
+          16,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 90117,
+        "frame_bytes": 16,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 14,
+        "ms": 59257,
+        "kind": "firmware-event",
+        "fields": [
+          45067,
+          12,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 45067,
+        "frame_bytes": 12,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 15,
+        "ms": 59269,
+        "kind": "firmware-event",
+        "fields": [
+          237571,
+          792,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 237571,
+        "frame_bytes": 792,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 16,
+        "ms": 59269,
+        "kind": "firmware-event",
+        "fields": [
+          237571,
+          792,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 237571,
+        "frame_bytes": 792,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 17,
+        "ms": 59269,
+        "kind": "firmware-event",
+        "fields": [
+          2,
+          96,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 2,
+        "frame_bytes": 96,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 18,
+        "ms": 59269,
+        "kind": "firmware-event",
+        "fields": [
+          118817,
+          80,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "event_id": 118817,
+        "frame_bytes": 80,
+        "preferred_mode": 5
+      },
+      {
+        "seq": 19,
+        "ms": 59269,
+        "kind": "mode-request",
+        "fields": [
+          1,
+          5,
+          1297040453,
+          2,
+          1
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "requested_mode": 1,
+        "preferred_mode": 5,
+        "advertised_modes": 2,
+        "decoded_dbs": true,
+        "decoded_sbs": false
+      },
+      {
+        "seq": 25,
+        "ms": 59292,
+        "kind": "firmware-event",
+        "fields": [
+          16400,
+          24,
+          1163284052,
+          0,
+          5
+        ],
+        "credit": 2,
+        "credit_reports": 2,
+        "event_id": 16400,
+        "frame_bytes": 24,
+        "preferred_mode": 5
+      }
+    ],
+    "metadata_only": true,
+    "firmware_mode_success_unproven": true,
+    "capture_sha256": "8bcb6f762a29b02f4c1d4524298a88995a21723176de39137805bcdf9137806c",
+    "capture_bytes": 291077
+  },
+  "mode_request": {
+    "seq": 19,
+    "ms": 59269,
+    "kind": "mode-request",
+    "fields": [
+      1,
+      5,
+      1297040453,
+      2,
+      1
+    ],
+    "credit": 1,
+    "credit_reports": 0,
+    "requested_mode": 1,
+    "preferred_mode": 5,
+    "advertised_modes": 2,
+    "decoded_dbs": true,
+    "decoded_sbs": false
+  },
+  "firmware_caps": [
+    {
+      "seq": 3,
+      "ms": 59119,
+      "kind": "firmware-mode-cap",
+      "fields": [
+        0,
+        1,
+        1128353875,
+        0,
+        2
+      ],
+      "credit": 2,
+      "credit_reports": 0,
+      "mode_id": 0,
+      "phy_map": 1,
+      "config_type": 0,
+      "advertised_modes": 2
+    },
+    {
+      "seq": 4,
+      "ms": 59119,
+      "kind": "firmware-mode-cap",
+      "fields": [
+        5,
+        3,
+        1128353875,
+        5,
+        2
+      ],
+      "credit": 2,
+      "credit_reports": 0,
+      "mode_id": 5,
+      "phy_map": 3,
+      "config_type": 5,
+      "advertised_modes": 2
+    }
+  ],
+  "firmware_pdevs": [
+    {
+      "seq": 5,
+      "ms": 59119,
+      "kind": "firmware-pdev-cap",
+      "fields": [
+        1,
+        5,
+        1346651478,
+        0,
+        1
+      ],
+      "credit": 2,
+      "credit_reports": 0,
+      "pdev_id": 1,
+      "mode_id": 5,
+      "phy_id": 0,
+      "supported_bands": 1
+    },
+    {
+      "seq": 6,
+      "ms": 59119,
+      "kind": "firmware-pdev-cap",
+      "fields": [
+        2,
+        5,
+        1346651478,
+        1,
+        2
+      ],
+      "credit": 2,
+      "credit_reports": 0,
+      "pdev_id": 2,
+      "mode_id": 5,
+      "phy_id": 1,
+      "supported_bands": 2
+    }
+  ],
+  "mode_response_event_received": true,
+  "mode_response_status_unparsed": true,
+  "mode_transition_success_unproven": true,
+  "original_single_pdev_alias_zero_confirmed_in_source": true,
+  "physical_pdev_ids_are_not_alias_error_proof": true,
+  "native_identity_generated_and_artifact_bound": true,
+  "native_identity_contract": {
+    "path": "native-contract.json",
+    "sha256": "05ae3d8b628b79cf71db4f70330ce4cd276eb5165026d904e4e19cffebac793e",
+    "native_sha256": "46f6f9f87e81e2d59938545de6ed418c140597f04d9d00dd091a34ce7a4fa377"
+  },
+  "original_loaded_content_entry_assets_avb_checks_retained": true,
+  "physical_shutdown": {
+    "fence": "ELDEN_WIFI_FENCE result=0 stage=6 master-off=1 transactions-sampled=1 idle=1 command=2 device-status=10 msi=4 perst=pending consumer=0",
+    "transport": "ELDEN_WIFI_TRANSPORT stop=0 msi=4 irq-active=0 master-attempted=1",
+    "perst": "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+    "wcn": "ELDEN_WCN RPC stop=1; radio/UART stopped, boot-shared votes retained"
+  },
+  "native_physical_shutdown_proven": true,
+  "warm_mhi_reset_proven": false,
+  "capture": {
+    "path": "edl_work/live-mode-v190-20261119/usb/20261118-170542.bin",
+    "bytes": 291077,
+    "sha256": "8bcb6f762a29b02f4c1d4524298a88995a21723176de39137805bcdf9137806c",
+    "status_samples": 65,
+    "drop_max": 110,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false,
+    "oversized_console_lines_discarded": 0
+  },
+  "restoration": {
+    "complete": true,
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "android_boot_completed": true,
+    "root": true,
+    "green": true,
+    "original_charging_equal": true,
+    "original_radios_equal": true,
+    "original_scans_equal": true,
+    "sleep_requested": true,
+    "radio_restoration": {
+      "complete": true,
+      "attempts": 2,
+      "errors": [],
+      "actual_radios": [
+        "1",
+        "1"
+      ],
+      "actual_scans": [
+        "1",
+        "1"
+      ]
+    },
+    "all_device_jobs_terminal": true
+  },
+  "all_jobs_terminal": true,
+  "network_accepted": false,
+  "full_goal_complete": false,
+  "next": "Confirm hardware-mode response status from its exact firmware schema and inspect live CE/DMA state; do not force pdev1 from physical-ID observations alone."
+}

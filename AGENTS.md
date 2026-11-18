@@ -1,5 +1,25 @@
 # UniXNU elden — authoritative source repository
 
+Latest v19020261119 HARDWARE:37/37 complete metadata records. Firmware advertises
+SINGLE0 and DBS_OR_SBS5, two physical pdevs1/2; actual DBS1 requested, preferred5,
+decodedDBS1 and response event4010/24B received. Response status NOT parsed, so no
+mode-success claim. Single-pdev source explicitly sets logicalpdev0; physical1/2
+are not proof that0is wrong. PMF_QOS/DYNAMIC_BW still unreaped at first-11/credits0.
+Next exact mode-response schema/status and actual CE/DMA state; no guessed pdev/
+clock/credit changes. Source/core DBS block matches exact-board6f97250e.
+Native1/kernel2/package2 pass; generated native identity bound to exact filename/
+contract+artifactSHA and loaded sections/commands/symbols, no manual layout change.
+Host21cap/quota +2decoder/8profile/4identity tests pass; WMI632/native1 inherited
+warnings retained. Host1 C/C++ conversion and package1 old-local failure preserved.
+Real DMA fence/MSI4/IRQactive0/PERSTlow1/WCNstop1, typed physical fastboot/full stock
+8b8e72da/Android/root/green/original charge+radio+scans/sleep restored. All jobs terminal.
+Imaged5926009/session721e3faaecb953da/kernel5234afcd/floor1738713600/0/3; capture
+291077B/dropmax0/no reconnect/discontinuity; post-disconnect counter unavailable.
+Reference sync160058:67roots/HEAD/branches verified,39current/2FF/14detached/3dirty/
+7diverged/2known missing refs. New scan/wake/age and thermal-drift changes reviewed
+outside research; candidate inputs frozen. Goal/charging/Wi-Fi/persistence/other
+peripherals remain incomplete; GPU/peripheral/QRTR/AnyRouter boundaries preserved.
+
 Latest v18920261118 HARDWARE:21/21 ordered CE3/WMI records/no trace overflow.
 INITcmd1 +401e slots0/1 complete; PMF_QOS22/DYNAMIC_BWa atpdev0 enqueue slots2/3,
 HP12/16 but no subsequent reap before ARP_AC_OVERRIDE23 fails-11/credits0.
