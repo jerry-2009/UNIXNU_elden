@@ -1,5 +1,20 @@
 # UniXNU elden — authoritative source repository
 
+Latest v18620261118 HARDWARE UI: explicit replay preserves required self-IPI/SMP,
+pauses only PMIC_LOGS vote readback and read-only CPU observation; args1015B.3menu+
+11capacity qualification tests and full native/entry/FAT/assets/AVB pass. Image d2e7928e/
+sessioneeab599887cfbb4d/kerneldd474de4/source58aa5fc has31Git-bound inputs. Data2GiB
+mount0/software KeyStore pass; swipe25/error0/release0 and Settings down0/up0;11complete
+CRC frames, last17 visibly Settings/General. Capture5645229B/8a87e67d/drop50/no reconnect
+or discontinuity; no observed ENOSPC/panic, not lossless. SMPhold onlineff throughout.
+Typed sync/physical fastboot/full stock8b8e72da/Android/root/green/original charge+radio+
+scan settings/sleep restored; all jobs terminal. v185 omitted required self-IPI and was
+correctly refused before UFS, now withdrawn; historical evidence retained. No physical
+finger/About/live-free-space/long-load/persistence acceptance yet. NEXT mainline Wi-Fi:
+actual CE3 shadow/direct HP/TP first-failure snapshot. Exact HAL mapping helpers match
+board6f97250e; Peach supports shadow; iowrite32 already has dsb sy. Do not add guessed
+barriers/credits/clocks or change timeouts. Charging/full Goal remain incomplete.
+
 Latest20261118 capacity clean-fresh2 COMPLETED: pure Git95445ba, all37stages from an
 empty output through XNU/native/current units, real KeyStore, charge/UFS, fresh2GiB seed,
 FD/loader/entry/FAT/AVB. Imageeb1a5322/sessionb1a6138583e67074/floor1738713600/0/3,

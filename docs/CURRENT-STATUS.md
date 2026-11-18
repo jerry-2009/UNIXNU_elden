@@ -1,5 +1,11 @@
 # 当前状态 · 2026-11-18
 
+v186已在2GiB Data下完成自动上滑、打开Settings/General；11张CRC完整画面和成功按下/抬起
+记录一致，八核onlineff。日志未捕获ENOSPC/panic（drop50），自动回fastboot及完整Android/
+root/原设置恢复通过。软件重放明确启用，并保留SMP必需自发IPI；v185错误省略该标志的
+试验已撤回。真实手指、About空间与长时负载仍待验收；Data仍非持久卷。
+[当前UI证据](evidence/data-ui-v186-20261118.json)。下一步回到Wi-Fi CE3 shadow/direct HP通知审计。
+
 2GiB完整clean命令现已从新空输出完成37阶段，直达签名boot及独立审核；原始输入均已声明，
 固定电源源码在仓内，不需要旧v99产物。新整链镜像尚未上机；此前v184分包的锁屏/回程证据保留。
 所有构建与设备任务已结束，平板已恢复Android。[整链验收](evidence/data-capacity-clean-build-20261118.json)。

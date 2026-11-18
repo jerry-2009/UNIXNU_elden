@@ -1,0 +1,72 @@
+{
+  "candidate": {
+    "profile": "data-capacity-2g-key",
+    "image_sha256": "d2e7928e174535ccda7429e54f57e82d94e7f1cb7f8e3e6ddd0042ea5f5d19bb",
+    "session": "eeab599887cfbb4d",
+    "kernel_sha256": "dd474de463c1eb5341dd654788460f0a728c30dd3965b6a9ebb5c618da737262",
+    "data_packed_sha256": "70500dc64e8a6733e3292f4e91b761e6c416cc050414280a39f4f4e790a7eb46",
+    "expected_data_bytes": 2147483648,
+    "accepted_static": true,
+    "keystore_capacity_updated": true,
+    "keep_packed_data": true,
+    "tablet_accessed": false,
+    "data_ui_replay": true,
+    "hardware_tested": false
+  },
+  "source_commit": "58aa5fc",
+  "ui_replay_enabled": true,
+  "boot_args_bytes": 1015,
+  "self_ipi_smp_admission_retained": true,
+  "only_paused_diagnostics": [
+    "PMIC_LOGS vote readback",
+    "read-only CPU sampling"
+  ],
+  "data_bytes": 2147483648,
+  "data_mount_return": 0,
+  "software_swipe": {
+    "sent": 25,
+    "error": 0,
+    "release": 0
+  },
+  "software_settings_tap": {
+    "down": 0,
+    "up": 0
+  },
+  "settings_general_visually_verified": true,
+  "physical_finger_validation": false,
+  "about_live_free_space_verified": false,
+  "capture": {
+    "path": "edl_work/live-data-ui-v186-20261118/usb/20261118-062438.bin",
+    "bytes": 5645229,
+    "sha256": "8a87e67d14f2afe460db1da3f483342be744d824b86889fe38727cc8e93d6d35",
+    "drop_max": 50,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false
+  },
+  "complete_crc_frames": 11,
+  "settings_frame": {
+    "id": 11,
+    "source_frame": 17,
+    "session": "eeab599887cfbb4d",
+    "width": 238,
+    "height": 380,
+    "raw_sha256": "9caab46f03382b202829e18808df987230925008a7a9fe37b652217e95ac1cd7",
+    "crc32": "628e3285",
+    "all_rows_verified": true,
+    "image": "D:\\Desktop\\Git\\Patch\\Y700-Elden\\lab\\records\\data-ui-20261118\\v186-frames\\frame-11.png",
+    "description": "Read-only 1:8 sampled framebuffer; UI content still requires visual assessment"
+  },
+  "observed_enospc": 0,
+  "observed_panic": 0,
+  "smp_online_masks": [
+    "ff"
+  ],
+  "typed_sync_physical_fastboot_full_stock_restore": true,
+  "android_root_green_original_settings_sleep_restored": true,
+  "all_device_jobs_terminal": true,
+  "persistent_data_complete": false,
+  "charging_complete": false,
+  "wifi_complete": false,
+  "full_goal_complete": false
+}
