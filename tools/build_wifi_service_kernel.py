@@ -10,6 +10,17 @@ def write(p,v):p.write_text(json.dumps(v,indent=2)+'\n')
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def defs(p):return {n for n,v in global_symbols(p).items() if v[0]&0x0e}
 
+def runtime_observer_exports(snapshot):
+    additions={'_elden_wifi_assets_ready'}|({'_elden_wifi_irq_snapshot'} if snapshot else set())
+    if snapshot and snapshot.get('credit_trace'):additions.add('_elden_wifi_credit_trace')
+    if snapshot and snapshot.get('srng_trace'):additions.add('_elden_wifi_srng_first_wmi')
+    if snapshot and snapshot.get('pci_window_trace'):additions.add('_elden_wifi_pci_diag_read')
+    if snapshot and snapshot.get('ce3_flow_trace'):
+        if snapshot.get('ce3_flow_trace') is not True or not snapshot.get('pci_window_trace'):
+            raise ValueError('CE3 flow exports require the explicit window profile')
+        additions|={'_elden_wifi_ce3_flow_note','_elden_wifi_ce3_flow_dump'}
+    return additions
+
 def relocated_baseline_plan(raw,expected_sha):
     """Prove the sole maintained-plan change is byte-identical WcnPower lookup."""
     digest='feb9fefa74ee07e39b7f5694c5921329d0017163a6391bdd82bf64a2ae9208c0'
@@ -76,10 +87,7 @@ def main():
     cmd=[x.replace(str(parent/'native.macho'),str(out/'native.macho')).replace(str(oldar),str(archive)).replace(oldlists[0],str(filelist)) for x in cmd]
     write(out/'link-command.json',cmd);env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as f:subprocess.run(cmd,cwd=out,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
-    additions={'_elden_wifi_assets_ready'}|({'_elden_wifi_irq_snapshot'} if snapshot else set())
-    if snapshot and snapshot.get('credit_trace'):additions.add('_elden_wifi_credit_trace')
-    if snapshot and snapshot.get('srng_trace'):additions.add('_elden_wifi_srng_first_wmi')
-    if snapshot and snapshot.get('pci_window_trace'):additions.add('_elden_wifi_pci_diag_read')
+    additions=runtime_observer_exports(snapshot)
     assert defs(out/'native.macho')==defs(parent/'native.macho')|additions
     for name,h in inherited.items():assert sha(Path(name))==h,name
     pre=read(ROOT/'profiles/v91/image-build/plan.json')['prelink'];assert sha(a.original_kernelcache)==pre['original_kernelcache_sha256']

@@ -3,7 +3,7 @@ import unittest
 import hashlib
 import json
 from wifi_service_boot import qualify_runtime_snapshot
-from build_wifi_service_kernel import relocated_baseline_plan
+from build_wifi_service_kernel import relocated_baseline_plan, runtime_observer_exports
 
 
 class RuntimeBoundary(unittest.TestCase):
@@ -49,6 +49,15 @@ class RuntimeBoundary(unittest.TestCase):
                 qualify_runtime_snapshot(snapshot,dict(native,ce3_flow_trace=native_flag),'a'*64,'wifi-ce3-flow-trace')
         with self.assertRaises(ValueError):
             qualify_runtime_snapshot(snapshot,native,'a'*64,'wifi-pci-window-trace')
+
+    def test_link_exports_add_exactly_the_two_flow_functions(self):
+        parent=self.snapshot('wifi-pci-window-trace')
+        current=dict(parent,ce3_flow_trace=True)
+        self.assertEqual(runtime_observer_exports(current)-runtime_observer_exports(parent),
+                         {'_elden_wifi_ce3_flow_note','_elden_wifi_ce3_flow_dump'})
+        self.assertEqual(runtime_observer_exports(parent)-runtime_observer_exports(current),set())
+        with self.assertRaises(ValueError):
+            runtime_observer_exports(dict(current,pci_window_trace=False))
 
     def test_srng_rejects_unqualified_or_mixed_inputs(self):
         for change in ({"rebuilt_units": 4}, {"retained_units": 121}, {"compiled_this_step": 3},

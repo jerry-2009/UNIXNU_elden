@@ -1,0 +1,11 @@
+{
+  "failed_link_checked": true,
+  "actual_added_exports": [
+    "_elden_wifi_ce3_flow_dump",
+    "_elden_wifi_ce3_flow_note"
+  ],
+  "actual_removed_exports": [],
+  "exact_export_gate_repaired": true,
+  "original_failure_preserved": true,
+  "hardware_tested": false
+}
