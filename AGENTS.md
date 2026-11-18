@@ -1,5 +1,23 @@
 # UniXNU elden — authoritative source repository
 
+Latest v18820261118 HARDWARE: PCI-window observer confirms CE3 request1b86400
+uses BAR86400/dynamic37/register3278/readback40000037/wake0, matching the exact
+Armada6f97250e Peach branch. HIF HP/TP0/0 vs coherent DMA TP8/last notificationHP16
+remains unexplained; next verify direct CSR/shadow-driven pointer read semantics
+and actual completion delivery, not guessed static mapping/credits/clocks/timeouts.
+Imagec4aa5d1f/session80bb66d9dc9166fd/kernel59e71bad passes signed/static qualification.
+Original90s-after-runtime return retained: real fence0/master-off1/sampled-idle1,
+MSIStopped4/IRQactive0/PERSTlow1/WCNstop1 and full typed/physical fastboot return
+are captured. Warm MHI reset remains unverified. Capture280679B/18a74fc9/drop0/
+reconnect0/discontinuity0; post-disconnect counter unavailable. Full stock8b8e72da/
+Android/root/green/original charging+radio+scan settings/sleep finally restored;
+initial startup radio-restore failure remains in supervisor, final receipt closes it.
+All jobs terminal, last verified device stock Android. v188 evidence is in
+docs/evidence/wifi-pci-window-v188-hardware-20261118.json and workbench lab/records.
+Data2GiB/v186 Settings software replay passed; physical fingers/About/long load/
+persistence still pending. RAM6GiB/SMPonlineff remain. Full Goal/charging/Wi-Fi/
+persistent Data incomplete; preserve other worktrees and AnyRouter staging.
+
 Latest v18720261118 HARDWARE: complete wifi-srng-trace imagee1cedc01/session4bd7a57ef992f50e
 signed/full asset+entry+Apple30/FAT/AVB pass; runtime4/native1/kernel1 qualification.
 First WMI16387 call5 after4accepted API sends: CE3id67/flags20000/shadowidx34/off984,

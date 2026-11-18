@@ -1,5 +1,16 @@
 # User GUI trial and Data exhaustion — 2026-11-16
 
+2026-11-18 current qualification: v186 mounted the2GiB volatile Data seed,
+completed software swipe and Settings/General with11 CRC-verified frames and
+SMPonlineff. No ENOSPC/panic was captured; drop50 limits absence claims. Typed
+return, full stock SHA, Android/root/green/original settings and sleep were
+restored. Physical fingers, About live free space and sustained load still need
+acceptance. RAM remains6GiB; Data persistence is not implemented. The complete
+clean command also passed37 stages from empty output, including signing and
+independent audit; it needs no v99 build products. See [UI hardware evidence](evidence/data-ui-v186-20261118.json)
+and [empty-output build evidence](evidence/data-capacity-clean-build-20261118.json).
+The v182/v183 paragraphs below retain their original publication boundaries.
+
 2026-11-18 follow-up: v182 with2GiB Data and the actual separately archived
 KeyStore adapter mounted Data with return0, registered software key operations
 and produced two CRC-verified lockscreen frames. No captured ENOSPC/panic was
@@ -39,11 +50,11 @@ The early32 full-frame CPU copies took122.7–140.3ms, median138.3ms at the reco
 19.2MHz counter frequency. Those capped samples are not a continuous GUI FPS
 measurement. Both software display cost and Data failures need attention.
 
-Next prepare a separately qualified2GiB sparse Data seed, preserving the original
-logical files, UUID, anonymous raw inode ownership and APFS checks. Its native
-staging/recovery guards and packer must be explicitly adapted and checked before
-use; merely changing the image size is not a flashable candidate. Sparse pages
-are allocated on writes, but resident-memory growth still needs runtime testing.
+The separately qualified2GiB sparse Data seed now preserves the original logical
+files, UUID, anonymous raw inode ownership and APFS checks; its actual KeyStore,
+staging/recovery guards and packer are updated. The above v186 trial establishes
+software UI operation, not sustained load or memory-pressure acceptance. Sparse
+pages are allocated on writes, so resident-memory growth still needs observation.
 Persistent writable Data remains a separate unfinished requirement; the existing
 128GiB root bundle is not automatically used as application Data.
 

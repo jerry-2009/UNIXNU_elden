@@ -1,15 +1,20 @@
 # 当前状态 · 2026-11-18
 
-v187完整诊断包实机已读到CE3首次失败：4次通知调用返回、最后HP16，shadow目标与直接地址
-相同，但HIF直接HP/TP=0/0、DMA TP=8。下一步核实际PCI窗口/唤醒与寄存器读取语义，
-不能据此定因firmware。短窗口提前回程未记录完整原生Wi-Fi停机证明；随后同步回fastboot、
-全SHA恢复Android/root/原设置通过。无线设置首次恢复有临时返回码异常，稍后成功，记录保留。
-[实机结果与边界](evidence/wifi-srng-v187-hardware-20261118.json)。
+v188已实机核对CE3访问路径：动态窗口0x37、寄存器0x3278、回读0x40000037、唤醒返回0；
+内部地址0x1b86400实际走BAR偏移0x86400，与Armada固定四代源码的Peach分支一致。
+HIF直接HP/TP仍为0/0、DMA TP为8、最后通知HP16。下一步核shadow驱动环的CSR读取语义
+及真实完成处理，尚不能断言通知丢失或固件挂死；Wi-Fi扫描与联网仍未通过。
+[本轮实机证据](evidence/wifi-pci-window-v188-hardware-20261118.json)。
 
-Wi-Fi CE3首失败观测组件已完成：实际软件通知计数/offset和真实HP/TP读取，16个helper场景、
-标量iOS17运行库编译及导入绑定通过。它尚未整核或上机，不能当成扫描联网修复。
-[组件与下一轮资格流程](../drivers/EldenWifi/SRNG-OBSERVATION.md)。本轮参考源同步未发现
-新的CE/WMI/本机充电代码修复；冻结输入保留。
+恢复原有运行起点后90秒回程条件后，本轮记录了真实DMA fence、bus-master关闭、事务空闲、
+MSI排空、PERST低和WCN停机，随后完整返回fastboot并恢复stock Android/root/green/原设置。
+无线设置启动早期的恢复失败保留，稍后重试及最终设置一致性已核验。日志280679字节、
+报告drop0/无重连；断开后的计数不可读，不扩大为全生命周期无丢失。MHI暖复位仍未证明。
+v187提前回程的失败边界保留在[前轮记录](evidence/wifi-srng-v187-hardware-20261118.json)。
+
+观测组件现已整核、签名并上机；只新增受限窗口寄存器读取，未更改通知/credit/时钟/超时。
+[构建与资格流程](../profiles/wifi-pci-window-trace/README.md)。今天67仓参考同步未发现
+可直接应用的CE/WMI/本机充电修复，冻结输入保留。
 
 v186已在2GiB Data下完成自动上滑、打开Settings/General；11张CRC完整画面和成功按下/抬起
 记录一致，八核onlineff。日志未捕获ENOSPC/panic（drop50），自动回fastboot及完整Android/

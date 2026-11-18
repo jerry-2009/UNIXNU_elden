@@ -1,4 +1,11 @@
-# Wi-Fi：固件已就绪，平台回程通过，下一步用户态与网络桥
+# Wi-Fi：固件与服务已接通，WMI完成仍待修复
+
+2026-11-18 v188：真实PCI窗口与唤醒核对通过，动态窗口0x37、0x3278回读0x40000037；
+Peach原厂分支明确采用此动态路径。CE3直接HP/TP仍0/0，coherent DMA TP8、通知HP16，
+这些差异的寄存器语义及完成路径仍须查证，不能直接归咎固件或改成static映射。
+本轮完整捕获DMA fence/MSI排空/PERST/WCN停机及stock Android/root/green/原设置恢复。
+暖MHI reset未证明，扫描/关联/DHCP/流量均未验收。下一步优先核shadow驱动环的直接CSR
+读取语义与设备完成链。[本轮证据](evidence/wifi-pci-window-v188-hardware-20261118.json)。
 
 **v179与用户操作窗口已收尾。** Wi-Fi已确定 WMI 走CE3，实际收到过2个credit，随后发送环
 HP16/TP8未推进；下一步审计通知路径。用户操作另证实512MiB Data发生大量ENOSPC，
@@ -37,10 +44,10 @@ v167起已经进入真实固件 `FW_INIT_DONE`/Linux stage4，PCIe/SMMU/DMA/MHI/
 已采样为空闲，MSI停止且无在途处理，PERST低确认，WLAN停机成功，完整恢复stock Android。
 [当前回程基线](../profiles/wifi-platform-fence/README.md)。这不代表MHI暖复位成功：2/ff04仍保留。
 
-**联网还未验收。** `nw_wifi_scan=0`只是UI请求入队；BSS仍为0。上游框架需要真实
-supplicant通过控制socket处理请求，目前服务尚未安装。原厂MAC文件和实际IOKit网络接口
-也仍待接入。下一步依次整合已编译的arm64/iOS17 supplicant、自己的launchd任务与签名/
-信任缓存、网络桥及本机MAC，再验证扫描、关联、DHCP、双向流量和重连。
+**联网还未验收。** 真实arm64/iOS17 supplicant、launchd任务、签名/信任、原厂MAC及控制
+socket已经接入并有实机握手；这不等于MAC启动或网络桥通过。当前WMI初始化命令超时、
+credit耗尽，诊断扫描保持准入关闭，BSS仍为0。先修实际完成链，再验扫描、关联、DHCP、
+双向流量和重连；`nw_wifi_scan=0`仍只能证明请求入队。
 
 不再重复只测回程的镜像；后续真实功能候选沿用同一已验回程链。充电双口取电、持续净充、
 完整保护周期和持久设置仍欠验，见[充电状态](CHARGING-STATUS.md)。蓝牙配对和睡眠也未完整完成。

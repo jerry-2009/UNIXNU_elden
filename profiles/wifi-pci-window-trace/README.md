@@ -32,3 +32,13 @@ typed return/full stock/root/settings gates. Allow the original runtime worker
 its terminal path; do not initiate an early20-second reset just because the
 snapshot arrived, and do not extend existing safety deadlines. This remains a
 diagnostic profile and does not claim scanning or networking acceptance.
+
+v188 hardware qualification (2026-11-18) confirms the original Peach dynamic
+window37/register3278/readback40000037 and wake0 at actual BAR offset86400.
+Direct CSR HP/TP0/0 still differs from coherent DMA TP8; the window result is
+not proof of failed notifications or firmware consumption. Verify pointer read
+semantics and the real completion path next. The original90-second runtime
+return captured actual DMA fence, master-off/idle, MSI drain, PERST and WCN stop;
+warm MHI reset remains unverified. Full stock/root/green/original settings and
+sleep were restored; startup radio-restore failure is retained with a final
+successful closure. See [hardware evidence](../../docs/evidence/wifi-pci-window-v188-hardware-20261118.json).
