@@ -45,7 +45,6 @@ credit/timeout behavior. `test_wifi_srng_qualification.py` checks these actual
 boundaries and the exact provider-relocation rule; host3 separately exercises
 16 real observer scenarios with modeled MMIO.
 
-Current candidate validation records follow in evidence. Hardware acceptance
 v187 hardware captured both snapshot lines: CE3id67/shadowidx34/off0x984,
 target/direct0x1b86400,4 entered/returned notifications and lastHP16. Direct
 HIF HP/TP0/0 differs from coherent DMA TP8. Validate window/wakeup/read semantics
