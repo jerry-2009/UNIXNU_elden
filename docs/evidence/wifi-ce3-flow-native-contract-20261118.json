@@ -1,0 +1,15 @@
+{
+  "profile": "wifi-ce3-flow-trace",
+  "full_kernel_passed": true,
+  "kernel_sha256": "88c7911d6c29b1c6e616923c687a809767f5ade3a0927b6307a6e8489479bafb",
+  "native_sha256": "d6fbd4e4b238a9f5c69f28fa0b0a856341c5b635673bdb30de7da9cdf27bb213",
+  "contract_sha256": "95a5c2e66e10852a467b53329efa6f24c9944448f359a2613642a239912ec0ba",
+  "original_export_gate_failure_preserved": true,
+  "expected_extra_exports": [
+    "_elden_wifi_ce3_flow_dump",
+    "_elden_wifi_ce3_flow_note"
+  ],
+  "exact_native_loaded_identity_frozen": true,
+  "hardware_tested": false,
+  "boot_packaged": false
+}
