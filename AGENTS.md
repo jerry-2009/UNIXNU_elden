@@ -1,5 +1,13 @@
 # UniXNU elden — authoritative source repository
 
+Latest v18420261118 signed canonical closure: source11fce16 exported ONLY by Git archive;
+all30capacity code inputs match committed raw blobs. Old audit_entry_relocation.py worktree
+CRLF differed from Git LF in v183; historical reports preserved, helper normalized and3
+objects/package rebuilt from Git. Imageea3b1393/session5a36ec4091564a51/kernel5483b1ee,
+same qualified fresh seed139c013b/floor1738713600/0/3. NOT hardware-tested yet. Empty-output
+capacity clean run is currently started on Mac lab/data-capacity-v184-20261118/clean-fresh1;
+inspect its live process/handle before assuming continued work. Full Goal remains active.
+
 Latest v18320261118 signed: source-built fresh2GiB sparse Data/raw233owners/fsck0,
 core3/UFS5/actual separately archived KeyStore2 predicates rebuilt.30source inputs and5
 inherited build-report digests close the capacity package. Literal boolean report bug fixed;

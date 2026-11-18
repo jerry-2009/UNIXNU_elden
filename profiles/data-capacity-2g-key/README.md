@@ -19,6 +19,12 @@ source closure, altered inherited build reports, seed reports and artifacts.
 
 ## Clean build
 
+v184's staged source is a pure Git archive of11fce16; all30 code-input byte hashes
+match that commit. v183's snapshot contained a CRLF working copy of one old
+Python auditor while Git held LF. Its record is retained; v184 was rebuilt from
+committed Git objects and is the current staged candidate. See
+[canonical closure](../../docs/evidence/data-capacity-v184-20261118.json).
+
 Use the original inputs and macOS/Xcode environment in
 [CLEAN-BUILD.md](../../docs/CLEAN-BUILD.md). This entrypoint creates every stage
 inside the new output; it does not require Patch, archived v99/v156/v182 builds
