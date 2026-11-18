@@ -5,6 +5,15 @@ ROOT=Path(__file__).resolve().parents[1]
 PARENT='f0771691887fced6a21ae6357b659560414bcbeacee2540a9a2896c89339a5d0'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def read(p):return json.loads(p.read_text())
+
+def qualify_runtime_snapshot(snap,native,base_binding,profile):
+    srng=profile=='wifi-srng-trace';credit=profile in ('wifi-credit-trace','wifi-srng-trace')
+    if profile not in ('wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace'):raise ValueError('Wrong snapshot profile')
+    if bool(snap.get('credit_trace'))!=credit or bool(native.get('credit_trace'))!=credit:raise ValueError('Wrong credit trace variant')
+    if not snap.get('append_only_observer') or snap.get('rebuilt_units')!=(5 if srng else 4 if credit else 1) or snap.get('retained_units')!=(120 if srng else 121 if credit else 124) or snap.get('base_binding_sha256')!=base_binding:raise ValueError('Wrong runtime snapshot boundary')
+    if credit and (not snap.get('reversible_counter_insertions') or not snap.get('inherited_irq_observer') or snap.get('compiled_this_step')!=(2 if srng else 3)):raise ValueError('Wrong credit trace boundary')
+    if bool(snap.get('srng_trace'))!=srng or bool(native.get('srng_trace'))!=srng:raise ValueError('Wrong SRNG trace variant')
+    if srng and (not snap.get('reversible_srng_insertions') or snap.get('producer_credit_timeout_changes') is not False):raise ValueError('Wrong SRNG observer boundary')
 def module(name,path):
     spec=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
 
@@ -42,19 +51,17 @@ def qualify(report_path,entry_path,runtime):
     from charge_verification_boot import qualify_shared_assets
     from audit_pcie_kernel_hooks import audit
     r=read(Path(report_path));folder=Path(report_path).parent;base=r['base_report']
-    if r['profile'] not in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace'] or r['parent_kernel_sha256']!=PARENT or base['kernel_sha256']!=PARENT:raise ValueError('Wrong service parent')
+    if r['profile'] not in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace'] or r['parent_kernel_sha256']!=PARENT or base['kernel_sha256']!=PARENT:raise ValueError('Wrong service parent')
     if bool(r['core'].get('owner_launch_required'))!=(r['profile']!='wifi-service'):raise ValueError('Wrong service launch rule')
     if r['profile']!='wifi-service':
         expected=read(ROOT/'profiles/wifi-service-owner/owner-contract.json')
         if r['core']['owner_common_sha256']!=expected['common_sha256'] or sha(ROOT/'drivers/EldenWifi/OwnerLaunchSource.py')!=expected['generator_sha256']:raise ValueError('Owner rule differs')
-    credit=r['profile']=='wifi-credit-trace';wmi=r['profile'] in ['wifi-wmi-snapshot','wifi-credit-trace']
+    srng=r['profile']=='wifi-srng-trace';credit=r['profile'] in ['wifi-credit-trace','wifi-srng-trace'];wmi=r['profile'] in ['wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace']
     if (r['changed_core_objects'],r['changed_native_objects'],r['added_native_objects'],r['core_filelist_unchanged'])!=(1,2 if wmi else 1,0,False):raise ValueError('Wrong service object delta')
     if bool(r['service_native'].get('wmi_snapshot'))!=wmi or bool(r.get('runtime_snapshot'))!=wmi:raise ValueError('Wrong WMI snapshot variant')
     if wmi:
         snap=r['runtime_snapshot']
-        if bool(snap.get('credit_trace'))!=credit or bool(r['service_native'].get('credit_trace'))!=credit:raise ValueError('Wrong credit trace variant')
-        if not snap['append_only_observer'] or snap['rebuilt_units']!=(4 if credit else 1) or snap['retained_units']!=(121 if credit else 124) or snap['base_binding_sha256']!=base['component_objects']['WifiRuntimeMsiBinding.o']['sha256']:raise ValueError('Wrong runtime snapshot boundary')
-        if credit and (not snap['reversible_counter_insertions'] or not snap['inherited_irq_observer'] or snap['compiled_this_step']!=3):raise ValueError('Wrong credit trace boundary')
+        qualify_runtime_snapshot(snap,r['service_native'],base['component_objects']['WifiRuntimeMsiBinding.o']['sha256'],r['profile'])
     for key in ['platform_physical_fence','runtime_platform_budget','runtime_platform_shutdown','runtime_owned_cleanup',
         'firmware_qdss_config','control_transport_bound','mhi_runtime_bound','ufs_ah8_retained','ufs_diagnostic_removed','root_worker_bound','smmu_domain_bound','owned_sgi_guard','scalar']:
         if r.get(key) is not True or base.get(key) is not True:raise ValueError('Prior protection missing: '+key)
@@ -68,10 +75,10 @@ def qualify(report_path,entry_path,runtime):
     core=module('service_core_source',ROOT/'drivers/EldenWifi/ServiceRuntimeSource.py')
     if hashlib.sha256(core.source()).hexdigest()!=r['core']['runtime_sha256']:raise ValueError('Service runtime source differs')
     generator=module('service_native_source',ROOT/'drivers/EldenWifi/ServiceNativeSource.py')
-    trace=r['profile'] in ['wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace']
+    trace=r['profile'] in ['wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace']
     if bool(r['service_native'].get('control_trace'))!=trace:raise ValueError('Wrong control trace variant')
     if trace:generator=module('service_trace_source',ROOT/'drivers/EldenWifi/ServiceControlTraceSource.py')
-    scan=r['profile'] in ['wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace']
+    scan=r['profile'] in ['wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace']
     if bool(r['service_native'].get('service_scan'))!=scan:raise ValueError('Wrong session scan variant')
     if scan:generator=module('service_scan_source',ROOT/'drivers/EldenWifi/ServiceScanSource.py')
     if wmi:generator=module('service_wmi_source',ROOT/'drivers/EldenWifi/ServiceWmiSource.py')
@@ -87,7 +94,7 @@ def qualify(report_path,entry_path,runtime):
 def menu(q):
     from pcie_root_boot import menu as root_menu
     if not q.get('wifi_service'):raise ValueError('Service assets not qualified')
-    title='Wi-Fi credit flow + USB - TEST' if q['profile']=='wifi-credit-trace' else 'Wi-Fi WMI delivery + USB - TEST' if q['profile']=='wifi-wmi-snapshot' else 'Wi-Fi live scan + USB - TEST' if q['profile']=='wifi-service-scan' else 'Wi-Fi control trace + USB - TEST' if q['profile']=='wifi-service-control-trace' else 'Wi-Fi signed service + USB - TEST' if q['profile']=='wifi-service-owner' else 'Wi-Fi service + USB - TEST'
+    title='Wi-Fi CE3 hardware HP + USB - TEST' if q['profile']=='wifi-srng-trace' else 'Wi-Fi credit flow + USB - TEST' if q['profile']=='wifi-credit-trace' else 'Wi-Fi WMI delivery + USB - TEST' if q['profile']=='wifi-wmi-snapshot' else 'Wi-Fi live scan + USB - TEST' if q['profile']=='wifi-service-scan' else 'Wi-Fi control trace + USB - TEST' if q['profile']=='wifi-service-control-trace' else 'Wi-Fi signed service + USB - TEST' if q['profile']=='wifi-service-owner' else 'Wi-Fi service + USB - TEST'
     return root_menu(dict(q,profile='wifi-platform-fence')).replace('Wi-Fi physical reset + USB - TEST',title,1)
 
 def augment_trust(original,q):

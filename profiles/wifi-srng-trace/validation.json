@@ -1,0 +1,6 @@
+{
+  "evidence": "../../docs/evidence/wifi-srng-v187-signed-20261118.json",
+  "candidate_sha256": "e1cedc01ab245120306d5126f024454e26e61e71de5e2f68f87aaaa2e0e1569f",
+  "kernel_and_package_passed": true,
+  "hardware_tested": false
+}

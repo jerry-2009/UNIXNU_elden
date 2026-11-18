@@ -1,0 +1,35 @@
+{
+  "candidate": {
+    "profile": "wifi-srng-trace",
+    "image_sha256": "e1cedc01ab245120306d5126f024454e26e61e71de5e2f68f87aaaa2e0e1569f",
+    "session": "4bd7a57ef992f50e",
+    "kernel_sha256": "3fd6732ee3923992007475e63a7bfde52bb88b3236dbad4e5ae952ddbc19f7b9",
+    "accepted_static": true,
+    "hardware_tested": false,
+    "packaging_source_sha256": "5959f211fea43e1c56939673d95d42907fda3bfdc442460b6141d48ea04fc159"
+  },
+  "runtime_binding_sha256": "ba29ce3e9b44835224ffd1fb34844cd298e2469c2b146d4f88ceb45a842aab8a",
+  "runtime_changed_retained": [
+    5,
+    120
+  ],
+  "native_warnings": 1,
+  "base_protections_preserved": true,
+  "original_apple_execution_ranges": 30,
+  "entry_delta": 7124,
+  "complete_asset_closure": true,
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "provider_relocation": {
+    "old_plan_sha256": "e15b65da67efed878e187e934000539dc00ff2fab3b0e5a7c2ff18bf180070c3",
+    "new_plan_sha256": "e4d69ee7cfb585a8879ed4f2c7b483b90a5d6be4c6ddcf43105266b068df7460",
+    "source_sha256": "feb9fefa74ee07e39b7f5694c5921329d0017163a6391bdd82bf64a2ae9208c0",
+    "only_provider_location_changed": true
+  },
+  "qualification_tests": 4,
+  "hardware_tested": false,
+  "workbench_records": "edl_work/wifi-srng-v187-20261118"
+}

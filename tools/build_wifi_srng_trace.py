@@ -103,6 +103,8 @@ def main():
         assert sha(ROOT / name) == digest, name
     result = {"compiled": True, "units": 125, "rebuilt_units": 5, "retained_units": 120,
               "compiled_this_step": 2, "credit_trace": True, "srng_trace": True, "append_only_observer": True,
+              "reversible_counter_insertions": prior["reversible_counter_insertions"],
+              "inherited_irq_observer": prior["inherited_irq_observer"], "reversible_srng_insertions": True,
               "base_binding_sha256": prior["base_binding_sha256"], "parent_binding_sha256": prior["binding_sha256"],
               "binding_sha256": sha(target), "source_inputs": sources, "objects": records,
               "inherited_objects": inherited, "consumed_inputs": consumed, "link": link,

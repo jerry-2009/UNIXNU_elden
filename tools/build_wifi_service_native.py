@@ -56,7 +56,10 @@ def main():
     if a.wmi_snapshot_build:
         snapshot=read(a.wmi_snapshot_build/'result.json')
         credit=bool(snapshot.get('credit_trace'))
-        assert snapshot['append_only_observer'] and snapshot['rebuilt_units']==(4 if credit else 1) and snapshot['retained_units']==(121 if credit else 124)
+        srng=bool(snapshot.get('srng_trace'))
+        assert not srng or credit
+        assert snapshot['append_only_observer'] and snapshot['rebuilt_units']==(5 if srng else 4 if credit else 1) and snapshot['retained_units']==(120 if srng else 121 if credit else 124)
+        if srng:assert snapshot['reversible_srng_insertions'] and snapshot['compiled_this_step']==2
         assert sha(a.wmi_snapshot_build/'WifiRuntimeMsiBinding.o')==snapshot['binding_sha256']
         spec=importlib.util.spec_from_file_location('service_wmi_source',ROOT/'drivers/EldenWifi/ServiceWmiSource.py')
         wmi=importlib.util.module_from_spec(spec);spec.loader.exec_module(wmi);new=wmi.generated()
@@ -122,6 +125,7 @@ def main():
         'private_assets':private_report,'inherited_sources':inherited,'scalar':True,'warnings':r.stderr.count(b'warning:'),
         'platform_physical_fence_preserved':True,'factory_mac_input':True,'service_admission':True,
         'credit_trace':bool(snapshot and credit),'wmi_snapshot':bool(snapshot),'irq_snapshot_binding':snapshot['binding_sha256'] if snapshot else None,
+        'srng_trace':bool(snapshot and snapshot.get('srng_trace')),
         'service_scan':a.service_scan,'control_trace':a.control_trace,'full_kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','object_sha256','warnings']}))
 if __name__=='__main__':main()
