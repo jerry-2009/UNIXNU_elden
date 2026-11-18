@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261119 REFERENCE SYNC FIX: old real-local-Git tests reproduce same-HEAD
+branch switch causing wrong-branch FF and late maintenance marker ignored.
+New11actual Git cases pass: branch/HEAD/upstream/dirty rechecks refuse changes,
+marker checked per repo/before+after fetch/pre-merge, verified complete commit
+is the only merge target. Original clean/dirty/detached/diverged handling retained.
+Final state check and Git command are not atomic across processes; maintenance
+must set marker and wait ongoing sync before editing. Evidence in
+docs/evidence/reference-sync-guards-20261119.json and workbench lab/records.
+Local tests retained in WindowsTemp; no reference fetch/build/tablet/driver or
+Goal status change this turn. Previously filtered operation not retried. Full
+Goal/charging/Wi-Fi/persistent Data/peripherals remain incomplete.
+
 Latest20261119 MAINTENANCE REVIEW: offline-peripheral-fixes4528eac and GPU71b5379
 published branch heads verified read-only. Four delivery archives:264+180+523+37
 content members/full SHA match; pen/RTC/broker saved reports agree with declarations.

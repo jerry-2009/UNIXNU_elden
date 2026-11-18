@@ -45,6 +45,17 @@ py -3.12 tools/maintenance/sync_reference_repos.py --workbench D:\Desktop\Git\Pa
 只快进干净未分叉的跟踪分支；有本地修改或未跟踪文件的仓只 fetch，固定检出不换版本。
 报告写入 `maintenance/reference-sync`，不操作设备。
 
+2026-11-19补充：每仓开始、fetch前后及快进前检查整理标记；标记出现即以
+`deferred-maintenance`结束该仓。快进前重新核对分支、HEAD、跟踪分支和工作树，
+变化以`changed-during-sync`保留。快进使用已解析的完整commit，随后远端引用变化
+不会另选提交。11个实际本地Git场景覆盖正常快进、固定检出、脏树、分叉、切换分支、
+跟踪分支变化、fetch后修改和整理标记，以及目标引用再次变化。
+[修复前后证据](evidence/reference-sync-guards-20261119.json)。
+
+这些检查保护了已复现的变更窗口；最后一次核对与Git命令仍非跨进程原子事务。
+整理线程应先写标记并等待既有同步任务结束，不与同一参考仓同时checkout或修改。
+测试仓保留在Windows Temp，未重刷候选、更新子模块或改动冻结输入。
+
 ## macOS 编译端的源码与产物
 
 macOS 主源码仓是 `~/Desktop/UniXNU_elden`。`lab/clean-build-20261114/isolated/UniXNU_elden`
