@@ -1,0 +1,8 @@
+{
+  "evidence": "../../docs/evidence/wifi-ce3-flow-component-20261118.json",
+  "host_passed": true,
+  "runtime_compiled": true,
+  "kernel_package_passed": false,
+  "hardware_tested": false,
+  "network_accepted": false
+}

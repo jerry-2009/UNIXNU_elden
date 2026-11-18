@@ -1,5 +1,18 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261118 CE3 flow component: actual original/derived CE send/reap10scenarios,
+bounded64-record/saturating-overflow/one-shot/8-producer/publication and7decoder
+cases pass ASan/UBSan. Scalar iOS17 CE/WMI rebuild,7changed/118retained runtime
+units, unchanged combined imports/noinit/two real new exports; binding0b2a90be.
+CE85/WMI632 inherited warnings remain; no helper warnings.6actual profile gates
+and6Android restoration tests pass. New serial-bound restoration API retries only
+within40s/5s-per-command, retains startup errors and requires actual original
+radio+scan equality. Full kernel/boot/hardware pending; component not network fix.
+Source/docs/profile are formal main; workbench receipts outside research. Last
+device remains fully restored stockv188; fresh100%4450mV/25.1C read, not write
+admission for a future image. Original90s runtime return retained. Goal/charging/
+Wi-Fi/persistent Data incomplete; GPU/peripheral/QRTR/AnyRouter boundaries remain.
+
 Latest v18820261118 HARDWARE: PCI-window observer confirms CE3 request1b86400
 uses BAR86400/dynamic37/register3278/readback40000037/wake0, matching the exact
 Armada6f97250e Peach branch. HIF HP/TP0/0 vs coherent DMA TP8/last notificationHP16

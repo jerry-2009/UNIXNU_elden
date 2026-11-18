@@ -21,7 +21,7 @@ def main():
     args = parser.parse_args()
     kernel, clean, output = args.kernel_build.resolve(), args.clean_build.resolve(), args.output.resolve()
     result = json.loads((kernel / "result.json").read_text())
-    if result["profile"] not in ("wifi-srng-trace","wifi-pci-window-trace") or result["runtime_snapshot"].get("srng_trace") is not True:
+    if result["profile"] not in ("wifi-srng-trace","wifi-pci-window-trace","wifi-ce3-flow-trace") or result["runtime_snapshot"].get("srng_trace") is not True:
         raise ValueError("Complete qualified SRNG kernel required")
     output.mkdir(parents=True, exist_ok=False)
     originals = json.loads((ROOT / "profiles/v91/image-build/plan.json").read_text())["prelink"]["original_executable_sha256"]

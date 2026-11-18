@@ -58,10 +58,12 @@ def main():
         credit=bool(snapshot.get('credit_trace'))
         srng=bool(snapshot.get('srng_trace'))
         window=bool(snapshot.get('pci_window_trace'))
+        flow=bool(snapshot.get('ce3_flow_trace'))
+        assert not flow or (window and snapshot.get('reversible_flow_insertions') is True and snapshot.get('flow_record_limit')==64)
         assert not window or srng
         assert not srng or credit
-        assert snapshot['append_only_observer'] and snapshot['rebuilt_units']==(6 if window else 5 if srng else 4 if credit else 1) and snapshot['retained_units']==(119 if window else 120 if srng else 121 if credit else 124)
-        if srng:assert snapshot['reversible_srng_insertions'] and snapshot['compiled_this_step']==(3 if window else 2)
+        assert snapshot['append_only_observer'] and snapshot['rebuilt_units']==(7 if flow else 6 if window else 5 if srng else 4 if credit else 1) and snapshot['retained_units']==(118 if flow else 119 if window else 120 if srng else 121 if credit else 124)
+        if srng:assert snapshot['reversible_srng_insertions'] and snapshot['compiled_this_step']==(2 if flow else 3 if window else 2)
         assert sha(a.wmi_snapshot_build/'WifiRuntimeMsiBinding.o')==snapshot['binding_sha256']
         spec=importlib.util.spec_from_file_location('service_wmi_source',ROOT/'drivers/EldenWifi/ServiceWmiSource.py')
         wmi=importlib.util.module_from_spec(spec);spec.loader.exec_module(wmi);new=wmi.generated()
@@ -129,6 +131,7 @@ def main():
         'credit_trace':bool(snapshot and credit),'wmi_snapshot':bool(snapshot),'irq_snapshot_binding':snapshot['binding_sha256'] if snapshot else None,
         'srng_trace':bool(snapshot and snapshot.get('srng_trace')),
         'pci_window_trace':bool(snapshot and snapshot.get('pci_window_trace')),
+        'ce3_flow_trace':bool(snapshot and snapshot.get('ce3_flow_trace')),
         'service_scan':a.service_scan,'control_trace':a.control_trace,'full_kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','object_sha256','warnings']}))
 if __name__=='__main__':main()

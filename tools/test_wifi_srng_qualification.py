@@ -31,6 +31,25 @@ class RuntimeBoundary(unittest.TestCase):
             with self.subTest(changes=changes),self.assertRaises(ValueError):
                 qualify_runtime_snapshot(dict(snapshot,**changes),dict(credit_trace=True,srng_trace=True,pci_window_trace=True),'a'*64,'wifi-pci-window-trace')
 
+    def test_ce3_flow_boundary_and_native_match(self):
+        snapshot=dict(self.snapshot('wifi-pci-window-trace'),rebuilt_units=7,
+                      retained_units=118,compiled_this_step=2,ce3_flow_trace=True,
+                      reversible_flow_insertions=True,flow_record_limit=64)
+        native=dict(credit_trace=True,srng_trace=True,pci_window_trace=True,ce3_flow_trace=True)
+        qualify_runtime_snapshot(snapshot,native,'a'*64,'wifi-ce3-flow-trace')
+        for changes in ({'rebuilt_units':6},{'retained_units':119},{'compiled_this_step':3},
+                        {'ce3_flow_trace':False},{'ce3_flow_trace':'true'},
+                        {'reversible_flow_insertions':False},{'flow_record_limit':65},
+                        {'flow_record_limit':64.0},{'pci_window_trace':False},
+                        {'producer_credit_timeout_changes':True}):
+            with self.subTest(changes=changes),self.assertRaises(ValueError):
+                qualify_runtime_snapshot(dict(snapshot,**changes),native,'a'*64,'wifi-ce3-flow-trace')
+        for native_flag in (False,'true'):
+            with self.assertRaises(ValueError):
+                qualify_runtime_snapshot(snapshot,dict(native,ce3_flow_trace=native_flag),'a'*64,'wifi-ce3-flow-trace')
+        with self.assertRaises(ValueError):
+            qualify_runtime_snapshot(snapshot,native,'a'*64,'wifi-pci-window-trace')
+
     def test_srng_rejects_unqualified_or_mixed_inputs(self):
         for change in ({"rebuilt_units": 4}, {"retained_units": 121}, {"compiled_this_step": 3},
                        {"base_binding_sha256": "b" * 64}, {"credit_trace": False}, {"srng_trace": False},
