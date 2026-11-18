@@ -50,8 +50,10 @@ idle prerequisite chain, creates the2048MiB seed, rebuilds the actual KeyStore
 adapter, and selects `--expanded-data --keep-packed-data` for packing and audit.
 The option is part of resume identity. The default seed remains512MiB. A kernel
 target with this option also needs the original OS image to qualify its new seed.
-The combined new empty-output command still requires a complete validation run;
-component and package validation must not be reported as that full clean run.
+The complete command passed all37stages from a new empty output using pure Git
+source95445ba, through independent signed-boot audit. The new imageeb1a5322… is
+unflashed; the separately staged v184 imageea3b1393… passed boot/return only.
+See [complete clean evidence](../../docs/evidence/data-capacity-clean-build-20261118.json).
 
 APFS allocation metadata varies between newly created seeds. The historical
 [seed-contract.json](../data-capacity-2g/seed-contract.json) keeps v182's exact

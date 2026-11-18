@@ -1,5 +1,9 @@
 # 当前状态 · 2026-11-18
 
+2GiB完整clean命令现已从新空输出完成37阶段，直达签名boot及独立审核；原始输入均已声明，
+固定电源源码在仓内，不需要旧v99产物。新整链镜像尚未上机；此前v184分包的锁屏/回程证据保留。
+所有构建与设备任务已结束，平板已恢复Android。[整链验收](evidence/data-capacity-clean-build-20261118.json)。
+
 v184实机重跑已到锁屏：2GiB Data和实际KeyStore均成功，完整自动回程及原厂Android/root/
 原设置恢复通过。日志未观察到ENOSPC/panic，drop127限制结论；BT菜单关闭了软件UI重放，
 所以Settings/可用空间/交互负载验收仍待进行。[实机范围](evidence/data-capacity-v184-hardware-20261118.json)。

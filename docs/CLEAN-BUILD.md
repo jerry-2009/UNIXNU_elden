@@ -5,7 +5,8 @@
 2026-11-18空输出复测发现蓝牙基线误从当前仓读取已更新的WcnPower.c，导致原指纹拒绝。
 现在该基线只读仓内固定源码快照，字节来自89b31f6599068d63792c3b124f775fcac0f6c2da，
 仍保持原feb9fefa…指纹；当前共享电源实现不改动。来源见
-[固定输入证据](../profiles/current-build/frozen/source-proof.json)，新空输出验证继续进行。
+[固定输入证据](../profiles/current-build/frozen/source-proof.json)。修正后完整2GiB命令已从
+新空输出目录完成37阶段并通过签名boot审核，见[整链证据](evidence/data-capacity-clean-build-20261118.json)。
 
 `--variant gui` 对应8GiB交互v109；`--variant bluetooth`
 对应v121蓝牙诊断分支（6GiB），具有真实HCI初始化和退出/stderr观察，蓝牙用户态
@@ -65,7 +66,7 @@ FAT16由仓库自己的写入器产生，已用独立fsck.fat核验，不依赖m
 
 [2GiB稀疏Data](../profiles/data-capacity-2g-key/README.md#clean-build)提供当前空间修复的完整命令，
 `--data-capacity-2g`同时重编实际KeyStore适配器并启用PackedRAMDisk；不加选项仍生成512MiB。
-新组合的空输出整链验收仍待运行，已有组件/实机证据见该profile。
+新组合空输出整链已通过；新整链镜像未刷入，现有实机证据仍以该profile标注的分包为准。
 
 充电旁路退出修订的完整选项链见
 [charge-window-handoff](../profiles/charge-window-handoff/README.md#build)。

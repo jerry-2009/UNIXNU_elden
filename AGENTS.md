@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261118 capacity clean-fresh2 COMPLETED: pure Git95445ba, all37stages from an
+empty output through XNU/native/current units, real KeyStore, charge/UFS, fresh2GiB seed,
+FD/loader/entry/FAT/AVB. Imageeb1a5322/sessionb1a6138583e67074/floor1738713600/0/3,
+raw233owners/fsck0 and literal KeyStore/packed flags pass. This new full-clean image is
+UNFLASHED; prior stagedv184ea3b hardware lockscreen/return is the device evidence.
+All build/listener/device jobs now terminal; stock Android/root/green/original settings
+restored. No live handles remain (88327 completed). docs/evidence/data-capacity-clean-build-
+20261118.json records closure. Next explicit UI-replay opt-in then Settings/space/load
+acceptance, and mainline CE3 notification/native MMIO audit. Full Goal/charging/Wi-Fi/
+persistent Data remain incomplete; preserve other worktrees and motor/audio guards.
+
 Latest v18420261118 HARDWARE rerun: Data2147483648 mount0 and actual software KeyStore
 registration0 pass;2CRC frames visibly lockscreen clock/gesture bar. Captured1460099B/
 a11723f7/drop127/no reconnect or discontinuity; no observed ENOSPC/panic, not lossless.

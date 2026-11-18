@@ -5,10 +5,11 @@
   "source_manifest_sha256": "716162e25dab29e594b1422107a7bd74f8de1b5970579983bba73f4cd66d860b",
   "all30_code_inputs_match_git_blobs": true,
   "component_kernel_and_package_passed": true,
-  "complete_clean_command_validated": false,
+  "complete_clean_command_validated": true,
   "hardware_tested": false,
   "hardware_boot_and_return_passed": true,
   "hardware_evidence": "../../docs/evidence/data-capacity-v184-hardware-20261118.json",
   "settings_interaction_accepted": false,
-  "human_about_acceptance_pending": true
+  "human_about_acceptance_pending": true,
+  "clean_build_evidence": "../../docs/evidence/data-capacity-clean-build-20261118.json"
 }
