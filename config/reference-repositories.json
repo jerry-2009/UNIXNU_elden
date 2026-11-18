@@ -102,6 +102,16 @@
       "observed_head": "c58470091712d02975fc3671c62004522eb9c74b"
     },
     {
+      "name": "IOHIDFamily-2031",
+      "url": "https://github.com/apple-oss-distributions/IOHIDFamily.git",
+      "observed_head": "b126cf696bf1c6eede740b92d3bfca7e62d09c06"
+    },
+    {
+      "name": "IOKitUser-pen-reference",
+      "url": "https://github.com/apple-oss-distributions/IOKitUser.git",
+      "observed_head": "323ead896d04424f87184d8f6ff0cce811aab106"
+    },
+    {
       "name": "linux-ath12k-7.0.14",
       "url": "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git",
       "observed_head": "458c6079fc1d41d564c37679c8ace02cd83ee817"

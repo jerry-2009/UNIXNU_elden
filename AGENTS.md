@@ -1,5 +1,20 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261119 MAINTENANCE REVIEW: offline-peripheral-fixes4528eac and GPU71b5379
+published branch heads verified read-only. Four delivery archives:264+180+523+37
+content members/full SHA match; pen/RTC/broker saved reports agree with declarations.
+No old tests rerun, new builds/tablet access/branch merge or candidate activation.
+Current-mainline integration/hardware remain unqualified. RTC persistence/alarm,
+pen real wire/UIKit/palm/sleep, wake GPIO-PDC/resume, motion transport/real samples,
+camera native pipeline/frames and haptics calibration/system route remain pending.
+Haptics catalog0/measured-bank absent/outputdisabled; GPU remains last. Source and
+untracked edits in both peer worktrees preserved. Main review:
+docs/PERIPHERAL-DELIVERY-REVIEW-20261119.md and paired evidence JSON. Two existing
+Apple reference clones added to inventory;68independent roots match68unique entries,
+existing pins retained. Full Goal/charging/Wi-Fi/persistent Data/peripherals unfinished.
+Previously filtered operation not retried; this turn is unrelated repository
+maintenance/evidence closure only. No Goal state change.
+
 Latest v19020261119 HARDWARE:37/37 complete metadata records. Firmware advertises
 SINGLE0 and DBS_OR_SBS5, two physical pdevs1/2; actual DBS1 requested, preferred5,
 decodedDBS1 and response event4010/24B received. Response status NOT parsed, so no
