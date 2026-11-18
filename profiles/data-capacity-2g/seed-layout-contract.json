@@ -1,0 +1,13 @@
+{
+  "expanded_bytes": 2147483648,
+  "logical_manifest_sha256": "48f55583046418c089d09381a85d7f0ce72c1bb8b57fa3770d91e2fbad550f8a",
+  "logical_entries_verified": 232,
+  "volume_uuid": "E5D06647-CCB4-491D-A897-3C21B55703CF",
+  "raw_owners_verified": 233,
+  "requested_size_mib": 2048,
+  "fsck_returncode": 0,
+  "apfs_feature_flags_match_baseline": true,
+  "only_new_image_files_modified": true,
+  "host_journal_contents_not_copied": true,
+  "requires_expanded_native_qualification": true
+}

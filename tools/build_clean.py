@@ -40,6 +40,7 @@ def main():
     p.add_argument('--ufs-wait-trial',action='store_true',help='Guarded UFS IRQ waiting plus bounded pinned-block polling/hybrid comparison')
     p.add_argument('--ufs-queue-trial',action='store_true',help='Owned DMA multi-slot queue and QD1/8/32 comparison')
     p.add_argument('--ufs-idle-trial',action='store_true',help='Stock5000us automatic Hibern8 and qualified restore')
+    p.add_argument('--data-capacity-2g',action='store_true',help='UFS idle baseline with2GiB sparse Data and the actual software KeyStore adapter')
     p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
     p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
     p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')
@@ -68,6 +69,8 @@ def main():
     if a.bt_scan_roles17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17):raise ValueError('--bt-scan-roles17 requires --bt-process-lifetime without other native17 options')
     if a.bt_discovery17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17):raise ValueError('--bt-discovery17 requires --bt-process-lifetime without other native17 options')
     if a.bt_address17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17 or a.bt_discovery17):raise ValueError('--bt-address17 requires --bt-process-lifetime without other native17 options')
+    if a.data_capacity_2g and (a.variant!='bluetooth' or not a.bt_address17):raise ValueError('--data-capacity-2g requires the qualified Bluetooth/address17 chain')
+    if a.data_capacity_2g:a.ufs_idle_trial=True
     if a.ufs_idle_trial:a.ufs_queue_trial=True
     if a.ufs_queue_trial:a.ufs_wait_trial=True
     if a.ufs_wait_trial:a.early_storage_guard=True
@@ -91,7 +94,7 @@ def main():
     needed=['llvm','original_agent','nvt_firmware','original_kernelcache']
     if a.variant=='bluetooth':needed+=['wcn_firmware']
     if a.target=='boot':needed+=['os_image','crypto','mu_repository','unixnu_repository','stock_boot','parent_vbmeta','avbtool','signing_key']
-    elif a.bluetool_lifecycle:needed+=['os_image']
+    elif a.bluetool_lifecycle or a.data_capacity_2g:needed+=['os_image']
     missing=[name for name in needed if name not in data]
     if missing:raise SystemExit('Missing declared inputs: '+', '.join(missing))
     inputs={name:input_path(name) for name in needed}
@@ -133,6 +136,7 @@ def main():
     identity['ufs_wait_trial']=a.ufs_wait_trial
     identity['ufs_queue_trial']=a.ufs_queue_trial
     identity['ufs_idle_trial']=a.ufs_idle_trial
+    identity['data_capacity_2g']=a.data_capacity_2g
     identity['charge_verification']=a.charge_verification
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
@@ -273,14 +277,19 @@ def main():
     if a.ufs_idle_trial:
         stage('ufs-idle-trial',script('build_charge_verification.py','--ufs-idle-trial','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'ufs-idle-trial'),'ufs-idle-trial/result.json')
         kernel_folder=out/'ufs-idle-trial';runtime_folder=kernel_folder/'runtime'
+    if a.data_capacity_2g:
+        stage('data',script('build_v91_data_seed.py','--size-mib','2048','--os-image',inputs['os_image'],'--output',out/'data'),'data/result.json')
+        stage('data-capacity-2g-key',script('build_data_capacity_kernel.py','--parent-build',kernel_folder,'--core-build',out/'bt-address17','--keystore-build',out/'keystore','--clean-build',out,'--seed-build',out/'data','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'data-capacity-2g-key'),'data-capacity-2g-key/result.json')
+        kernel_folder=out/'data-capacity-2g-key';runtime_folder=kernel_folder/'runtime'
     if a.target=='boot':
         stage('firmware',script('build_v91_firmware.py','--mu-root',inputs['mu_repository'],'--unixnu-root',inputs['unixnu_repository'],'--crypto-path',inputs['crypto'],'--llvm',inputs['llvm'],'--output',out/'firmware','--jobs',a.jobs),'firmware/result.json')
         stage('loader',script('build_v91_payload_loader.py','--mu-root',out/'firmware/project/third_party/mu_wide_platforms','--unixnu-root',out/'firmware/project/third_party/UniXNU','--llvm',inputs['llvm'],'--output',out/'loader'),'loader/result.json')
-        stage('data',script('build_v91_data_seed.py','--os-image',inputs['os_image'],'--output',out/'data'),'data/result.json')
+        if not a.data_capacity_2g:stage('data',script('build_v91_data_seed.py','--os-image',inputs['os_image'],'--output',out/'data'),'data/result.json')
         ep={'candidate_sha256':read(kernel_folder/'result.json')['kernel_sha256'],'original_executable_sha256':read(ROOT/'profiles/v91/image-build/plan.json')['prelink']['original_executable_sha256']};(out/'entry-plan.json').write_text(json.dumps(ep,indent=2)+'\n')
         stage('entry',script('prepare_v91_entry.py','--kernel',kernel_folder/'kernel.macho','--plan',out/'entry-plan.json','--clang',inputs['llvm']/'clang','--output',out/'entry'),'entry/result.json')
         variant_args=['--wcn-report',kernel_folder/'result.json','--bt-runtime',runtime_folder] if a.variant=='bluetooth' else ['--hid-report',kernel_folder/'result.json']
         if a.pd_gui:variant_args+=['--pd-gui']
+        if a.data_capacity_2g:variant_args+=['--expanded-data','--keep-packed-data']
         stage('boot',script('build_v91_boot.py','--portable-fat','--kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--fd',out/'firmware/UEFI.fd','--loader',out/'loader/EldenPayloadLoader.efi','--data',out/'data/data.packed','--data-report',out/'data/result.json','--library',out/'icon/EldenIconCpuMode.dylib','--agent',out/'agent/iconservicesagent','--stock-boot',inputs['stock_boot'],'--avbtool',inputs['avbtool'],'--key',inputs['signing_key'],'--clang',inputs['llvm']/'clang',*variant_args,'--output',out/'boot'),'boot/result.json')
         stage('boot-audit',script('audit_v91_boot.py','--image',out/'boot/boot-signed.img','--entry-kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--stock-boot',inputs['stock_boot'],'--parent-vbmeta',inputs['parent_vbmeta'],'--data-report',out/'data/result.json',*variant_args,'--output',out/'boot/audit.json'),'boot/audit.json')
     state['complete']=True;save();print('Completed '+a.target+'; no device operation performed',flush=True)

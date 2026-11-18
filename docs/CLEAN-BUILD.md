@@ -57,7 +57,11 @@ FAT16由仓库自己的写入器产生，已用独立fsck.fat核验，不依赖m
 
 ## 命令
 
-当前充电旁路退出修订的完整选项链见
+[2GiB稀疏Data](../profiles/data-capacity-2g-key/README.md#clean-build)提供当前空间修复的完整命令，
+`--data-capacity-2g`同时重编实际KeyStore适配器并启用PackedRAMDisk；不加选项仍生成512MiB。
+新组合的空输出整链验收仍待运行，已有组件/实机证据见该profile。
+
+充电旁路退出修订的完整选项链见
 [charge-window-handoff](../profiles/charge-window-handoff/README.md#build)。
 恢复系统亮度服务时再加 `--backlight-service`，见[该配置的实机记录](../profiles/backlight-service/README.md)。
 PD确认后进行功耗试验使用 `--pd-power-trial`，见[独立试验配置](../profiles/pd-power-trial/README.md)；它不是普通GUI日用配置。

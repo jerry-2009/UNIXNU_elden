@@ -35,6 +35,8 @@ def main():
     p.add_argument('--clang',default='clang');p.add_argument('--wsl-distro',help='Use Linux filesystem/signing tools in this Windows WSL distribution')
     p.add_argument('--portable-fat',action='store_true',help='Use the repository FAT16 writer; no mtools, dosfstools or WSL')
     p.add_argument('--data-report',type=Path,help='Source-built Data seed filesystem/manifest verification')
+    p.add_argument('--expanded-data',action='store_true',help='Require the separately qualified2GiB native Data profile')
+    p.add_argument('--keep-packed-data',action='store_true',help='Use the existing DarwinBoot PackedRAMDisk handoff, as Sheng does')
     p.add_argument('--fbwc-report',type=Path,help='Explicit qualified v93 framebuffer build; adds only the bare fbwc option')
     p.add_argument('--battery-ui',action='store_true',help='Restore qualified battery UI; compact existing numeric-one flags without dropping options')
     p.add_argument('--wcn-report',type=Path)
@@ -54,15 +56,20 @@ def main():
     firmware_contract=verify_firmware(a.fd)
     loader_contract=verify_loader(a.loader)
     data_contract={'legacy_frozen_seed':True}
-    if sha(a.data)!=HASHES['data']:
+    if a.expanded_data or sha(a.data)!=HASHES['data']:
         if not a.data_report:raise RuntimeError('Rebuilt Data seed requires --data-report')
-        data_contract=verify_packed_seed(a.data,a.data_report)
+        data_contract=verify_packed_seed(a.data,a.data_report,expected_bytes=2147483648 if a.expanded_data else 536870912)
     if a.fd.stat().st_size!=4194304:raise RuntimeError('Firmware must be 4MiB')
     stock=check_image(a.stock_boot,'boot_a')
     if stock.sha256!='8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890':raise RuntimeError('Wrong stock contract')
     entry=json.loads(a.entry_report.read_text())
     if bool(a.wcn_report)!=bool(a.bt_runtime) or (a.wcn_report and (a.fbwc_report or a.battery_ui or a.hid_report)) or (a.hid_report and (a.fbwc_report or a.battery_ui)):raise ValueError('Select one qualified kernel profile')
     bt=bt_runtime_boot.qualify(a.wcn_report,a.entry_report,a.bt_runtime) if a.wcn_report else None
+    if a.expanded_data!=bool(bt and bt.get('expanded_data')):raise ValueError('Data capacity and native profile must match')
+    if a.expanded_data and data_contract['packed_sha256']!=bt['data_packed_sha256']:raise ValueError('Native profile expects a different Data seed')
+    if a.keep_packed_data:
+        from data_capacity_boot import keep_packed
+        bt=keep_packed(bt)
     if a.pd_gui:bt=bt_runtime_boot.pd_gui(bt)
     if a.early_stall:bt=bt_runtime_boot.early_stall(bt)
     hid=hid_delivery_boot.qualify(a.hid_report,a.entry_report) if a.hid_report else None
@@ -76,6 +83,7 @@ def main():
         from memory_window_boot import adt as memory_adt
         adt=encode_adt(memory_adt(adt_config)['tree'])
     tree=adt_walk(adt)
+    if tree['keep_packed']!=a.keep_packed_data:raise ValueError('Packed Data handoff differs from requested mode')
     expected_window=hid.get('memory_window_bytes',0x180000000) if hid else 0x180000000
     if tree['window']!=expected_window or tree['gpuaddon'] is not None:raise RuntimeError('Unexpected memory/GPU configuration')
     (payloads/'kernel.macho.adt').write_bytes(adt)

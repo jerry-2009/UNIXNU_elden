@@ -1,5 +1,19 @@
 # User GUI trial and Data exhaustion — 2026-11-16
 
+2026-11-18 follow-up: v182 with2GiB Data and the actual separately archived
+KeyStore adapter mounted Data with return0, registered software key operations
+and produced two CRC-verified lockscreen frames. No captured ENOSPC/panic was
+observed; drop17 prevents a lossless-log claim. About/Settings and long stability
+remain pending. The old audit's overwritten boolean is preserved as evidence.
+
+Current v183 regenerates a new2GiB APFS seed, verifies233 raw owners and read-only
+fsck, rebuilds the three actual objects, binds30source inputs/five inherited
+reports and independently audits entry/assets/FAT/AVB.11actual qualification
+tests include literal booleans and rejection paths. The new capacity clean-build
+entry and staged packager are in [the maintained profile](../profiles/data-capacity-2g-key/README.md).
+v183 hardware and the complete new empty-output command are still unaccepted.
+Neither profile provides persistent application Data or increases the6GiB RAM window.
+
 The user-operated v156 session used the already-qualified image
 `5f8837128ab71b2bc6d2b45c02f9133aa30b5a2243663ce425bda859588d29df`
 with a6GiB XNU memory window and a512MiB sparse RAM Data seed. The host allowed

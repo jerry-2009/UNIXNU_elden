@@ -1,0 +1,10 @@
+{
+  "packed_sha256": "7337df9c95c44eec5d75fc9c435683dcc4acd437dc53a85fe25893cf3e81a32d",
+  "raw_sha256": "c847db929bcf2a102e400cf26a00d1440b64f8d8476cecaf97084bf612b70e77",
+  "expanded_bytes": 2147483648,
+  "logical_manifest_sha256": "48f55583046418c089d09381a85d7f0ce72c1bb8b57fa3770d91e2fbad550f8a",
+  "logical_entries_verified": 232,
+  "volume_uuid": "E5D06647-CCB4-491D-A897-3C21B55703CF",
+  "raw_owners_verified": 233,
+  "requested_size_mib": 2048
+}

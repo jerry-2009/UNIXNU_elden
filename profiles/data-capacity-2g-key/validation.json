@@ -1,0 +1,8 @@
+{
+  "evidence": "../../docs/evidence/data-capacity-v183-20261118.json",
+  "candidate_sha256": "14bf65ff5fcd9b54b30f7d1fd2b8ba268b27a4d597f91fbeb0844a7ad88538a5",
+  "source_manifest_sha256": "716162e25dab29e594b1422107a7bd74f8de1b5970579983bba73f4cd66d860b",
+  "component_kernel_and_package_passed": true,
+  "complete_clean_command_validated": false,
+  "hardware_tested": false
+}

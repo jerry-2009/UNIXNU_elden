@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest v18320261118 signed: source-built fresh2GiB sparse Data/raw233owners/fsck0,
+core3/UFS5/actual separately archived KeyStore2 predicates rebuilt.30source inputs and5
+inherited build-report digests close the capacity package. Literal boolean report bug fixed;
+11actual qualification/rejection tests pass. New seed139c013b/kernel5c695373/image14bf65ff,
+sessionda3ea46ff92d12c2/floor1738713600/0/3; warnings90/26/0 retained. Packed import
+resident1146880/table4194304 and pinned firmware/384actual KeyStore cases are host evidence.
+v182 had accepted lockscreen/mount0/key registration0; historical erroneous audit untouched.
+v183 is NOT hardware-tested yet. Next bounded GUI/space trial with full stock restoration,
+then CE3 head/shadow/notification audit. Current clean-build capacity entry added; complete
+new empty-output chain validation pending. Persistent Data/charging/network/Goal incomplete.
+Unattended authorization active; preserve GPU/QRTR/peripheral worktrees and motor guards.
+
 Latest v179 + user GUI20261116: Wi-Fi first-failure counters show WMI EP2/service100, credit-size2176,
 ULCE3/DLCE2, allocated2+returned2,4accepted sends then2591 shortage retries. CE work returns; CE3HP16/TP8,
 do not use drained HTTCE4 as WMI evidence. Next CE3 head/shadow/notification audit. Timer/BH completion flags

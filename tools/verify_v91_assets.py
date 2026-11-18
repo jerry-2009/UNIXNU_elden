@@ -7,11 +7,14 @@ def verify_loader(path):
     p=json.loads((PROFILE/'loader-contract.json').read_text());data=bytes(path) if isinstance(path,(bytes,bytearray)) else Path(path).read_bytes();at=p['debug_guid_offset'];n=p['debug_guid_bytes']
     if len(data)!=p['bytes'] or data[at-4:at]!=b'RSDS' or hashlib.sha256(data[:at]+bytes(n)+data[at+n:]).hexdigest()!=p['normalized_sha256']:raise ValueError('Loader differs outside the allowed CodeView GUID')
     return {'sha256':hashlib.sha256(data).hexdigest(),'only_codeview_guid_may_differ':True}
-def verify_packed_seed(path,report_path):
+def verify_packed_seed(path,report_path,*,expected_bytes=536870912):
+    # Existing callers remain512MiB-only. A new native capacity profile must
+    # explicitly request the separately built2GiB asset; metadata cannot opt in.
+    if expected_bytes not in (536870912,2147483648):raise ValueError('Unsupported explicit Data capacity')
     profile=json.loads((PROFILE/'data-seed.json').read_text());report=json.loads(Path(report_path).read_text());data=bytes(path) if isinstance(path,(bytes,bytearray)) else Path(path).read_bytes()
     if hashlib.sha256(data).hexdigest()!=report['packed_sha256'] or report['logical_manifest_sha256']!=hashlib.sha256((PROFILE/'data-seed.json').read_bytes()).hexdigest() or report['volume_uuid']!=profile['volume_uuid'] or report['logical_entries_verified']!=len(profile['entries']):raise ValueError('Seed report/manifest identity mismatch')
     magic,version,block_size,total,count=struct.unpack_from('<8sIIQQ',data)
-    if (magic,version,block_size,total)!=(b'DBRDISK1',1,4096,536870912) or not 1<=count<=65536:raise ValueError('Invalid packed Data header')
+    if (magic,version,block_size,total)!=(b'DBRDISK1',1,4096,expected_bytes) or report.get('expanded_bytes')!=expected_bytes or not 1<=count<=65536:raise ValueError('Invalid packed Data header')
     cursor=32+count*16;end=0;h=hashlib.sha256();zero=bytes(1<<20);packed_blocks=[]
     for i in range(count):
         offset,length=struct.unpack_from('<QQ',data,32+i*16)
