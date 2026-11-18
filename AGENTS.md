@@ -1,5 +1,18 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261118 Wi-Fi SRNG component: source b94ab8f implements reversible common HAL/
+v179WMI observers. First-EAGAIN only, actual CE3 mapping/notification enter+exit/timer/
+lastHP+offset, and two documented real R2 HP/TP reads; never read shadow registers.
+16actual helper scenarios ASan/UBSan pass; Mac wifi-srng-v187-20261118 host3/runtime3
+rebuild2units,5changed/120retained, scalar/noinit/combined imports unchanged/one real
+new export. Binding92afc065; existing HAL70/WMI632 warnings retained. Prior builds
+exposed signed count/narrowing warnings in new helper; corrected, evidence preserved.
+This is NOT a full kernel/boot or hardware result. NEXT compose current service core/
+native + runtime3 into new explicit profile, audit full boot and do one first-failure
+diagnostic with all existing DMA/MSI/PERST/return/stock gates. No guessed credit/clock/
+timeout changes. All component jobs terminal, device remains restored stock Android.
+Full Goal/charging/Wi-Fi/persistent Data incomplete; other worktrees unchanged.
+
 Latest v18620261118 HARDWARE UI: explicit replay preserves required self-IPI/SMP,
 pauses only PMIC_LOGS vote readback and read-only CPU observation; args1015B.3menu+
 11capacity qualification tests and full native/entry/FAT/assets/AVB pass. Image d2e7928e/
