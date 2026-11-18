@@ -41,6 +41,7 @@ def main():
     p.add_argument('--ufs-queue-trial',action='store_true',help='Owned DMA multi-slot queue and QD1/8/32 comparison')
     p.add_argument('--ufs-idle-trial',action='store_true',help='Stock5000us automatic Hibern8 and qualified restore')
     p.add_argument('--data-capacity-2g',action='store_true',help='UFS idle baseline with2GiB sparse Data and the actual software KeyStore adapter')
+    p.add_argument('--data-ui-replay',action='store_true',help='Explicit2GiB software UI trial without self-IPI/CPU sampling diagnostics')
     p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
     p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
     p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')
@@ -70,6 +71,7 @@ def main():
     if a.bt_discovery17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17):raise ValueError('--bt-discovery17 requires --bt-process-lifetime without other native17 options')
     if a.bt_address17 and (not a.bt_process_lifetime or a.bt_optional17 or a.bt_complete17 or a.bt_scan17 or a.bt_scan_ready17 or a.bt_scan_observe17 or a.bt_scan_roles17 or a.bt_discovery17):raise ValueError('--bt-address17 requires --bt-process-lifetime without other native17 options')
     if a.data_capacity_2g and (a.variant!='bluetooth' or not a.bt_address17):raise ValueError('--data-capacity-2g requires the qualified Bluetooth/address17 chain')
+    if a.data_ui_replay and not a.data_capacity_2g:raise ValueError('--data-ui-replay requires --data-capacity-2g')
     if a.data_capacity_2g:a.ufs_idle_trial=True
     if a.ufs_idle_trial:a.ufs_queue_trial=True
     if a.ufs_queue_trial:a.ufs_wait_trial=True
@@ -137,6 +139,7 @@ def main():
     identity['ufs_queue_trial']=a.ufs_queue_trial
     identity['ufs_idle_trial']=a.ufs_idle_trial
     identity['data_capacity_2g']=a.data_capacity_2g
+    identity['data_ui_replay']=a.data_ui_replay
     identity['charge_verification']=a.charge_verification
     stamp=hashlib.sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest();journal=out/'build-state.json'
     if out.exists():
@@ -290,6 +293,7 @@ def main():
         variant_args=['--wcn-report',kernel_folder/'result.json','--bt-runtime',runtime_folder] if a.variant=='bluetooth' else ['--hid-report',kernel_folder/'result.json']
         if a.pd_gui:variant_args+=['--pd-gui']
         if a.data_capacity_2g:variant_args+=['--expanded-data','--keep-packed-data']
+        if a.data_ui_replay:variant_args+=['--data-ui-replay']
         stage('boot',script('build_v91_boot.py','--portable-fat','--kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--fd',out/'firmware/UEFI.fd','--loader',out/'loader/EldenPayloadLoader.efi','--data',out/'data/data.packed','--data-report',out/'data/result.json','--library',out/'icon/EldenIconCpuMode.dylib','--agent',out/'agent/iconservicesagent','--stock-boot',inputs['stock_boot'],'--avbtool',inputs['avbtool'],'--key',inputs['signing_key'],'--clang',inputs['llvm']/'clang',*variant_args,'--output',out/'boot'),'boot/result.json')
         stage('boot-audit',script('audit_v91_boot.py','--image',out/'boot/boot-signed.img','--entry-kernel',out/'entry/kernel.macho','--entry-report',out/'entry/result.json','--stock-boot',inputs['stock_boot'],'--parent-vbmeta',inputs['parent_vbmeta'],'--data-report',out/'data/result.json',*variant_args,'--output',out/'boot/audit.json'),'boot/audit.json')
     state['complete']=True;save();print('Completed '+a.target+'; no device operation performed',flush=True)

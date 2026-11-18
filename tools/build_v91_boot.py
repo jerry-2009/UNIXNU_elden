@@ -37,6 +37,7 @@ def main():
     p.add_argument('--data-report',type=Path,help='Source-built Data seed filesystem/manifest verification')
     p.add_argument('--expanded-data',action='store_true',help='Require the separately qualified2GiB native Data profile')
     p.add_argument('--keep-packed-data',action='store_true',help='Use the existing DarwinBoot PackedRAMDisk handoff, as Sheng does')
+    p.add_argument('--data-ui-replay',action='store_true',help='Qualified2GiB UI trial; replace self-IPI/CPU diagnostics with explicit software replay')
     p.add_argument('--fbwc-report',type=Path,help='Explicit qualified v93 framebuffer build; adds only the bare fbwc option')
     p.add_argument('--battery-ui',action='store_true',help='Restore qualified battery UI; compact existing numeric-one flags without dropping options')
     p.add_argument('--wcn-report',type=Path)
@@ -70,6 +71,9 @@ def main():
     if a.keep_packed_data:
         from data_capacity_boot import keep_packed
         bt=keep_packed(bt)
+    if a.data_ui_replay:
+        from data_capacity_boot import enable_ui_replay
+        bt=enable_ui_replay(bt)
     if a.pd_gui:bt=bt_runtime_boot.pd_gui(bt)
     if a.early_stall:bt=bt_runtime_boot.early_stall(bt)
     hid=hid_delivery_boot.qualify(a.hid_report,a.entry_report) if a.hid_report else None

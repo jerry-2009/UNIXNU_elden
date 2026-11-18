@@ -22,6 +22,7 @@ def main():
     p.add_argument('--data-report',type=Path)
     p.add_argument('--expanded-data',action='store_true')
     p.add_argument('--keep-packed-data',action='store_true')
+    p.add_argument('--data-ui-replay',action='store_true')
     p.add_argument('--fbwc-report',type=Path)
     p.add_argument('--entry-report',type=Path)
     p.add_argument('--battery-ui',action='store_true')
@@ -38,6 +39,9 @@ def main():
     if a.keep_packed_data:
         from data_capacity_boot import keep_packed
         bt=keep_packed(bt)
+    if a.data_ui_replay:
+        from data_capacity_boot import enable_ui_replay
+        bt=enable_ui_replay(bt)
     if a.pd_gui:bt=bt_runtime_boot.pd_gui(bt)
     if a.early_stall:bt=bt_runtime_boot.early_stall(bt)
     hid=hid_delivery_boot.qualify(a.hid_report,a.entry_report) if a.hid_report else None

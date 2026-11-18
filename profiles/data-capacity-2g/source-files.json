@@ -28,6 +28,7 @@
     "tools/replay_xnu_objects.py",
     "tools/link_v91_kernel.py",
     "tools/test_data_capacity_boot.py",
+    "tools/test_data_ui_menu.py",
     "tools/test_data_key_gate.py",
     "tools/test_expanded_data_seed.py",
     "tools/test_packed_data_handoff.py"

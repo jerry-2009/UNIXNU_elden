@@ -27,6 +27,13 @@ source closure, altered inherited build reports, seed reports and artifacts.
 
 ## Clean build
 
+Add `--data-ui-replay` for a bounded software swipe/Settings validation window.
+It preserves all physical input, eight-core/SMP, thermal, PD and recovery options;
+only the startup self-IPI test and read-only CPU sampling are paused to fit the
+original1023-byte argument limit. The normal2GiB profile stays unchanged. This
+enables requests, not automatic or fabricated user interaction. Actual menu
+semantics/fallback/budget checks are in `tools/test_data_ui_menu.py`.
+
 v184's staged source is a pure Git archive of11fce16; all30 code-input byte hashes
 match that commit. v183's snapshot contained a CRLF working copy of one old
 Python auditor while Git held LF. Its record is retained; v184 was rebuilt from
@@ -75,6 +82,9 @@ Then `tools/build_data_capacity_boot.py --kernel-build <new-kernel> --clean-buil
 --parent-vbmeta <parent> --avbtool <avbtool> --signing-key <key> --llvm <llvm>
 --output <new-package>` prepares the entry, packs and independently audits the
 signed boot. It never accesses the tablet. Rollback1738713600/footer0/parent3,
+Pass `--data-ui-replay` to this packager for the same explicit UI validation mode.
+
+The signed boot preserves rollback1738713600/footer0/parent3,
 all30 original Apple executable regions and entry delta7124 remain required.
 
 `tools/test_data_capacity_boot.py` exercises actual qualification for both

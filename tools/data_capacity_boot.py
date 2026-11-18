@@ -1,6 +1,6 @@
 """Qualify a2GiB Data seed only with its rebuilt native size predicates."""
 from pathlib import Path
-import hashlib,importlib.util,json
+import hashlib,importlib.util,json,copy,tomllib
 from charge_verification_boot import qualify_shared_assets
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE_MANIFEST='profiles/data-capacity-2g/source-files.json'
@@ -53,7 +53,25 @@ def menu(q):
     if not q.get('expanded_data') or q['expected_data_bytes']!=2147483648:raise ValueError('Explicit Data capacity required')
     text=bt_runtime_boot.menu(dict(q,profile='ufs-idle-trial'))
     title='iPadOS sparse Data 2GiB - TEST' if q.get('keep_packed_data') else 'iPadOS Data 2GiB - TEST'
-    return text.replace('UFS idle power + wake - TEST',title,1)
+    text=text.replace('UFS idle power + wake - TEST',title,1)
+    if q.get('data_ui_replay'):
+        enable_ui_replay(q)
+        from battery_boot import arguments
+        before=tomllib.loads(text);original=before['entry'][0]['args'];values=arguments(original)
+        if values.get('armcpu-self-ipi')!='1' or values.get('ecp')!='2' or 'elden-ui-replay' in values:raise ValueError('Unexpected UI diagnostic baseline')
+        tokens=[t for t in original.split() if t.partition('=')[0] not in ('armcpu-self-ipi','ecp')]
+        tokens.append('elden-ui-replay');updated=' '.join(tokens)
+        expected=dict(values);expected.pop('armcpu-self-ipi');expected.pop('ecp');expected['elden-ui-replay']='1'
+        if arguments(updated)!=expected or len(updated.replace('@SESSION@','0'*16).encode())>1023:raise ValueError('UI diagnostic option contract changed')
+        if text.count('args = "'+original+'"')!=1:raise ValueError('Ambiguous primary UI entry')
+        text=text.replace('args = "'+original+'"','args = "'+updated+'"',1)
+        after=tomllib.loads(text);comparable=copy.deepcopy(after);comparable['entry'][0]['args']=original
+        if comparable!=before:raise ValueError('UI diagnostic changed fallback/menu fields')
+    return text
+
+def enable_ui_replay(q):
+    if not q or q.get('profile')!='data-capacity-2g-key' or q.get('expanded_data') is not True or q.get('expected_data_bytes')!=2147483648 or q.get('keystore_capacity_updated') is not True:raise ValueError('UI replay requires qualified2GiB Data and actual KeyStore')
+    return dict(q,data_ui_replay=True)
 
 def keep_packed(q):
     if not q or q.get('profile') not in ('data-capacity-2g','data-capacity-2g-key') or q.get('expected_data_bytes')!=2147483648:raise ValueError('Packed handoff requires the explicit2GiB profile')

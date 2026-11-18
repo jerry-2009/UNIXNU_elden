@@ -20,6 +20,7 @@ def main():
     for name in ("kernel-build", "clean-build", "seed-build", "stock-boot",
                  "parent-vbmeta", "avbtool", "signing-key", "llvm", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--data-ui-replay", action="store_true", help="Explicit bounded software UI trial")
     args = parser.parse_args()
     kernel = args.kernel_build.resolve(strict=True)
     clean = args.clean_build.resolve(strict=True)
@@ -42,6 +43,8 @@ def main():
         "--clang", args.llvm / "clang", "--output", output / "entry")
     variant = ["--wcn-report", kernel / "result.json", "--bt-runtime", kernel / "runtime",
                "--expanded-data", "--keep-packed-data"]
+    if args.data_ui_replay:
+        variant.append("--data-ui-replay")
     run("build_v91_boot.py", "--portable-fat", "--kernel", output / "entry/kernel.macho",
         "--entry-report", output / "entry/result.json", "--fd", clean / "firmware/UEFI.fd",
         "--loader", clean / "loader/EldenPayloadLoader.efi", "--data", seed / "data.packed",
@@ -58,6 +61,8 @@ def main():
     if not audit["accepted_static"] or audit["image_sha256"] != image_hash:
         raise ValueError("Boot audit failed")
     qualification = audit["bluetooth_runtime"]
+    if bool(qualification.get("data_ui_replay")) != args.data_ui_replay:
+        raise ValueError("UI trial mode differs from requested audit")
     if qualification.get("keystore_capacity_updated") is not True or qualification.get("keep_packed_data") is not True:
         raise ValueError("Missing actual KeyStore or packed Data qualification")
     if (audit["rollback_index"], audit["footer_location"], audit["parent_boot_chain_location"]) != (1738713600, 0, 3):
@@ -66,6 +71,7 @@ def main():
                "kernel_sha256": result["kernel_sha256"], "data_packed_sha256": qualification["data_packed_sha256"],
                "expected_data_bytes": qualification["expected_data_bytes"], "accepted_static": True,
                "keystore_capacity_updated": True, "keep_packed_data": True, "tablet_accessed": False,
+               "data_ui_replay": args.data_ui_replay,
                "hardware_tested": False}
     (output / "result.json").write_text(json.dumps(receipt, indent=2) + "\n")
     print(json.dumps(receipt, indent=2))
