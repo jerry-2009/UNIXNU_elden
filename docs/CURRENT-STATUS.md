@@ -1,5 +1,16 @@
 # 当前状态 · 2026-11-18
 
+v189实机捕获21条完整WMI/CE3顺序：初始化命令1/0x401e的slot0/1已回收，随后
+PMF_QOS(0x22)、DYNAMIC_BW(0x0a)以pdev0入队slot2/3，首次失败前未见新回收；
+ARP_AC_OVERRIDE(0x23)因credit0返回−11。后两缓冲位于较高IOVA，但仍在已声明128MiB内，
+不能据地址断言DMA故障；pdev编号正确性也仍待核。下一步核实际映射/生命周期和固件cap。
+[实机顺序与回程证据](evidence/wifi-ce3-flow-v189-hardware-20261118.json)。
+
+本轮保留90秒运行回程，完整捕获DMA fence/MSI排空/PERST/WCN停机并恢复stock Android/
+root/green/原充电与无线扫描设置；新恢复器两次观察即核对一致。Wi-Fi仍未扫描联网。
+日志296154字节、64次status/drop最大0，无重连；断开后计数不可读，不扩大完整性结论。
+GPU与笔输入已具离线构建成果，均未集成或实机验收；继续按Wi-Fi主线、GPU最后推进。
+
 v188已实机核对CE3访问路径：动态窗口0x37、寄存器0x3278、回读0x40000037、唤醒返回0；
 内部地址0x1b86400实际走BAR偏移0x86400，与Armada固定四代源码的Peach分支一致。
 HIF直接HP/TP仍为0/0、DMA TP为8、最后通知HP16。下一步核shadow驱动环的CSR读取语义

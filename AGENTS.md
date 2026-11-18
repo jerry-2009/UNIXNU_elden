@@ -1,17 +1,25 @@
 # UniXNU elden — authoritative source repository
 
-Latest20261118 CE3 flow component: actual original/derived CE send/reap10scenarios,
-bounded64-record/saturating-overflow/one-shot/8-producer/publication and7decoder
-cases pass ASan/UBSan. Scalar iOS17 CE/WMI rebuild,7changed/118retained runtime
-units, unchanged combined imports/noinit/two real new exports; binding0b2a90be.
-CE85/WMI632 inherited warnings remain; no helper warnings.6actual profile gates
-and6Android restoration tests pass. New serial-bound restoration API retries only
-within40s/5s-per-command, retains startup errors and requires actual original
-radio+scan equality. Full kernel/boot/hardware pending; component not network fix.
-Source/docs/profile are formal main; workbench receipts outside research. Last
-device remains fully restored stockv188; fresh100%4450mV/25.1C read, not write
-admission for a future image. Original90s runtime return retained. Goal/charging/
-Wi-Fi/persistent Data incomplete; GPU/peripheral/QRTR/AnyRouter boundaries remain.
+Latest v18920261118 HARDWARE:21/21 ordered CE3/WMI records/no trace overflow.
+INITcmd1 +401e slots0/1 complete; PMF_QOS22/DYNAMIC_BWa atpdev0 enqueue slots2/3,
+HP12/16 but no subsequent reap before ARP_AC_OVERRIDE23 fails-11/credits0.
+Earlier buffers1000dc60/10007ea0; later128c0820/128c0920 all within owned128MiB
+IOVA. Different addresses do NOT prove DMA fault; pdev0 correctness also unproved.
+Next actual DMA mapping/lifetime + firmware-derived pdev audit before changing
+routing/credits/clocks. R2 mirror read semantics and wake-attempt execution remain
+unproved; raw wake0 can be its initializer. Keep original90s runtime return.
+Real fence0/master-off1/sampled-idle1/MSI4/IRQactive0/PERSTlow1/WCNstop1 plus typed
+physical fastboot/full stock8b8e72da/Android/root/green/original charge+radio+scans/
+sleep restored; new bounded restoration completes2attempts/0errors. All jobs terminal.
+Imagee88895bf/sessiona08146c51527edcf/kernel88c7911d/floor1738713600/0/3; capture
+296154B/dropmax0/64status samples/no reconnect/discontinuity; post-disconnect counter
+unavailable. Native1/kernel2/package2 are accepted; kernel1 missing-export and
+package1 missing-contract failures retained. Source014f1e8 Git inputs match all
+compiled fingerprints.7profile checks/6restore tests/10actual CE+7decoder cases pass.
+Peripheral8449126: pen five-object link offline only, raw/integrity/current-main
+integration pending, other4pending. GPU71b5379 entry-ready offline delivery, no
+boot/hardware acceptance; both branches/worktrees preserved and GPU last. Full
+Goal/charging/Wi-Fi/persistent Data/remaining peripherals stay incomplete.
 
 Latest v18820261118 HARDWARE: PCI-window observer confirms CE3 request1b86400
 uses BAR86400/dynamic37/register3278/readback40000037/wake0, matching the exact

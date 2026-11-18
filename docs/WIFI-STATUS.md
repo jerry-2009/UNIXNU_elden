@@ -1,5 +1,16 @@
 # Wi-Fi：固件与服务已接通，WMI完成仍待修复
 
+v189实机捕获21条完整WMI/CE3顺序：初始化命令1/0x401e的slot0/1已回收，随后
+PMF_QOS(0x22)、DYNAMIC_BW(0x0a)以pdev0入队slot2/3，首次失败前未见新回收；
+ARP_AC_OVERRIDE(0x23)因credit0返回−11。后两缓冲位于较高IOVA，但仍在已声明128MiB内，
+不能据地址断言DMA故障；pdev编号正确性也仍待核。下一步核实际映射/生命周期和固件cap。
+[实机顺序与回程证据](evidence/wifi-ce3-flow-v189-hardware-20261118.json)。
+
+本轮保留90秒运行回程，完整捕获DMA fence/MSI排空/PERST/WCN停机并恢复stock Android/
+root/green/原充电与无线扫描设置；新恢复器两次观察即核对一致。Wi-Fi仍未扫描联网。
+日志296154字节、64次status/drop最大0，无重连；断开后计数不可读，不扩大完整性结论。
+GPU与笔输入已具离线构建成果，均未集成或实机验收；继续按Wi-Fi主线、GPU最后推进。
+
 2026-11-18 v188：真实PCI窗口与唤醒核对通过，动态窗口0x37、0x3278回读0x40000037；
 Peach原厂分支明确采用此动态路径。CE3直接HP/TP仍0/0，coherent DMA TP8、通知HP16，
 这些差异的寄存器语义及完成路径仍须查证，不能直接归咎固件或改成static映射。

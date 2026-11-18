@@ -1,0 +1,534 @@
+{
+  "date": "2026-11-18",
+  "version": "v189",
+  "profile": "wifi-ce3-flow-trace",
+  "candidate_sha256": "e88895bf062e024317106be0883c978c9ae953e90ad195e1ec2328c74e70bc51",
+  "session": "a08146c51527edcf",
+  "kernel_sha256": "88c7911d6c29b1c6e616923c687a809767f5ade3a0927b6307a6e8489479bafb",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "source_commit": "014f1e8e4dc8a69b5055ff02228a1a08d5eca592",
+  "component_evidence": "wifi-ce3-flow-component-20261118.json",
+  "full_native_kernel_entry_assets_avb_passed": true,
+  "flow": {
+    "events": [
+      {
+        "seq": 0,
+        "ms": 59092,
+        "kind": "wmi-request",
+        "fields": [
+          1,
+          328,
+          0,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 0,
+        "command": 1
+      },
+      {
+        "seq": 1,
+        "ms": 59092,
+        "kind": "ce3-post",
+        "fields": [
+          0,
+          4,
+          0,
+          340,
+          268491872
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "slot": 0,
+        "hp": 4,
+        "cached_tp": 0
+      },
+      {
+        "seq": 2,
+        "ms": 59092,
+        "kind": "wmi-result",
+        "fields": [
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "command": 1,
+        "result": 0
+      },
+      {
+        "seq": 3,
+        "ms": 59093,
+        "kind": "ce3-reap",
+        "fields": [
+          0,
+          4,
+          4,
+          340,
+          268491872
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "slot": 0,
+        "hp": 4,
+        "cached_tp": 4
+      },
+      {
+        "seq": 4,
+        "ms": 59093,
+        "kind": "ce3-empty",
+        "fields": [
+          1,
+          4,
+          4,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "slot": 1,
+        "hp": 4,
+        "cached_tp": 4
+      },
+      {
+        "seq": 5,
+        "ms": 59241,
+        "kind": "wmi-request",
+        "fields": [
+          16414,
+          16,
+          0,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 0,
+        "command": 16414
+      },
+      {
+        "seq": 6,
+        "ms": 59241,
+        "kind": "ce3-post",
+        "fields": [
+          1,
+          8,
+          4,
+          28,
+          268467872
+        ],
+        "credit": 0,
+        "credit_reports": 0,
+        "slot": 1,
+        "hp": 8,
+        "cached_tp": 4
+      },
+      {
+        "seq": 7,
+        "ms": 59241,
+        "kind": "wmi-result",
+        "fields": [
+          16414,
+          0,
+          0,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 0,
+        "command": 16414,
+        "result": 0
+      },
+      {
+        "seq": 8,
+        "ms": 59242,
+        "kind": "ce3-reap",
+        "fields": [
+          1,
+          8,
+          8,
+          28,
+          268467872
+        ],
+        "credit": 0,
+        "credit_reports": 0,
+        "slot": 1,
+        "hp": 8,
+        "cached_tp": 8
+      },
+      {
+        "seq": 9,
+        "ms": 59242,
+        "kind": "ce3-empty",
+        "fields": [
+          2,
+          8,
+          8,
+          4,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 0,
+        "slot": 2,
+        "hp": 8,
+        "cached_tp": 8
+      },
+      {
+        "seq": 10,
+        "ms": 63111,
+        "kind": "pdev-selector",
+        "fields": [
+          34,
+          0,
+          16387,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 2,
+        "parameter_id": 34,
+        "pdev_id": 0
+      },
+      {
+        "seq": 11,
+        "ms": 63111,
+        "kind": "wmi-request",
+        "fields": [
+          16387,
+          16,
+          0,
+          0,
+          0
+        ],
+        "credit": 2,
+        "credit_reports": 2,
+        "command": 16387
+      },
+      {
+        "seq": 12,
+        "ms": 63111,
+        "kind": "ce3-post",
+        "fields": [
+          2,
+          12,
+          8,
+          28,
+          311167008
+        ],
+        "credit": 1,
+        "credit_reports": 2,
+        "slot": 2,
+        "hp": 12,
+        "cached_tp": 8
+      },
+      {
+        "seq": 13,
+        "ms": 63111,
+        "kind": "wmi-result",
+        "fields": [
+          16387,
+          0,
+          0,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 2,
+        "command": 16387,
+        "result": 0
+      },
+      {
+        "seq": 14,
+        "ms": 63111,
+        "kind": "pdev-selector",
+        "fields": [
+          10,
+          0,
+          16387,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 2,
+        "parameter_id": 10,
+        "pdev_id": 0
+      },
+      {
+        "seq": 15,
+        "ms": 63111,
+        "kind": "wmi-request",
+        "fields": [
+          16387,
+          16,
+          0,
+          0,
+          0
+        ],
+        "credit": 1,
+        "credit_reports": 2,
+        "command": 16387
+      },
+      {
+        "seq": 16,
+        "ms": 63111,
+        "kind": "ce3-post",
+        "fields": [
+          3,
+          16,
+          8,
+          28,
+          311167264
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "slot": 3,
+        "hp": 16,
+        "cached_tp": 8
+      },
+      {
+        "seq": 17,
+        "ms": 63111,
+        "kind": "wmi-result",
+        "fields": [
+          16387,
+          0,
+          0,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "command": 16387,
+        "result": 0
+      },
+      {
+        "seq": 18,
+        "ms": 63111,
+        "kind": "pdev-selector",
+        "fields": [
+          35,
+          0,
+          16387,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "parameter_id": 35,
+        "pdev_id": 0
+      },
+      {
+        "seq": 19,
+        "ms": 63111,
+        "kind": "wmi-request",
+        "fields": [
+          16387,
+          16,
+          0,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "command": 16387
+      },
+      {
+        "seq": 20,
+        "ms": 66111,
+        "kind": "wmi-result",
+        "fields": [
+          16387,
+          4294967285,
+          0,
+          0,
+          0
+        ],
+        "credit": 0,
+        "credit_reports": 2,
+        "command": 16387,
+        "result": -11
+      }
+    ],
+    "claimed": 21,
+    "emitted": 21,
+    "dropped": 0,
+    "fully_published": true,
+    "bounded_trace_complete": true,
+    "independent_fields_not_atomic_snapshot": true,
+    "network_accepted": false,
+    "capture_sha256": "026d22a84559c88f2f040d8dec4a4a3c32ddd85664529992260df1142b33b772",
+    "capture_bytes": 296154
+  },
+  "first_ce3_posts": [
+    {
+      "seq": 1,
+      "ms": 59092,
+      "kind": "ce3-post",
+      "fields": [
+        0,
+        4,
+        0,
+        340,
+        268491872
+      ],
+      "credit": 1,
+      "credit_reports": 0,
+      "slot": 0,
+      "hp": 4,
+      "cached_tp": 0
+    },
+    {
+      "seq": 6,
+      "ms": 59241,
+      "kind": "ce3-post",
+      "fields": [
+        1,
+        8,
+        4,
+        28,
+        268467872
+      ],
+      "credit": 0,
+      "credit_reports": 0,
+      "slot": 1,
+      "hp": 8,
+      "cached_tp": 4
+    },
+    {
+      "seq": 12,
+      "ms": 63111,
+      "kind": "ce3-post",
+      "fields": [
+        2,
+        12,
+        8,
+        28,
+        311167008
+      ],
+      "credit": 1,
+      "credit_reports": 2,
+      "slot": 2,
+      "hp": 12,
+      "cached_tp": 8
+    },
+    {
+      "seq": 16,
+      "ms": 63111,
+      "kind": "ce3-post",
+      "fields": [
+        3,
+        16,
+        8,
+        28,
+        311167264
+      ],
+      "credit": 0,
+      "credit_reports": 2,
+      "slot": 3,
+      "hp": 16,
+      "cached_tp": 8
+    }
+  ],
+  "completed_ce3_slots": [
+    0,
+    1
+  ],
+  "unreaped_before_first_failure_slots": [
+    2,
+    3
+  ],
+  "pdev_selectors": [
+    {
+      "parameter_id": 34,
+      "name": "PMF_QOS",
+      "pdev_id": 0
+    },
+    {
+      "parameter_id": 10,
+      "name": "DYNAMIC_BW",
+      "pdev_id": 0
+    },
+    {
+      "parameter_id": 35,
+      "name": "ARP_AC_OVERRIDE",
+      "pdev_id": 0
+    }
+  ],
+  "parameter_values_not_logged": true,
+  "initial_command_ids": [
+    1,
+    16414
+  ],
+  "all_observed_buffer_addresses_within_declared_128m_iova": true,
+  "larger_buffer_addresses_are_not_dma_fault_proof": true,
+  "pdev_number_correctness_unverified": true,
+  "r2_read_mirror_contract_unverified": true,
+  "wakeup_attempt_not_counted_by_v188_observer": true,
+  "first_failure_result": -11,
+  "credits_at_first_failure": 0,
+  "physical_shutdown": {
+    "fence": "ELDEN_WIFI_FENCE result=0 stage=6 master-off=1 transactions-sampled=1 idle=1 command=2 device-status=10 msi=4 perst=pending consumer=0",
+    "transport": "ELDEN_WIFI_TRANSPORT stop=0 msi=4 irq-active=0 master-attempted=1",
+    "perst": "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+    "wcn": "ELDEN_WCN RPC stop=1; radio/UART stopped, boot-shared votes retained"
+  },
+  "native_dma_msi_perst_wcn_stop_proven": true,
+  "warm_mhi_reset_proven": false,
+  "capture": {
+    "path": "edl_work/live-ce3-flow-v189-20261118/usb/20261118-150701.bin",
+    "bytes": 296154,
+    "sha256": "026d22a84559c88f2f040d8dec4a4a3c32ddd85664529992260df1142b33b772",
+    "status_samples": 64,
+    "drop_max": 12,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false,
+    "oversized_console_lines_discarded": 0
+  },
+  "restoration": {
+    "complete": true,
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "root": true,
+    "green": true,
+    "android_boot_completed": true,
+    "original_charging_equal": true,
+    "original_radios_equal": true,
+    "original_scans_equal": true,
+    "sleep_requested": true,
+    "all_device_jobs_terminal": true,
+    "radio_restoration": {
+      "complete": true,
+      "attempts": 2,
+      "errors": [],
+      "actual_radios": [
+        "1",
+        "1"
+      ],
+      "actual_scans": [
+        "1",
+        "1"
+      ]
+    }
+  },
+  "all_jobs_terminal": true,
+  "network_accepted": false,
+  "full_goal_complete": false,
+  "next": "Audit actual DMA mapping/lifetime and firmware-derived pdev number for PMF_QOS/DYNAMIC_BW before any routing/credit/clock changes.",
+  "parallel_review": {
+    "peripheral_head": "8449126",
+    "pen_native_link_offline_only": true,
+    "pen_raw_packet_integrity_and_current_mainline_integration_pending": true,
+    "other_four_workstreams_pending": true,
+    "gpu_head": "71b5379",
+    "gpu_entry_ready_offline_delivery": true,
+    "gpu_boot_and_hardware_unqualified": true,
+    "branches_unmerged_and_worktrees_unchanged": true,
+    "gpu_last": true
+  }
+}
