@@ -1,6 +1,12 @@
 # 从新克隆构建 GUI / 蓝牙分支
 
 入口是 `tools/build_clean.py`。它不需要旧 v99 构建目录、Patch 工作台、旧内核、
+2026-11-18空输出复测发现蓝牙基线误从当前仓读取已更新的WcnPower.c，导致原指纹拒绝。
+现在该基线只读仓内固定源码快照，字节来自89b31f6599068d63792c3b124f775fcac0f6c2da，
+仍保持原feb9fefa…指纹；当前共享电源实现不改动。来源见
+[固定输入证据](../profiles/current-build/frozen/source-proof.json)，新空输出验证继续进行。
+
+入口不需要
 旧对象或旧驱动归档。`--variant gui` 对应8GiB交互v109；`--variant bluetooth`
 对应v121蓝牙诊断分支（6GiB），具有真实HCI初始化和退出/stderr观察，蓝牙用户态
 尚未连接成功。两者保持独立，不把它们冒称为已实机合并的配置。

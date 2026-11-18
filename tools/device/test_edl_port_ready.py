@@ -35,4 +35,14 @@ try:open_verified_edl_port(1,disappearing,lambda name:h,c.now,c.sleep)
 except RuntimeError:pass
 else:raise AssertionError('Disappeared identity accepted')
 assert h.closed
+interface=SimpleNamespace(device='COM7',vid=0x05c6,pid=0x9008,location='1-5:x.3')
+c=Clock();h=Handle();calls=[]
+port,n=open_verified_edl_port(1,lambda:[interface],lambda name:(calls.append(name) or h),c.now,c.sleep)
+assert port is h and n==1 and calls==['COM7'] and not h.closed
+for location in ['1-50:x.3','1-2:x.3','1-5:x.4','1-5:unknown']:
+    c=Clock();calls=[];wrong=SimpleNamespace(device='COM7',vid=0x05c6,pid=0x9008,location=location)
+    try:open_verified_edl_port(1,lambda:[wrong],lambda name:calls.append(name),c.now,c.sleep)
+    except RuntimeError:pass
+    else:raise AssertionError('Unknown interface/physical path accepted')
+    assert not calls
 print('PASS: PnP/open race retry, wrong-device rejection, busy-owner refusal, pre-protocol identity recheck')

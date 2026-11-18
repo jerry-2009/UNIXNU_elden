@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest v18420261118 first live attempt ended BEFORE port open/programmer/NAND write:
+pyserial exposes physical1-5 as1-5:x.3 (USBMI3); old exact string guard rejected it.
+Strictly admit only that proven COM7/05c6:9008 spelling plus1-5; unknown paths/interfaces
+remain refused. Port host scenarios pass. Sahara reset8 ACK alone left EDL; approved
+RAM programmer/GPT/full stock8b8e72da read-only check/Firehose reset restored Android,
+root/green/original charging+radio+scan settings and sleep; no NAND writes. All jobs terminal.
+clean-fresh1 completed XNU/native then stopped at changed current WcnPower.c provider.
+Baseline now uses exact feb9fefa snapshot from89b31f65; current shared power untouched.
+New empty-output validation pending. Do not treat the failed supervisor's provisional
+candidate_written=true as a NAND write; flash.edl_opened=false and recovery SHA are authoritative.
+
 Latest v18420261118 signed canonical closure: source11fce16 exported ONLY by Git archive;
 all30capacity code inputs match committed raw blobs. Old audit_entry_relocation.py worktree
 CRLF differed from Git LF in v183; historical reports preserved, helper normalized and3
