@@ -1,5 +1,10 @@
 # 当前状态 · 2026-11-18
 
+Wi-Fi CE3首失败观测组件已完成：实际软件通知计数/offset和真实HP/TP读取，16个helper场景、
+标量iOS17运行库编译及导入绑定通过。它尚未整核或上机，不能当成扫描联网修复。
+[组件与下一轮资格流程](../drivers/EldenWifi/SRNG-OBSERVATION.md)。本轮参考源同步未发现
+新的CE/WMI/本机充电代码修复；冻结输入保留。
+
 v186已在2GiB Data下完成自动上滑、打开Settings/General；11张CRC完整画面和成功按下/抬起
 记录一致，八核onlineff。日志未捕获ENOSPC/panic（drop50），自动回fastboot及完整Android/
 root/原设置恢复通过。软件重放明确启用，并保留SMP必需自发IPI；v185错误省略该标志的
