@@ -118,6 +118,7 @@ def qualify_shared_assets(report_path,entry_path,runtime,*,wifi_service=False):
         if sha(ROOT/path)!=h:raise ValueError('Diagnostic source/tool changed: '+path)
     for name in ('kernel','native'):
         if sha(folder/(name+'.macho'))!=r[name+'_sha256']:raise ValueError('Diagnostic artifact changed')
+    contract=folder/'native-contract.json' if r.get('native_identity_contract') is not None else ROOT/'profiles'/profile/'native-contract.json'
     expected=load_native_contract(folder,r,profile,wifi_service=wifi_service);s,c,h=native_identity(folder/'native.macho')
     if (s,c,h)!=(expected['sections'],expected['commands'],expected['symbols']):raise ValueError('Diagnostic loaded content differs')
     originals=json.loads((ROOT/'profiles/v91/image-build/plan.json').read_text())['prelink']['original_executable_sha256']
