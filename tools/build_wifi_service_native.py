@@ -60,6 +60,8 @@ def main():
         window=bool(snapshot.get('pci_window_trace'))
         flow=bool(snapshot.get('ce3_flow_trace'))
         mode=bool(snapshot.get('mode_trace'))
+        response=bool(snapshot.get('response_trace'))
+        assert not response or (mode and snapshot.get('response_trace') is True and snapshot.get('reversible_response_insertions') is True and snapshot.get('fixed_response_bytes')==20 and snapshot.get('ce3_config_read_count')==6)
         assert not mode or (flow and snapshot.get('mode_trace') is True and snapshot.get('reversible_mode_insertions') is True and snapshot.get('mode_note_limits')==[8,4,16])
         assert not flow or (window and snapshot.get('reversible_flow_insertions') is True and snapshot.get('flow_record_limit')==64)
         assert not window or srng
@@ -135,6 +137,7 @@ def main():
         'pci_window_trace':bool(snapshot and snapshot.get('pci_window_trace')),
         'ce3_flow_trace':bool(snapshot and snapshot.get('ce3_flow_trace')),
         'mode_trace':bool(snapshot and snapshot.get('mode_trace')),
+        'response_trace':bool(snapshot and snapshot.get('response_trace')),
         'service_scan':a.service_scan,'control_trace':a.control_trace,'full_kernel_linked':False,'hardware_tested':False}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['compiled','object_sha256','warnings']}))
 if __name__=='__main__':main()
