@@ -1,5 +1,19 @@
 # UniXNU elden — authoritative source repository
 
+Latest v18720261118 HARDWARE: complete wifi-srng-trace imagee1cedc01/session4bd7a57ef992f50e
+signed/full asset+entry+Apple30/FAT/AVB pass; runtime4/native1/kernel1 qualification.
+First WMI16387 call5 after4accepted API sends: CE3id67/flags20000/shadowidx34/off984,
+target=direct1b86400/maps36. Notify enter4/exit4/lastHP16/timer0; direct HIF HP/TP0/0
+differs from coherent DMA TP8. This is NOT proof missing notifications/firmware hang;
+next validate actual PCI static/dynamic window, wake result and R2 read semantics.
+Capture190568B/f1f0ccf7/drop8/no reconnect/discontinuity. Typed sync/physical fastboot/full
+stock8b8e72da confirmed. Early20s diagnostic return caught native WCNstop0; no full native
+DMA/MSI/PERST completion proof in this capture, do not claim it. Next trial must wait
+the existing terminal worker or repair the actual stop path, not prolong safety limits.
+Android root/green/original charging+radio+scans/sleep finally restored; initial svc-wifi
+restore returned nonzero/empty during startup, retry later succeeded, failures retained.
+All device/build jobs terminal. Full Goal/charging/network/persistence remain incomplete.
+
 Latest20261118 Wi-Fi SRNG component: source b94ab8f implements reversible common HAL/
 v179WMI observers. First-EAGAIN only, actual CE3 mapping/notification enter+exit/timer/
 lastHP+offset, and two documented real R2 HP/TP reads; never read shadow registers.

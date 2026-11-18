@@ -1,5 +1,11 @@
 # 当前状态 · 2026-11-18
 
+v187完整诊断包实机已读到CE3首次失败：4次通知调用返回、最后HP16，shadow目标与直接地址
+相同，但HIF直接HP/TP=0/0、DMA TP=8。下一步核实际PCI窗口/唤醒与寄存器读取语义，
+不能据此定因firmware。短窗口提前回程未记录完整原生Wi-Fi停机证明；随后同步回fastboot、
+全SHA恢复Android/root/原设置通过。无线设置首次恢复有临时返回码异常，稍后成功，记录保留。
+[实机结果与边界](evidence/wifi-srng-v187-hardware-20261118.json)。
+
 Wi-Fi CE3首失败观测组件已完成：实际软件通知计数/offset和真实HP/TP读取，16个helper场景、
 标量iOS17运行库编译及导入绑定通过。它尚未整核或上机，不能当成扫描联网修复。
 [组件与下一轮资格流程](../drivers/EldenWifi/SRNG-OBSERVATION.md)。本轮参考源同步未发现

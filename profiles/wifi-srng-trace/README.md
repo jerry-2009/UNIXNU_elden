@@ -46,6 +46,14 @@ boundaries and the exact provider-relocation rule; host3 separately exercises
 16 real observer scenarios with modeled MMIO.
 
 Current candidate validation records follow in evidence. Hardware acceptance
+v187 hardware captured both snapshot lines: CE3id67/shadowidx34/off0x984,
+target/direct0x1b86400,4 entered/returned notifications and lastHP16. Direct
+HIF HP/TP0/0 differs from coherent DMA TP8. Validate window/wakeup/read semantics
+before blaming hardware consumption. The early return did not prove complete
+native shutdown; typed reset/full stock/Android/root/settings restoration passed.
+[Hardware evidence](../../docs/evidence/wifi-srng-v187-hardware-20261118.json).
+
+Complete hardware acceptance
 requires both CFG/HP lines before forced RDDM and complete physical stop/return/
 stock/root/original settings restoration. Raw HP/TP values are observations;
 they do not by themselves prove firmware consumption or credit delivery.
