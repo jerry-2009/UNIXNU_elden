@@ -1,0 +1,46 @@
+{
+  "scope": "CE3 first-WMI-failure observer component; full Goal incomplete",
+  "runtime_binding_sha256": "92afc065053761cd4e87415221ee7d66a03b0506e1eac207bc38e5882ce1f3c5",
+  "source_inputs": {
+    "tools/build_wifi_srng_trace.py": "1124c2f6a40433c8939bc152e736c055fe88782191553bf1c93e93146faec471",
+    "tools/test_wifi_srng_trace.py": "67bf32b95a6cc268eee4a1a8b3e750ccb1e98381a527cf22dbc1ae26a6a8befa",
+    "drivers/EldenWifi/SrngTrace.h": "c9dc8d583442d031319f7d4dc9f6b8855a01727a43eaa591f5394e50085bbb2c",
+    "drivers/EldenWifi/SrngTrace.inc": "01b43e11f7d86b9af42a975652d66007e5b5352f10051d663a78c90928c10e97",
+    "drivers/EldenWifi/peach/SrngTracePatch.py": "85bffaffe0602ae1f6c17d99875b8af072bda61095a9f9e9ddc78bf8da703bda"
+  },
+  "units": 125,
+  "rebuilt_units": 5,
+  "retained_units": 120,
+  "compiled_this_step": 2,
+  "warnings": {
+    "ath12k_hal.o": 70,
+    "ath12k_wmi.o": 632
+  },
+  "actual_observer_host_validation": {
+    "passed": true,
+    "actual_observer_helpers": true,
+    "reversible_sources": 2,
+    "hardware_mmio_and_driver_protocol_modeled": true,
+    "sanitizers": [
+      "ASan",
+      "UBSan"
+    ],
+    "observer_sha256": "01b43e11f7d86b9af42a975652d66007e5b5352f10051d663a78c90928c10e97",
+    "summary": "PASS 16 actual observer scenarios; two real HP/TP accesses, no shadow read, one-shot and bounds; max line=168",
+    "hardware_tested": false
+  },
+  "scalar": true,
+  "combined_imports_unchanged": true,
+  "only_added_definition": "elden_wifi_srng_first_wmi",
+  "register_reads": "only actual CE3 R2 HP/TP; no shadow-register read",
+  "individually_observed_counters": true,
+  "protocol_clock_credit_timeout_changed": false,
+  "full_kernel_linked": false,
+  "hardware_tested": false,
+  "jobs_terminal": true,
+  "final_builds": [
+    "host3",
+    "runtime3"
+  ],
+  "workbench_records": "edl_work/wifi-srng-v187-20261118"
+}
