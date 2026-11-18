@@ -46,3 +46,10 @@ ABI and adds marked request/capability/event/pdev records, separately capped at
 recorded. Capability decoding and receipt of an event do not prove that the
 requested hardware-mode transition succeeded. `build_wifi_mode_trace.py` and
 `decode_wifi_mode_trace.py` preserve and validate the original CE sequence.
+
+New service-kernel builds emit an artifact-bound `native-contract.json` in their
+output directory. The report binds its exact relative name, SHA256 and complete
+native artifact SHA. Packaging independently compares the actual loadable
+sections/commands/symbols to that saved identity. Legacy reports retain their
+frozen profile contract. A new build therefore needs no manual change to the
+repository's older native layout declaration.

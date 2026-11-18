@@ -2,7 +2,7 @@
 import argparse,hashlib,io,json,os,shutil,subprocess,sys,tarfile
 from pathlib import Path
 from replay_xnu_objects import global_symbols
-from link_v91_kernel import verify_original_executables
+from link_v91_kernel import verify_original_executables,native_identity
 from audit_entry_relocation import entry
 ROOT=Path(__file__).resolve().parents[1]
 def read(p):return json.loads(p.read_text())
@@ -108,6 +108,8 @@ def main():
     for name in ['tools/build_wifi_service_kernel.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py']:
         inputs[name]=sha(ROOT/name)
     if native.get('control_trace') and not core.get('owner_launch_required'):raise ValueError('Control trace requires the qualified owner rule')
+    loaded_sections,loaded_commands,loaded_symbols=native_identity(out/'native.macho')
+    write(out/'native-contract.json',dict(sections=loaded_sections,commands=loaded_commands,symbols=loaded_symbols))
     result=dict(prior);result.update(profile='wifi-ce3-flow-trace' if snapshot and snapshot.get('ce3_flow_trace') else 'wifi-pci-window-trace' if snapshot and snapshot.get('pci_window_trace') else 'wifi-srng-trace' if snapshot and snapshot.get('srng_trace') else 'wifi-credit-trace' if snapshot and snapshot.get('credit_trace') else 'wifi-wmi-snapshot' if snapshot else 'wifi-service-scan' if native.get('service_scan') else 'wifi-service-control-trace' if native.get('control_trace') else 'wifi-service-owner' if core.get('owner_launch_required') else 'wifi-service',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
         source_inputs=inputs,changed_core_objects=1,changed_native_objects=2 if snapshot else 1,added_native_objects=0,core_filelist_unchanged=False,
         core=core,service_native=native,service_assets=assets,base_report=prior,
@@ -116,6 +118,7 @@ def main():
         endpoint_generated_sources=native['generated_sources'],runtime_snapshot=snapshot,boot_packaged=False,hardware_tested=False)
     result['parent_policy_inputs']=parent_policy_inputs
     result['baseline_provider_relocation']=provider_relocation
+    result['native_identity_contract']=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=result['native_sha256'])
     result['component_objects']=dict(prior['component_objects']);result['component_objects']['Native.o']={'path':str(a.service_native/'Native.o'),'sha256':native['object_sha256']}
     if snapshot:result['component_objects']['WifiRuntimeMsiBinding.o']={'path':str(a.irq_snapshot_build/'WifiRuntimeMsiBinding.o'),'sha256':snapshot['binding_sha256']}
     write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['profile','kernel_sha256','original_apple_executables_hashed']}))

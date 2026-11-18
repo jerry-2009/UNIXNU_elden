@@ -9,6 +9,19 @@ sys.path.insert(0,str(ROOT/'drivers/EldenBluetooth'))
 sys.path.insert(0,str(ROOT/'drivers/EldenBluetooth/userland'))
 from Native17Optional import SITES
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+
+def load_native_contract(folder,report,profile,*,wifi_service=False):
+    declared=report.get('native_identity_contract')
+    if declared is None:
+        return json.loads((ROOT/'profiles'/profile/'native-contract.json').read_text())
+    if not wifi_service or set(declared)!={'path','sha256','native_sha256'} or declared['path']!='native-contract.json':
+        raise ValueError('Invalid generated native identity declaration')
+    artifact=Path(folder)/'native.macho';contract=Path(folder)/'native-contract.json'
+    if declared['native_sha256']!=report['native_sha256'] or sha(artifact)!=declared['native_sha256'] or sha(contract)!=declared['sha256']:
+        raise ValueError('Generated native identity is not bound to this artifact')
+    expected=json.loads(contract.read_text())
+    if set(expected)!={'sections','commands','symbols'}:raise ValueError('Invalid native identity fields')
+    return expected
 def qualify(report_path,entry_path,runtime):
     folder=Path(report_path).parent;r=json.loads(Path(report_path).read_text());e=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     profile=r.get('profile')
@@ -105,7 +118,7 @@ def qualify_shared_assets(report_path,entry_path,runtime,*,wifi_service=False):
         if sha(ROOT/path)!=h:raise ValueError('Diagnostic source/tool changed: '+path)
     for name in ('kernel','native'):
         if sha(folder/(name+'.macho'))!=r[name+'_sha256']:raise ValueError('Diagnostic artifact changed')
-    contract=ROOT/'profiles'/profile/'native-contract.json';expected=json.loads(contract.read_text());s,c,h=native_identity(folder/'native.macho')
+    expected=load_native_contract(folder,r,profile,wifi_service=wifi_service);s,c,h=native_identity(folder/'native.macho')
     if (s,c,h)!=(expected['sections'],expected['commands'],expected['symbols']):raise ValueError('Diagnostic loaded content differs')
     originals=json.loads((ROOT/'profiles/v91/image-build/plan.json').read_text())['prelink']['original_executable_sha256']
     verify_original_executables(folder/'kernel.macho',json.loads((folder/'kernel.json').read_text()),originals)
