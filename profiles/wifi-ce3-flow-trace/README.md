@@ -39,3 +39,10 @@ and the real recorder/formatter with ASan/UBSan. HAL/MMIO/clock are modeled.
 `tools/analysis/decode_wifi_ce3_flow.py` checks the captured sequence/summary and
 decodes signed return values. Build, hardware and network acceptance are distinct;
 this diagnostic does not itself qualify scanning or networking.
+
+The mode-metadata variant rebuilds only WMI over v189. It uses the same64-record
+ABI and adds marked request/capability/event/pdev records, separately capped at
+8capabilities/4pdevs/16event headers. No parameter values or event payloads are
+recorded. Capability decoding and receipt of an event do not prove that the
+requested hardware-mode transition succeeded. `build_wifi_mode_trace.py` and
+`decode_wifi_mode_trace.py` preserve and validate the original CE sequence.
