@@ -41,7 +41,7 @@ def main():
     p.add_argument('--ufs-queue-trial',action='store_true',help='Owned DMA multi-slot queue and QD1/8/32 comparison')
     p.add_argument('--ufs-idle-trial',action='store_true',help='Stock5000us automatic Hibern8 and qualified restore')
     p.add_argument('--data-capacity-2g',action='store_true',help='UFS idle baseline with2GiB sparse Data and the actual software KeyStore adapter')
-    p.add_argument('--data-ui-replay',action='store_true',help='Explicit2GiB software UI trial without self-IPI/CPU sampling diagnostics')
+    p.add_argument('--data-ui-replay',action='store_true',help='Explicit2GiB software UI trial without PMIC log/CPU sampling diagnostics')
     p.add_argument('--bt-address17',action='store_true',help='Wait for the actual IOKit Bluetooth address and retain discovery accounting')
     p.add_argument('--bt-discovery17',action='store_true',help='Wait for the real Bluetooth address and count native discovery delivery')
     p.add_argument('--bt-scan-roles17',action='store_true',help='Correct native17 standard/vendor scan selector roles; includes capability observation')

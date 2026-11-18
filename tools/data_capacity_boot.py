@@ -58,10 +58,14 @@ def menu(q):
         enable_ui_replay(q)
         from battery_boot import arguments
         before=tomllib.loads(text);original=before['entry'][0]['args'];values=arguments(original)
-        if values.get('armcpu-self-ipi')!='1' or values.get('ecp')!='2' or 'elden-ui-replay' in values:raise ValueError('Unexpected UI diagnostic baseline')
-        tokens=[t for t in original.split() if t.partition('=')[0] not in ('armcpu-self-ipi','ecp')]
+        if values.get('armcpu-self-ipi')!='1' or values.get('elden-power-votes')!='1' or values.get('ecp')!='2' or 'elden-ui-replay' in values:raise ValueError('Unexpected UI diagnostic baseline')
+        if any(key in values for key in ('elden-regs','elden-dc-noop','elden-ulog')):raise ValueError('Power log channel has another diagnostic consumer')
+        # Self-IPI is required by the existing early SMP admission. Preserve it.
+        # Only the separate PMIC_LOGS readback and read-only CPU observer pause;
+        # PMIC notifications, thermal/ICL/PD and charging control stay enabled.
+        tokens=[t for t in original.split() if t.partition('=')[0] not in ('elden-power-votes','ecp')]
         tokens.append('elden-ui-replay');updated=' '.join(tokens)
-        expected=dict(values);expected.pop('armcpu-self-ipi');expected.pop('ecp');expected['elden-ui-replay']='1'
+        expected=dict(values);expected.pop('elden-power-votes');expected.pop('ecp');expected['elden-ui-replay']='1'
         if arguments(updated)!=expected or len(updated.replace('@SESSION@','0'*16).encode())>1023:raise ValueError('UI diagnostic option contract changed')
         if text.count('args = "'+original+'"')!=1:raise ValueError('Ambiguous primary UI entry')
         text=text.replace('args = "'+original+'"','args = "'+updated+'"',1)

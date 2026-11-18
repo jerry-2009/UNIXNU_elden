@@ -23,7 +23,7 @@ class DataUiMenu(unittest.TestCase):
         old = tomllib.loads(menu(self.q))
         new = tomllib.loads(menu(enable_ui_replay(self.q)))
         expected = arguments(old["entry"][0]["args"])
-        expected.pop("armcpu-self-ipi")
+        expected.pop("elden-power-votes")
         expected.pop("ecp")
         expected["elden-ui-replay"] = "1"
         self.assertEqual(arguments(new["entry"][0]["args"]), expected)
@@ -31,9 +31,10 @@ class DataUiMenu(unittest.TestCase):
         restored["entry"][0]["args"] = old["entry"][0]["args"]
         self.assertEqual(restored, old)
         self.assertLessEqual(len(new["entry"][0]["args"].replace("@SESSION@", "0" * 16).encode()), 1023)
-        for name, value in {"cpus": "8", "sheng-smp": "1", "smp-hold": "600",
+        for name, value in {"cpus": "8", "sheng-smp": "1", "armcpu-self-ipi": "1", "smp-hold": "600",
                             "vdog": "3", "elden-panic-delay": "180", "elden-thermal": "3",
-                            "elden-touch": "7", "elden-charge-control": "1"}.items():
+                            "elden-touch": "7", "elden-charge-control": "1", "elden-pmic-notify": "1",
+                            "elden-usb-icl": "2", "epd": "2"}.items():
             self.assertEqual(expected[name], value)
 
     def test_wrong_or_unqualified_profiles_are_rejected(self):

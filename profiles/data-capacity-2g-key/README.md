@@ -29,10 +29,12 @@ source closure, altered inherited build reports, seed reports and artifacts.
 
 Add `--data-ui-replay` for a bounded software swipe/Settings validation window.
 It preserves all physical input, eight-core/SMP, thermal, PD and recovery options;
-only the startup self-IPI test and read-only CPU sampling are paused to fit the
+only the separate PMIC_LOGS vote readback and read-only CPU sampling are paused to fit the
 original1023-byte argument limit. The normal2GiB profile stays unchanged. This
 enables requests, not automatic or fabricated user interaction. Actual menu
 semantics/fallback/budget checks are in `tools/test_data_ui_menu.py`.
+The SMP-required self-IPI flag remains enabled. v185 mistakenly omitted it and
+was correctly refused before UFS, then restored stock; it is withdrawn.
 
 v184's staged source is a pure Git archive of11fce16; all30 code-input byte hashes
 match that commit. v183's snapshot contained a CRLF working copy of one old

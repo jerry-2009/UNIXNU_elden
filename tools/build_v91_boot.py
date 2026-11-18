@@ -37,7 +37,7 @@ def main():
     p.add_argument('--data-report',type=Path,help='Source-built Data seed filesystem/manifest verification')
     p.add_argument('--expanded-data',action='store_true',help='Require the separately qualified2GiB native Data profile')
     p.add_argument('--keep-packed-data',action='store_true',help='Use the existing DarwinBoot PackedRAMDisk handoff, as Sheng does')
-    p.add_argument('--data-ui-replay',action='store_true',help='Qualified2GiB UI trial; replace self-IPI/CPU diagnostics with explicit software replay')
+    p.add_argument('--data-ui-replay',action='store_true',help='Qualified2GiB UI trial; pause PMIC log/CPU sampling, retain SMP self-IPI admission')
     p.add_argument('--fbwc-report',type=Path,help='Explicit qualified v93 framebuffer build; adds only the bare fbwc option')
     p.add_argument('--battery-ui',action='store_true',help='Restore qualified battery UI; compact existing numeric-one flags without dropping options')
     p.add_argument('--wcn-report',type=Path)
