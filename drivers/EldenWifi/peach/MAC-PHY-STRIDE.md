@@ -44,8 +44,9 @@ Full integration uses `build_wifi_net17_kernel.py --mac-phy-runtime
 out/stride-runtime`. The explicit profile qualifier checks the real binding
 against the retained parent, its source hashes and one-unit scope. Together
 with the network startup-order fix, the signed candidate is c9c33f92…,
-session5e076ea0aa1dd9cf, floor1738713600/footer0/parent3. Hardware remains
-unverified until a corresponding live record exists.
+session5e076ea0aa1dd9cf, floor1738713600/footer0/parent3. The live trial ran this object and preserved station4 publication and full
+stock restoration, but still saw30 WMI timeouts/BSS0. It does not establish this
+defect as the hardware failure cause.
 
 See [component evidence](../../../docs/evidence/wifi-station-stride-20261120.json).
 This does not establish that the observed firmware TLVs were short. Keep the

@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 STATION+STRIDE HARDWARE: networkstart0 at real station4/MAC
+match confirmed. New full-stride WMI ran, still30timeouts/BSS0; no claimed root
+cause/scan/association/DHCP/traffic. Netdrain0, callbackreturned/unbind0/config0,
+real DMAfence/MSI4/IRQactive0/PERSTlow/WCNstop, typed sync/physical fastboot/full
+stock8b8e72da/Android/root/green/original charge+radios+scans/sleep restored.
+Radio restoration4attempts/2startup errors retained. Capture285911B/dropmax14,
+no reconnect/discontinuity; post-disconnect unavailable. Imagec9c33f92/session
+5e076ea0aa1dd9cf/floor1738713600/0/3. All jobs terminal, stockcurrent. Keep
+memory-safety/start-order repairs; next true WMI completion path, no repeated
+interface/start-order/firmware-hash probe. Full Goal active/incomplete.
+
 Latest20261120 STATION+STRIDE signed: reviewed Sheng08cde20e real netDone
 stage4 gate; old net17 boot publishedstage2 too early. Now actual station4+
 channels+MAC snapshot required. Host59bridge cases pass. Exact-board Linux
