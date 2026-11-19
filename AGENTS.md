@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 OEM UMAC WAKE signed: loaded TB322FC module33869cd6 proves
+MHI reference plus0x3004 request and1e04040==2 handshake, missing in current
+Linux path. Explicit same-owner compiled pair,<=50ms checks/failed clear+put;
+retains CE/WMI/IRQ/FW/timeouts/124objects/stride/physical return.37actual helper
+ASan/UBSan models,17qualification mutations and native/fullkernel/Apple30/
+entry7124/package1 audit pass; PCI120/native1 inherited warnings. Image21b9231b/
+sessionb86eb5d73f05fd7b/floor1738713600/0/3 NOT hardware-tested. One bounded
+handshake/CE3/scan trial next; no Wi-Fi success. Normal no-hold stays baseline,
+all build jobs terminal, device stock/root/green. Full Goal active/incomplete.
+
 Latest20261120 MHI LEASE HARDWARE: real get0/held1 and put1/held0 captured,
 station4/netstart0/drain0 and full fence/MSI4/PERSTlow/WCNstop/typed sync/physical
 fastboot/fullstock8b8e72da/Android/root/green/original charge+radios+scans/sleep

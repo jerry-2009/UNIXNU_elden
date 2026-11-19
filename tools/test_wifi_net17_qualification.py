@@ -33,6 +33,21 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated MHI lease accepted: '+name)
+    if report.get('umac_hold_trial'):
+        for name in ('reversible','pair','scope','import','request','status','ready','bound','both'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='reversible':runtime['umac_delta_reversible']=False
+            elif name=='pair':selected['network_worker']['umac_hold_trial']=False
+            elif name=='scope':runtime['changed_units']=['ath12k_wmi.o','ath12k_ce.o']
+            elif name=='import':runtime['added_native_import']='_other_hold'
+            elif name=='request':runtime['umac_request_offset']=0x3008
+            elif name=='status':runtime['umac_status_offset']=0x4040
+            elif name=='ready':runtime['umac_ready_value']=1
+            elif name=='bound':runtime['umac_polling_bound_ms']=500
+            else:selected['mhi_hold_trial']=True
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated OEM UMAC wake accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,
@@ -44,6 +59,11 @@ def main():
         import tomllib
         if tomllib.loads(menu(held))['entry'][0]['args']!=tomllib.loads(menu(q))['entry'][0]['args']:
             raise AssertionError('MHI lease changed inherited boot arguments')
+    if report.get('umac_hold_trial'):
+        held=dict(q,umac_hold_trial=True)
+        import tomllib
+        if tomllib.loads(menu(held))['entry'][0]['args']!=tomllib.loads(menu(q))['entry'][0]['args']:
+            raise AssertionError('UMAC trial changed inherited boot arguments')
     text=menu(q)
     import tomllib
     config=tomllib.loads(text)

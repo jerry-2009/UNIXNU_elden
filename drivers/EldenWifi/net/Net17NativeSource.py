@@ -5,7 +5,9 @@ import importlib.util
 ROOT=Path(__file__).resolve().parents[3]
 
 
-def generated(mhi_hold=False):
+def generated(mhi_hold=False, umac_hold=False):
+    if mhi_hold and umac_hold:
+        raise ValueError('Select only one explicit wake trial')
     spec=importlib.util.spec_from_file_location('net17_service_scan',ROOT/'drivers/EldenWifi/ServiceScanSource.py')
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);files=module.generated()
     def replace(text,old,new):
@@ -68,6 +70,18 @@ extern "C" int elden_wifi_mhi_hold_requested(void){
        c->runtime_returned||c->transport_cleanup||ml_at_interrupt_context())return 0;
     // This helper exists only in the explicit --mhi-hold build. The inherited
     // runtime admission already selects the real owned ewt=1 experiment.
+    PE_parse_boot_argn("ewt",&option,sizeof option);
+    return option==1;
+}
+'''
+        files['NativeExports.inc']=text.encode()
+    if umac_hold:
+        text=files['NativeExports.inc'].decode()+'''
+extern "C" int elden_wifi_umac_hold_requested(void){
+    Context *c=runtime_context;uint32_t option=0;
+    if(!c||__atomic_load_n(&stop_requested,__ATOMIC_ACQUIRE)||!c->runtime_entered||!c->runtime_prepared||
+       c->runtime_returned||c->transport_cleanup||ml_at_interrupt_context())return 0;
+    // This helper exists only in the qualified OEM UMAC-wake trial.
     PE_parse_boot_argn("ewt",&option,sizeof option);
     return option==1;
 }

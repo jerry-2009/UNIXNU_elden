@@ -24,8 +24,11 @@ def qualify_components(report):
     from Net17NativeSource import generated
     net=report['network_bridge'];worker=report['network_worker']
     hold=report.get('mhi_hold_trial') is True
+    umac=report.get('umac_hold_trial') is True
+    if hold and umac:raise ValueError('Mutually exclusive wake trials')
     if hold!=bool(worker.get('mhi_hold_trial')) or hold!=bool(stride and stride.get('mhi_hold_trial')):raise ValueError('MHI wake pair mismatch')
-    if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold).items()}:
+    if umac!=bool(worker.get('umac_hold_trial')) or umac!=bool(stride and stride.get('umac_hold_trial')):raise ValueError('UMAC wake pair mismatch')
+    if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac).items()}:
         raise ValueError('Network bridge source differs')
     if not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes'] or not net['late_initializer_owned'] or not net['other_sections_preserved']:
         raise ValueError('Network lifecycle/late initializer not qualified')
@@ -33,10 +36,12 @@ def qualify_components(report):
         if sha(ROOT/name)!=digest:raise ValueError('Network input changed: '+name)
     components=report['component_objects']
     if stride:
-        if stride.get('mac_phy_stride_fix') is not True or (not hold and (stride.get('imports_exports_unchanged') is not True or stride.get('other_ce_mhi_pci_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o'])) or stride['base_binding_sha256']!=parent['component_objects']['WifiRuntimeMsiBinding.o']['sha256']:
+        if stride.get('mac_phy_stride_fix') is not True or (not (hold or umac) and (stride.get('imports_exports_unchanged') is not True or stride.get('other_ce_mhi_pci_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o'])) or stride['base_binding_sha256']!=parent['component_objects']['WifiRuntimeMsiBinding.o']['sha256']:
             raise ValueError('Wrong MAC/PHY-only runtime repair')
         if hold and (stride.get('lease_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('other_ce_mhi_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_mhi_hold_requested'):
             raise ValueError('Wrong bounded MHI wake lease')
+        if umac and (stride.get('umac_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('other_ce_mhi_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_umac_hold_requested' or stride.get('mhi_reference_and_umac_handshake') is not True or (stride.get('umac_request_offset'),stride.get('umac_status_offset'),stride.get('umac_ready_value'),stride.get('umac_polling_bound_ms'))!=(0x3004,0x1e04040,2,50)):
+            raise ValueError('Wrong exact OEM UMAC wake contract')
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -61,6 +66,7 @@ def qualify(report_path,entry_path,runtime):
         firmware_qdss_config=True,runtime_owned_cleanup=True,runtime_platform_shutdown=True,runtime_platform_budget=True,
         platform_physical_fence=True,network_bridge=True)
     result['mhi_hold_trial']=report.get('mhi_hold_trial') is True
+    result['umac_hold_trial']=report.get('umac_hold_trial') is True
     return result
 
 
@@ -78,4 +84,12 @@ def menu(qualification):
         # The opt-in is the compiled/qualified runtime-worker pair, not a
         # further command-line flag. Keep all1023 inherited argument bytes.
         text=text.replace('Wi-Fi iOS17 network bridge + USB - TEST','Wi-Fi MHI wake lease + USB - TEST',1)
+    if qualification.get('umac_hold_trial'):
+        if qualification.get('mhi_hold_trial'):raise ValueError('Mutually exclusive wake trials')
+        import tomllib
+        from battery_boot import arguments
+        first=tomllib.loads(text)['entry'][0]['args']
+        if arguments(first).get('ewt')!='1' or len(first.replace('@SESSION@','0'*16).encode())>1023:
+            raise ValueError('UMAC wake requires the inherited owned runtime intent')
+        text=text.replace('Wi-Fi iOS17 network bridge + USB - TEST','Wi-Fi OEM UMAC wake + USB - TEST',1)
     return text

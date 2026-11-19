@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+2026-11-20原厂模块确认独立UMAC握手：实际MHI引用后写0x3004，读取1e04040必须为2。
+新显式候选37项helper模型、17资格反例、原生/整核/入口/签包通过；候选21b9231b，
+sessionb86eb5d73f05fd7b，floor1738713600/0/3。未实机，下一轮一次核握手与CE3推进。
+[机制与复现](../drivers/EldenWifi/UMAC-WAKE.md)／[证据](evidence/wifi-umac-wake-20261120.json)。
+Wi-Fi未联网，完整Goal仍active。
+
 2026-11-20唤醒引用实测：真实get0/held1与put1/held0通过，但仍30次WMI超时，CE3
 依旧sw2/write4/hp16/tp8、BSS0。这个对照未消除阻塞，不重复或提升为默认；也不能据此
 排除所有MHI电源问题。站点4发布、net drain0及完整真实DMA fence／MSI／PERST／stock/
