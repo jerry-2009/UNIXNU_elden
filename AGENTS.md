@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 CE3 INSPECT HARDWARE: both pending28B buffers have exact
+descriptor/arena/CPU-PAR44/backing-PA and fixed headers, no SMMUfault. This is
+not hardware SMMU/device-read proof. At first PDEV failure actual R0 base/size/
+ID/MSI0, MISC80idle-disabled, R2HP/TP0 while software16/DMA8. Loss stage/read
+path unknown. Full put/netdrain/fence/MSI/PERST/stock/root/green/settings restore
+pass, capture287043B/6c897aff/drop0/no reconnect, post-disconnect unknown.
+NEXT passive startup timeline signed:14host/37qualifier/2C/123retained/native
+worker retained/fullkernel/Apple30/entry7124/package1; Core157/WMI632 warnings.
+Image8de0c7d2/session5da802cc8c1de368/floor1738713600/0/3 NOT hardware-tested. No guessed
+ring reinstall/mode-response patch. Full Goal active/incomplete, stockcurrent.
+
 Latest20261120 CE3 INSPECT signed: exact firstEAGAIN18R0/R2 reads,<=4
 retained descriptors/fixedHTC-WMI-TLV headers and actual native owner/arena/
 SMMU status/CPU-PAR44/physical backing check. CPU mapping is not hardware

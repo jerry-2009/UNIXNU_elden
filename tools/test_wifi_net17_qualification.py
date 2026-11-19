@@ -86,6 +86,18 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated CE3 inspection accepted: '+name)
+    if report.get('ce3_timeline_trial'):
+        for name in ('reversible','events','reads','exports','scope','report'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='reversible':runtime['timeline_delta_reversible']=False
+            elif name=='events':runtime['timeline_events_max']=100
+            elif name=='reads':runtime['timeline_reads_per_event']=100
+            elif name=='exports':runtime['runtime_added_exports']=['_unexpected']
+            elif name=='scope':runtime['changed_units']=['ath12k_wmi.o','ath12k_pci.o']
+            else:selected['ce3_timeline_trial']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated CE3 timeline accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

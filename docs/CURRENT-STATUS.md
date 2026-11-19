@@ -1,5 +1,11 @@
 # 当前状态 · 2026-11-18
 
+2026-11-20实机首次CE3证据已齐：两个28B缓冲地址/CPU映射/物理对应及固定协议头通过，
+而硬件R0基址/大小/MSI已零、MISC80，软件HP16/DMA TP8。尚不确定何时丢失或读取路径异常。
+[实录](evidence/wifi-ce3-inspect-hardware-20261120.json)。下一份只读启动边界时间线已签，
+14helper/37资格反例/整核通过；[复现](../drivers/EldenWifi/CE3-START-TIMELINE.md)。
+完整回程stock恢复通过；Wi-Fi未联网，Goal active。
+
 2026-11-20首次CE3合并证据版已签：只读18个寄存器/最多4个描述符/固定协议头，
 原生核对真实owner、arena、SMMU状态、CPU PAR和物理对应；不把CPU映射当成设备DMA证明。
 27实际函数模型/31资格反例/整核/签包通过；候选32e4a34d，session69c7185df67b4674，

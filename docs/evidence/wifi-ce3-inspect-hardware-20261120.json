@@ -1,0 +1,100 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "ce3_inspect_trial": true,
+  "hardware_tested": true,
+  "image_sha256": "32e4a34d65dd674fbe2313114326b7073f9422ba73799c7b380236b758c42f99",
+  "session": "69c7185df67b4674",
+  "raw": {
+    "path": "edl_work\\live-ce3-inspect-20261120\\usb\\20261119-225319.bin",
+    "bytes": 287043,
+    "sha256": "6c897affbb1606e9bd71ce85d0a1343572e661c574f39fbd083af173ea2a30ee",
+    "status_samples": 65,
+    "drop_max": 23,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "key_lines": [
+    "ELDEN_ATH12K level=4 ELDEN_UMAC_WAKE get=0 held=1 before=2 after=2 checks=1",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_INSPECT command=4003 sw=2 write=4 hp=16 dma=8/8 flags=20000",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=0/4/8 val=0/0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=c/10/1c val=0/80/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=20/30/34 val=0/0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=38/3c/40 val=0/0/3",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=44/48/50 val=0/0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=400/404/4c val=0/0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_DESC slot=2 words=128c0820/1c0000/2/0 match=1 len=28",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_MAP slot=2 rc=0 bus=128c0820 pa=8ee2c0820 want=8ee2c0820 par=44000008ee2c0b00/44000008ee2c0b00 live=3568 fault=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_HDR slot=2 htc=140102 ctrl=200 command=4003 tlv=52000c",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_DESC slot=3 words=128c0920/1c0000/2/0 match=1 len=28",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_MAP slot=3 rc=0 bus=128c0920 pa=8ee2c0920 want=8ee2c0920 par=44000008ee2c0b00/44000008ee2c0b00 live=3568 fault=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_HDR slot=3 htc=140102 ctrl=300 command=4003 tlv=52000c",
+    "ELDEN_WIFI_NET drain=0",
+    "ELDEN_ATH12K level=4 ELDEN_UMAC_WAKE put=1 held=0",
+    "ELDEN_WIFI_FENCE result=0 stage=6 master-off=1 transactions-sampled=1 idle=1 command=2 device-status=10 msi=4 perst=pending consumer=0",
+    "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+    "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+  ],
+  "descriptors": {
+    "slots": [
+      2,
+      3
+    ],
+    "lengths": [
+      28,
+      28
+    ],
+    "address_equal_to_skb": true,
+    "arena_and_cpu_mapping_checks": [
+      0,
+      0
+    ],
+    "cpu_attributes": "0x44 read and write",
+    "physical_backing_matches": true,
+    "hardware_smmu_or_device_read_proven": false,
+    "htc_headers": "0x140102/seq2,3",
+    "wmi_command": "0x4003",
+    "tlv_header": "0x52000c"
+  },
+  "observed_registers": {
+    "base": 0,
+    "size": 0,
+    "id": 0,
+    "misc": "0x80 idle and disabled",
+    "remote_tail": 0,
+    "msi_address": 0,
+    "direct_hp": 0,
+    "direct_tp": 0,
+    "dma_tp": 8,
+    "software_hp": 16
+  },
+  "stage_of_cleared_configuration_proven": false,
+  "firmware_reset_cause_proven": false,
+  "first_timeout_command": "16387",
+  "bss": 0,
+  "scan_accepted": false,
+  "association": false,
+  "dhcp": false,
+  "traffic": false,
+  "physical_fence_return_proven": true,
+  "umac_release_proven": true,
+  "stock_restore_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_original_settings_restored": true,
+  "radio_restoration": {
+    "complete": true,
+    "attempts": 2,
+    "errors": [],
+    "actual_radios": [
+      "1",
+      "1"
+    ],
+    "actual_scans": [
+      "1",
+      "1"
+    ]
+  },
+  "device_jobs_terminal": true,
+  "next": "Locate exactly when CE3 hardware config becomes zero across CE init/DP init/WMI ready/mode/first PDEV; no guessed reinitialization.",
+  "goal": "active and incomplete"
+}

@@ -56,3 +56,12 @@ no scanning, association, DHCP or traffic acceptance yet.
 [Evidence](../../docs/evidence/wifi-ce3-inspect-20261120.json).
 Mac`lab/wifi-ce3-inspect-20261120/{host3,runtime2,worker1,kernel1,entry1,package1}`;
 workbench`edl_work/wifi-ce3-inspect-20261120`.
+
+## Hardware result
+
+Both pending28-byte descriptors/buffers passed native arena/CPU mapping/backing
+checks and fixed protocol headers. Actual CE3 R0 config words and R2HP/TP
+read0, MISC80 idle-disabled, software HP16/DMA TP8. Device reads and the
+configuration-loss stage are unproved. Put/net drain/physical DMA/MSI/PERST
+fence and full stock restoration passed.
+[Hardware record](../../docs/evidence/wifi-ce3-inspect-hardware-20261120.json).
