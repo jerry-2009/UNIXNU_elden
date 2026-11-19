@@ -103,6 +103,13 @@ static void trafficLog(void){
     text=text[:start]+'''  log(6,"wifi-net: en0 attached; original factory identity supplied; capabilities 0x%x",ifnet_capabilities_enabled(ifp));
   return 0;'''+text[end:]
     text+='''
+extern "C" int elden_wifi_net_station_ready(uint8_t mac[6]){
+  if(!mac)return EINVAL;memset(mac,0,6);
+  nw_wifi_status state={};nw_wifi_status_get(&state);
+  if(nw_wifi_stats.stage<4||!state.channels)return EAGAIN;
+  if(state.mac[0]&1||!(state.mac[0]|state.mac[1]|state.mac[2]|state.mac[3]|state.mac[4]|state.mac[5]))return EINVAL;
+  memcpy(mac,state.mac,6);return 0;
+}
 extern "C" void elden_wifi_net_stop_begin(void){
   __atomic_store_n(&gStopping,1u,__ATOMIC_RELEASE);
   // Retain callbacks/services/interface storage until reset. Do not claim an

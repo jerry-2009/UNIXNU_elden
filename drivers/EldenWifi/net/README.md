@@ -1,5 +1,13 @@
 # Elden iOS17 network bridge
 
+2026-11-20 startup correction: publish only after Linux stage4 and a real
+station snapshot with channels and the qualified factory MAC. The initial
+network trial published at stage2; it proves interface wiring, not a mature
+startup order. The correction follows Sheng's actual `netDone` gate and adds
+five host readiness checks. The companion upstream
+[MAC/PHY stride fix](../peach/MAC-PHY-STRIDE.md) is explicitly qualified in
+the same candidate. Hardware effectiveness remains pending.
+
 This is the BSD/IOKit part of Wi-Fi: real en0, Apple80211 requests, station
 events, Ethernet packets and BPF for DHCP. It consumes the existing Ath12kWifi
 station API. It does not replace the WLAN/PCIe/SMMU/MSI/CE/WMI/firmware layers.

@@ -15,7 +15,7 @@ def main():
         if name=='profile':selected['profile']='wifi-ce3-flow-trace'
         elif name=='parent':selected['retained_parent_kernel_sha256']='0'*64
         elif name=='core':selected['core']={}
-        elif name=='hardware':selected['ce_wmi_firmware_objects_unchanged']=False
+        elif name=='hardware':selected['ce_wmi_firmware_objects_unchanged']=not report['ce_wmi_firmware_objects_unchanged']
         elif name=='worker':selected['network_worker']['generated_sources']['MhiRuntime.inc']='0'*64
         elif name=='net':selected['network_bridge']['source_sha256']='0'*64
         elif name=='object':selected['component_objects']['EldenWifiNet17.late.o']['sha256']='0'*64

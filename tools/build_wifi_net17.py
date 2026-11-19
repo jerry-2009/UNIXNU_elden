@@ -82,7 +82,7 @@ def main():
     assert all(after[name]==value for name,value in before.items() if not name.endswith('/__mod_init_func'))
     symbols=global_symbols(obj);definitions={name for name,row in symbols.items() if row[0]&0x0e}
     imports={name for name,row in symbols.items() if not row[0]&0x0e}
-    own={'_elden_wifi_net_start','_elden_wifi_net_stop_begin','_elden_wifi_net_drain','_elden_wifi_net_pump','_elden_wifi_net_static_init'}
+    own={'_elden_wifi_net_start','_elden_wifi_net_station_ready','_elden_wifi_net_stop_begin','_elden_wifi_net_drain','_elden_wifi_net_pump','_elden_wifi_net_static_init'}
     assert own<=definitions
     runtime={'_elden_wifi_net_admit','_native_wifi_logf','_sheng_wifi_wake'}
     available={name for name,row in global_symbols(args.reference_kernel).items() if row[0]&0x0e}|runtime

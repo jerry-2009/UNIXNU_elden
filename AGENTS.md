@@ -1,5 +1,18 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 STATION+STRIDE signed: reviewed Sheng08cde20e real netDone
+stage4 gate; old net17 boot publishedstage2 too early. Now actual station4+
+channels+MAC snapshot required. Host59bridge cases pass. Exact-board Linux
+26f8f87f/upstream4c6eb712 full MAC-PHY element allocation repair ports to plain
+WMI, old/new70actual callback cases pass; stride236. Target short-TLV length
+NOT observed, no hardware corruption/root-cause claim. Runtime1WMI/124retained,
+632inherited warnings; bridge0/worker1oldshadow, fullkernel/8qualifier mutations/
+entry/package/audit pass. Imagec9c33f92/session5e076ea0aa1dd9cf/floor1738713600/0/3.
+NOT hardware-tested yet; prior net17 fully restoredstock. Next one combined
+functional trial; no guessed credits/clocks/pdev and no interrupted response
+candidate reused. docs/evidence/wifi-station-stride and MAC-PHY-STRIDE.md current.
+All build jobs terminal; Goal/Wi-Fi/charging/persistence/peripherals incomplete.
+
 Latest20261119 NET17 HARDWARE: en0 published, real IONetworkStack opened and
 Apple80211 requests received; networkstart0/drain0. Existing30WMI16387 timeouts,
 scan0/BSS0; association/DHCP/traffic unaccepted. Same six stock firmware hashes

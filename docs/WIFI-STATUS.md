@@ -1,5 +1,12 @@
 # Wi-Fi：固件与服务已接通，WMI完成仍待修复
 
+2026-11-20合并修复候选：网络桥按Sheng实际stage4和真实站点快照启动，纠正先前stage2
+提前发布；桥59项模型通过。四代Linux已有的MAC/PHY全结构体分配步长修复已移植，
+70个实际旧新callback场景通过；尚未观测本机短TLV，不能断言它导致WMI阻塞。
+一个WMI对象＋124保留、两原生组件、full kernel与签包通过，632／1既有警告保留。
+候选c9c33f92、session5e076ea0aa1dd9cf、floor1738713600／0／3，未上机。
+[证据与下一轮](evidence/wifi-station-stride-20261120.json)。完整Goal active，继续集中Wi-Fi。
+
 2026-11-19网络桥实机通过：en0发布、IONetworkStack被系统打开、Apple80211请求到达；
 回程net drain0及真实DMA fence／MSI4／PERST低／WLAN停止通过，完整恢复stock Android/root/
 green/原充电／无线／扫描设置并熄屏。捕获282598B、64状态样本、drop最大0、无重连，断开

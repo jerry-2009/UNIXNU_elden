@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 int elden_wifi_net_start(const uint8_t mac[6]);
+/* Read only the real station snapshot; stage4 and valid MAC/channels required.
+ * Returns not-ready before Linux has published its actual station interface. */
+int elden_wifi_net_station_ready(uint8_t mac[6]);
 void elden_wifi_net_stop_begin(void);
 /* Returns busy until every accepted callback returns. Does not unload or
  * reclaim retained ifnet/services; the bounded platform reset owns them. */

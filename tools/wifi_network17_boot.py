@@ -14,7 +14,8 @@ def qualify_components(report):
         raise ValueError('Wrong network bridge baseline')
     if report['retained_parent_kernel_sha256']!=PARENT_KERNEL or report['retained_parent_native_sha256']!=parent['native_sha256']:
         raise ValueError('Wrong retained native baseline')
-    if report.get('ce_wmi_firmware_objects_unchanged') is not True or report.get('core_filelist_unchanged') is not True or (report['changed_core_objects'],report['changed_native_objects'],report['added_native_objects'])!=(0,1,1):
+    stride=report.get('mac_phy_stride_runtime')
+    if report.get('ce_wmi_firmware_objects_unchanged') is not (not bool(stride)) or report.get('core_filelist_unchanged') is not True or (report['changed_core_objects'],report['changed_native_objects'],report['added_native_objects'])!=(0,2 if stride else 1,1):
         raise ValueError('Wrong network-only composition')
     for name in ('core','service_assets','optional_runtime','service_native','runtime_snapshot'):
         if report.get(name)!=parent.get(name):raise ValueError('Retained service changed: '+name)
@@ -29,11 +30,19 @@ def qualify_components(report):
     for name,digest in {**net['source_inputs'],**worker['source_inputs']}.items():
         if sha(ROOT/name)!=digest:raise ValueError('Network input changed: '+name)
     components=report['component_objects']
+    if stride:
+        if stride.get('mac_phy_stride_fix') is not True or stride.get('imports_exports_unchanged') is not True or stride.get('other_ce_mhi_pci_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o'] or stride['base_binding_sha256']!=parent['component_objects']['WifiRuntimeMsiBinding.o']['sha256']:
+            raise ValueError('Wrong MAC/PHY-only runtime repair')
+        runtime=components['WifiRuntimeMsiBinding.o']
+        if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
+            raise ValueError('MAC/PHY runtime object differs')
+        for name,digest in stride['source_inputs'].items():
+            if sha(ROOT/name)!=digest:raise ValueError('MAC/PHY input changed')
     for name,proof in [('Native.o',worker),('EldenWifiNet17.late.o',net)]:
         if components[name]['sha256']!=proof['object_sha256'] or sha(Path(components[name]['path']))!=proof['object_sha256']:
             raise ValueError('Network component object differs')
     for name,component in parent['component_objects'].items():
-        if name!='Native.o' and components[name]!=component:raise ValueError('Retained hardware component changed')
+        if name!='Native.o' and not (stride and name=='WifiRuntimeMsiBinding.o') and components[name]!=component:raise ValueError('Retained hardware component changed')
 
 
 def qualify(report_path,entry_path,runtime):

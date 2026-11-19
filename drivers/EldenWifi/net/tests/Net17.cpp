@@ -19,6 +19,7 @@ static const nw_wifi_events *events;
 static std::string key_sent,ssid_sent;
 static std::vector<nw_bss_info> bsses;
 extern "C" {
+struct nw_wifi_stats nw_wifi_stats={};
 int elden_wifi_net_admit(void){return admitted;}
 void native_wifi_logf(int,const char *format,...){char text[256];va_list args;va_start(args,format);vsnprintf(text,sizeof text,format,args);va_end(args);}
 void sheng_wifi_wake(void){wakes++;}
@@ -47,6 +48,11 @@ static int request(bool set,int type,void *bytes,uint32_t length,int32_t *value=
 
 int main(){
     const uint8_t mac[6]={0x02,1,2,3,4,5};
+    uint8_t station[6]={};CHECK(elden_wifi_net_station_ready(nullptr)==EINVAL);
+    CHECK(elden_wifi_net_station_ready(station)==EAGAIN);
+    nw_wifi_stats.stage=4;CHECK(elden_wifi_net_station_ready(station)==EAGAIN);
+    status.channels=1;CHECK(elden_wifi_net_station_ready(station)==EINVAL);
+    memcpy(status.mac,mac,6);CHECK(!elden_wifi_net_station_ready(station)&&!memcmp(station,mac,6));
     CHECK(elden_wifi_net_start(nullptr)==EINVAL);
     uint8_t bad[6]={1,0,0,0,0,0};CHECK(elden_wifi_net_start(bad)==EINVAL);
     admitted=-108;CHECK(elden_wifi_net_start(mac)==-108);admitted=0;

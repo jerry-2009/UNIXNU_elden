@@ -17,18 +17,21 @@ def generated():
     text=files['MhiRuntime.inc'].decode()
     marker='    log("\\nELDEN_WIFI_RUNTIME start=%d linux-stage=%u master=%u command=%x\\n",rc,nw_wifi_stats.stage,(unsigned)c->config.master_attempted,c->config.command);'
     text=replace(text,marker,marker+'''
-    bool network_started=false;
-    if(!rc){
-        void *handle=OSMetaClass::preModLoad(g_kernel_kmod_info.name);
-        int network_error=-12;
-        if(handle){elden_wifi_net_static_init();network_error=OSMetaClass::postModLoad(handle);}
-        if(!network_error)network_error=elden_wifi_net_start(elden_wifi_factory_mac_address);
-        network_started=!network_error;
-        log("\\nELDEN_WIFI_NET start=%d\\n",network_error);
-        if(network_error)rc=network_error;
-    }''')
+    bool network_started=false;''')
     text=replace(text,'        int busy=nw_wifi_step();c->runtime_rounds++;',
-        '        int busy=nw_wifi_step();c->runtime_rounds++;\n        if(network_started)elden_wifi_net_pump(runtime_ms());')
+        '''        int busy=nw_wifi_step();c->runtime_rounds++;
+        if(!network_started&&nw_wifi_stats.stage>=4){
+            uint8_t station_mac[6]={};int network_error=elden_wifi_net_station_ready(station_mac);
+            if(!network_error&&memcmp(station_mac,elden_wifi_factory_mac_address,6))network_error=-71;
+            void *handle=nullptr;
+            if(!network_error){handle=OSMetaClass::preModLoad(g_kernel_kmod_info.name);if(!handle)network_error=-12;}
+            if(handle){elden_wifi_net_static_init();network_error=OSMetaClass::postModLoad(handle);}
+            if(!network_error)network_error=elden_wifi_net_start(station_mac);
+            network_started=!network_error;
+            log("\\nELDEN_WIFI_NET start=%d station-stage=%u\\n",network_error,nw_wifi_stats.stage);
+            if(network_error){rc=network_error;break;}
+        }
+        if(network_started)elden_wifi_net_pump(runtime_ms());''')
     marker='    c->runtime_stage=4;c->transport_cleanup=true;c->transport_ready=false;control_stop_begin();'
     text=replace(text,marker,'''    elden_wifi_net_stop_begin();
     int net_drained=-16;

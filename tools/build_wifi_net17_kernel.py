@@ -23,8 +23,18 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('parent-build','worker-build','net-build','clean-build','original-kernelcache','output'):
         parser.add_argument('--'+name,type=Path,required=True)
+    parser.add_argument('--mac-phy-runtime',type=Path,help='Explicit qualified full-stride WMI allocation repair')
     args=parser.parse_args();parent=args.parent_build.resolve();out=args.output.resolve()
     prior=read(parent/'result.json');worker=read(args.worker_build/'result.json');net=read(args.net_build/'result.json')
+    stride=read(args.mac_phy_runtime/'result.json') if args.mac_phy_runtime else None
+    if stride:
+        base_runtime=prior['component_objects']['WifiRuntimeMsiBinding.o']
+        if not stride['compiled'] or stride.get('mac_phy_stride_fix') is not True or stride['base_binding_sha256']!=base_runtime['sha256'] or not stride['imports_exports_unchanged'] or stride['changed_units']!=['ath12k_wmi.o']:
+            raise ValueError('Unqualified MAC/PHY stride runtime')
+        if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
+            raise ValueError('MAC/PHY stride runtime artifact changed')
+        for name,digest in stride['source_inputs'].items():
+            if sha(ROOT/name)!=digest:raise ValueError('MAC/PHY stride source changed')
     if prior['profile']!='wifi-service-scan' or not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes']:
         raise ValueError('Use the retained service scan and physical-fence baseline')
     for name in ('native','kernel'):
@@ -50,7 +60,7 @@ def main():
     retained={};members={}
     for name in names:
         old=subprocess.check_output(['ar','p',oldar,name]);retained[name]=hashlib.sha256(old).hexdigest()
-        data=(args.worker_build/'Native.o').read_bytes() if name=='Native.o' else old
+        data=(args.worker_build/'Native.o').read_bytes() if name=='Native.o' else (args.mac_phy_runtime/'WifiRuntimeMsiBinding.o').read_bytes() if stride and name=='WifiRuntimeMsiBinding.o' else old
         (folder/name).write_bytes(data);members[name]=hashlib.sha256(data).hexdigest()
     name='EldenWifiNet17.late.o';data=(args.net_build/name).read_bytes();(folder/name).write_bytes(data)
     names.append(name);members[name]=hashlib.sha256(data).hexdigest()
@@ -91,6 +101,7 @@ def main():
     if before[1]-before[0]!=after[1]-after[0] or after[1]-after[0]!=7124:raise ValueError('Entry branch contract changed')
     s,c,h=native_identity(out/'native.macho');write(out/'native-contract.json',dict(sections=s,commands=c,symbols=h))
     own={**net['source_inputs'],**worker['source_inputs'],'tools/build_wifi_net17_kernel.py':sha(Path(__file__))}
+    if stride:own.update(stride['source_inputs'])
     policy=['tools/wifi_network17_boot.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py',
             'tools/build_charge_verification.py','tools/build_wifi_service_native.py','tools/build_wifi_service_kernel.py']
     changed_policy={name:dict(parent_sha256=prior['source_inputs'].get(name),current_sha256=sha(ROOT/name)) for name in policy}
@@ -105,16 +116,18 @@ def main():
     shutil.copytree(parent/'runtime',out/'runtime')
     components=dict(prior['component_objects']);components['Native.o']=dict(path=str(args.worker_build/'Native.o'),sha256=worker['object_sha256'])
     components['EldenWifiNet17.late.o']=dict(path=str(args.net_build/'EldenWifiNet17.late.o'),sha256=net['object_sha256'])
+    if stride:components['WifiRuntimeMsiBinding.o']=dict(path=str(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o'),sha256=stride['binding_sha256'])
     proof=dict(prior)
     proof.update(profile='wifi-network-17',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
         retained_parent_profile=prior['profile'],retained_parent_kernel_sha256=prior['kernel_sha256'],
         retained_parent_native_sha256=prior['native_sha256'],retained_parent_source_inputs=prior['source_inputs'],
         retained_parent_report=prior,source_inputs=inputs,changed_core_objects=0,
-        changed_native_objects=1,added_native_objects=1,retained_pcie_members=retained,archive_members=members,
-        core_filelist_unchanged=(out/'link.filelist').read_bytes()==filelist,ce_wmi_firmware_objects_unchanged=True,
+        changed_native_objects=2 if stride else 1,added_native_objects=1,retained_pcie_members=retained,archive_members=members,
+        core_filelist_unchanged=(out/'link.filelist').read_bytes()==filelist,ce_wmi_firmware_objects_unchanged=not bool(stride),
         all_actual_imports_resolved=True,original_apple_executables_hashed=30,entry_return_target=hex(after[1]),entry_delta=7124,
         native_contract_sha256=sha(out/'native-contract.json'),hardware_tested=False,boot_packaged=False,
         component_objects=components,network_worker=worker,network_bridge=net,parent_policy_updates=changed_policy,
+        mac_phy_stride_runtime=stride,station_ready_before_network_publication=True,
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     write(out/'result.json',proof)
     print(json.dumps({key:proof[key] for key in ('profile','kernel_sha256','native_sha256','all_actual_imports_resolved','hardware_tested')}))
