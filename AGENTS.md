@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 MHI LEASE HARDWARE: real get0/held1 and put1/held0 captured,
+station4/netstart0/drain0 and full fence/MSI4/PERSTlow/WCNstop/typed sync/physical
+fastboot/fullstock8b8e72da/Android/root/green/original charge+radios+scans/sleep
+restored. WMI still30timeouts; CE3sw2/write4/hp16/tp8 and BSS0. Lease contrast
+did not solve failure, no repeated wake-only trial/default promotion. Not every
+MHI power cause excluded. Capture293029B/SHA0c088476/dropmax0/no reconnect or
+discontinuity; post-disconnect unavailable. Image1c0cac97/sessionb442d7babe00bddf,
+floor1738713600/0/3. All jobs terminal; stockcurrent. Next exact vendor descriptor/
+address contract audit before new behavior; normal no-hold baseline retained.
+Full Goal/Wi-Fi/charging/persistence/peripherals incomplete; no blocked status.
+
 Latest20261120 MHI WAKE LEASE signed: optional real MHIget_sync held from
 Peach PCI start until exact stop/powerdown put, failed get owns no put. Native
 compiled opt-in ewt1; all1023 inherited bootarg bytes preserved.34actual helper

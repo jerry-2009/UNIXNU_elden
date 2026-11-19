@@ -1,5 +1,12 @@
 # Elden 基本可用实施计划
 
+2026-11-20唤醒引用实测：真实get0/held1与put1/held0通过，但仍30次WMI超时，CE3
+依旧sw2/write4/hp16/tp8、BSS0。这个对照未消除阻塞，不重复或提升为默认；也不能据此
+排除所有MHI电源问题。站点4发布、net drain0及完整真实DMA fence／MSI／PERST／stock/
+root/green/原设置恢复通过。日志293029B/drop0/无重连，断开后计数未知。
+[本轮](evidence/wifi-mhi-lease-hardware-20261120.json)。下一步保持普通无hold基线，核Peach
+描述符／地址契约后再改硬件行为。完整Goal active，Wi-Fi仍未联网。
+
 2026-11-20有界MHI唤醒引用对照已签：实际get_sync保持到PCI stop/power-down，失败
 不补credit、不延时，编译选项显式启用。34实际helper模型场景、12资格反例与整核／签包通过；
 PCI120既有警告／worker1shadow保留，原1023 boot参数与回程保持。候选1c0cac97，

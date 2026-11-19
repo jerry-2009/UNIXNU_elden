@@ -1,5 +1,12 @@
 # Bounded MHI wake-reference contrast
 
+One real trial confirms get0/held1 and put1/held0, station4 network publication,
+and full physical-fence/stock Android restoration. WMI still times out30 times;
+CE3 remains sw2/write4/hp16/tp8 and BSS0. This contrast did not fix the failure.
+The no-hold candidate remains the normal baseline; do not repeat or promote this
+power-state trial. It does not exclude every MHI or firmware power issue.
+[Hardware evidence](../../docs/evidence/wifi-mhi-lease-hardware-20261120.json).
+
 This diagnostic candidate tests whether a device power transition prevents
 later WMI commands from being consumed. The previous trial reaches station4
 but CE3 stops after the initialization command completions; later WMI commands
