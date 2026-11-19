@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+2026-11-20第三轮直接HP对照：exact CE3/1b86400已选，仍首条PDEV超时、sw2/write4/
+HP16/TP8、BSS0。它没有排除所有通知或DMA问题；纯直接HP/纯唤醒不再重复。
+真实UMAC put、网络排空、物理DMA fence/MSI/PERST与完整stock恢复通过。
+[本轮证据](evidence/wifi-ce3-direct-hardware-20261120.json)。当前Wi-Fi未扫描联网，
+完整Goal active；下一步聚焦首命令消费及DMA所有权，保留普通无hold功能基线。
+
 2026-11-20 CE3通知对照候选已签：只将本机ring67的HP指针设为原有直接路径1b86400，
 其余CE及QMI shadow表不变。144实际函数场景/30资格反例和整核/签包通过；
 候选771f5240，session4e3c23ffa069941e，未实机。

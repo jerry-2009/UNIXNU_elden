@@ -50,3 +50,13 @@ unaccepted. Do not retry the previous interrupted response-trace candidate.
 [Evidence](../../../docs/evidence/wifi-ce3-direct-20261120.json).
 Mac`lab/wifi-ce3-direct-20261120/{host1,runtime2,kernel1,entry1,package1}`;
 workbench`edl_work/wifi-ce3-direct-20261120`.
+
+## Hardware result
+
+The exact direct pointer was selected. The first PDEV16387 timeout remained:
+CE3sw2/write4/HP16/DMA-TP8 and BSS0. This contrast did not fix the failure;
+all notification/DMA/lifetime questions are not excluded. No direct-only repeat
+or default promotion. UMAC put, net drain, actual physical DMA/MSI/PERST fence,
+typed fastboot and full stock Android/root/green/original settings restoration
+all passed.
+[Hardware evidence](../../../docs/evidence/wifi-ce3-direct-hardware-20261120.json).

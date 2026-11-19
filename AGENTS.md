@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 CE3 DIRECT HARDWARE: exact1b86400 directHP selected with
+UMACget0/scratch2, yet same firstPDEV16387 timeout/CE3sw2/write4/hp16/tp8,
+BSS0. Direct-only contrast did not remove failure; no direct/wake-only repeat
+or default promotion. UMACput1/netdrain0/callback/unbind0/realfence/MSI4/
+PERSTlow/WCNstop/typed physicalfastboot/fullstock8b8e72da/Android/root/green/
+original charge+radios+scans/sleep restored; all jobs terminal. Capture284574B/793f859e
+/drop0/no reconnect/discontinuity, post-disconnect unknown. Source-tested empty
+VDEV MLO array retained, hardware efficacy still unproved; normal no-hold stays
+functional baseline. First-WMI command-consumption/DMA ownership remains the
+focus, no credits/clocks/timeouts guessed. Full Goal active/incomplete.
+
 Latest20261120 CE3 DIRECT signed: previous UMAC16descriptor progress not
 stable; next exact Peachring67/R2=1b86400 selects original directHP branch,
 OEMignore_shadow counterpart. OtherCE pointers/QMI shadow table/credits/
