@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 MHI WAKE LEASE signed: optional real MHIget_sync held from
+Peach PCI start until exact stop/powerdown put, failed get owns no put. Native
+compiled opt-in ewt1; all1023 inherited bootarg bytes preserved.34actual helper
+ASan/UBSan models,12qualifier mutation cases, runtime3/worker2/kernel2/entry2/
+package2/audit pass. PCI120inherited warnings/worker1oldshadow; actual MHIget/put
+and native option symbols resolve.124parent runtime objects retained, stride
+fix retained; CE/IRQ/FW/credits/timeouts unchanged. Image1c0cac97/sessionb442d7ba
+be00bddf/floor1738713600/0/3, NOT hardware-tested. package1overlength rejection
+retained, no relaxed argument bound. Next one bounded power-state contrast;
+do not claim MHI power is established WMI cause. Goal/Wi-Fi/charging/persistence
+remain incomplete. Last device stock/root/green restored; all build jobs terminal.
+
 Latest20261120 STATION+STRIDE HARDWARE: networkstart0 at real station4/MAC
 match confirmed. New full-stride WMI ran, still30timeouts/BSS0; no claimed root
 cause/scan/association/DHCP/traffic. Netdrain0, callbackreturned/unbind0/config0,

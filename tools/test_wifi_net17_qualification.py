@@ -23,12 +23,27 @@ def main():
         try:qualify_components(selected)
         except (ValueError,KeyError):cases+=1
         else:raise AssertionError('Mutated component accepted: '+name)
+    if report.get('mhi_hold_trial'):
+        for name in ('lease','pair','scope','import'):
+            selected=copy.deepcopy(report)
+            if name=='lease':selected['mac_phy_stride_runtime']['lease_delta_reversible']=False
+            elif name=='pair':selected['network_worker']['mhi_hold_trial']=False
+            elif name=='scope':selected['mac_phy_stride_runtime']['changed_units']=['ath12k_wmi.o','ath12k_ce.o']
+            else:selected['mac_phy_stride_runtime']['added_native_import']='_other_hold'
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated MHI lease accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,
         control_transport_bound=True,firmware_qdss_config=True,runtime_owned_cleanup=True,
         runtime_platform_shutdown=True,runtime_platform_budget=True,platform_physical_fence=True)
     if menu(q)!=route_menu(q):raise AssertionError('Boot dispatcher missed new route')
+    if report.get('mhi_hold_trial'):
+        held=dict(q,mhi_hold_trial=True)
+        import tomllib
+        if tomllib.loads(menu(held))['entry'][0]['args']!=tomllib.loads(menu(q))['entry'][0]['args']:
+            raise AssertionError('MHI lease changed inherited boot arguments')
     text=menu(q)
     import tomllib
     config=tomllib.loads(text)

@@ -1,5 +1,12 @@
 # 当前状态 · 2026-11-18
 
+2026-11-20有界MHI唤醒引用对照已签：实际get_sync保持到PCI stop/power-down，失败
+不补credit、不延时，编译选项显式启用。34实际helper模型场景、12资格反例与整核／签包通过；
+PCI120既有警告／worker1shadow保留，原1023 boot参数与回程保持。候选1c0cac97，
+sessionb442d7babe00bddf，floor1738713600／0／3；未实机，不能断言省电状态是WMI根因。
+[机制与复现](../drivers/EldenWifi/MHI-WAKE-LEASE.md)／[证据](evidence/wifi-mhi-lease-20261120.json)。
+下一步只做一次这个有价值的对照，完整Goal active，继续集中Wi-Fi。
+
 2026-11-20合并修复实机：网络桥确实在station-stage4、真实站点MAC匹配后启动；
 新WMI步长对象已运行，但仍30次超时、BSS0，不能认定它为原WMI原因。net drain0、真实
 DMA fence／MSI4／PERST低／WLAN停止与完整stock/root/green/原设置恢复通过；恢复初期

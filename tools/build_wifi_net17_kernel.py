@@ -29,8 +29,12 @@ def main():
     stride=read(args.mac_phy_runtime/'result.json') if args.mac_phy_runtime else None
     if stride:
         base_runtime=prior['component_objects']['WifiRuntimeMsiBinding.o']
-        if not stride['compiled'] or stride.get('mac_phy_stride_fix') is not True or stride['base_binding_sha256']!=base_runtime['sha256'] or not stride['imports_exports_unchanged'] or stride['changed_units']!=['ath12k_wmi.o']:
+        hold=stride.get('mhi_hold_trial') is True
+        if not stride['compiled'] or stride.get('mac_phy_stride_fix') is not True or stride['base_binding_sha256']!=base_runtime['sha256'] or (not hold and (not stride['imports_exports_unchanged'] or stride['changed_units']!=['ath12k_wmi.o'])):
             raise ValueError('Unqualified MAC/PHY stride runtime')
+        if hold and (stride.get('lease_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_mhi_hold_requested' or worker.get('mhi_hold_trial') is not True):
+            raise ValueError('MHI wake lease requires the exact opt-in runtime/worker pair')
+        if bool(worker.get('mhi_hold_trial'))!=hold:raise ValueError('MHI wake worker/runtime mismatch')
         if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
             raise ValueError('MAC/PHY stride runtime artifact changed')
         for name,digest in stride['source_inputs'].items():
@@ -128,6 +132,7 @@ def main():
         native_contract_sha256=sha(out/'native-contract.json'),hardware_tested=False,boot_packaged=False,
         component_objects=components,network_worker=worker,network_bridge=net,parent_policy_updates=changed_policy,
         mac_phy_stride_runtime=stride,station_ready_before_network_publication=True,
+        mhi_hold_trial=bool(stride and stride.get('mhi_hold_trial')),
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     write(out/'result.json',proof)
     print(json.dumps({key:proof[key] for key in ('profile','kernel_sha256','native_sha256','all_actual_imports_resolved','hardware_tested')}))
