@@ -98,6 +98,16 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated CE3 timeline accepted: '+name)
+    if report.get('window_reselect_trial'):
+        for name in ('reversible','peach','order','report'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='reversible':runtime['window_delta_reversible']=False
+            elif name=='peach':runtime['window_peach_only']=False
+            elif name=='order':runtime['window_lock_value_readback_preserved']=False
+            else:selected['window_reselect_trial']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated window reselection accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

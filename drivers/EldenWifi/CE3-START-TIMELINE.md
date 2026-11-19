@@ -37,3 +37,12 @@ Use the qualified inspector worker, then the complete network17 kernel and
 entry/package audit. [Evidence](../../docs/evidence/wifi-ce3-timeline-20261120.json).
 No scan, association, DHCP or traffic acceptance is implied. Full physical
 fence/stock restoration remains mandatory for the bounded live trial.
+
+## Hardware result
+
+CE3 programming/readback is valid through stage8, with actual window37.
+Before the first PDEV (stage9), the actual window is0 and selected register
+reads ffffffff. Its local expected-window cache does not force a refresh.
+The actual origin of the window change is unproved. The earlier zero-register
+observation is not an actual ring-reset proof.
+[Hardware record](../../docs/evidence/wifi-ce3-timeline-hardware-20261120.json).

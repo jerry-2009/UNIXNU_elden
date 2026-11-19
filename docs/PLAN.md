@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+2026-11-20时间线定位：CE3配置正常到stage8，stage9实际窗口从37变0而缓存未更新，
+读数变ffffffff；不能再据零值断言环被清空。原厂默认NO_CACHE1已核，Peach选窗修补
+保留原锁/数值/读回，8195实际旧新模型/41资格反例/整核签包通过；候选17c7d76a，未实机。
+[时间线实录](evidence/wifi-ce3-timeline-hardware-20261120.json)／[修补复现](../drivers/EldenWifi/peach/WINDOW-RESELECT.md)。
+完整Goal active，Wi-Fi未联网。
+
 2026-11-20实机首次CE3证据已齐：两个28B缓冲地址/CPU映射/物理对应及固定协议头通过，
 而硬件R0基址/大小/MSI已零、MISC80，软件HP16/DMA TP8。尚不确定何时丢失或读取路径异常。
 [实录](evidence/wifi-ce3-inspect-hardware-20261120.json)。下一份只读启动边界时间线已签，

@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 CE3 TIMELINE HARDWARE: stages1..8 base10001bc0/size8000/
+ID4/MISCc2/hw8:8/window40000037; before firstPDEVstage9 readsffffffff and
+actualwindow40000000. Cause of window change unknown; earlier CE0reads not
+real ring-reset proof. Native buffers/PAR/backing pass; full put/fence/stock/
+root/green/settings restore pass,285820B/19c044fc/drop0/no reconnect.
+NEXT exact OEM default_config.h NO_CACHE1 policy ports to Peach selector;
+existinglock/value/staticbits/readback preserved.8195actual model cases/41
+qualifier/PCI1+124retained/fullkernel/Apple30/entry7124/package1 audit pass.
+Image17c7d76a/sessionf25726514a16d4aa/floor1738713600/0/3 NOT hardware tested;
+PCI120warnings. No ring reinstall/credits/timeouts guessed. Full Goal active,
+Wi-Fi not accepted; device stock, all jobs terminal.
+
 Latest20261120 CE3 INSPECT HARDWARE: both pending28B buffers have exact
 descriptor/arena/CPU-PAR44/backing-PA and fixed headers, no SMMUfault. This is
 not hardware SMMU/device-read proof. At first PDEV failure actual R0 base/size/

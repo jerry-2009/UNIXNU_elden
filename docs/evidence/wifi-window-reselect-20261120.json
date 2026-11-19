@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "window_reselect_trial": true,
+  "hardware_tested": false,
+  "trigger": "Real stage8 hardware window37, stage9 window0; local cached selection does not refresh.",
+  "vendor_commit": "d50b305f7da9e14715a25120a4ac7b1a4b8b97c3",
+  "vendor_policy": "PCIE_REG_WINDOW_LOCAL_NO_CACHE1 in qcacld-3.0/configs/default_config.h",
+  "host": {
+    "passed": true,
+    "actual_selector_functions": true,
+    "stale_cache_failure_reproduced": true,
+    "mmio_modeled": true,
+    "hardware_tested": false,
+    "summary": "PASS 8195 actual window selector cases; old stale-cache failure reproduced; exact lock/value/readback retained",
+    "pci_parent_sha256": "7c80e0f3be2b3a059e3d4b36459b915fdd037257ecd0ac650b32460a687f2608",
+    "pci_fixed_sha256": "f56c5ee0fd553d64d34938426c3ac84623c5bf39774648a8b2f016f7279fac0f",
+    "source_inputs": {
+      "tools/test_wifi_window_reselect.py": "287f09868fda8b46b63b69576436ec14fd7257a60fda0d324f49d3d31729dbc5",
+      "drivers/EldenWifi/peach/WindowReselectPatch.py": "e90c155f107b318c000265bf4bf4e55f91002b2fdc66a4a5821011d95d955932"
+    }
+  },
+  "runtime": {
+    "binding_sha256": "91e7b2ac7a2187828aa9aed381efa4a5c8b91f1c112235d4cb1f4960e31c5b70",
+    "pci_object_sha256": "2b9cc62a2e4ec82aa0deba0a5edbacf7c0b27261c1adebfa5edfd0591e46812d",
+    "source_sha256": "f56c5ee0fd553d64d34938426c3ac84623c5bf39774648a8b2f016f7279fac0f",
+    "warnings": 120,
+    "retained_units": 124,
+    "lock_value_readback_preserved": true
+  },
+  "kernel": {
+    "kernel_sha256": "9d6189adef6dfc9adb5a7958dfcd133aa5ff8238f52c7a3193b779a4375b0558",
+    "native_sha256": "d29f264de5c6fdc7267a702fe9a3c2c2921a7f10b2cba352b8317bd12831f403",
+    "apple_regions": 30,
+    "entry_delta": 7124,
+    "core_unchanged": true,
+    "native_worker_retained": true
+  },
+  "qualification": {
+    "passed": true,
+    "mutation_cases": 41,
+    "menu_dispatch": true,
+    "countdown_and_fallback_preserved": true,
+    "actual_component_report_qualified": true,
+    "hardware_tested": false
+  },
+  "package": {
+    "accepted_static": true,
+    "image_sha256": "17c7d76afda9e77c3d3937366ee7083b52a0a795566f4250efa3b44ea1362a7e",
+    "session": "f25726514a16d4aa",
+    "rollback": 1738713600,
+    "footer": 0,
+    "parent": 3
+  },
+  "source_inputs": {
+    "tools/build_wifi_mac_phy_stride.py": "db711b86ed45a131de5df0aef42aa9aa03b02653de90ca60b1f291abdef497e0",
+    "drivers/EldenWifi/peach/MacPhyStridePatch.py": "f44303dc0b7aca73ef8a4346d1ac4b88a0255da6b8d567c23ffe1f7438739186",
+    "tools/test_wifi_mac_phy_stride.py": "e30b29fe802b0e648d4acd2b3080f5b13ed3862623bfce7f344024d882760925",
+    "tools/build_wifi_umac_wake.py": "d9f99233622a857ec2d95667bea76b50c1d8053c69c9a115798d78492f1e6778",
+    "tools/test_wifi_umac_wake.py": "6bfe52f3efc6b7d37adc9bf1100979d41397a39bd4f86234e0ef51a6b7245b0f",
+    "drivers/EldenWifi/UmacWake.inc": "eef5c433dc92571cc277e7fdd06217059c52c9ad754f3f2212d61937ae6e9ee2",
+    "drivers/EldenWifi/peach/UmacWakePatch.py": "b1577baed5e9b2a9defa42504348ed973a4951a9dc4e76faf2260e6e6d7fe606",
+    "tools/build_wifi_vdev_mlo_array.py": "5df573c0fc56356f0276ebc422bb060a65a76b2d424164a33750d40b272f4048",
+    "tools/test_wifi_vdev_mlo_array.py": "7f4766cf453dfc5a9aa9902c53b2c1e586a06e8549d3acdec309433edc42abbf",
+    "drivers/EldenWifi/peach/VdevMloArrayPatch.py": "2816641a4170adf0577b0ed0a248c5a41b14f2e73b3125742e2dc92241fd46c9",
+    "tools/build_wifi_ce3_inspect.py": "2e6944ba392892abfdff2a40a9daf14fc63de8402c3dc980cbc4f2ac56d130ab",
+    "tools/test_wifi_ce3_inspect.py": "f733836bc58e18d134d368effa8ccbd4de13b89169c70a47bce1fa756d765edb",
+    "drivers/EldenWifi/peach/Ce3InspectPatch.py": "551b156e5833fc4358b97ae0e156df47b5c46418d4aaf2de504cc1d898c7d2be",
+    "drivers/EldenWifi/Ce3Inspect.inc": "100cd0bb1d86de33b9cc42cef296856cafd09525b9bc4f06c832a2404f9a36da",
+    "drivers/EldenWifi/DmaInspect.h": "08055e1cef205f99cf5bc79c8fc69173d484916e570fa73c3917e5e94cebb864",
+    "drivers/EldenWifi/DmaInspect.inc": "b1f6a059df07cbca1c6c4c903309865454131b62038baf687fc6c843fec64fdf",
+    "tools/build_wifi_ce3_timeline.py": "18737490988eeefe01400453759429e540b5a105523b100c30985ca27fa4e57b",
+    "tools/test_wifi_ce3_timeline.py": "2a82b9e8a7d72fedae2fa7fb6a7848551edc939b8ce5cafec49588bc3c4bb725",
+    "drivers/EldenWifi/peach/Ce3TimelinePatch.py": "108a066418e7d847ac25945cb8bb6045da4882632cef2e4ee01e2569e1337f55",
+    "drivers/EldenWifi/Ce3Timeline.h": "699038d1853bbcd35cd58ff7d4f317091cc4a0d125a393d4df4b44c696f152c6",
+    "drivers/EldenWifi/Ce3Timeline.inc": "2975d7a0783c6945909fd1ccf8edb14ee26c153a51325f0517370ac94ed0047b",
+    "tools/build_wifi_window_reselect.py": "99f91cef68b1f3cd020353c6ca07a6a1eb1ad9d257474b9ce212fc9801fadce1",
+    "tools/test_wifi_window_reselect.py": "287f09868fda8b46b63b69576436ec14fd7257a60fda0d324f49d3d31729dbc5",
+    "drivers/EldenWifi/peach/WindowReselectPatch.py": "e90c155f107b318c000265bf4bf4e55f91002b2fdc66a4a5821011d95d955932"
+  },
+  "no_ring_reinit_or_credit_timeout_change": true,
+  "next": "One exact OEM window policy hardware trial with passive timeline and full stock restoration.",
+  "goal": "active and incomplete"
+}
