@@ -1,5 +1,13 @@
 # Elden 基本可用实施计划
 
+2026-11-19网络桥实机通过：en0发布、IONetworkStack被系统打开、Apple80211请求到达；
+回程net drain0及真实DMA fence／MSI4／PERST低／WLAN停止通过，完整恢复stock Android/root/
+green/原充电／无线／扫描设置并熄屏。捕获282598B、64状态样本、drop最大0、无重连，断开
+后计数未知。仍30次WMI16387超时、扫描准入未开、BSS0，关联/DHCP/流量未通过。
+原厂启动路径与六份主固件SHA也已实读：与候选全同，没有证据换bdwlan/regdb或m3。
+[本轮实证](evidence/wifi-network17-hardware-20261119.json)。下一步只推进首次WMI完成链，
+不再重复接口／回程-only测试。充电候选暂存，Wi-Fi优先，完整Goal仍active未完成。
+
 2026-11-19按用户要求集中Wi-Fi：补齐此前缺少的真实BSD／IOKit网络桥，优先复用Sheng
 同21H461已实机WPA2／DHCP／流量版本08cde20e。54项实际生成代码ASan/UBSan模型检查通过；
 网络桥／原生线程／完整内核／签名boot通过，编译0／1旧shadow警告。停止后关闭请求并有界

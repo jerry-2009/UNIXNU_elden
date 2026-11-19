@@ -1,5 +1,18 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261119 NET17 HARDWARE: en0 published, real IONetworkStack opened and
+Apple80211 requests received; networkstart0/drain0. Existing30WMI16387 timeouts,
+scan0/BSS0; association/DHCP/traffic unaccepted. Same six stock firmware hashes
+and ueventd paths read back, no BDF/regdb/m3 replacement justified. Full real
+DMA fence/MSI4/IRQ-active0/PERSTlow/WCN stop/typed reset/physical fastboot/full
+stock8b8e72da/Android/root/green/original charge+radio+scan settings restored.
+Capture282598B/SHA1a71bcac,64status samples/dropmax0/no reconnect/discontinuity;
+post-disconnect counter unavailable. All device/build jobs terminal. Image7fae1095/
+sessionedf7cfeebe4b2c89/floor1738713600/0/3. Keep this bridge; no more repeated
+interface-only trials. NEXT first-WMI completion/credit work; previously interrupted
+response candidate not reused. Goal/charging/Wi-Fi/persistence/peripherals remain
+active/incomplete; peer/GPU/QRTR/AnyRouter guards retained.
+
 Latest20261119 WIFI NET17 signed component: user prioritizes Wi-Fi now. Real
 BSD/IOKit en0 bridge derived from hardware-recorded Sheng08cde20e/21H461,
 Ath12k ABI5f7f5a8.54actual generated bridge checks ASan/UBSan, native7/worker3/

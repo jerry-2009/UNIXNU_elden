@@ -44,8 +44,10 @@ The signed independent candidate passes entry, FAT/assets, session and AVB check
 at1738713600/footer0/parent3, with default xnu and an8s countdown.
 
 See [current evidence](../../../docs/evidence/wifi-network17-20261119.json).
-Until live evidence is added this is **not an Elden scan, association, DHCP or
-traffic acceptance**. v190's first WMI timeout remains unresolved; no guessed
+One live trial now proves en0 publication, IONetworkStack opening and actual
+Apple80211 requests. Net drain0 and the original physical-fence/full stock
+Android restoration pass. It still reports30 WMI timeouts, no accepted scan/BSS,
+association, DHCP or traffic. This is **not Elden networking acceptance**. v190's first WMI timeout remains unresolved; no guessed
 credit, clock or pdev changes are introduced here. GPU and other worktrees stay
 separate. The full peripheral Goal remains active.
 
