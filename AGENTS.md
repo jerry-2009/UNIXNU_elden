@@ -1,5 +1,17 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261119 CHARGING EVIDENCE REVIEW:4historical captures and full stock
+restoration receipts verified. v144 raw backlight1597/798/restored1597 complete
+post-transition9samples each yield normalized medians0/+190/0mA. v145 GUI2048
+tail10 median-177.5mA; highSOC/short windows not sustained normal-load proof.
+Aggregate raw current discharge-positive, independentFG charge-positive/native
+publisher charge-positive; initial audit-sign mistake corrected, drivers unchanged.
+HighSOC v140 mode sequence passes, actual stop/recharge cycles/physical bypass/
+dual-port stable supply+data/sleep/persistent settings remain unfinished.
+docs/CHARGING-ACCEPTANCE-REVIEW-20261119.md and paired evidence/closure are current.
+No new device/build/flash/test/Goal-status change or filtered-operation retry.
+Full Goal/charging/Wi-Fi/persistent Data/peripherals remain incomplete.
+
 Latest20261119 REFERENCE SYNC FIX: old real-local-Git tests reproduce same-HEAD
 branch switch causing wrong-branch FF and late maintenance marker ignored.
 New11actual Git cases pass: branch/HEAD/upstream/dirty rechecks refuse changes,

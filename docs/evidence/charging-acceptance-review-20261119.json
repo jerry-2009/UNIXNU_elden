@@ -1,0 +1,193 @@
+{
+  "date": "2026-11-19",
+  "scope": "Read-only charging evidence review",
+  "inputs_sha256": {
+    "D:\\Desktop\\Git\\UniXNU_elden\\profiles\\charge-verification\\hardware.json": "2da64c8ceaf1ee46263f444ca9d5d9270fa03455a6610b759165ef5566659d22",
+    "D:\\Desktop\\Git\\Patch\\Y700-Elden\\edl_work\\live-charge-verify-v139-20261115\\usb\\20261114-234558.bin": "7caacc3f9c38e4f9acdf959e2708a319cac1cb93280f5e6de6260465ba50e5eb",
+    "D:\\Desktop\\Git\\UniXNU_elden\\profiles\\charge-window-handoff\\hardware.json": "cee562886142de98dfcfe06d1d2eb4b32501a62623a89a79d7ef8ef87b7d4bd8",
+    "D:\\Desktop\\Git\\Patch\\Y700-Elden\\edl_work\\live-charge-window-v140-20261115\\usb\\20261115-003006.bin": "077a0d6284d289d27221183378f2d8a3d4d0667a51b6a07f25ef87f81def780f",
+    "D:\\Desktop\\Git\\UniXNU_elden\\profiles\\pd-power-trial\\hardware.json": "5ad18ce31f5238e4f26c36559e159b35ec2ff5ecbbe1bef8369e78c07dde8126",
+    "D:\\Desktop\\Git\\Patch\\Y700-Elden\\edl_work\\live-pd-power-v144-20261115\\usb\\20261115-030237.bin": "29bb583dc339635ada1503eaa1835d5072840ddd0f8a37b0717f6b3951ed2291",
+    "D:\\Desktop\\Git\\Patch\\Y700-Elden\\edl_work\\live-pd-power-v144-20261115\\backlight-power-assessment.json": "e7664ba7549b6a155059f499df4ece464690ff6d5df30674a7a72bed5ee4e2a8",
+    "D:\\Desktop\\Git\\UniXNU_elden\\profiles\\pd-gui\\hardware.json": "7970411a861b0d1eeb4855bc13521bb9132ffbde8961dd9da966ab4883a10899",
+    "D:\\Desktop\\Git\\Patch\\Y700-Elden\\edl_work\\live-pd-gui-v145-20261115\\usb\\20261115-035103.bin": "9d04ee2dbd872d0571b0774003392db630f9ff3f239edadba55ba99bb7a2cf73",
+    "D:\\Desktop\\Git\\Patch\\Y700-Elden\\edl_work\\live-pd-disconnect-v72-20261111\\user-meter.json": "5ac661f9d23563b955c078a0356aaa31c494fc066c25ade89de218850a7b8455",
+    "D:\\Desktop\\Git\\Patch\\Y700-Elden\\edl_work\\live-pd-disconnect-v72-20261111\\usb-handoff-assessment.json": "320acfd8b17d04d98cab78759ac35cded3be37a2fd645838100e550415ca942e",
+    "D:\\Desktop\\Git\\UniXNU_elden\\docs\\evidence\\charge-window-model-review.json": "200b43b5584599d8d4af87b88ee1a0c76db525d88f4d7840a0f158dbfb8ed938",
+    "D:\\Desktop\\Git\\Patch\\Y700-Elden\\lab\\records\\wifi-mode-v190-20261119\\restoration-final.json": "541d1cdcf4593682469506c1470c0c0ada578c88ba5a83f28dce15f038c024da",
+    "D:\\Desktop\\Git\\UniXNU_elden\\drivers\\EldenPmicGlink\\BatterySnapshot.c": "3c2fd8c7c9a9f814e37867f257b55b4a1f06d3afb79adaab9b83947694bfebcb",
+    "D:\\Desktop\\Git\\UniXNU_elden\\drivers\\EldenPmicGlink\\BatteryRuntime.cpp": "1089a257772887dc278670ba695ba2e3ab1e9b3a84eaac528a29555cfb9fbff2",
+    "D:\\Desktop\\Git\\UniXNU_elden\\docs\\CHARGING-STATUS.md": "d12c8ccc9a9c6e2ab5cb55f11fbcc0da7749ed3d06dc6784c4222c81720ebff8",
+    "D:\\Desktop\\Git\\UniXNU_elden\\docs\\DUAL-INPUT-CONTRACT.md": "671e9d95bcc900b5606ccdd94aadfc319a0ef0666c58cb9c01870898ec7a917c"
+  },
+  "trials": {
+    "charge-verification": {
+      "session": "749dba0f0bad0011",
+      "capture_bytes": 1204986,
+      "capture_sha256": "7caacc3f9c38e4f9acdf959e2708a319cac1cb93280f5e6de6260465ba50e5eb",
+      "dropped": 6,
+      "restoration_verified": true,
+      "published_battery_samples": 58
+    },
+    "charge-window-handoff": {
+      "session": "6eca575bb9089559",
+      "capture_bytes": 1248051,
+      "capture_sha256": "077a0d6284d289d27221183378f2d8a3d4d0667a51b6a07f25ef87f81def780f",
+      "dropped": 28,
+      "restoration_verified": true,
+      "published_battery_samples": 69,
+      "high_soc_mode_sequence_verified": true,
+      "complete_threshold_cycles": false
+    },
+    "pd-power-trial": {
+      "session": "52ceaafdeb92e958",
+      "capture_bytes": 1281918,
+      "capture_sha256": "29bb583dc339635ada1503eaa1835d5072840ddd0f8a37b0717f6b3951ed2291",
+      "dropped": 26,
+      "restoration_verified": true,
+      "published_battery_samples": 77,
+      "phases": [
+        {
+          "phase": "baseline",
+          "complete_samples": 9,
+          "normalized_median_ma": 0,
+          "cycles": [
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "independent_gauges_and_publisher_agree": true
+        },
+        {
+          "phase": "dim",
+          "complete_samples": 9,
+          "normalized_median_ma": 190,
+          "cycles": [
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65
+          ],
+          "independent_gauges_and_publisher_agree": true
+        },
+        {
+          "phase": "restored",
+          "complete_samples": 9,
+          "normalized_median_ma": 0,
+          "cycles": [
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80
+          ],
+          "independent_gauges_and_publisher_agree": true
+        }
+      ],
+      "short_low_backlight_net_charge": true,
+      "sustained_default_gui_charge_verified": false,
+      "individual_port_watts_measured": false
+    },
+    "pd-gui": {
+      "session": "5b2c7a4c59047a95",
+      "capture_bytes": 3580790,
+      "capture_sha256": "9d04ee2dbd872d0571b0774003392db630f9ff3f239edadba55ba99bb7a2cf73",
+      "dropped": 242,
+      "restoration_verified": true,
+      "published_battery_samples": 60,
+      "default_brightness": 2048,
+      "last_ten_median_ma": -177.5,
+      "sustained_default_gui_charge_verified": false
+    }
+  },
+  "short_port_meter_watts": [
+    14.872,
+    15.651
+  ],
+  "meter_and_target_timestamps_aligned": false,
+  "disconnect_capture_complete": false,
+  "source_model_label_correction_verified": true,
+  "latest_v190_original_settings_restored": true,
+  "current_sign_contract": {
+    "aggregate_raw": "discharge-positive microamps",
+    "fg1_fg2": "charge-positive milliamps",
+    "native_publisher": "charge-positive milliamps"
+  },
+  "audit_initial_gauge_sign_error_corrected": true,
+  "driver_sources_changed": false,
+  "new_device_access": false,
+  "new_candidate_build": false,
+  "new_tests_run": false,
+  "full_charging_goal_complete": false,
+  "reviewed_source_commit": "9b0b0d16a8dba6be0db1f6327854b1dc21308e87",
+  "initial_review_sha256": "41bbe917be2cccdd03f558d601bb627ca7b90725c82906a978d69f3cd3fde33c",
+  "historical_restore_records": {
+    "charge-verification": {
+      "path": "edl_work/live-charge-verify-v139-20261115/stock-restore/result.json",
+      "record_sha256": "3146d6c4011c4c40edabe7c0d7694c852a8c2a39eaf7ef18af6210ff4cc46468",
+      "full_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+      "success": true,
+      "serial": "HA2A1PT2",
+      "rollback_index": 1738713600,
+      "footer_location": 0,
+      "historical_result_only": true
+    },
+    "charge-window-handoff": {
+      "path": "edl_work/live-charge-window-v140-20261115/restore/result.json",
+      "record_sha256": "6b91f1b416e61e96035bbfbec81d44c28016429d5121016fa3e1bb048e601d83",
+      "full_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+      "success": true,
+      "serial": "HA2A1PT2",
+      "rollback_index": 1738713600,
+      "footer_location": 0,
+      "historical_result_only": true
+    },
+    "pd-power-trial": {
+      "path": "edl_work/live-pd-power-v144-20261115/restore/result.json",
+      "record_sha256": "5397b7f8d6304d02a4d5fd9a3a52bdd915e5c1de99c7fdabaf2015cbd3ec2737",
+      "full_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+      "success": true,
+      "serial": "HA2A1PT2",
+      "rollback_index": 1738713600,
+      "footer_location": 0,
+      "historical_result_only": true
+    },
+    "pd-gui": {
+      "path": "edl_work/live-pd-gui-v145-20261115/restore/result.json",
+      "record_sha256": "4e179322f87da29f704a5b12a643dcaec049045df82c27489c4dd3110eca89e7",
+      "full_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+      "success": true,
+      "serial": "HA2A1PT2",
+      "rollback_index": 1738713600,
+      "footer_location": 0,
+      "historical_result_only": true
+    }
+  },
+  "no_new_hardware_acceptance": true,
+  "goal_status_changed": false,
+  "previously_filtered_operation_retried": false,
+  "remaining_requirements": [
+    "dual-port data retention and stable supply",
+    "sustained net charging at ordinary UI brightness/load",
+    "physical bypass behavior",
+    "actual stop/recharge threshold cycles",
+    "sleep/resume power behavior",
+    "persistent settings"
+  ],
+  "evidence_scope": "Historical captures, saved restoration receipts and current-state documentation only"
+}
