@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+2026-11-20首次CE3合并证据版已签：只读18个寄存器/最多4个描述符/固定协议头，
+原生核对真实owner、arena、SMMU状态、CPU PAR和物理对应；不把CPU映射当成设备DMA证明。
+27实际函数模型/31资格反例/整核/签包通过；候选32e4a34d，session69c7185df67b4674，
+未实机。[复现](../drivers/EldenWifi/CE3-DMA-INSPECTION.md)／[证据](evidence/wifi-ce3-inspect-20261120.json)。
+下一轮一次采完关键证据，完整Goal active，Wi-Fi未扫描联网。
+
 2026-11-20第三轮直接HP对照：exact CE3/1b86400已选，仍首条PDEV超时、sw2/write4/
 HP16/TP8、BSS0。它没有排除所有通知或DMA问题；纯直接HP/纯唤醒不再重复。
 真实UMAC put、网络排空、物理DMA fence/MSI/PERST与完整stock恢复通过。

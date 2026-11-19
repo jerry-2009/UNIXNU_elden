@@ -23,6 +23,7 @@ def main():
     group=parser.add_mutually_exclusive_group()
     group.add_argument('--mhi-hold',action='store_true',help='Expose only the bounded opt-in MHI power-state lease')
     group.add_argument('--umac-hold',action='store_true',help='Expose only the OEM MHI+UMAC wake trial')
+    parser.add_argument('--dma-inspect',action='store_true',help='Expose bounded first-failure DMA inspection on the UMAC worker')
     args=parser.parse_args();parent=args.parent_native.resolve();out=args.output.resolve()
     prior=json.loads((parent/'result.json').read_text());net=json.loads((args.net_build/'result.json').read_text())
     if not prior.get('service_scan') or not prior.get('platform_physical_fence_preserved') or not net['compiled']:
@@ -30,7 +31,7 @@ def main():
     if sha(parent/'Native.o')!=prior['object_sha256'] or sha(args.net_build/'EldenWifiNet17.late.o')!=net['object_sha256']:
         raise ValueError('Parent component identity mismatch')
     out.mkdir(parents=True,exist_ok=False);source=out/'source';source.mkdir()
-    new=generated(args.mhi_hold,args.umac_hold)
+    new=generated(args.mhi_hold,args.umac_hold,args.dma_inspect)
     for name,data in new.items():(source/name).write_bytes(data)
     private=parent/'EldenWifiFactoryMac.h'
     if sha(private)!=prior['private_assets']['header_sha256']:raise ValueError('Original factory identity input changed')
@@ -50,6 +51,11 @@ def main():
         alias=str(Path(directory)/'EldenNet17.h')
         if alias in names:raise ValueError('Network API alias collision')
         overlay['roots'].append(dict(type='file',name=alias,**{'external-contents':str(ROOT/'drivers/EldenWifi/net/EldenNet17.h')}));names.add(alias)
+        if args.dma_inspect:
+            for file in ('DmaInspect.h','DmaInspect.inc'):
+                alias=str(Path(directory)/file)
+                if alias in names:raise ValueError('DMA inspection alias collision')
+                overlay['roots'].append(dict(type='file',name=alias,**{'external-contents':str(ROOT/'drivers/EldenWifi'/file)}));names.add(alias)
     vfs=out/'overlay.json';vfs.write_text(json.dumps(overlay,indent=2)+'\n')
     command[command.index('-ivfsoverlay')+1]=str(vfs);command[command.index('-o')+1]=str(out/'Native.o')
     result=subprocess.run(command,cwd=args.clean_build/'units/working/WcnPowerNative',capture_output=True)
@@ -57,6 +63,7 @@ def main():
     obj=out/'Native.o';additions={'_elden_wifi_net_admit','_native_wifi_logf','_sheng_wifi_wake'}
     if args.mhi_hold:additions.add('_elden_wifi_mhi_hold_requested')
     if args.umac_hold:additions.add('_elden_wifi_umac_hold_requested')
+    if args.dma_inspect:additions.add('_elden_wifi_dma_inspect')
     if defs(obj)!=defs(parent/'Native.o')|additions:raise ValueError('Unexpected worker exports')
     bridge=defs(args.net_build/'EldenWifiNet17.late.o');available=defs(args.reference_kernel)|bridge
     missing=refs(obj)-available
@@ -68,6 +75,7 @@ def main():
     for name,digest in inherited.items():
         if sha(Path(name))!=digest:raise ValueError('Retained input changed: '+name)
     own=['tools/build_wifi_net17_native.py','drivers/EldenWifi/net/Net17NativeSource.py','drivers/EldenWifi/net/EldenNet17.h']
+    if args.dma_inspect:own+=['drivers/EldenWifi/DmaInspect.h','drivers/EldenWifi/DmaInspect.inc']
     proof=dict(compiled=True,object_sha256=sha(obj),base_object_sha256=prior['object_sha256'],
         source_inputs={name:sha(ROOT/name) for name in own},retained_parent_source_inputs=prior['source_inputs'],
         generated_sources={name:hashlib.sha256(data).hexdigest() for name,data in new.items()},
@@ -76,6 +84,7 @@ def main():
         native_net_imports=sorted(refs(obj)&bridge),warnings=result.stderr.count(b'warning:'),
         no_initializers=True,scalar=True,platform_physical_fence_preserved=True,
         no_ce_wmi_firmware_changes=True,mhi_hold_trial=args.mhi_hold,umac_hold_trial=args.umac_hold,
+        ce3_inspect_trial=args.dma_inspect,
         full_kernel_linked=False,hardware_tested=False)
     (out/'result.json').write_text(json.dumps(proof,indent=2)+'\n')
     print(json.dumps({key:proof[key] for key in ('compiled','object_sha256','warnings','imports_missing','hardware_tested')}))

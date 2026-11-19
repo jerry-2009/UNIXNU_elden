@@ -73,6 +73,19 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated CE3 direct contrast accepted: '+name)
+    if report.get('ce3_inspect_trial'):
+        for name in ('first','count','reads','privacy','worker','import','report'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='first':runtime['first_failure_only']=False
+            elif name=='count':runtime['max_descriptor_records']=100
+            elif name=='reads':runtime['register_read_count']=100
+            elif name=='privacy':runtime['no_payload_or_command_value_logging']=False
+            elif name=='worker':selected['network_worker']['ce3_inspect_trial']=False
+            elif name=='import':runtime['added_inspect_native_import']='_unexpected'
+            else:selected['ce3_inspect_trial']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated CE3 inspection accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

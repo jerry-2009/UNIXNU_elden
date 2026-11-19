@@ -20,6 +20,11 @@ def qualify_ce3_direct(runtime):
         raise ValueError('Wrong exact CE3 direct-HP contrast')
 
 
+def qualify_ce3_inspect(runtime,worker):
+    if runtime.get('umac_hold_trial') is not True or runtime.get('vdev_empty_mlo_array') is not True or runtime.get('ce3_direct_trial') or runtime.get('ce3_inspect_delta_reversible') is not True or runtime.get('first_failure_only') is not True or runtime.get('no_payload_or_command_value_logging') is not True or (runtime.get('max_descriptor_records'),runtime.get('register_read_count'))!=(4,18) or runtime.get('added_inspect_native_import')!='_elden_wifi_dma_inspect' or worker.get('ce3_inspect_trial') is not True:
+        raise ValueError('Wrong bounded first-CE3 inspection pair')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -38,12 +43,14 @@ def qualify_components(report):
     hold=report.get('mhi_hold_trial') is True
     umac=report.get('umac_hold_trial') is True
     direct=report.get('ce3_direct_trial') is True
+    inspect=report.get('ce3_inspect_trial') is True
     if hold and umac:raise ValueError('Mutually exclusive wake trials')
     if hold!=bool(worker.get('mhi_hold_trial')) or hold!=bool(stride and stride.get('mhi_hold_trial')):raise ValueError('MHI wake pair mismatch')
     if umac!=bool(worker.get('umac_hold_trial')) or umac!=bool(stride and stride.get('umac_hold_trial')):raise ValueError('UMAC wake pair mismatch')
     if bool(report.get('vdev_empty_mlo_array'))!=bool(stride and stride.get('vdev_empty_mlo_array')):raise ValueError('VDEV repair report mismatch')
     if direct!=bool(stride and stride.get('ce3_direct_trial')):raise ValueError('CE3 direct report mismatch')
-    if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac).items()}:
+    if inspect!=bool(stride and stride.get('ce3_inspect_trial')) or inspect!=bool(worker.get('ce3_inspect_trial')):raise ValueError('CE3 inspection report mismatch')
+    if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect).items()}:
         raise ValueError('Network bridge source differs')
     if not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes'] or not net['late_initializer_owned'] or not net['other_sections_preserved']:
         raise ValueError('Network lifecycle/late initializer not qualified')
@@ -59,6 +66,7 @@ def qualify_components(report):
             raise ValueError('Wrong exact OEM UMAC wake contract')
         if stride.get('vdev_empty_mlo_array'):qualify_vdev_array(stride)
         if direct:qualify_ce3_direct(stride)
+        if inspect:qualify_ce3_inspect(stride,worker)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -86,6 +94,7 @@ def qualify(report_path,entry_path,runtime):
     result['umac_hold_trial']=report.get('umac_hold_trial') is True
     result['vdev_empty_mlo_array']=report.get('vdev_empty_mlo_array') is True
     result['ce3_direct_trial']=report.get('ce3_direct_trial') is True
+    result['ce3_inspect_trial']=report.get('ce3_inspect_trial') is True
     return result
 
 
@@ -117,4 +126,7 @@ def menu(qualification):
     if qualification.get('ce3_direct_trial'):
         if not qualification.get('vdev_empty_mlo_array'):raise ValueError('CE3 direct requires the qualified VDEV/UMAC parent')
         text=text.replace('Wi-Fi VDEV array repair + USB - TEST','Wi-Fi CE3 direct HP + USB - TEST',1)
+    if qualification.get('ce3_inspect_trial'):
+        if qualification.get('ce3_direct_trial') or not qualification.get('vdev_empty_mlo_array'):raise ValueError('CE3 inspection requires original shadow VDEV parent')
+        text=text.replace('Wi-Fi VDEV array repair + USB - TEST','Wi-Fi CE3 DMA inspect + USB - TEST',1)
     return text

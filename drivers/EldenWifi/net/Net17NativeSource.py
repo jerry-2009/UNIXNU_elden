@@ -5,9 +5,11 @@ import importlib.util
 ROOT=Path(__file__).resolve().parents[3]
 
 
-def generated(mhi_hold=False, umac_hold=False):
+def generated(mhi_hold=False, umac_hold=False, dma_inspect=False):
     if mhi_hold and umac_hold:
         raise ValueError('Select only one explicit wake trial')
+    if dma_inspect and not umac_hold:
+        raise ValueError('DMA inspection requires the qualified UMAC worker')
     spec=importlib.util.spec_from_file_location('net17_service_scan',ROOT/'drivers/EldenWifi/ServiceScanSource.py')
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);files=module.generated()
     def replace(text,old,new):
@@ -87,4 +89,8 @@ extern "C" int elden_wifi_umac_hold_requested(void){
 }
 '''
         files['NativeExports.inc']=text.encode()
+    if dma_inspect:
+        files['Native.cpp']=replace(files['Native.cpp'].decode(),
+            '#include "EldenNet17.h"','#include "EldenNet17.h"\n#include "DmaInspect.h"').encode()
+        files['NativeExports.inc']+=b'\n#include "DmaInspect.inc"\n'
     return files

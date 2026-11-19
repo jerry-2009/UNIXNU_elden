@@ -1,5 +1,16 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 CE3 INSPECT signed: exact firstEAGAIN18R0/R2 reads,<=4
+retained descriptors/fixedHTC-WMI-TLV headers and actual native owner/arena/
+SMMU status/CPU-PAR44/physical backing check. CPU mapping is not hardware
+SMMU/device DMA proof. First-only/no payload or command values/keys.27actual
+helper models+31qualifier mutations/runtime2+worker1+kernel1+entry1+package1
+audit pass; WMI632/native1 inherited warnings. Image32e4a34d/session69c7185d
+f67b4674/floor1738713600/0/3 NOT hardware-tested. Original shadow/UMAC/VDEV
+parent preserved; interrupted response candidate not reused. All jobs terminal,
+stock current; next one consolidated evidence trial then fullphysical return.
+Full Goal/Wi-Fi/charging/persistence/peripherals active and incomplete.
+
 Latest20261120 CE3 DIRECT HARDWARE: exact1b86400 directHP selected with
 UMACget0/scratch2, yet same firstPDEV16387 timeout/CE3sw2/write4/hp16/tp8,
 BSS0. Direct-only contrast did not remove failure; no direct/wake-only repeat

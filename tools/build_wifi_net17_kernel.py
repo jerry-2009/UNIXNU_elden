@@ -32,6 +32,7 @@ def main():
         hold=stride.get('mhi_hold_trial') is True
         umac=stride.get('umac_hold_trial') is True
         direct=stride.get('ce3_direct_trial') is True
+        inspect=stride.get('ce3_inspect_trial') is True
         if hold and umac:raise ValueError('Mutually exclusive wake trials')
         if not stride['compiled'] or stride.get('mac_phy_stride_fix') is not True or stride['base_binding_sha256']!=base_runtime['sha256'] or (not (hold or umac) and (not stride['imports_exports_unchanged'] or stride['changed_units']!=['ath12k_wmi.o'])):
             raise ValueError('Unqualified MAC/PHY stride runtime')
@@ -47,13 +48,17 @@ def main():
         if direct:
             from wifi_network17_boot import qualify_ce3_direct
             qualify_ce3_direct(stride)
+        if inspect:
+            from wifi_network17_boot import qualify_ce3_inspect
+            qualify_ce3_inspect(stride,worker)
+        if bool(worker.get('ce3_inspect_trial'))!=inspect:raise ValueError('DMA inspection worker/runtime mismatch')
         if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
             raise ValueError('MAC/PHY stride runtime artifact changed')
         for name,digest in stride['source_inputs'].items():
             if sha(ROOT/name)!=digest:raise ValueError('MAC/PHY stride source changed')
     if prior['profile']!='wifi-service-scan' or not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes']:
         raise ValueError('Use the retained service scan and physical-fence baseline')
-    if not stride and (worker.get('mhi_hold_trial') or worker.get('umac_hold_trial')):
+    if not stride and (worker.get('mhi_hold_trial') or worker.get('umac_hold_trial') or worker.get('ce3_inspect_trial')):
         raise ValueError('Wake worker requires its qualified runtime')
     for name in ('native','kernel'):
         if sha(parent/(name+'.macho'))!=prior[name+'_sha256']:raise ValueError('Parent kernel identity changed')
@@ -150,6 +155,7 @@ def main():
         umac_hold_trial=bool(stride and stride.get('umac_hold_trial')),
         vdev_empty_mlo_array=bool(stride and stride.get('vdev_empty_mlo_array')),
         ce3_direct_trial=bool(stride and stride.get('ce3_direct_trial')),
+        ce3_inspect_trial=bool(stride and stride.get('ce3_inspect_trial')),
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     write(out/'result.json',proof)
     print(json.dumps({key:proof[key] for key in ('profile','kernel_sha256','native_sha256','all_actual_imports_resolved','hardware_tested')}))
