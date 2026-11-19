@@ -15,6 +15,11 @@ def qualify_vdev_array(runtime):
         raise ValueError('Wrong exact VDEV WMI sources')
 
 
+def qualify_ce3_direct(runtime):
+    if runtime.get('umac_hold_trial') is not True or runtime.get('vdev_empty_mlo_array') is not True or runtime.get('ce3_direct_delta_reversible') is not True or runtime.get('ce3_only') is not True or runtime.get('ce3_qmi_shadow_config_unchanged') is not True or runtime.get('other_ce_mhi_irq_firmware_policy_unchanged') is not True or (runtime.get('ce3_ring_id'),runtime.get('ce3_hp_offset'))!=(67,0x1b86400) or runtime.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o','w7_hal.o']:
+        raise ValueError('Wrong exact CE3 direct-HP contrast')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -32,10 +37,12 @@ def qualify_components(report):
     net=report['network_bridge'];worker=report['network_worker']
     hold=report.get('mhi_hold_trial') is True
     umac=report.get('umac_hold_trial') is True
+    direct=report.get('ce3_direct_trial') is True
     if hold and umac:raise ValueError('Mutually exclusive wake trials')
     if hold!=bool(worker.get('mhi_hold_trial')) or hold!=bool(stride and stride.get('mhi_hold_trial')):raise ValueError('MHI wake pair mismatch')
     if umac!=bool(worker.get('umac_hold_trial')) or umac!=bool(stride and stride.get('umac_hold_trial')):raise ValueError('UMAC wake pair mismatch')
     if bool(report.get('vdev_empty_mlo_array'))!=bool(stride and stride.get('vdev_empty_mlo_array')):raise ValueError('VDEV repair report mismatch')
+    if direct!=bool(stride and stride.get('ce3_direct_trial')):raise ValueError('CE3 direct report mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac).items()}:
         raise ValueError('Network bridge source differs')
     if not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes'] or not net['late_initializer_owned'] or not net['other_sections_preserved']:
@@ -48,9 +55,10 @@ def qualify_components(report):
             raise ValueError('Wrong MAC/PHY-only runtime repair')
         if hold and (stride.get('lease_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('other_ce_mhi_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_mhi_hold_requested'):
             raise ValueError('Wrong bounded MHI wake lease')
-        if umac and (stride.get('umac_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('other_ce_mhi_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_umac_hold_requested' or stride.get('mhi_reference_and_umac_handshake') is not True or (stride.get('umac_request_offset'),stride.get('umac_status_offset'),stride.get('umac_ready_value'),stride.get('umac_polling_bound_ms'))!=(0x3004,0x1e04040,2,50)):
+        if umac and (stride.get('umac_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or (not direct and stride.get('other_ce_mhi_irq_firmware_objects_unchanged') is not True) or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o']+(['w7_hal.o'] if direct else []) or stride.get('added_native_import')!='_elden_wifi_umac_hold_requested' or stride.get('mhi_reference_and_umac_handshake') is not True or (stride.get('umac_request_offset'),stride.get('umac_status_offset'),stride.get('umac_ready_value'),stride.get('umac_polling_bound_ms'))!=(0x3004,0x1e04040,2,50)):
             raise ValueError('Wrong exact OEM UMAC wake contract')
         if stride.get('vdev_empty_mlo_array'):qualify_vdev_array(stride)
+        if direct:qualify_ce3_direct(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -77,6 +85,7 @@ def qualify(report_path,entry_path,runtime):
     result['mhi_hold_trial']=report.get('mhi_hold_trial') is True
     result['umac_hold_trial']=report.get('umac_hold_trial') is True
     result['vdev_empty_mlo_array']=report.get('vdev_empty_mlo_array') is True
+    result['ce3_direct_trial']=report.get('ce3_direct_trial') is True
     return result
 
 
@@ -105,4 +114,7 @@ def menu(qualification):
     if qualification.get('vdev_empty_mlo_array'):
         if not qualification.get('umac_hold_trial'):raise ValueError('VDEV repair requires its qualified UMAC parent')
         text=text.replace('Wi-Fi OEM UMAC wake + USB - TEST','Wi-Fi VDEV array repair + USB - TEST',1)
+    if qualification.get('ce3_direct_trial'):
+        if not qualification.get('vdev_empty_mlo_array'):raise ValueError('CE3 direct requires the qualified VDEV/UMAC parent')
+        text=text.replace('Wi-Fi VDEV array repair + USB - TEST','Wi-Fi CE3 direct HP + USB - TEST',1)
     return text

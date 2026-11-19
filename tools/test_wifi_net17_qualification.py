@@ -61,6 +61,18 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated VDEV array repair accepted: '+name)
+    if report.get('ce3_direct_trial'):
+        for name in ('reversible','ring','offset','qmi','policy','report'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='reversible':runtime['ce3_direct_delta_reversible']=False
+            elif name=='ring':runtime['ce3_ring_id']=68
+            elif name=='offset':runtime['ce3_hp_offset']=0x1b88400
+            elif name=='qmi':runtime['ce3_qmi_shadow_config_unchanged']=False
+            elif name=='policy':runtime['other_ce_mhi_irq_firmware_policy_unchanged']=False
+            else:selected['ce3_direct_trial']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated CE3 direct contrast accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

@@ -1,5 +1,27 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 CE3 DIRECT signed: previous UMAC16descriptor progress not
+stable; next exact Peachring67/R2=1b86400 selects original directHP branch,
+OEMignore_shadow counterpart. OtherCE pointers/QMI shadow table/credits/
+FW/IRQ/timeouts unchanged.144actual selector ASan/UBSan,30qualifier mutations,
+w7HAL1/124retained/fullkernel/Apple30/entry7124/package1 audit pass. HAL71
+warnings recorded; runtime1 wrong quotedhw.h rejected, runtime2-iquote exact
+deps. Image771f5240/session4e3c23ffa069941e/floor1738713600/0/3 NOT hardware
+tested. Nativeworker retained. Next one meaningful notification contrast and
+full physical stop. Device stock restored, all jobs terminal. Full Goal active
+and incomplete; no scan/network acceptance.
+
+Latest20261120 VDEV ARRAY HARDWARE: UMACget0/held1/scratch2 but earlyCE3
+sw2/write4/hp16/tp8/PDEV16387 failure returned, so prior16-descriptor progress
+is not stable and no UMAC root-cause claim. Empty MLO repair did not get an
+independent VDEV trial; retain actual schema fix, no repeated wake-only tests.
+This run put1/netdrain0/callbackreturned/unbind0/realfence/MSI4/PERSTlow/WCNstop
+plus typed physical fastboot/fullstock8b8e72da/Android/root/green/original
+charge+radios+scans/sleep all pass. Capture285717B/8891ae1f/drop0/no reconnect/
+discontinuity, post-disconnect unknown. All jobs terminal; stockcurrent.
+Next exact first-producer notification versus device-consumption contrast,
+no invented credits/clocks/timeouts. Full Goal active/incomplete.
+
 Latest20261120 VDEV ARRAY signed: first UMAC trial nowCE3sw16/hp64/tp64,
 VDEV20488 blocked scan; loaded OEM33869cd6 and exactd50b305f require non-MLO
 ARRAY_STRUCT18/len0 trailing4B, current7.0.14 omits it. Peach-only insertion;

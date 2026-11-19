@@ -1,5 +1,17 @@
 # Elden 基本可用实施计划
 
+2026-11-20 CE3通知对照候选已签：只将本机ring67的HP指针设为原有直接路径1b86400，
+其余CE及QMI shadow表不变。144实际函数场景/30资格反例和整核/签包通过；
+候选771f5240，session4e3c23ffa069941e，未实机。
+[对照目的与复现](../drivers/EldenWifi/peach/CE3-DIRECT-HP.md)／[证据](evidence/wifi-ce3-direct-20261120.json)。
+保持完整Goal active，Wi-Fi未联网。
+
+2026-11-20空MLO修复版实机又停在早期CE3sw2/write4/HP16/TP8，首次PDEV16387。
+之前UMAC版推进16条并不稳定，不能断言根因已解决；这轮尚未真正验证VDEV修复效果。
+真实UMAC put/net drain/物理DMA fence/MSI/PERST/完整stock恢复全部通过。
+[本轮](evidence/wifi-vdev-array-hardware-20261120.json)。下一步区分第一处通知与设备消费；
+完整Goal active，Wi-Fi未扫描联网。
+
 2026-11-20普通VDEV协议差异已修：原厂要求空MLO数组（tag18/len0/4B），
 目前Linux发送省略。只修Peach非MLO创建；20个实际旧新/原厂helper模型与24资格反例、
 整核/签包通过。候选c37cd59d，session7fde4cc64a53f234，未实机；联网未完成。

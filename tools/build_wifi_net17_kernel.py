@@ -31,18 +31,22 @@ def main():
         base_runtime=prior['component_objects']['WifiRuntimeMsiBinding.o']
         hold=stride.get('mhi_hold_trial') is True
         umac=stride.get('umac_hold_trial') is True
+        direct=stride.get('ce3_direct_trial') is True
         if hold and umac:raise ValueError('Mutually exclusive wake trials')
         if not stride['compiled'] or stride.get('mac_phy_stride_fix') is not True or stride['base_binding_sha256']!=base_runtime['sha256'] or (not (hold or umac) and (not stride['imports_exports_unchanged'] or stride['changed_units']!=['ath12k_wmi.o'])):
             raise ValueError('Unqualified MAC/PHY stride runtime')
         if hold and (stride.get('lease_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_mhi_hold_requested' or worker.get('mhi_hold_trial') is not True):
             raise ValueError('MHI wake lease requires the exact opt-in runtime/worker pair')
         if bool(worker.get('mhi_hold_trial'))!=hold:raise ValueError('MHI wake worker/runtime mismatch')
-        if umac and (stride.get('umac_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_umac_hold_requested' or worker.get('umac_hold_trial') is not True or stride.get('mhi_reference_and_umac_handshake') is not True or (stride.get('umac_request_offset'),stride.get('umac_status_offset'),stride.get('umac_ready_value'),stride.get('umac_polling_bound_ms'))!=(0x3004,0x1e04040,2,50)):
+        if umac and (stride.get('umac_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o']+(['w7_hal.o'] if direct else []) or stride.get('added_native_import')!='_elden_wifi_umac_hold_requested' or worker.get('umac_hold_trial') is not True or stride.get('mhi_reference_and_umac_handshake') is not True or (stride.get('umac_request_offset'),stride.get('umac_status_offset'),stride.get('umac_ready_value'),stride.get('umac_polling_bound_ms'))!=(0x3004,0x1e04040,2,50)):
             raise ValueError('OEM UMAC wake requires exact contract and runtime/worker pair')
         if bool(worker.get('umac_hold_trial'))!=umac:raise ValueError('UMAC wake worker/runtime mismatch')
         if stride.get('vdev_empty_mlo_array'):
             from wifi_network17_boot import qualify_vdev_array
             qualify_vdev_array(stride)
+        if direct:
+            from wifi_network17_boot import qualify_ce3_direct
+            qualify_ce3_direct(stride)
         if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
             raise ValueError('MAC/PHY stride runtime artifact changed')
         for name,digest in stride['source_inputs'].items():
@@ -145,6 +149,7 @@ def main():
         mhi_hold_trial=bool(stride and stride.get('mhi_hold_trial')),
         umac_hold_trial=bool(stride and stride.get('umac_hold_trial')),
         vdev_empty_mlo_array=bool(stride and stride.get('vdev_empty_mlo_array')),
+        ce3_direct_trial=bool(stride and stride.get('ce3_direct_trial')),
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     write(out/'result.json',proof)
     print(json.dumps({key:proof[key] for key in ('profile','kernel_sha256','native_sha256','all_actual_imports_resolved','hardware_tested')}))

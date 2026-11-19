@@ -47,3 +47,12 @@ until the actual VDEV/scan and complete stop/restoration are qualified.
 [Evidence](../../../docs/evidence/wifi-vdev-array-20261120.json).
 Mac`lab/wifi-vdev-array-20261120/{host2,runtime1,kernel1,entry1,package1}`;
 workbench`edl_work/wifi-vdev-array-20261120`.
+
+## Hardware limitation
+
+This candidate returned to the earlier CE3 HP16/TP8/PDEV16387 timeout even
+with real UMAC get/held/status2. The preceding16-descriptor advance was not
+stable. Thus the VDEV wire repair is source-tested but not independently
+qualified on hardware. This run did prove UMAC put, network drain, actual
+DMA/MSI/PERST fence, typed physical fastboot and complete stock restoration.
+[Hardware evidence](../../../docs/evidence/wifi-vdev-array-hardware-20261120.json).
