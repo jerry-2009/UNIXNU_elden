@@ -1,5 +1,19 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261119 CHARGE LINK RECOVERY: actual old24/new30 reconnect scenarios,
+18window/146policy regression and ASan/UBSan pass. Record possible SET28=0 inhibit
+before queue acceptance; retain across lost ACK/readback/error, roll back only
+known unsent request, clear only valid successful SET28=1 ACK. OEM thresholds
+stay owned by firmware. Both native consumers rebuilt with generated header/two
+aliases each; full native/prelink passes, exports/imports/core/Apple30/entry7124
+unchanged.8qualifier tests + actual loaded identity/menu/ADT/trust audit pass;
+object warnings0/inherited linker10. Kernel36d2db88/native6f3bc5bf, independent
+address-v138 baseline. Not packaged/flashed/hardware accepted; new complete
+empty-output boot command not run. profiles/charge-link-recovery and paired
+docs/evidence + lab/records are current. All build/audit jobs terminal. No device
+access or retry of the previously interrupted Wi-Fi candidate. Full Goal remains
+active; charging/Wi-Fi/persistent Data/remaining peripherals incomplete.
+
 Latest20261119 CHARGING EVIDENCE REVIEW:4historical captures and full stock
 restoration receipts verified. v144 raw backlight1597/798/restored1597 complete
 post-transition9samples each yield normalized medians0/+190/0mA. v145 GUI2048

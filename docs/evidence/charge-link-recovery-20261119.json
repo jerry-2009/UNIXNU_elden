@@ -1,0 +1,139 @@
+{
+  "format": 1,
+  "date": "2026-11-19",
+  "profile": "charge-link-recovery",
+  "defect": "Manual charge inhibit could survive link loss before bypass completion because the applied mode did not record the write.",
+  "correction": "Retain possible inhibit ownership until a valid successful release ACK; roll back only a known unsent inhibit request.",
+  "baseline": "Source-built bt-address17/address-v138, independent of the interrupted Wi-Fi diagnostic candidate",
+  "host": {
+    "passed": true,
+    "actual_production_policies_executed": true,
+    "firmware_behavior_modeled": true,
+    "original_scenarios": 24,
+    "fixed_scenarios": 30,
+    "window_regression_scenarios": 18,
+    "policy_regression_checks": 146,
+    "sanitizers": [
+      "ASan",
+      "UBSan"
+    ],
+    "record_sha256": "a7fa528d93f3363c6552bb0262b76d626f3e58a6b48a6f50d35211927ac69ddc"
+  },
+  "native": {
+    "kernel_sha256": "36d2db88601064eae213a1df11d4c2c9b4a880d851fdcad16571620b3831113f",
+    "native_sha256": "6f3bc5bf7b667e0ed288227c777f0ef206ed74381532598721a201049114d385",
+    "parent_kernel_sha256": "88877bdf9c25b96c9ae329f99f4e2238e775c5894f7dcf048fc6c658b506f3fa",
+    "generated_header_sha256": "b05e9e6a148cef9feb19b65ffe996e5b08ef8cf20f55061ab9bdd0ed36476cb4",
+    "objects": {
+      "PmicClient": {
+        "source_sha256": "5242cc51c521a459eac646c755f27b03cb5090fc4be36bd9c943bcfa35b83673",
+        "object_sha256": "b375b60329114ad5bf7c71789cc92d904205ba2cec791e2ec6b01b2a5c917771",
+        "bindings": [
+          "/Users/ciscohe/Desktop/UniXNU_elden/research/battery-telemetry-20261108/source-input-v35/PmicClient.cpp",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/unified/native/build/project/records/battery-telemetry-20261108/source-input-v35/PmicClient.cpp"
+        ],
+        "objcopy": [],
+        "generated_policy_header_sha256": "b05e9e6a148cef9feb19b65ffe996e5b08ef8cf20f55061ab9bdd0ed36476cb4",
+        "policy_header_bindings": [
+          "/Users/ciscohe/Desktop/UniXNU_elden/research/battery-telemetry-20261108/source-input-v35/ChargePolicy.h",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/unified/native/build/project/records/battery-telemetry-20261108/source-input-v35/ChargePolicy.h"
+        ]
+      },
+      "ChargePolicy": {
+        "source_sha256": "d1087379538d0fbbea15ca03a53d96b5af7d6b9b347099372604f63dfec15313",
+        "object_sha256": "5929262c4ca6a2c14b42f4627b9f97ff53c73a9f67128fc392d07e4ef9da9ba8",
+        "bindings": [
+          "/Users/ciscohe/Desktop/UniXNU_elden/research/battery-telemetry-20261108/source-input-v35/ChargePolicy.c",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/unified/native/build/project/records/battery-telemetry-20261108/source-input-v35/ChargePolicy.c"
+        ],
+        "objcopy": [],
+        "generated_policy_header_sha256": "b05e9e6a148cef9feb19b65ffe996e5b08ef8cf20f55061ab9bdd0ed36476cb4",
+        "policy_header_bindings": [
+          "/Users/ciscohe/Desktop/UniXNU_elden/research/battery-telemetry-20261108/source-input-v35/ChargePolicy.h",
+          "/Users/ciscohe/Desktop/UniXNU_elden/lab/clean-build-20261114/isolated/unified/native/build/project/records/battery-telemetry-20261108/source-input-v35/ChargePolicy.h"
+        ]
+      }
+    },
+    "generated_contract": {
+      "path": "native-contract.json",
+      "sha256": "8a6b80493ab40837f00a59a63cfcf969dd5aef5ab9007c7895d7674bd8d74bd9",
+      "native_sha256": "6f3bc5bf7b667e0ed288227c777f0ef206ed74381532598721a201049114d385"
+    },
+    "original_apple_executable_regions": 30,
+    "entry_delta": 7124,
+    "core_filelist_unchanged": true,
+    "imports_exports_unchanged": true,
+    "no_initializers": true,
+    "scalar": true,
+    "compiler_warnings": 0,
+    "linker_warnings": 10,
+    "record_sha256": "834454aa1995eba6415838ef10847960e4151dcdcdd8db86f0c2ba8c648e09e0"
+  },
+  "qualification": {
+    "unit_tests": 8,
+    "log_sha256": "e663df51851e8758fd917fb6096a05ca60e3673e3278c77f6d391d204d0582e5",
+    "actual_native_audit_sha256": "dca4268f4eb302dea546f909284fd274f88260e72f98cd39cbc5ef059bea3d0f",
+    "all_header_aliases_bound": true,
+    "menu_adt_trust_unchanged_from_window": true,
+    "menu_default": "xnu",
+    "menu_timeout_seconds": 8,
+    "primary_arguments_bytes": 1015
+  },
+  "frozen_inputs": {
+    "drivers/EldenPmicGlink/ChargePolicy.c": "baea8785f4353b020293126b7b109f40157f3287e34c080134ad3d70c29bdfeb",
+    "drivers/EldenPmicGlink/ChargePolicy.h": "ffa9a0c4cb4aee9a4f0881058365306dcd8e0cb1c1b5fc8356322e18c48a0605",
+    "drivers/EldenPmicGlink/WindowSource.py": "62eee5440f7feccd9c845f0e9e801c15e15b2c6cc2d66329bfa74fc00a0cf462"
+  },
+  "build_source_inputs": {
+    "tools/build_bt_address17.py": "1ae20cb9816148ef8963b7b97aec02099d541ffa5a32e4a214b98f119d30a7c1",
+    "tools/prepare_bt_helper_trace.py": "4d2f48bca348825bb9839710186bad16995931a2f977755f4e76f9622877624f",
+    "drivers/EldenBluetooth/runtime/LaunchCacheSource.py": "5395ec8f6a33b3a34ca2d204ab41c2c0b214419b8e53bc6d9e9ed72926559d38",
+    "drivers/EldenBluetooth/runtime/LaunchCache.inc": "398a283c8d7e66ffdec7509086285cf2432b907c13aa74eebf418b23be9025b2",
+    "drivers/EldenBluetooth/NativeInitSource.py": "5d15395c99dfccbb18b129e3279c68e7f7c4b5ba98bad7ac96a035c3289e6153",
+    "drivers/EldenBluetooth/ScanInitSource.py": "772f1d1385e56f94d47f258b69892beadb2db947d1dc377fc702e1e07401cbaf",
+    "drivers/EldenBluetooth/AddressWaitCapacitySource.py": "5db1b1b8acf7e2b6acc60e3dbcf0914be4affee7651c3c8f12a6ce389fea15e9",
+    "drivers/EldenBluetooth/AdmissionTraceSource.py": "81bb5f5d24e9373d67f4ff3766f24b8143ef40e8005c005cb59557935b179e74",
+    "drivers/EldenBluetooth/DiscoverySource.py": "c972ea31e0f39557001bc0664143a70952b23b527c8d4e30be526fb1f972b468",
+    "drivers/EldenBluetooth/Discovery.inc": "bd837fb655470853083c387893bac8d56a47b5c9e6377825153da8eed486a183",
+    "drivers/EldenBluetooth/diagnostics/AddressPropertyMarker.inc": "28f9b68eb1441282dc065c03410a7af2e4c6c617af81837102606a0dc6947560",
+    "drivers/EldenBluetooth/ProcessLifetimeSource.py": "8596e3815397b9b31d636a62a403eda589ab41e1d6dca84f7cc3c402d70a8fe0",
+    "drivers/EldenBluetooth/RegistrySource.py": "395e393e87cc73a022f05fc6c9179630819b0c21420c122258108a1c852f3791",
+    "drivers/EldenBluetooth/NativeHost.cpp": "646849166bcd935a8c594cff2470a24ed56484f274c15bff1f8eeb9ca64496e3",
+    "drivers/EldenBluetooth/diagnostics/TransportTrace.py": "5f0812b9148e252fefea321ed83a7de7db2bed6fc721b6ffbe1429b1bc435445",
+    "drivers/EldenBluetooth/diagnostics/NativeScanRolesMarker.inc": "116bc9f7ce8046414588fb1d47840989f03be7603296bb97041d7ccee09b617f",
+    "tools/build_charge_verification.py": "f5aa09e8e4cb7017439e8d785366ae4e65eec245d4f879e6bbe3e403455d685a",
+    "drivers/EldenPmicGlink/VerificationSource.py": "91d315c011d6b8a025a24ab81c569646bce0c757bb9f7d026f864ff78756728f",
+    "drivers/EldenPmicGlink/ChargeVerification.h": "dfdc83887f21bb65f29fdd452b8a8e2988ec0fb6848c5a0197d66f62ab5c9ac1",
+    "drivers/EldenPmicGlink/ChargePolicy.c": "baea8785f4353b020293126b7b109f40157f3287e34c080134ad3d70c29bdfeb",
+    "drivers/EldenPmicGlink/ChargePolicy.h": "ffa9a0c4cb4aee9a4f0881058365306dcd8e0cb1c1b5fc8356322e18c48a0605",
+    "profiles/v91/sources/power/PmicClient.cpp": "6c7fbcb75b1fbc7aa39c286171d9e6859534a4f79c197a28ab8542b20321e17a",
+    "drivers/EldenPmicGlink/WindowSource.py": "62eee5440f7feccd9c845f0e9e801c15e15b2c6cc2d66329bfa74fc00a0cf462",
+    "drivers/EldenPmicGlink/LinkSource.py": "215a8978261975da88bbd00c50fbc4481725c2654d00528aa903b6c972743023",
+    "tools/test_charge_link.py": "f19b30687a4e92081106c12310f6c9a206e0c631363e0f09415adfa63e741301",
+    "drivers/EldenPmicGlink/TestChargeLink.c": "0d6105edc66b684cb6aa5fcc9ef5b050b783fa8dffdd2ca5bfe7ed93c82065cb"
+  },
+  "final_source_inputs": {
+    "drivers/EldenPmicGlink/LinkSource.py": "215a8978261975da88bbd00c50fbc4481725c2654d00528aa903b6c972743023",
+    "drivers/EldenPmicGlink/TestChargeLink.c": "0d6105edc66b684cb6aa5fcc9ef5b050b783fa8dffdd2ca5bfe7ed93c82065cb",
+    "tools/test_charge_link.py": "f19b30687a4e92081106c12310f6c9a206e0c631363e0f09415adfa63e741301",
+    "tools/test_charge_link_qualification.py": "9972f73688bbd6d9abee4ab21b21f3da68a008f203c73453e48b17dbcf66f516",
+    "tools/build_charge_verification.py": "f5aa09e8e4cb7017439e8d785366ae4e65eec245d4f879e6bbe3e403455d685a",
+    "tools/build_clean.py": "61c56a73f94e108a35cca80cd706d941c675bda90e0f100e66ad656706fa9a42",
+    "tools/charge_verification_boot.py": "d7b14e51d48035d916ff51a436f2a4373e153d382d73f2c90a5e1aa1801d6292",
+    "tools/bt_runtime_boot.py": "79f13bc7424ffb1f444dcdb7fba279f93fc5e2bf6db952f22dc4dee2d6f8e422"
+  },
+  "packaged": false,
+  "flashed": false,
+  "hardware_tested": false,
+  "full_new_clean_boot_command_run": false,
+  "device_access_this_work": false,
+  "goal": "active and incomplete",
+  "remaining": [
+    "Full signed package and one meaningful hardware qualification",
+    "Dual-port sustained net charging and data coexistence",
+    "Physical system-power bypass",
+    "Full stop/recharge threshold cycles",
+    "Sleep and persistent settings"
+  ],
+  "evidence_directory": "workbench lab/records/charge-link-recovery-20261119"
+}

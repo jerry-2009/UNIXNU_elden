@@ -28,6 +28,7 @@ def main():
     p.add_argument('--bt-process-lifetime',action='store_true',help='Keep H4 process references local to each callback')
     p.add_argument('--charge-verification',action='store_true',help='Require fresh charging readback and bound verification waits on the current address baseline')
     p.add_argument('--charge-window-handoff',action='store_true',help='Include verification and return from bypass to OEM automatic charging windows')
+    p.add_argument('--charge-link-recovery',action='store_true',help='Independent charging pair retaining possible manual inhibit across transport loss')
     p.add_argument('--spmi-translation-survey',action='store_true',help='Include window handoff and compare SPMI page read/write translation without FIFO access')
     p.add_argument('--backlight-service',action='store_true',help='Enable the qualified native brightness service on the window-handoff baseline')
     p.add_argument('--backlight-power-trial',action='store_true',help='Bounded baseline/dim/restore power observation; separate from brightness service use')
@@ -87,6 +88,15 @@ def main():
     if a.backlight_power_trial:a.backlight_service=True
     if a.backlight_service and a.spmi_translation_survey:raise ValueError('Use separate backlight and translation variants')
     if a.spmi_translation_survey or a.backlight_service:a.charge_window_handoff=True
+    if a.charge_link_recovery:
+        if a.variant!='bluetooth' or not a.bt_address17:
+            raise ValueError('--charge-link-recovery requires the qualified Bluetooth/address17 chain')
+        if any((a.spmi_translation_survey,a.backlight_service,a.backlight_power_trial,
+                a.pd_power_trial,a.pd_gui,a.cpu_power_observation,a.cpu_governor,
+                a.storage_medium,a.early_storage_guard,a.ufs_wait_trial,
+                a.ufs_queue_trial,a.ufs_idle_trial,a.data_capacity_2g)):
+            raise ValueError('--charge-link-recovery requires its separate charge/address17 chain')
+        a.charge_window_handoff=True
     if a.charge_window_handoff:a.charge_verification=True
     if a.charge_verification and not a.bt_address17:raise ValueError('--charge-verification currently requires the qualified --bt-address17 baseline')
     if sys.platform!='darwin':raise SystemExit('Native build requires macOS with Xcode/iPhoneOS SDK. Windows/WSL can inspect sources and flash separately.')
@@ -126,6 +136,7 @@ def main():
     identity['bt_discovery17']=a.bt_discovery17
     identity['bt_address17']=a.bt_address17
     identity['charge_window_handoff']=a.charge_window_handoff
+    identity['charge_link_recovery']=a.charge_link_recovery
     identity['spmi_translation_survey']=a.spmi_translation_survey
     identity['backlight_service']=a.backlight_service
     identity['backlight_power_trial']=a.backlight_power_trial
@@ -246,8 +257,8 @@ def main():
         stage('bt-address17',script('build_bt_address17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-address-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-address17'),'bt-address17/result.json')
         kernel_folder=out/'bt-address17';runtime_folder=kernel_folder/'runtime'
     if a.charge_verification:
-        charge_name='charge-window-handoff' if a.charge_window_handoff else 'charge-verification'
-        charge_args=['--window-handoff'] if a.charge_window_handoff else []
+        charge_name='charge-link-recovery' if a.charge_link_recovery else 'charge-window-handoff' if a.charge_window_handoff else 'charge-verification'
+        charge_args=['--link-recovery'] if a.charge_link_recovery else ['--window-handoff'] if a.charge_window_handoff else []
         if a.spmi_translation_survey:charge_name='spmi-translation-survey';charge_args+=['--translation-survey']
         stage(charge_name,script('build_charge_verification.py','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/charge_name,*charge_args),charge_name+'/result.json')
         kernel_folder=out/charge_name;runtime_folder=kernel_folder/'runtime'

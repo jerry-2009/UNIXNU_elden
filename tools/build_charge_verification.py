@@ -18,6 +18,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ('clean-build','parent-build','original-kernelcache','llvm','output'):p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--window-handoff',action='store_true',help='Release explicit bypass when returning to firmware-managed windows')
+    p.add_argument('--link-recovery',action='store_true',help='Retain possible manual charge inhibit across transport loss; recompile both consumers')
     p.add_argument('--translation-survey',action='store_true',help='Window variant plus one SPMI page translation survey; no FIFO access')
     p.add_argument('--backlight-service',action='store_true',help='Rebuild the backlight boot alias over the qualified window parent')
     p.add_argument('--backlight-power-trial',action='store_true',help='Use the existing dim/restore path with bounded observation timing')
@@ -30,6 +31,12 @@ def main():
     p.add_argument('--ufs-queue-trial',action='store_true',help='Owned DMA, multi-slot queue and QD1/8/32 trial over the verified IRQ parent')
     p.add_argument('--ufs-idle-trial',action='store_true',help='Stock5000us automatic Hibern8 with idle/read/restore validation')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
+    if a.link_recovery:
+        if any((a.translation_survey,a.backlight_service,a.backlight_power_trial,a.pd_power_trial,
+                a.cpu_power_observation,a.cpu_governor,a.storage_medium,a.early_storage_guard,
+                a.ufs_wait_trial,a.ufs_queue_trial,a.ufs_idle_trial)):
+            raise ValueError('Link recovery is a separate charging pair over the qualified address baseline')
+        a.window_handoff=True
     if a.backlight_power_trial and not a.backlight_service:raise ValueError('Power trial requires --backlight-service')
     if a.backlight_service and (a.window_handoff or a.translation_survey):raise ValueError('Backlight uses an already qualified window parent')
     if a.pd_power_trial and (a.backlight_service or a.backlight_power_trial or a.window_handoff or a.translation_survey):raise ValueError('PD power uses an already qualified backlight power parent')
@@ -45,6 +52,10 @@ def main():
         from WindowSource import policy as window_policy
         policy_derive=window_policy
     client_derive=client
+    generated_policy_header=None
+    if a.link_recovery:
+        from LinkSource import policy as link_policy,client as link_client,header as link_header
+        policy_derive=link_policy;client_derive=link_client;generated_policy_header=link_header()
     if a.translation_survey:
         if not a.window_handoff:raise ValueError('Translation survey requires --window-handoff')
         from TranslationSource import client as translation_client
@@ -64,6 +75,7 @@ def main():
     rows=read(base/'native/build/results.json');capture=read(base/'native/capture.json')
     virtual_root=read(ROOT/'profiles/v91/native-build/plan.json')['virtual_root'].rstrip('/')
     out.mkdir(parents=True);(out/'source').mkdir();records={};objects={};object_archives={};inherited={}
+    if generated_policy_header is not None:(out/'source/ChargePolicy.h').write_bytes(generated_policy_header)
     units=[('PmicClient','PmicClient.cpp',client_derive,CLIENT),('ChargePolicy','ChargePolicy.c',policy_derive,POLICY)]
     if a.backlight_service or a.pd_power_trial:
         sys.path.insert(0,str(ROOT/'drivers/EldenBacklight'))
@@ -96,9 +108,13 @@ def main():
         if relative.startswith('research/'):relative='records/'+relative[len('research/'):]
         cwd=(base/'native/build/project'/relative).resolve();assert cwd.is_relative_to((base/'native/build/project').resolve()) and cwd.is_dir()
         source=out/'source'/name;source.write_bytes(derive());cmd=list(row['command']);overlay=read(Path(cmd[cmd.index('-ivfsoverlay')+1]));assert overlay['fallthrough'] is False
-        bindings=[];extra=[]
+        bindings=[];extra=[];policy_header_bindings=[]
         for item in overlay['roots']:
             f=Path(item['external-contents']);inherited[str(f)]=sha(f)
+            if generated_policy_header is not None and Path(item['name']).name=='ChargePolicy.h':
+                from LinkSource import HEADER
+                assert sha(f)==HEADER,'Consumer header is not the frozen charge state'
+                item['external-contents']=str(out/'source/ChargePolicy.h');policy_header_bindings.append(item['name'])
             if a.cpu_governor and Path(item['name']).name in ('EldenScmiPerf.h','CpuPerfAccess.h'):
                 assert sha(f)==sha(ROOT/'profiles/v91/sources/power'/Path(item['name']).name),'CPU protocol header differs from frozen provider'
             if item['name'].endswith('/'+name):
@@ -115,6 +131,7 @@ def main():
                         extra += [{'type':'file','name':str(Path(item['name']).parent/'GovernorControl.h'),'external-contents':str(ROOT/'drivers/EldenCpuPower/GovernorControl.h')},
                                   {'type':'file','name':str(Path(item['name']).parent/'EldenCpuFreqPolicy.h'),'external-contents':str(out/'source/EldenCpuFreqPolicy.h')}]
         assert bindings;known={x['name'] for x in overlay['roots']}
+        if generated_policy_header is not None:assert policy_header_bindings,'Each charge consumer must bind the derived header'
         for item in extra:
             if item['name'] in known and a.cpu_governor:
                 prior=[v for v in overlay['roots'] if v['name']==item['name']]
@@ -138,6 +155,8 @@ def main():
         asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',obj],text=True);(out/(unit+'.asm')).write_text(asm)
         assert not re.search(r'^\s*[0-9a-f]+:\s+[0-9a-f]{8}\s+.*\b[qvdshb]\d+(?:\b|\.)',asm,re.M)
         records[unit]={'source_sha256':sha(source),'object_sha256':sha(obj),'command':cmd,'cwd':str(cwd),'bindings':bindings,'objcopy':expected_objcopy};objects[obj.name]=obj
+        if generated_policy_header is not None:
+            records[unit].update(generated_policy_header_sha256=sha(out/'source/ChargePolicy.h'),policy_header_bindings=policy_header_bindings)
         object_archives[obj.name]='libEldenBacklight.a' if unit=='BacklightRuntime' else 'libEldenPmicClient.a'
     if a.cpu_governor:
         from cpu_governor_build import compile_recovery
@@ -200,6 +219,7 @@ def main():
     before=entry((parent/'kernel.macho').read_bytes());after=entry((out/'kernel.macho').read_bytes());assert before[2]==after[2] and before[1]-before[0]==after[1]-after[0]==7124
     files=[Path(__file__).resolve(),ROOT/'drivers/EldenPmicGlink/VerificationSource.py',ROOT/'drivers/EldenPmicGlink/ChargeVerification.h',ROOT/'drivers/EldenPmicGlink/ChargePolicy.c',ROOT/'drivers/EldenPmicGlink/ChargePolicy.h',CLIENT_PATH]
     if a.window_handoff:files.append(ROOT/'drivers/EldenPmicGlink/WindowSource.py')
+    if a.link_recovery:files += [ROOT/'drivers/EldenPmicGlink/LinkSource.py',ROOT/'tools/test_charge_link.py',ROOT/'drivers/EldenPmicGlink/TestChargeLink.c']
     if a.translation_survey:files += [ROOT/'drivers/EldenPmicGlink/TranslationSource.py',ROOT/'drivers/EldenUsbThermal/TranslationSurvey.h']
     if a.backlight_service:files += [ROOT/'drivers/EldenBacklight/BootSource.py',ROOT/'drivers/EldenBacklight/BacklightRuntime.cpp']
     if a.backlight_power_trial:files.append(ROOT/'drivers/EldenBacklight/PowerTrialSource.py')
@@ -222,6 +242,12 @@ def main():
     sources={**parent_report['source_inputs'],**{str(f.relative_to(ROOT)):sha(f) for f in files}}
     report={'profile':'charge-verification','kernel_sha256':sha(out/'kernel.macho'),'native_sha256':sha(out/'native.macho'),'changed_core_objects':0,'changed_native_objects':2,'native_objects':records,'archive_members':members,'core_filelist_unchanged':True,'scalar':True,'optional_runtime':parent_report['optional_runtime'],'source_inputs':sources,'inherited_inputs':inputs,'inherited_sources':inherited,'entry_return_target':hex(after[1]),'parent_kernel_sha256':parent_report['kernel_sha256'],'original_apple_executables_hashed':30,'hardware':False}
     if a.window_handoff:report['profile']='charge-window-handoff'
+    if a.link_recovery:
+        report['profile']='charge-link-recovery';report['manual_inhibit_survives_transport_loss']=True
+        report['generated_policy_header_sha256']=sha(out/'source/ChargePolicy.h')
+        loaded_sections,loaded_commands,loaded_symbols=native_identity(out/'native.macho')
+        write(out/'native-contract.json',dict(sections=loaded_sections,commands=loaded_commands,symbols=loaded_symbols))
+        report['native_identity_contract']=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=report['native_sha256'])
     if a.translation_survey:report['profile']='spmi-translation-survey'
     if a.backlight_service:report['profile']='backlight-service';report['changed_native_objects']=1
     if a.backlight_power_trial:report['profile']='backlight-power-trial'

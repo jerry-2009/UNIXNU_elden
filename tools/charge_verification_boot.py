@@ -14,7 +14,7 @@ def load_native_contract(folder,report,profile,*,wifi_service=False):
     declared=report.get('native_identity_contract')
     if declared is None:
         return json.loads((ROOT/'profiles'/profile/'native-contract.json').read_text())
-    if not wifi_service or set(declared)!={'path','sha256','native_sha256'} or declared['path']!='native-contract.json':
+    if not (wifi_service or profile=='charge-link-recovery') or set(declared)!={'path','sha256','native_sha256'} or declared['path']!='native-contract.json':
         raise ValueError('Invalid generated native identity declaration')
     artifact=Path(folder)/'native.macho';contract=Path(folder)/'native-contract.json'
     if declared['native_sha256']!=report['native_sha256'] or sha(artifact)!=declared['native_sha256'] or sha(contract)!=declared['sha256']:
@@ -22,6 +22,33 @@ def load_native_contract(folder,report,profile,*,wifi_service=False):
     expected=json.loads(contract.read_text())
     if set(expected)!={'sections','commands','symbols'}:raise ValueError('Invalid native identity fields')
     return expected
+def qualify_charge_link_pair(folder,report):
+    """Check both compiled consumers, including every state-header alias."""
+    sys.path.insert(0,str(ROOT/'drivers/EldenPmicGlink'))
+    from LinkSource import policy,client,header
+    folder=Path(folder)
+    expected_header=header();wanted_header=hashlib.sha256(expected_header).hexdigest()
+    header_path=(folder/'source/ChargePolicy.h').resolve()
+    if report.get('manual_inhibit_survives_transport_loss') is not True or report.get('generated_policy_header_sha256')!=wanted_header:
+        raise ValueError('Wrong charge link-recovery contract')
+    if header_path.read_bytes()!=expected_header:raise ValueError('Derived charge header differs')
+    if set(report['native_objects'])!={'ChargePolicy','PmicClient'}:
+        raise ValueError('Both charge consumers must be rebuilt')
+    for unit,name,data in [('ChargePolicy','ChargePolicy.c',policy()),('PmicClient','PmicClient.cpp',client())]:
+        row=report['native_objects'][unit]
+        if row['source_sha256']!=hashlib.sha256(data).hexdigest() or (folder/'source'/name).read_bytes()!=data or row.get('generated_policy_header_sha256')!=wanted_header:
+            raise ValueError('Charge consumer source/header pairing differs')
+        overlay=json.loads((folder/(unit+'.overlay.json')).read_text())
+        aliases=[item for item in overlay['roots'] if Path(item['name']).name=='ChargePolicy.h']
+        names=[item['name'] for item in aliases]
+        declared=row.get('policy_header_bindings',[])
+        if overlay.get('fallthrough') is not False or len(names)!=2 or len(set(names))!=2 or len(declared)!=2 or set(names)!=set(declared):
+            raise ValueError('Charge consumer must bind both frozen header aliases')
+        if any(Path(item['external-contents']).resolve()!=header_path for item in aliases):
+            raise ValueError('Charge consumer resolves an old state header')
+        if sha(folder/(unit+'.o'))!=row['object_sha256']:
+            raise ValueError('Charge consumer object differs')
+
 def qualify(report_path,entry_path,runtime):
     folder=Path(report_path).parent;r=json.loads(Path(report_path).read_text());e=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     profile=r.get('profile')
@@ -34,7 +61,9 @@ def qualify(report_path,entry_path,runtime):
     if profile=='ufs-wait-trial':units={'ArmCpu','ShengUfs'}
     if profile=='ufs-queue-trial':units={'ShengUfs'}
     if profile=='ufs-idle-trial':units={'ShengUfs'}
-    if profile not in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile not in ('charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile=='charge-link-recovery':
+        qualify_charge_link_pair(folder,r)
     if profile in ('ufs-queue-trial','ufs-idle-trial'):
         sys.path.insert(0,str(ROOT/'drivers/EldenUfsQueue'));import NativeSource as q
         row=r['native_objects']['ShengUfs']
