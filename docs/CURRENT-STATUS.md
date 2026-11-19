@@ -1,5 +1,17 @@
 # 当前状态 · 2026-11-18
 
+2026-11-20普通VDEV协议差异已修：原厂要求空MLO数组（tag18/len0/4B），
+目前Linux发送省略。只修Peach非MLO创建；20个实际旧新/原厂helper模型与24资格反例、
+整核/签包通过。候选c37cd59d，session7fde4cc64a53f234，未实机；联网未完成。
+[复现及契约](../drivers/EldenWifi/peach/VDEV-MLO-ARRAY.md)／[证据](evidence/wifi-vdev-array-20261120.json)。
+下一轮一次核VDEV与scan；停机须真实证明，不因物理回程成功而称排空成功。
+
+2026-11-20原厂UMAC候选实机有推进：get0/held1、scratch2；CE3从2条到16条，
+首次失败移至VDEV20488。扫描/BSS仍0，不能称联网成功。停机未记录put/drain/fence，
+保留资源至有界物理复位；完整stock/root/green/原设置恢复通过。
+[本轮实录](evidence/wifi-umac-wake-hardware-20261120.json)。下一步核普通VDEV必需空MLO
+数组及停机等待，不重复纯唤醒测试；完整Goal继续active。
+
 2026-11-20原厂模块确认独立UMAC握手：实际MHI引用后写0x3004，读取1e04040必须为2。
 新显式候选37项helper模型、17资格反例、原生/整核/入口/签包通过；候选21b9231b，
 sessionb86eb5d73f05fd7b，floor1738713600/0/3。未实机，下一轮一次核握手与CE3推进。

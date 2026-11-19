@@ -48,6 +48,19 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated OEM UMAC wake accepted: '+name)
+    if report.get('vdev_empty_mlo_array'):
+        for name in ('reversible','tag','bytes','parent','source','scope','report'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='reversible':runtime['vdev_array_delta_reversible']=False
+            elif name=='tag':runtime['vdev_array_tag']=0
+            elif name=='bytes':runtime['vdev_array_bytes']=8
+            elif name=='parent':runtime['vdev_parent_wmi_source_sha256']='0'*64
+            elif name=='source':runtime['vdev_fixed_wmi_source_sha256']='0'*64
+            elif name=='scope':runtime['vdev_other_and_mlo_streams_unchanged']=False
+            else:selected['vdev_empty_mlo_array']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated VDEV array repair accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

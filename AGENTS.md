@@ -1,5 +1,27 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 VDEV ARRAY signed: first UMAC trial nowCE3sw16/hp64/tp64,
+VDEV20488 blocked scan; loaded OEM33869cd6 and exactd50b305f require non-MLO
+ARRAY_STRUCT18/len0 trailing4B, current7.0.14 omits it. Peach-only insertion;
+other/MLO packets exact.20actual old/new+vendor-helper ASan/UBSan,24qualification
+mutations, WMI1/124retained/nativeworker retained/fullkernel/Apple30/entry7124/
+package1 audit pass,632inherited WMI warnings. Imagec37cd59d/session7fde4cc64a
+53f234/floor1738713600/0/3 NOT hardware-tested. Last UMAC stop missing fence/put
+proof; typed physical reset and fullstock/root/green/settings restore passed.
+Next one exact VDEV/scan contrast and real stop check. Full Goal active and
+incomplete, device stock, all build jobs terminal.
+
+Latest20261120 UMAC HARDWARE: exact get0/held1/scratch2 observed; first failure
+moved from PDEV to VDEV20488. CE3sw16/write16/hp64/tp64 proves16descriptors
+consumed, not allWMI handlers. BSS0, scan/create still fails; no Wi-Fi acceptance.
+No observed put/network-drain/runtime-stop/fence: WCN9s bound expires, objects
+retained to typed platform reset. Physical fastboot/fullstock8b8e72da/Android/
+root/green/original charge+radios+scans/sleep restored, all jobs terminal.
+Capture285690B/SHA5bbf0871/drop0/no reconnect or discontinuity, post-disconnect
+unknown. Do not call this graceful stop or prove UMAC causation from1trial.
+Next audit VDEV non-MLO wire contract and stop wait; no wake-only repeat.
+Full Goal/Wi-Fi/charging/persistence/peripherals active and incomplete.
+
 Latest20261120 OEM UMAC WAKE signed: loaded TB322FC module33869cd6 proves
 MHI reference plus0x3004 request and1e04040==2 handshake, missing in current
 Linux path. Explicit same-owner compiled pair,<=50ms checks/failed clear+put;

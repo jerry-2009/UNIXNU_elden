@@ -60,3 +60,16 @@ The signed candidate is`21b9231b3ca96156b9bf7b787f64481d932717048c1ebd745f658453
 session`b86eb5d73f05fd7b`, floor1738713600/footer0/parent3.
 Hardware remains pending: require the real handshake and CE3 progression,
 then scan/BSS, association, DHCP and bidirectional traffic before Wi-Fi acceptance.
+
+## First hardware result
+
+The genuine handshake returned0/held1/before2/after2. CE3 progressed to
+sw16/write16/HP64/DMA-TP64, then the first timeout was VDEV20488 during
+scan-interface setup. No BSS/association/DHCP/traffic acceptance exists. The
+WCN9s stop bound expired; no put, network-drain, runtime-stop or physical
+DMA/MSI/PERST fence was observed. Resources remained held to typed physical
+reset. Physical fastboot and complete stock Android/root/green/original
+settings restoration passed. Do not call this a graceful stop or attribute
+causation from one contrast.
+
+[Hardware evidence](../../docs/evidence/wifi-umac-wake-hardware-20261120.json).

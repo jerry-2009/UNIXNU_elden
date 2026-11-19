@@ -1,0 +1,87 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "umac_hold_trial": true,
+  "image_sha256": "21b9231b3ca96156b9bf7b787f64481d932717048c1ebd745f658453692db930",
+  "session": "b86eb5d73f05fd7b",
+  "hardware_tested": true,
+  "raw": {
+    "path": "edl_work\\live-umac-wake-20261120\\usb\\20261119-202334.bin",
+    "bytes": 285690,
+    "sha256": "5bbf0871acbf5aabdd8a6e03ffd73165a4afc7afdf85d2b7370674c794ec6a20",
+    "status_samples": 65,
+    "drop_max": 0,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "observed": {
+    "umac": [
+      "ELDEN_ATH12K level=4 ELDEN_UMAC_WAKE get=0 held=1 before=2 after=2 checks=1"
+    ],
+    "station": [
+      "ELDEN_WIFI_NET start=0 station-stage=4"
+    ],
+    "ce3": [
+      "ELDEN_ATH12K level=3 stuck: ce3 src sw 16 write 16 hp 64 reap 60 cached-tp 64 tp 64"
+    ],
+    "first_timeout": "20488",
+    "timeouts": {
+      "16387": 27,
+      "20482": 1,
+      "20488": 3
+    },
+    "vdev_failures": [
+      "ELDEN_ATH12K level=4 failed to set vdev 0 tx encap mode: -11",
+      "ELDEN_ATH12K level=4 failed to set vdev 0 rx decap mode: -11",
+      "ELDEN_ATH12K level=4 failed to set vdev 0 chainmask 0x3, nss 2 :-11"
+    ],
+    "sync": [
+      "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+    ],
+    "wcn": [
+      "ELDEN_WCN RPC stop=0; held or bounded wait expired, continuing reset"
+    ]
+  },
+  "real_umac_awake_status": true,
+  "first_ce3_stall_changed": true,
+  "ce3_consumed_commands": 16,
+  "ce3_sw": 16,
+  "ce3_write": 16,
+  "ce3_hp": 64,
+  "ce3_dma_tp": 64,
+  "first_vdev_set_param_timeout": true,
+  "scan_accepted": false,
+  "bss": 0,
+  "association": false,
+  "dhcp": false,
+  "traffic": false,
+  "graceful_network_runtime_stop_proven": false,
+  "umac_reference_put_proven": false,
+  "physical_dma_msi_perst_fence_proven": false,
+  "safe_typed_platform_reset_observed": true,
+  "physical_fastboot_observed": true,
+  "full_stock_restore_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_original_settings_restored": true,
+  "radio_restoration": {
+    "complete": true,
+    "attempts": 2,
+    "errors": [],
+    "actual_radios": [
+      "1",
+      "1"
+    ],
+    "actual_scans": [
+      "1",
+      "1"
+    ]
+  },
+  "device_jobs_terminal": true,
+  "caveats": [
+    "CE3 TP64 proves16 descriptors consumed, not every WMI handler successful.",
+    "This run moved first failure; single-run UMAC causation needs separate qualification.",
+    "WCN quiesce bounded expiry and missing fence/put must not be described as graceful stop."
+  ],
+  "next": "Retain negative and positive result. Audit first VDEV create/setting contract and stop waiting before next live expansion.",
+  "goal": "active and incomplete"
+}

@@ -8,6 +8,13 @@ PARENT_KERNEL='b6b0d1b8daa2e19f69b3e3a909a6654ba148289da79b180cd25ee49d3cb873b4'
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def qualify_vdev_array(runtime):
+    if runtime.get('umac_hold_trial') is not True or runtime.get('vdev_array_delta_reversible') is not True or runtime.get('vdev_array_peach_only') is not True or runtime.get('vdev_other_and_mlo_streams_unchanged') is not True or (runtime.get('vdev_array_tag'),runtime.get('vdev_array_bytes'),runtime.get('vdev_array_vendor_commit'))!=(18,4,'d50b305f7da9e14715a25120a4ac7b1a4b8b97c3'):
+        raise ValueError('Wrong exact OEM VDEV array repair')
+    if runtime.get('vdev_parent_wmi_source_sha256')!='0c2e215a5c0fd6e65766959b4e076b0e5db340b941000730c6ed649a24fbdbd5' or runtime.get('vdev_fixed_wmi_source_sha256')!='8a64e386a5ad6fadf3639a694ded604f3509aafa6795c7e93c500d1849f195ee':
+        raise ValueError('Wrong exact VDEV WMI sources')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -28,6 +35,7 @@ def qualify_components(report):
     if hold and umac:raise ValueError('Mutually exclusive wake trials')
     if hold!=bool(worker.get('mhi_hold_trial')) or hold!=bool(stride and stride.get('mhi_hold_trial')):raise ValueError('MHI wake pair mismatch')
     if umac!=bool(worker.get('umac_hold_trial')) or umac!=bool(stride and stride.get('umac_hold_trial')):raise ValueError('UMAC wake pair mismatch')
+    if bool(report.get('vdev_empty_mlo_array'))!=bool(stride and stride.get('vdev_empty_mlo_array')):raise ValueError('VDEV repair report mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac).items()}:
         raise ValueError('Network bridge source differs')
     if not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes'] or not net['late_initializer_owned'] or not net['other_sections_preserved']:
@@ -42,6 +50,7 @@ def qualify_components(report):
             raise ValueError('Wrong bounded MHI wake lease')
         if umac and (stride.get('umac_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('other_ce_mhi_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_umac_hold_requested' or stride.get('mhi_reference_and_umac_handshake') is not True or (stride.get('umac_request_offset'),stride.get('umac_status_offset'),stride.get('umac_ready_value'),stride.get('umac_polling_bound_ms'))!=(0x3004,0x1e04040,2,50)):
             raise ValueError('Wrong exact OEM UMAC wake contract')
+        if stride.get('vdev_empty_mlo_array'):qualify_vdev_array(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -67,6 +76,7 @@ def qualify(report_path,entry_path,runtime):
         platform_physical_fence=True,network_bridge=True)
     result['mhi_hold_trial']=report.get('mhi_hold_trial') is True
     result['umac_hold_trial']=report.get('umac_hold_trial') is True
+    result['vdev_empty_mlo_array']=report.get('vdev_empty_mlo_array') is True
     return result
 
 
@@ -92,4 +102,7 @@ def menu(qualification):
         if arguments(first).get('ewt')!='1' or len(first.replace('@SESSION@','0'*16).encode())>1023:
             raise ValueError('UMAC wake requires the inherited owned runtime intent')
         text=text.replace('Wi-Fi iOS17 network bridge + USB - TEST','Wi-Fi OEM UMAC wake + USB - TEST',1)
+    if qualification.get('vdev_empty_mlo_array'):
+        if not qualification.get('umac_hold_trial'):raise ValueError('VDEV repair requires its qualified UMAC parent')
+        text=text.replace('Wi-Fi OEM UMAC wake + USB - TEST','Wi-Fi VDEV array repair + USB - TEST',1)
     return text
