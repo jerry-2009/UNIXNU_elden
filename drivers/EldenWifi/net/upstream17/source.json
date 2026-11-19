@@ -1,0 +1,32 @@
+{
+  "license": "BSD-2-Clause-Patent",
+  "os_profile": "ipados-17.7.11-21H461",
+  "files": [
+    {
+      "repository": "https://github.com/UniXNU/UniXNU-sheng",
+      "revision": "08cde20edc3254ed6f7df8d0f5384fb887786e8f",
+      "path": "package/WifiNet.cpp",
+      "output": "WifiNet.cpp",
+      "sha256": "8093ba8451b77603a081bd3f8897e56ebfefbefb67a0823699c4dbbf884d321e",
+      "bytes": 40009
+    },
+    {
+      "repository": "https://github.com/UniXNU/Ath12kWifi",
+      "revision": "5f7f5a8a9f02f7ab45ed10a2f226e348c519a838",
+      "path": "include/nw_abi.h",
+      "output": "nw_abi.h",
+      "sha256": "7e196cf4a15d60f1ac62db0ffa64b15ab64f3d9aa1cb7842ca81f3edfaaf4a2c",
+      "bytes": 6682
+    }
+  ],
+  "hardware_provenance": {
+    "repository": "https://github.com/UniXNU/UniXNU-sheng",
+    "revision": "08cde20edc3254ed6f7df8d0f5384fb887786e8f",
+    "file": "porting.toml",
+    "sha256": "6c0f488657d79779dbeeeb4a7ab7289e2c09eb515aa4723fca72ca6426e86855",
+    "device": "sheng/SM8550",
+    "recorded_result": "Firmware c7-00108; WPA2-Personal 5GHz/80MHz; DHCP within31s; about12Mbit/s down,24Mbit/s up, under1% transmit loss.",
+    "elden_hardware_tested": false
+  },
+  "preserved_other_net_draft": true
+}

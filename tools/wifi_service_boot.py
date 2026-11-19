@@ -39,7 +39,8 @@ def trust_append(original,digests):
     return result
 
 def qualify_assets(report,runtime,native,base_trust_sha):
-    fixed=read(ROOT/'profiles'/report['profile']/'assets-contract.json');actual=read(runtime/'wifi-service-assets.json')
+    assets_profile='wifi-service-scan' if report['profile']=='wifi-network-17' else report['profile']
+    fixed=read(ROOT/'profiles'/assets_profile/'assets-contract.json');actual=read(runtime/'wifi-service-assets.json')
     for key,value in fixed.items():
         if actual.get(key)!=value:raise ValueError('Service asset contract differs: '+key)
     if actual!=report['service_assets'] or actual!=report['core']['assets']:raise ValueError('Service/core assets differ')

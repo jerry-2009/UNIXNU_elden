@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/UniXNU/UniXNU-Pagani-Drivers",
+  "revision": "c888efd3ce1b817d13f28783a77cf689cb2255c9",
+  "path": "drivers/PaganiWifi/Test/net_stub.h",
+  "sha256": "5a897626d4e0c8c3d171a19342a5d6c2405a8d9966ce1273e8a5c85ec5b33308",
+  "scope": "Host service model only, no hardware or driver copied"
+}

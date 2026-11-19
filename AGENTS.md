@@ -1,5 +1,20 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261119 WIFI NET17 signed component: user prioritizes Wi-Fi now. Real
+BSD/IOKit en0 bridge derived from hardware-recorded Sheng08cde20e/21H461,
+Ath12k ABI5f7f5a8.54actual generated bridge checks ASan/UBSan, native7/worker3/
+kernel3/entry1/package1/audit pass;0bridge/1inherited worker warning, linker10.
+Input admission closes and100ms bounded in-flight drain precedes unchanged
+physical-fence shutdown; original services/maps retained until reset. Core/CE/
+WMI/firmware unchanged, Apple30/entry7124 retained.8mutation qualifier cases pass.
+Image7fae1095/sessionedf7cfeebe4b2c89/floor1738713600/0/3/RAM6GiB. NOT hardware
+tested yet: first v190WMI failure unresolved, scan/association/DHCP/traffic unaccepted.
+No interrupted mode-response candidate reused. Next one network/interface live
+trial with exact admission and full stock restoration. docs/evidence/wifi-network17
+and drivers/EldenWifi/net/README are current. Charging candidateed063e4b separately
+packaged/audited but deferred by user's Wi-Fi priority. Full Goal remains active;
+GPU/peer/QRTR/AnyRouter boundaries preserved. All build jobs terminal.
+
 Latest20261119 CHARGE LINK RECOVERY: actual old24/new30 reconnect scenarios,
 18window/146policy regression and ASan/UBSan pass. Record possible SET28=0 inhibit
 before queue acceptance; retain across lost ACK/readback/error, roll back only

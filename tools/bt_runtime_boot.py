@@ -11,6 +11,9 @@ def qualify(report_path,entry_path,runtime):
     if not report_path or not entry_path or not runtime:raise ValueError('Complete v99 build, entry and runtime inputs required')
     report=json.loads(Path(report_path).read_text());entry=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     name=report.get('profile')
+    if name=='wifi-network-17':
+        from wifi_network17_boot import qualify as network_qualify
+        return network_qualify(report_path,entry_path,runtime)
     if name in ('data-capacity-2g','data-capacity-2g-key'):
         from data_capacity_boot import qualify as capacity_qualify
         return capacity_qualify(report_path,entry_path,runtime)
@@ -119,6 +122,9 @@ def early_stall(qualification):
     return dict(qualification,profile='early-storage-stall',native_profile='early-storage-guard',controlled_stall=True)
 
 def menu(qualification=None):
+    if qualification and qualification.get('profile')=='wifi-network-17':
+        from wifi_network17_boot import menu as network_menu
+        return network_menu(qualification)
     if qualification and qualification.get('profile') in ('data-capacity-2g','data-capacity-2g-key'):
         from data_capacity_boot import menu as capacity_menu
         return capacity_menu(qualification)
@@ -180,6 +186,8 @@ def menu(qualification=None):
     if new['entry'][1:]!=config['entry'][1:] or new['boot']!=config['boot']:raise ValueError('Fallback/menu behavior changed')
     return text
 def adt(base,qualification=None):
+    if qualification and qualification.get('profile')=='wifi-network-17':
+        qualification=dict(qualification,profile='ufs-idle-trial')
     if qualification and qualification.get('profile') in ('data-capacity-2g','data-capacity-2g-key'):
         if qualification.get('keep_packed_data'):
             from data_capacity_boot import packed_adt
@@ -209,6 +217,9 @@ def adt(base,qualification=None):
         result=registry_adt(result)
     return result
 def augment_trust(original,qualification):
+    if qualification.get('profile')=='wifi-network-17':
+        from wifi_service_boot import augment_trust as service_trust
+        return service_trust(original,qualification)
     if qualification.get('profile') in ('data-capacity-2g','data-capacity-2g-key'):
         qualification=dict(qualification,profile='ufs-idle-trial')
     if qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace','wifi-ce3-flow-trace']:
