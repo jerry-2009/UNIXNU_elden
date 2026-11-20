@@ -17,11 +17,13 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ('pmic-build','wcn-build','clean-build','parent-build','llvm','output'):p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--sideband-pins',action='store_true',help='Exact board SW_CTRL18/19 and HOST_SOL202 before WLAN enable')
+    p.add_argument('--board-state',action='store_true',help='Read existing physical WCN rail/pin state at qualified runtime boundaries')
     a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);pmic=a.pmic_build.resolve();wcn=a.wcn_build.resolve();parent=a.parent_build.resolve()
     pr=read(pmic/'result.json');wr=read(wcn/'result.json');kr=read(parent/'result.json');proofs={};wcn_source=source.wcn()
     if a.sideband_pins:
         from SidebandSource import source as sideband_source
-        wcn_source=sideband_source()
+        wcn_source=sideband_source(a.board_state)
+    elif a.board_state:raise ValueError('Board state requires qualified sideband maps')
     for unit,folder,report,derived in [('PmicClient',pmic,pr['native_objects']['PmicClient'],source.client()),('WcnPowerNative',wcn,wr,wcn_source)]:
         objname=unit+'.o';old=folder/objname
         if sha(old)!=report['object_sha256']:raise ValueError('Retained consumer object changed')
@@ -52,6 +54,7 @@ def main():
         cwd=report.get('cwd',str(a.clean_build/'units/working/WcnPowerNative'))
         r=subprocess.run(cmd,cwd=cwd,capture_output=True);(out/(unit+'.log')).write_bytes(r.stdout+r.stderr);r.check_returncode()
         adds={'_elden_wifi_battery_ready'} if unit=='PmicClient' else set()
+        if unit=='WcnPowerNative' and a.board_state:adds.add('_elden_wifi_board_state')
         if symbols(target,True)!=symbols(old,True)|adds:raise ValueError('Consumer export delta changed')
         refs=symbols(target,False);allowed=symbols(parent/'native.macho',True)|{'_elden_wifi_battery_ready'}
         if refs-allowed:raise ValueError('Unresolved consumer imports: '+str(refs-allowed))
@@ -75,11 +78,13 @@ def main():
     archive=folder/'libEldenPmicClient.a';subprocess.run(['ar','rcs',str(archive),*names],cwd=folder,env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
     own=['tools/build_wifi_battery_admission.py','tools/test_wifi_battery_admission.py','drivers/EldenWifi/BatteryAdmissionSource.py','drivers/EldenWifi/BatteryAdmission.h','drivers/EldenWifi/BatteryAdmission.inc']
     if a.sideband_pins:own+=['tools/test_wifi_sideband_pins.py','drivers/EldenWifi/SidebandSource.py','drivers/EldenWifi/SidebandPins.h']
+    if a.board_state:own+=['drivers/EldenWifi/BoardState.inc','tools/test_wifi_board_state.py']
     proof=dict(compiled=True,wifi_battery_runtime_trial=True,radio_only_no_charger_set=True,chemistry_two_gauges_epoch_age_checked=True,
         controls_and_charger_permission_unchanged=True,pmic_archive=str(archive),pmic_archive_sha256=sha(archive),parent_pmic_archive=str(oldar),
         parent_pmic_archive_sha256=sha(oldar),pmic_retained_members=retained,consumers=proofs,
         source_inputs={n:sha(ROOT/n) for n in own},hardware_tested=False)
     proof.update(sideband_pins_trial=a.sideband_pins,sideband_gpio_indices=[18,19,202] if a.sideband_pins else [],sideband_cold_before_votes=a.sideband_pins,sideband_unknown_state_retained=a.sideband_pins)
+    proof.update(board_state_trial=a.board_state,board_state_no_device_controls=a.board_state,board_state_gpio_indices=[16,18,19,202] if a.board_state else [],board_state_rails=6 if a.board_state else 0)
     (out/'result.json').write_text(json.dumps(proof,indent=2)+'\n')
     print(json.dumps({k:proof[k] for k in ['compiled','wifi_battery_runtime_trial','pmic_archive_sha256','hardware_tested']}))
 

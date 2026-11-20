@@ -1,5 +1,13 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 BOARD STATE signed: OEMmode+sideband combinedstillCE3loss/
+BSS0/fullstockrestore. Next reads alreadyownedGPIO16/18/19/202,sixrails,
+PLLparents atready/firstPMF/firstfailure;no controlwrites/maps.30actual
+ASan/UBSan+76qualifier/fullkernel/Apple30/entry7124/package1pass. Imaged2ec5dd0/
+sessionb2c6456bd8019b67/floor1738713600/0/3 NOThardwaretested. ExactOEMMHI audit
+shows offloadedwriteflush branch, notmissingunconditionalwake. Alljobs terminal,
+stock current. FullGoal active/Wi-Fi incomplete.
+
 Latest20261120 STARTUP CONTRACT HARDWARE: parsedWMI_INIT status0/reason0/
 module0/wait0/ready1. CPU BAR PAR maps40400000/40403000/40486000 correctly;
 not device-translation proof. MHIwake_set1/refs1/1/ctl200/status201 remains

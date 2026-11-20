@@ -1,0 +1,126 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "profile": "wifi-network-17",
+  "purpose": "Read actual already-owned WLAN_EN/SW_CTRL/HOST_SOL pin state, six external regulators and GPLL0 parents at ready/first PMF/first failure. No new control writes or maps. Determine whether physical rails or reset/enable signals changed when CE3 vanished.",
+  "host": {
+    "passed": true,
+    "actual_helper": true,
+    "asan_ubsan": true,
+    "spmi_mmio_modeled": true,
+    "no_control_writes": true,
+    "hardware_tested": false,
+    "summary": "PASS 30 existing WCN state cases; no control writes, ownership and read errors preserved",
+    "source_inputs": {
+      "tools/test_wifi_board_state.py": "8fed594dcd14b240689a556f15100f62c84d1e07877fce9c3df0c2ee16f9a523",
+      "drivers/EldenWifi/BoardState.inc": "2a8f3b4223c0760e6fd75660984ca4c7820182f148159862e88cd97e4ee484c8",
+      "drivers/EldenWifi/SidebandSource.py": "b0d799582753bbc364cd3ef74754b9ce6e8ce042ef7063caa756f01c6330b872",
+      "drivers/EldenWifi/peach/BoardStatePatch.py": "22b9de81c6f6494bf2ec618b41ff2e374147af2c74aa86a5481d936b273a6a4f"
+    }
+  },
+  "qualification": {
+    "passed": true,
+    "mutation_cases": 76,
+    "menu_dispatch": true,
+    "countdown_and_fallback_preserved": true,
+    "actual_component_report_qualified": true,
+    "hardware_tested": false
+  },
+  "runtime": {
+    "binding_sha256": "a2a6bfa3a13049eca0dd1230b9d1ce64a5baab8e1e1eadf8eb9d2d0c0da3d3f9",
+    "added_native_import": "_elden_wifi_board_state",
+    "boundaries": [
+      12,
+      9,
+      90
+    ],
+    "no_control_writes": true,
+    "units": {
+      "core.c": {
+        "source_sha256": "c6a33ec57fc499f773e8aa8c74a963f566a75762553cb8c239c3163cac5ba538",
+        "object_sha256": "ad5e424c197af510a54e8ff8ecf7ab0c51650959fdc56c8b5f4de33791b2dd07",
+        "warnings": 157
+      },
+      "wmi.c": {
+        "source_sha256": "61867fdf5b0f257f8ecfff906db8312e2c1f4b1ace1410977dae0d0598a5f88e",
+        "object_sha256": "46f817f82bbb6854246a1eb10ad88e01b80b1df7429f9fb67fb76bf6d8ca10fd",
+        "warnings": 632
+      }
+    }
+  },
+  "battery_consumers": {
+    "PmicClient": {
+      "source_sha256": "cf3994a4a90d06781c8368f5757ecd321d072c56872ff404c718d7cd32ff090f",
+      "object_sha256": "6041ff93ee4731980e853a82d4582412805540027aa6f78852b1576ac9fa8084",
+      "warnings": 0
+    },
+    "WcnPowerNative": {
+      "source_sha256": "0d0a3496cacc86c639121bb5a894169dcbd2bed92d5c1737393064fc6dfdd620",
+      "object_sha256": "62bd9e995f2d9e6cb5ade7cee98ee0e0dc99d0f638cf5360d1ce2698e4ade1d4",
+      "warnings": 1
+    }
+  },
+  "kernel": {
+    "kernel_sha256": "f92f430aad8164dcb6be627e90bc2551a76e37c42861dba2a6acd5e9cf3643b4",
+    "native_sha256": "d9efe268cd41c0a0f9eb18c19407fa4b39b9eb3ce1894413e22a0a6ea4ed9ffb",
+    "all_actual_imports_resolved": true,
+    "entry_delta": 7124
+  },
+  "package": {
+    "image_sha256": "d2ec5dd0bb37fc81fc7158ccccff011976c97ed940c11ae24978777e6a5954d7",
+    "session": "b2c6456bd8019b67",
+    "rollback_index": 1738713600,
+    "footer_location": 0,
+    "parent_boot_chain_location": 3,
+    "accepted_static": true,
+    "full_asset_source_closure": true
+  },
+  "source_inputs": {
+    "tools/build_wifi_mac_phy_stride.py": "db711b86ed45a131de5df0aef42aa9aa03b02653de90ca60b1f291abdef497e0",
+    "drivers/EldenWifi/peach/MacPhyStridePatch.py": "f44303dc0b7aca73ef8a4346d1ac4b88a0255da6b8d567c23ffe1f7438739186",
+    "tools/test_wifi_mac_phy_stride.py": "e30b29fe802b0e648d4acd2b3080f5b13ed3862623bfce7f344024d882760925",
+    "tools/build_wifi_umac_wake.py": "d9f99233622a857ec2d95667bea76b50c1d8053c69c9a115798d78492f1e6778",
+    "tools/test_wifi_umac_wake.py": "6bfe52f3efc6b7d37adc9bf1100979d41397a39bd4f86234e0ef51a6b7245b0f",
+    "drivers/EldenWifi/UmacWake.inc": "eef5c433dc92571cc277e7fdd06217059c52c9ad754f3f2212d61937ae6e9ee2",
+    "drivers/EldenWifi/peach/UmacWakePatch.py": "b1577baed5e9b2a9defa42504348ed973a4951a9dc4e76faf2260e6e6d7fe606",
+    "tools/build_wifi_vdev_mlo_array.py": "5df573c0fc56356f0276ebc422bb060a65a76b2d424164a33750d40b272f4048",
+    "tools/test_wifi_vdev_mlo_array.py": "7f4766cf453dfc5a9aa9902c53b2c1e586a06e8549d3acdec309433edc42abbf",
+    "drivers/EldenWifi/peach/VdevMloArrayPatch.py": "2816641a4170adf0577b0ed0a248c5a41b14f2e73b3125742e2dc92241fd46c9",
+    "tools/build_wifi_ce3_inspect.py": "2e6944ba392892abfdff2a40a9daf14fc63de8402c3dc980cbc4f2ac56d130ab",
+    "tools/test_wifi_ce3_inspect.py": "f733836bc58e18d134d368effa8ccbd4de13b89169c70a47bce1fa756d765edb",
+    "drivers/EldenWifi/peach/Ce3InspectPatch.py": "551b156e5833fc4358b97ae0e156df47b5c46418d4aaf2de504cc1d898c7d2be",
+    "drivers/EldenWifi/Ce3Inspect.inc": "100cd0bb1d86de33b9cc42cef296856cafd09525b9bc4f06c832a2404f9a36da",
+    "drivers/EldenWifi/DmaInspect.h": "08055e1cef205f99cf5bc79c8fc69173d484916e570fa73c3917e5e94cebb864",
+    "drivers/EldenWifi/DmaInspect.inc": "b1f6a059df07cbca1c6c4c903309865454131b62038baf687fc6c843fec64fdf",
+    "tools/build_wifi_ce3_timeline.py": "5f167c8b59a340f44fa95a73998ab917e20cdbcd08ba846b5731a4ce19de6431",
+    "tools/test_wifi_ce3_timeline.py": "cfc8136cf52b4c95fda2f3dbaf917d17eab191920a3be4ad8141cecc096ead7d",
+    "drivers/EldenWifi/peach/Ce3TimelinePatch.py": "01058009130c62c87dd1bfeea4ad6209f118ab897d3d70871a797f004f623fe2",
+    "drivers/EldenWifi/Ce3Timeline.h": "699038d1853bbcd35cd58ff7d4f317091cc4a0d125a393d4df4b44c696f152c6",
+    "drivers/EldenWifi/Ce3Timeline.inc": "cefd9b3f2a2e395aea0b358fcf216d5b6baa2c74556c6dc3c07b27cbf764bac8",
+    "tools/build_wifi_window_reselect.py": "99f91cef68b1f3cd020353c6ca07a6a1eb1ad9d257474b9ce212fc9801fadce1",
+    "tools/test_wifi_window_reselect.py": "287f09868fda8b46b63b69576436ec14fd7257a60fda0d324f49d3d31729dbc5",
+    "drivers/EldenWifi/peach/WindowReselectPatch.py": "e90c155f107b318c000265bf4bf4e55f91002b2fdc66a4a5821011d95d955932",
+    "tools/build_wifi_pci_state_trace.py": "5aed5d34bdbc66d83d4d81fb6f6c44f87b3d9b785a54799ad9c6f594c176a08b",
+    "tools/test_wifi_pci_state_trace.py": "e6ed41354912e164f3688f3af95106cd5b0419d978ad839619d15289506cca28",
+    "drivers/EldenWifi/peach/PciStateTracePatch.py": "e50d69324256259fe11b424d1daf92ed98333232aae0846149b9f80511946655",
+    "drivers/EldenWifi/PciStateTrace.inc": "2ab51ad927cbd10e5d1f130d31f6a895feb6e85650ed25047a5e30c40583266e",
+    "tools/build_wifi_oem_init.py": "24637411eeca20bccdd054f0fe71364dad0d718753e8d3ee4c752a7579f3355e",
+    "tools/test_wifi_oem_init.py": "ddf557adaf550ccd0559301ef7f28c1e91d5dc52a13e5c74ebeecceb15fd743a",
+    "drivers/EldenWifi/OemInitMode.inc": "2f964c8c637712d9023f7c16f85e19d9ced1c157d6fc136d3c67231d7c67ba1e",
+    "drivers/EldenWifi/peach/OemInitModePatch.py": "bb74eb0902b88018ab811e78c3e91278974cf2f7ccdd3a3036dccaf13e579b20",
+    "tools/build_wifi_board_state.py": "bf5bf5059d9d6d236a6b45ed76b4c6a7c61fe9cb792a062eebda841b6c3834bf",
+    "tools/test_wifi_board_state.py": "8fed594dcd14b240689a556f15100f62c84d1e07877fce9c3df0c2ee16f9a523",
+    "drivers/EldenWifi/BoardState.inc": "2a8f3b4223c0760e6fd75660984ca4c7820182f148159862e88cd97e4ee484c8",
+    "drivers/EldenWifi/peach/BoardStatePatch.py": "22b9de81c6f6494bf2ec618b41ff2e374147af2c74aa86a5481d936b273a6a4f",
+    "tools/build_wifi_battery_admission.py": "ad5e7d48e0313b38ad534a9f62cbbc521b403d1c78209692033206e6168b3a0f",
+    "tools/test_wifi_battery_admission.py": "ad807b0b6f70754b6dc0934b91e2e73b114c234cc206a6f489f71c732d06572e",
+    "drivers/EldenWifi/BatteryAdmissionSource.py": "49c3016d721890626f4d4dc65e7248df59b50f5023247372d8bdb3f6ab4ecb0e",
+    "drivers/EldenWifi/BatteryAdmission.h": "ed76a4fa23b48f023e7f0928a920d1659b0cc0031068b2776265d14382467ab0",
+    "drivers/EldenWifi/BatteryAdmission.inc": "a839090772b5bfc1c08f762d00b7820263c96edf1be49a4f653c49af46bd4fc9",
+    "tools/test_wifi_sideband_pins.py": "a1317367f85b659cd8222821e54b5a691e250f6cde43b0a2654368588b6eb770",
+    "drivers/EldenWifi/SidebandSource.py": "b0d799582753bbc364cd3ef74754b9ce6e8ce042ef7063caa756f01c6330b872",
+    "drivers/EldenWifi/SidebandPins.h": "e51ef90ea36e43c9d783b06691aa3dbce6e21bcf79d6c33cbec4e56c885d0c77"
+  },
+  "next": "One bounded joint physical-state/WMI test, then complete stock return. No additional wake/mode/pin-only retries.",
+  "goal": "active and incomplete"
+}

@@ -192,6 +192,20 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated startup contract accepted: '+name)
+    if report.get('board_state_trial'):
+        for name in ('pair','controls','boundaries','import','provider','pins','rails','report'):
+            selected=copy.deepcopy(report)
+            if name=='pair':selected['battery_admission']['board_state_trial']=False
+            elif name=='controls':selected['mac_phy_stride_runtime']['board_state_no_device_controls']=False
+            elif name=='boundaries':selected['mac_phy_stride_runtime']['board_state_boundaries']=[12,9]
+            elif name=='import':selected['mac_phy_stride_runtime']['board_state_added_import']='_other'
+            elif name=='provider':selected['battery_admission']['board_state_no_device_controls']=False
+            elif name=='pins':selected['battery_admission']['board_state_gpio_indices']=[16,18,19,201]
+            elif name=='rails':selected['battery_admission']['board_state_rails']=7
+            else:selected['board_state_trial']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated board state accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

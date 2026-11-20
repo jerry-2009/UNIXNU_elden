@@ -40,7 +40,7 @@ def main():
         if battery.get('sideband_pins_trial'):
             from SidebandSource import source as sideband_source
             if battery.get('sideband_gpio_indices')!=[18,19,202] or not battery.get('sideband_cold_before_votes') or not battery.get('sideband_unknown_state_retained'):raise ValueError('Unqualified sideband pin scope')
-            wcn_data=sideband_source()
+            wcn_data=sideband_source(bool(battery.get('board_state_trial')))
         for unit,data in [('PmicClient',battery_source.client()),('WcnPowerNative',wcn_data)]:
             row=battery['consumers'][unit]
             if row['source_sha256']!=hashlib.sha256(data).hexdigest() or sha(args.battery_admission_build/(unit+'.o'))!=row['object_sha256']:
@@ -93,6 +93,9 @@ def main():
         if stride.get('startup_contract_trial'):
             from wifi_network17_boot import qualify_startup_contract
             qualify_startup_contract(stride)
+        if stride.get('board_state_trial'):
+            from wifi_network17_boot import qualify_board_state
+            qualify_board_state(stride,battery)
         if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
             raise ValueError('MAC/PHY stride runtime artifact changed')
         for name,digest in stride['source_inputs'].items():
@@ -169,6 +172,7 @@ def main():
     with (out/'link.log').open('x') as log:subprocess.run(command,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
     added=set(worker['added_exports'])|new_net_defs|set(stride.get('runtime_added_exports',[]) if stride else [])
     if battery:added.add('_elden_wifi_battery_ready')
+    if battery and battery.get('board_state_trial'):added.add('_elden_wifi_board_state')
     if defs(out/'native.macho')!=old_defs|added:raise ValueError('Unexpected complete native export set')
     if refs(out/'native.macho')!=refs(parent/'native.macho'):raise ValueError('Unresolved complete native imports changed')
     for path,digest in inherited.items():
@@ -232,6 +236,7 @@ def main():
         umac_command_lease_trial=bool(stride and stride.get('umac_command_lease_trial')),
         oem_init_mode_trial=bool(stride and stride.get('oem_init_mode_trial')),
         startup_contract_trial=bool(stride and stride.get('startup_contract_trial')),
+        board_state_trial=bool(stride and stride.get('board_state_trial')),
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     if battery:
         proof['battery_loaded_archives']=dict(pmic=dict(path=str(newpmic),sha256=sha(newpmic),member='PmicClient.o',member_sha256=battery['consumers']['PmicClient']['object_sha256']),

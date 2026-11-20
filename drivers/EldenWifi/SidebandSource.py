@@ -6,7 +6,7 @@ sys.path.insert(0,str(ROOT/'drivers/EldenWifi'))
 import BatteryAdmissionSource as battery
 
 
-def source():
+def source(board_state=False):
     text=battery.wcn().decode()
     def replace(old,new):
         nonlocal text
@@ -44,4 +44,8 @@ static int sideband_prepare(Context *c){
     int sideband=sideband_prepare(c);
     if(sideband){__atomic_store_n(&active,c,__ATOMIC_RELEASE);__atomic_store_n(&platform_init_state,3,__ATOMIC_RELEASE);return sideband;}
 ''')
+    if board_state:
+        marker='static void publish(Context *c){'
+        replace(marker,(ROOT/'drivers/EldenWifi/BoardState.inc').read_text(encoding='utf-8')+'\n'+marker)
+        text+='\nextern "C" int elden_wifi_board_state(unsigned stage){return board_state(stage);}\n'
     return text.encode()

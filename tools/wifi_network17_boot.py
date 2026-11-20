@@ -63,6 +63,13 @@ def qualify_startup_contract(runtime):
         raise ValueError('Startup evidence requires unchanged functional parent')
 
 
+def qualify_board_state(runtime, battery):
+    if runtime.get('oem_init_mode_trial') is not True or runtime.get('board_state_no_device_controls') is not True or runtime.get('board_state_reversible') is not True or runtime.get('board_state_boundaries') != [12,9,90] or runtime.get('board_state_added_import') != '_elden_wifi_board_state':
+        raise ValueError('Wrong physical board-state runtime scope')
+    if not battery or battery.get('board_state_trial') is not True or battery.get('sideband_pins_trial') is not True or battery.get('board_state_no_device_controls') is not True or battery.get('board_state_gpio_indices') != [16,18,19,202] or battery.get('board_state_rails') != 6:
+        raise ValueError('Physical board-state provider mismatch')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -99,6 +106,7 @@ def qualify_components(report):
     if bool(report.get('umac_command_lease_trial'))!=bool(stride and stride.get('umac_command_lease_trial')):raise ValueError('UMAC command lease report mismatch')
     if bool(report.get('oem_init_mode_trial'))!=bool(stride and stride.get('oem_init_mode_trial')):raise ValueError('OEM init report mismatch')
     if bool(report.get('startup_contract_trial'))!=bool(stride and stride.get('startup_contract_trial')):raise ValueError('Startup contract report mismatch')
+    if bool(report.get('board_state_trial'))!=bool(stride and stride.get('board_state_trial')) or bool(report.get('board_state_trial'))!=bool(battery and battery.get('board_state_trial')):raise ValueError('Board-state pair mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
         raise ValueError('Network bridge source differs')
@@ -114,7 +122,7 @@ def qualify_components(report):
         if battery.get('sideband_pins_trial'):
             from SidebandSource import source as sideband_source
             if battery.get('sideband_gpio_indices')!=[18,19,202] or battery.get('sideband_cold_before_votes') is not True or battery.get('sideband_unknown_state_retained') is not True:raise ValueError('Sideband physical contract changed')
-            wcn_data=sideband_source()
+            wcn_data=sideband_source(bool(battery.get('board_state_trial')))
         for unit,data in [('PmicClient',battery_source.client()),('WcnPowerNative',wcn_data)]:
             row=battery['consumers'][unit]
             if hashlib.sha256(data).hexdigest()!=row['source_sha256']:raise ValueError('Radio-only consumer source differs')
@@ -147,6 +155,7 @@ def qualify_components(report):
         if stride.get('umac_command_lease_trial'):qualify_umac_command_lease(stride)
         if stride.get('oem_init_mode_trial'):qualify_oem_init(stride)
         if stride.get('startup_contract_trial'):qualify_startup_contract(stride)
+        if stride.get('board_state_trial'):qualify_board_state(stride,battery)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -184,6 +193,7 @@ def qualify(report_path,entry_path,runtime):
     result['oem_init_mode_trial']=report.get('oem_init_mode_trial') is True
     result['sideband_pins_trial']=report.get('sideband_pins_trial') is True
     result['startup_contract_trial']=report.get('startup_contract_trial') is True
+    result['board_state_trial']=report.get('board_state_trial') is True
     return result
 
 
