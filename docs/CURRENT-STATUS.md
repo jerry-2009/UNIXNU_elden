@@ -1,5 +1,11 @@
 # 当前状态 · 2026-11-18
 
+2026-11-20原厂无缓存选窗修补实机生效：stage9窗口维持37，CE3配置仍base0/size0/MSI0、
+MISC80，首次PDEV超时。缓存缺陷已修但非完整根因。首轮PD准入拒绝保留，同像重试
+真实运行及完整物理fence/stock恢复通过。
+[记录](evidence/wifi-window-reselect-hardware-20261120.json)。下一步核pdev创建与接口open
+导致的环状态变化，完整Goal active，Wi-Fi未联网。
+
 2026-11-20时间线定位：CE3配置正常到stage8，stage9实际窗口从37变0而缓存未更新，
 读数变ffffffff；不能再据零值断言环被清空。原厂默认NO_CACHE1已核，Peach选窗修补
 保留原锁/数值/读回，8195实际旧新模型/41资格反例/整核签包通过；候选17c7d76a，未实机。

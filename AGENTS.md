@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 WINDOW RESELECT HARDWARE: first runPDphase7/error2
+refused PCIEstage0 before radio; preserved, same image retried fresh. Actual
+run2 stages1..8 CE3base10001bc0/size8000/id4/window37; stage9 window37 remains
+but CE3base/size/MSI0/MISC80, earlyPDEV timeout persists. Windowcache defect
+repaired but not Wi-Fi root cause. Nativebuffers/PAR/backing pass; fullput/net
+drain/fence/MSI/PERST/typedphysicalfastboot/fullstock/root/green/settings restore
+pass,353030B/b72ea5a9/drop0/no reconnect. Last device stock/all jobs terminal.
+Next inspect core-pdev creation/interface-open lifecycle for actual ring-state
+loss, not guessed live ring reinit. Full Goal/Wi-Fi/peripherals active/incomplete.
+
 Latest20261120 CE3 TIMELINE HARDWARE: stages1..8 base10001bc0/size8000/
 ID4/MISCc2/hw8:8/window40000037; before firstPDEVstage9 readsffffffff and
 actualwindow40000000. Cause of window change unknown; earlier CE0reads not

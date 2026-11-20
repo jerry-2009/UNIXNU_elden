@@ -41,3 +41,12 @@ Mac`lab/wifi-window-reselect-20261120/{host1,runtime1,kernel1,entry1,package1}`;
 workbench`edl_work/wifi-window-reselect-20261120`.
 Accept only actual CE3 progression/scan and complete physical stop/restoration;
 no association, DHCP or traffic claim yet.
+
+## Hardware result
+
+Attempt1 was rejected at PD admission before any Wi-Fi runtime execution.
+Same-image fresh attempt2 reached the runtime: window37 is retained at stage9,
+but actual CE3 base/size/ID/MSI remain0, MISC80 and the early PDEV failure
+persists. This repairs stale selection without solving the whole Wi-Fi fault.
+Full physical fence, UMAC release, typed fastboot and stock restoration passed.
+[Hardware evidence](../../../docs/evidence/wifi-window-reselect-hardware-20261120.json).
