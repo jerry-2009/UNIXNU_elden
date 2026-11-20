@@ -1,5 +1,10 @@
 # Wi-Fi：固件与服务已接通，WMI完成仍待修复
 
+2026-11-20 sideband实测：GPIO18/19及GPIO202原厂归属切换、输出低和回读通过，
+但第一条PMF之前CE3仍变零，BSS0，尚未联网。完整回程/stock/root/green/原设置恢复通过；
+未证明graceful DMA fence，不扩称硬件停机完成。不重复pin/wake-only试验，集中实际BAR
+访问与固件初始化契约。[实证](evidence/wifi-sideband-egpio-hardware-20261120.json)。
+
 2026-11-20唤醒引用实测：真实get0/held1与put1/held0通过，但仍30次WMI超时，CE3
 依旧sw2/write4/hp16/tp8、BSS0。这个对照未消除阻塞，不重复或提升为默认；也不能据此
 排除所有MHI电源问题。站点4发布、net drain0及完整真实DMA fence／MSI／PERST／stock/

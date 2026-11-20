@@ -1,5 +1,10 @@
 # 当前状态 · 2026-11-18
 
+2026-11-20 sideband实测：GPIO18/19及GPIO202原厂归属切换、输出低和回读通过，
+但第一条PMF之前CE3仍变零，BSS0，尚未联网。完整回程/stock/root/green/原设置恢复通过；
+未证明graceful DMA fence，不扩称硬件停机完成。不重复pin/wake-only试验，集中实际BAR
+访问与固件初始化契约。[实证](evidence/wifi-sideband-egpio-hardware-20261120.json)。
+
 2026-11-20修正实际WCN装载库后只读电池准入实机通过。CE3/UMAC仍在首条PMF前清零，
 MHI硬件仍M0、引用1/1，既有CPU写路径未记录复位/清零写入（非全体writer证明）。
 [实录](evidence/wifi-pci-state-hardware-20261120.json)。停机9s未完成，保留资源至物理复位；

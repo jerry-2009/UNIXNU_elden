@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 SIDEBAND eGPIO HARDWARE: exact18/19=5/0/742,
+202=1a41/0/742 rc0/writes4 confirmed. CE3stilllost beforefirstPMF with
+MHIctl200/status201/refs1/1, no selectedCPUwrite, BSS0/28timeouts.
+No GPIO-root-cause or warmreset claim; no put/netdrain/gracefulfence,
+resources retained to typedphysicalreset. Fullstock/root/green/original
+settings restored, alljobs terminal. Raw262040/drop0/59status/no reconnect;
+postdisconnect unknown. Next consolidate actualBAR access/firmware startup
+contract, no more GPIO/wake-only repeats. FullGoal active/Wi-Fi incomplete.
+
 Latest20261120 SIDEBAND eGPIO signed: prior real trial refused exact cold
 GPIO18/19=1/0/742 and202=801/0/742 before writes/radio; full stock restored.
 Original6f97250e msm_pinmux_set_mux claims eGPIO for AP via bit12; only this
