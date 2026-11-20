@@ -170,6 +170,9 @@ def qualify_shared_assets(report_path,entry_path,runtime,*,wifi_service=False):
     result={'profile':profile,'profile_sha256':sha(contract),'trust_sha256':trace['trust_sha256'],'cache_cdhash':cache['cdhash'],'cache_input_trust_sha256':trace['cache_input_trust_sha256'],'helper_sha256':trace['helper_sha256'],
             'entry_return_target':hex(target),'entry_assembly_sha256':'818ed81e39f38ee6f13bdbf4f166e9e7a5d72f4b7a652d52872e2ba85ea53cc1','mode':4,'key_state':2,'text_fixups_hex':optional['table_hex'],'table_count':59,'hardware_tested':False}
     if wifi_service:
-        from wifi_service_boot import qualify_assets
+        if r.get('station_trial'):
+            from wifi_station import qualify_assets
+        else:
+            from wifi_service_boot import qualify_assets
         result.update(qualify_assets(r,runtime,native,trace['trust_sha256']))
     return result

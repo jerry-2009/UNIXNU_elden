@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest 20261120 PORTABLE STATION signed: complete fixed Piano2438556c
+station/auth/association/REO-TCL-WBM data/WPA2 helper/orderedkey/generation
+plus existing Sheng iOS17 BSD bridge. OriginalY700 firmware/board/DMA/return
+retained; profileprivate/no logs. Originalassoc/sta/dp/net+crypto ASan/UBSan/
+actualadapter/fullkernel/Apple30/entry7124/12mutations/package pass.
+Image87d1c43c/session2661d591ea5855d4/floor1738713600/0/3 NOT hardware tested.
+Next ONE combined association/WPA2/DHCP/traffic+physicalstockrestore trial;
+then requested Mac Trash/document maintenance. Full Goal active,not complete.
+
 Latest 20261120 PORTABLE SCAN HARDWARE accepted: actual Y700 completed
 two-roundscan,32retainedBSS(cap32)/113managementframes/6HTTrings,
 CE24sent/24completed/0drop,realcredits/state629/error0. Protocolstopidle1/rc0,

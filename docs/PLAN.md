@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+完整station候选已签：沿成功SM8750扫描链合入关联、REO/TCL/WBM数据、WPA2 helper与密钥，
+接原Sheng iOS17桥。原厂固件／硬件准入／回程保持；原关联数据与crypto自测、适配拒绝测试、
+fullkernel／Apple30／入口7124／12资格反例／签包通过，87d1c43c未实机。
+[源码与复现](../drivers/EldenWifi/portable/station/README.md)／[构建](evidence/wifi-portable-station-20261120.json)。
+下一轮一次关联／WPA2／DHCP／流量／回程综合验收，之后Mac回收及文档整合。完整Goal active。
+
 本轮真机扫描通过：两轮完成，保留32个BSS（列表上限32）、113管理帧、HTT6环，CE24发送／
 24回收／0丢弃，state629/error0。真实协议停止及BM关闭／transaction idle／MSI4／PERST、
 物理fastboot、全SHA stock/root/green/原充电无线扫描设置恢复均通过，所有任务已结束。

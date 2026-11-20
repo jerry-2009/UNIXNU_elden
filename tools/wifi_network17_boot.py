@@ -141,6 +141,9 @@ def qualify_eager_memory(runtime):
 
 
 def qualify_components(report):
+    if report.get('station_trial'):
+        from wifi_station import qualify_components as qualify_station
+        return qualify_station(report)
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
         raise ValueError('Wrong network bridge baseline')
@@ -287,6 +290,7 @@ def qualify(report_path,entry_path,runtime):
     result['first_failure_trial']=report.get('first_failure_trial') is True
     result['eager_memory_trial']=report.get('eager_memory_trial') is True
     result['portable_scan_trial']=report.get('portable_scan_trial') is True
+    result['station_trial']=report.get('station_trial') is True
     return result
 
 
@@ -358,4 +362,8 @@ def menu(qualification):
         import tomllib
         current=tomllib.loads(text)['entry'][0]['name'] if 'name' in tomllib.loads(text)['entry'][0] else tomllib.loads(text)['entry'][0]['title']
         text=text.replace(current,'Wi-Fi SM8750 portable scan + USB - TEST',1)
+    if qualification.get('station_trial'):
+        import tomllib
+        current=tomllib.loads(text)['entry'][0]['title']
+        text=text.replace(current,'Wi-Fi SM8750 WPA2 and data + USB - TEST',1)
     return text
