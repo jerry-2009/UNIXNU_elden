@@ -180,6 +180,18 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated sideband pin contract accepted: '+name)
+    if report.get('startup_contract_trial'):
+        for name in ('startup_contract_reversible','startup_contract_no_new_device_writes',
+                     'startup_contract_par_cpu_only','startup_contract_fw_status_parsed',
+                     'startup_contract_wake_db_owner_checked','reads','payload','report'):
+            selected=copy.deepcopy(report)
+            if name=='report':selected['startup_contract_trial']=False
+            elif name=='reads':selected['mac_phy_stride_runtime']['startup_contract_par_reads_max']=4
+            elif name=='payload':selected['mac_phy_stride_runtime']['startup_contract_payload_logging']=True
+            else:selected['mac_phy_stride_runtime'][name]=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated startup contract accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

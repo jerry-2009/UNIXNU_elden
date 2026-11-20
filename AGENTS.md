@@ -1,5 +1,13 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 STARTUP CONTRACT signed: GPIOhandoff actualpass yetCE3still
+lost beforefirstPMF. Consolidated parsedWMI_INITstatus/reason/module, existing
+MHIwakeDBwrites+softwarewake_set, firstlostCPU-PAR3 records added; no new
+MMIOwrites/requests/timeouts/credits.30actual ASan/UBSan+69qualifier/fullkernel/
+Apple30/entry7124/package1 pass. Image9ce48227/sessionb0f0c980f66f3896/floor
+1738713600/0/3 NOThardwaretested. PCI120/core157 inheritedwarnings retained.
+Lastdevice fullstock/root/green/settings restored. FullGoal/Wi-Fi incomplete.
+
 Latest20261120 SIDEBAND eGPIO HARDWARE: exact18/19=5/0/742,
 202=1a41/0/742 rc0/writes4 confirmed. CE3stilllost beforefirstPMF with
 MHIctl200/status201/refs1/1, no selectedCPUwrite, BSS0/28timeouts.

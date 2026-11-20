@@ -53,6 +53,16 @@ def qualify_oem_init(runtime):
     if runtime.get('pci_state_trace_trial') is not True or runtime.get('umac_access_trial') or runtime.get('umac_command_lease_trial') or any(runtime.get(k) is not True for k in ['oem_init_delta_reversible','oem_init_peach_only','oem_init_firmware_preferred_mode','oem_init_firmware_physical_band_map','oem_init_single_pdev_alias_unchanged','oem_init_no_post_ready_switch']):raise ValueError('Wrong exact OEM initialization mode/map contract')
 
 
+def qualify_startup_contract(runtime):
+    flags = ['startup_contract_reversible', 'startup_contract_no_new_device_writes',
+             'startup_contract_par_cpu_only', 'startup_contract_fw_status_parsed',
+             'startup_contract_wake_db_owner_checked']
+    if runtime.get('pci_state_trace_trial') is not True or any(runtime.get(k) is not True for k in flags) or runtime.get('startup_contract_par_reads_max') != 3 or runtime.get('startup_contract_payload_logging') is not False:
+        raise ValueError('Wrong consolidated startup contract observation')
+    if runtime.get('umac_access_trial') or runtime.get('umac_command_lease_trial') or runtime.get('oem_init_mode_trial'):
+        raise ValueError('Startup evidence requires unchanged functional parent')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -88,6 +98,7 @@ def qualify_components(report):
     if bool(report.get('umac_access_trial'))!=bool(stride and stride.get('umac_access_trial')):raise ValueError('UMAC first-access report mismatch')
     if bool(report.get('umac_command_lease_trial'))!=bool(stride and stride.get('umac_command_lease_trial')):raise ValueError('UMAC command lease report mismatch')
     if bool(report.get('oem_init_mode_trial'))!=bool(stride and stride.get('oem_init_mode_trial')):raise ValueError('OEM init report mismatch')
+    if bool(report.get('startup_contract_trial'))!=bool(stride and stride.get('startup_contract_trial')):raise ValueError('Startup contract report mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
         raise ValueError('Network bridge source differs')
@@ -135,6 +146,7 @@ def qualify_components(report):
         if stride.get('umac_access_trial'):qualify_umac_access(stride)
         if stride.get('umac_command_lease_trial'):qualify_umac_command_lease(stride)
         if stride.get('oem_init_mode_trial'):qualify_oem_init(stride)
+        if stride.get('startup_contract_trial'):qualify_startup_contract(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -171,6 +183,7 @@ def qualify(report_path,entry_path,runtime):
     result['umac_command_lease_trial']=report.get('umac_command_lease_trial') is True
     result['oem_init_mode_trial']=report.get('oem_init_mode_trial') is True
     result['sideband_pins_trial']=report.get('sideband_pins_trial') is True
+    result['startup_contract_trial']=report.get('startup_contract_trial') is True
     return result
 
 
@@ -234,4 +247,7 @@ def menu(qualification):
     if qualification.get('sideband_pins_trial'):
         if not qualification.get('wifi_battery_runtime_trial'):raise ValueError('Sideband requires its qualified real power owner')
         text=text.replace('Wi-Fi PCI state observation + USB - TEST','Wi-Fi board sideband pins + USB - TEST',1)
+    if qualification.get('startup_contract_trial'):
+        if not qualification.get('pci_state_trace_trial'):raise ValueError('Startup evidence requires its actual observer parent')
+        text=text.replace('Wi-Fi board sideband pins + USB - TEST','Wi-Fi startup contract + USB - TEST',1)
     return text
