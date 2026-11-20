@@ -56,7 +56,7 @@ def main():
     for n,h in retained.items():
         if sha(Path(n))!=h:raise ValueError('Retained runtime changed')
     own=['tools/build_wifi_ce3_timeline.py','tools/test_wifi_ce3_timeline.py','drivers/EldenWifi/peach/Ce3TimelinePatch.py','drivers/EldenWifi/Ce3Timeline.h','drivers/EldenWifi/Ce3Timeline.inc']
-    proof=dict(prior);proof.update(ce3_timeline_trial=True,timeline_delta_reversible=True,timeline_events_max=12,timeline_reads_per_event=7,
+    proof=dict(prior);proof.update(ce3_timeline_trial=True,timeline_delta_reversible=True,timeline_events_max=16,timeline_reads_per_event=9,
         changed_units=['ath12k_wmi.o','ath12k_pci.o','ath12k_core.o'],runtime_added_exports=['_elden_ce3_timeline'],
         parent_inspect_binding_sha256=prior['binding_sha256'],binding_sha256=sha(target),timeline_units=proofs,
         link=link,retained_objects=retained,source_inputs={**prior['source_inputs'],**{n:sha(ROOT/n) for n in own}},hardware_tested=False)

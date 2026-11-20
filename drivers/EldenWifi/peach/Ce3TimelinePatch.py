@@ -21,8 +21,11 @@ def patch(name,data):
                 (5,'\tath12k_hal_cc_config(ab);'),
                 (6,'\tret = ath12k_wmi_wait_for_unified_ready(ab);'),
                 (7,'\t\tret = ath12k_wmi_set_hw_mode(ab, WMI_HOST_HW_MODE_DBS);'),
-                (8,'\tret = ath12k_dp_tx_htt_h2t_ver_req_msg(ab);')]:
-            add(anchor,'\n'+('\t\t' if stage==7 else '\t')+'elden_ce3_timeline(ab,'+str(stage)+', '+('0' if stage==5 else 'ret')+');')
+                (8,'\tret = ath12k_dp_tx_htt_h2t_ver_req_msg(ab);'),
+                (10,'\t\tret = ath12k_core_pdev_create(ab);'),
+                (11,'\t\tath12k_hif_irq_enable(ab);'),
+                (12,'\t\tret = ath12k_core_rfkill_config(ab);')]:
+            add(anchor,'\n'+('\t\t' if stage in (7,10,11,12) else '\t')+'elden_ce3_timeline(ab,'+str(stage)+', '+('0' if stage in (5,11) else 'ret')+');')
     else:
         add('#include "Ce3Inspect.inc"','\n#include "Ce3Timeline.h"')
         marker='\tret = ath12k_wmi_cmd_send(wmi, skb, WMI_PDEV_SET_PARAM_CMDID);'

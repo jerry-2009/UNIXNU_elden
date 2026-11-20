@@ -35,9 +35,9 @@ int main(void){
  struct ath12k_base ab={0};ab.hw_rev=17;ab.mem=(void *)1;ab.hw_params=&p;ab.ce.ce_pipe[3].src_ring=&ring;
  struct hal_srng *s=&ab.hal.srng_list[67];s->initialized=1;s->entry_size=4;s->ring_size=128;s->hwreg_base[0]=0x1b86000;s->hwreg_base[1]=0x1b86400;s->u.src_ring.tp_addr=&tail;
  elden_ce3_timeline(NULL,1,0);assert(!reads);cases++;
- for(unsigned i=1;i<=12;i++){misc=i<6?0x42:0x80;elden_ce3_timeline(&ab,i,0);assert(reads==i*7&&logs==i);cases++;}
- elden_ce3_timeline(&ab,9,0);assert(reads==84&&logs==12);cases++;
- printf("PASS %u actual timeline cases; bounded12 events/7reads, register state modeled\n",cases);
+ for(unsigned i=1;i<=16;i++){misc=i<6?0x42:0x80;elden_ce3_timeline(&ab,i,0);assert(reads==i*9&&logs==i);cases++;}
+ elden_ce3_timeline(&ab,9,0);assert(reads==144&&logs==16);cases++;
+ printf("PASS %u actual timeline cases; bounded16 events/9reads, register state modeled\n",cases);
 }
 '''.replace('@HELPER@',helper)
     src=out/'test.c';src.write_text(code)

@@ -26,7 +26,7 @@ def qualify_ce3_inspect(runtime,worker):
 
 
 def qualify_ce3_timeline(runtime):
-    if runtime.get('ce3_inspect_trial') is not True or runtime.get('ce3_direct_trial') or runtime.get('timeline_delta_reversible') is not True or (runtime.get('timeline_events_max'),runtime.get('timeline_reads_per_event'))!=(12,7) or runtime.get('runtime_added_exports')!=['_elden_ce3_timeline'] or runtime.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o','ath12k_core.o']:
+    if runtime.get('ce3_inspect_trial') is not True or runtime.get('ce3_direct_trial') or runtime.get('timeline_delta_reversible') is not True or (runtime.get('timeline_events_max'),runtime.get('timeline_reads_per_event'))!=(16,9) or runtime.get('runtime_added_exports')!=['_elden_ce3_timeline'] or runtime.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o','ath12k_core.o']:
         raise ValueError('Wrong bounded CE3 start timeline')
 
 

@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 CE3 BOUNDARIES signed: extends timeline to16events/9reads
+with corepdev alloc/IRQenable/rfkill and actualUMAC3004/scratch status. Retains
+qualifiedwindow reselection, inspector, originalshadow, nativeworker/other
+objects; no live reinit/protocol/credit/timeout changes.18host/41qualifier/full
+kernel/Apple30/entry7124/package1 pass. Image1d64ba61/session4aae5d91c3a80d7d/
+floor1738713600/0/3 NOT hardware-tested. Windowfix provesselection but actual
+CE3still0beforefirstPDEV. Next one narrow lifecycle trial. Full Goal active,
+Wi-Fi not accepted; device stock, all jobs terminal.
+
 Latest20261120 WINDOW RESELECT HARDWARE: first runPDphase7/error2
 refused PCIEstage0 before radio; preserved, same image retried fresh. Actual
 run2 stages1..8 CE3base10001bc0/size8000/id4/window37; stage9 window37 remains

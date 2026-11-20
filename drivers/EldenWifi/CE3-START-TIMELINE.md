@@ -46,3 +46,11 @@ reads ffffffff. Its local expected-window cache does not force a refresh.
 The actual origin of the window change is unproved. The earlier zero-register
 observation is not an actual ring-reset proof.
 [Hardware record](../../docs/evidence/wifi-ce3-timeline-hardware-20261120.json).
+
+## Narrow boundary extension
+
+After the window repair the real ring state is still zero before first PDEV.
+The extension preserves earlier records and adds pdev allocation/IRQ/rfkill
+boundaries plus UMAC wake/request status; at most16 records/9 reads.18actual
+model cases/41qualifier tests/fullkernel/package pass. No ring reinitialization.
+[Candidate](../../docs/evidence/wifi-window-boundaries-20261120.json).
