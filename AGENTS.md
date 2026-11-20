@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 FIRST FAILURE signed: exactUMACregister parent nowobserves
+ready12/actualfirsthandshakefailure90,21rawBAR+47ownedphysicalreads;
+no newwake/controlmaps,readclearresetcauseexcluded,nonatomicstatusretained.
+2Cunits+nativeworker/123retained,13actualphysicalASan/UBSanmodels/
+119qualifier/fullkernel/Apple30/entry7124/package1pass. Imageddd1352e/
+session72daf70592c1ce2a/floor1738713600/0/3 NOThardwaretested;PCI120/core157/native1
+warnings retained. Firstcompositionwrongworkerbasehashrefused;worker2/
+runtime2/kernel2corrected. Nextoneconsolidatedfailure/scantrial;stockcurrent,
+fullGoal active/Wi-Fi incomplete,peerworktrees unchanged.
+
 Latest20261120 UMAC REGISTER HARDWARE: initialactualper-registerhandshake
 passes;firstPMFbefore forcedRDDMreal scratch0/11checks/-110 thenlatches.
 Subsequentffffffff are refusalSENTINELS,NOTrawCE3/hardwaredecode proof.

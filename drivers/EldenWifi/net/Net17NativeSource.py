@@ -5,7 +5,7 @@ import importlib.util
 ROOT=Path(__file__).resolve().parents[3]
 
 
-def generated(mhi_hold=False, umac_hold=False, dma_inspect=False, battery_only=False):
+def generated(mhi_hold=False, umac_hold=False, dma_inspect=False, battery_only=False, first_failure=False):
     if mhi_hold and umac_hold:
         raise ValueError('Select only one explicit wake trial')
     if dma_inspect and not umac_hold:
@@ -96,4 +96,9 @@ extern "C" int elden_wifi_umac_hold_requested(void){
     if battery_only:
         spec=importlib.util.spec_from_file_location('net17_battery_admission',ROOT/'drivers/EldenWifi/BatteryAdmissionSource.py')
         m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);files=m.worker(files)
+    if first_failure:
+        if not umac_hold or not dma_inspect or not battery_only:
+            raise ValueError('First-failure observation requires the qualified owner/runtime pair')
+        spec=importlib.util.spec_from_file_location('net17_first_failure',ROOT/'drivers/EldenWifi/FirstFailureNativeSource.py')
+        m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);files=m.apply(files)
     return files

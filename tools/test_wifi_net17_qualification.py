@@ -248,6 +248,23 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated UMAC register contract accepted: '+name)
+    if report.get('first_failure_trial'):
+        for name in ('report','worker','first_failure_reversible','first_failure_no_new_control_writes',
+                     'first_failure_raw_no_wake','first_failure_readclear_excluded','stages','raw-count',
+                     'physical-count','worker-sha','source','object'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='report':selected['first_failure_trial']=False
+            elif name=='worker':selected['network_worker']['first_failure_physical']=False
+            elif name=='stages':runtime['first_failure_stages']=[12]
+            elif name=='raw-count':runtime['first_failure_raw_count']=22
+            elif name=='physical-count':runtime['first_failure_physical_count']=48
+            elif name=='worker-sha':runtime['first_failure_worker_sha256']='0'*64
+            elif name=='source':runtime['first_failure_units']['pci.c']['source_sha256']='0'*64
+            elif name=='object':runtime['first_failure_units']['core.c']['object_sha256']='0'*64
+            else:runtime[name]=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated first-failure contract accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

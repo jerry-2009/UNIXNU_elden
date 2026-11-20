@@ -1,5 +1,11 @@
 # Wi-Fi：固件与服务已接通，WMI完成仍待修复
 
+2026-11-20首失效合并观察候选已签：初始化完成和真实握手失败各采一次，21个raw BAR读数加
+47个已持有物理映射读数，保留逐项返回码；不增加唤醒／复位／映射，不读读后清零原因寄存器。
+13实际函数模型、119资格反例、整核和签包通过；ddd1352e未实机。
+[复现](../drivers/EldenWifi/peach/FIRST-FAILURE.md)／[构建](evidence/wifi-first-failure-20261120.json)。
+下一轮一次收齐差异，再根据实证修补。Wi-Fi仍BSS0，完整Goal active。
+
 2026-11-20逐寄存器唤醒实测：初期真实握手成功，第一条PMF前scratch0、11次检查后−110。
 后续ffffffff均为拒绝访问的返回值，不能当硬件CE3／链路读数；发生在强制RDDM之前。
 BSS仍0，未关联／DHCP／流量，完整stock/root/green/原充电无线扫描设置恢复并熄屏。

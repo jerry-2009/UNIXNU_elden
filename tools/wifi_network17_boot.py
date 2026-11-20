@@ -26,7 +26,7 @@ def qualify_ce3_inspect(runtime,worker):
 
 
 def qualify_ce3_timeline(runtime):
-    exports=['_elden_ce3_timeline']+(['_elden_wifi_umac_access_first'] if runtime.get('umac_access_trial') else ['_elden_wifi_umac_command_begin','_elden_wifi_umac_command_end'] if runtime.get('umac_command_lease_trial') else [])
+    exports=['_elden_ce3_timeline']+(['_elden_wifi_umac_access_first'] if runtime.get('umac_access_trial') else ['_elden_wifi_umac_command_begin','_elden_wifi_umac_command_end'] if runtime.get('umac_command_lease_trial') else [])+(['_elden_wifi_first_failure_sample'] if runtime.get('first_failure_trial') else [])
     if runtime.get('ce3_inspect_trial') is not True or runtime.get('ce3_direct_trial') or runtime.get('timeline_delta_reversible') is not True or (runtime.get('timeline_events_max'),runtime.get('timeline_reads_per_event'))!=(16,9) or runtime.get('runtime_added_exports')!=exports or runtime.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o','ath12k_core.o']+(['ath12k_qmi.o'] if runtime.get('host_wake_capability_trial') else []):
         raise ValueError('Wrong bounded CE3 start timeline')
 
@@ -108,11 +108,27 @@ def qualify_umac_register(runtime):
         raise ValueError('Wrong OEM per-register UMAC contract')
     parent=Path(runtime['umac_register_parent_source'])
     candidates=[Path(v) for v in runtime['pci_state_command'] if v.endswith('/pci.c')]
-    if len(candidates)!=1 or sha(parent)!=EXPECTED or patch(parent.read_bytes())!=candidates[0].read_bytes() or sha(candidates[0])!=runtime['umac_register_source_sha256'] or runtime['pci_state_source_sha256']!=runtime['umac_register_source_sha256']:
+    source=candidates[0] if len(candidates)==1 else None
+    obj=source.parent/'ath12k_pci.o' if source else None
+    if runtime.get('first_failure_trial'):
+        source=Path(runtime['first_failure_parent_units']['pci.c']['source'])
+        obj=Path(runtime['first_failure_parent_units']['pci.c']['object'])
+    if len(candidates)!=1 or sha(parent)!=EXPECTED or patch(parent.read_bytes())!=source.read_bytes() or sha(source)!=runtime['umac_register_source_sha256'] or (not runtime.get('first_failure_trial') and runtime['pci_state_source_sha256']!=runtime['umac_register_source_sha256']):
         raise ValueError('UMAC register source does not reproduce the exact patch')
-    obj=candidates[0].parent/'ath12k_pci.o'
-    if sha(obj)!=runtime['umac_register_object_sha256'] or runtime['pci_state_object_sha256']!=runtime['umac_register_object_sha256']:
+    if sha(obj)!=runtime['umac_register_object_sha256'] or (not runtime.get('first_failure_trial') and runtime['pci_state_object_sha256']!=runtime['umac_register_object_sha256']):
         raise ValueError('UMAC register consumed object differs')
+
+
+def qualify_first_failure(runtime,worker):
+    sys.path.insert(0,str(ROOT/'drivers/EldenWifi/peach'))
+    from FirstFailurePatch import EXPECTED,patch
+    flags=['first_failure_reversible','first_failure_no_new_control_writes','first_failure_raw_no_wake','first_failure_readclear_excluded']
+    if runtime.get('umac_register_trial') is not True or any(runtime.get(k) is not True for k in flags) or runtime.get('first_failure_stages')!=[12,90] or (runtime.get('first_failure_raw_count'),runtime.get('first_failure_physical_count'))!=(21,47):raise ValueError('Wrong consolidated first-failure scope')
+    if worker.get('first_failure_physical') is not True or worker.get('first_failure_readonly') is not True or worker.get('first_failure_no_new_maps') is not True or worker.get('first_failure_no_control_writes') is not True or worker.get('first_failure_sample_stages')!=[12,90] or runtime.get('first_failure_worker_sha256')!=worker['object_sha256']:raise ValueError('First-failure physical worker mismatch')
+    for n in ['pci.c','core.c']:
+        parent=runtime['first_failure_parent_units'][n];row=runtime['first_failure_units'][n]
+        old=Path(parent['source']);source=Path(row['source']);obj=Path(row['object'])
+        if sha(old)!=EXPECTED[n] or sha(old)!=parent['source_sha256'] or patch(n,old.read_bytes())!=source.read_bytes() or sha(source)!=row['source_sha256'] or sha(obj)!=row['object_sha256']:raise ValueError('First-failure source/object differs: '+n)
 
 
 def qualify_components(report):
@@ -155,8 +171,9 @@ def qualify_components(report):
     if bool(report.get('host_wake_capability_trial'))!=bool(stride and stride.get('host_wake_capability_trial')):raise ValueError('Host wake capability report mismatch')
     if bool(report.get('posted_reset_trial'))!=bool(stride and stride.get('posted_reset_trial')):raise ValueError('Posted-reset report mismatch')
     if bool(report.get('umac_register_trial'))!=bool(stride and stride.get('umac_register_trial')):raise ValueError('UMAC register report mismatch')
+    if bool(report.get('first_failure_trial'))!=bool(stride and stride.get('first_failure_trial')) or bool(report.get('first_failure_trial'))!=bool(worker.get('first_failure_physical')):raise ValueError('First-failure report mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
-    if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
+    if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery),bool(report.get('first_failure_trial'))).items()}:
         raise ValueError('Network bridge source differs')
     if not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes'] or not net['late_initializer_owned'] or not net['other_sections_preserved']:
         raise ValueError('Network lifecycle/late initializer not qualified')
@@ -207,6 +224,7 @@ def qualify_components(report):
         if stride.get('host_wake_capability_trial'):qualify_host_wake_capability(stride)
         if stride.get('posted_reset_trial'):qualify_posted_reset(stride)
         if stride.get('umac_register_trial'):qualify_umac_register(stride)
+        if stride.get('first_failure_trial'):qualify_first_failure(stride,worker)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -248,6 +266,7 @@ def qualify(report_path,entry_path,runtime):
     result['host_wake_capability_trial']=report.get('host_wake_capability_trial') is True
     result['posted_reset_trial']=report.get('posted_reset_trial') is True
     result['umac_register_trial']=report.get('umac_register_trial') is True
+    result['first_failure_trial']=report.get('first_failure_trial') is True
     return result
 
 
