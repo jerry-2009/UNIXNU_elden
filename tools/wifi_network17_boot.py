@@ -62,6 +62,7 @@ def qualify_components(report):
     stride=report.get('mac_phy_stride_runtime')
     battery=report.get('battery_admission')
     if bool(report.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission report mismatch')
+    if bool(report.get('sideband_pins_trial'))!=bool(battery and battery.get('sideband_pins_trial')):raise ValueError('Sideband report mismatch')
     if report.get('ce_wmi_firmware_objects_unchanged') is not (not bool(stride)) or report.get('core_filelist_unchanged') is not True or (report['changed_core_objects'],report['changed_native_objects'],report['added_native_objects'])!=(0,(2 if stride else 1)+int(bool(battery)),1):
         raise ValueError('Wrong network-only composition')
     for name in ('core','service_assets','optional_runtime','service_native','runtime_snapshot'):
@@ -98,7 +99,12 @@ def qualify_components(report):
     if battery:
         if battery.get('compiled') is not True or battery.get('radio_only_no_charger_set') is not True or battery.get('chemistry_two_gauges_epoch_age_checked') is not True or battery.get('controls_and_charger_permission_unchanged') is not True:raise ValueError('Radio-only admission gates not qualified')
         sys.path.insert(0,str(ROOT/'drivers/EldenWifi'));import BatteryAdmissionSource as battery_source
-        for unit,data in [('PmicClient',battery_source.client()),('WcnPowerNative',battery_source.wcn())]:
+        wcn_data=battery_source.wcn()
+        if battery.get('sideband_pins_trial'):
+            from SidebandSource import source as sideband_source
+            if battery.get('sideband_gpio_indices')!=[18,19,202] or battery.get('sideband_cold_before_votes') is not True or battery.get('sideband_unknown_state_retained') is not True:raise ValueError('Sideband physical contract changed')
+            wcn_data=sideband_source()
+        for unit,data in [('PmicClient',battery_source.client()),('WcnPowerNative',wcn_data)]:
             row=battery['consumers'][unit]
             if hashlib.sha256(data).hexdigest()!=row['source_sha256']:raise ValueError('Radio-only consumer source differs')
         for name,digest in battery['source_inputs'].items():
@@ -164,6 +170,7 @@ def qualify(report_path,entry_path,runtime):
     result['umac_access_trial']=report.get('umac_access_trial') is True
     result['umac_command_lease_trial']=report.get('umac_command_lease_trial') is True
     result['oem_init_mode_trial']=report.get('oem_init_mode_trial') is True
+    result['sideband_pins_trial']=report.get('sideband_pins_trial') is True
     return result
 
 
@@ -224,4 +231,7 @@ def menu(qualification):
     if qualification.get('oem_init_mode_trial'):
         if not qualification.get('pci_state_trace_trial') or qualification.get('umac_access_trial') or qualification.get('umac_command_lease_trial'):raise ValueError('OEM init requires its exact state parent')
         text=text.replace('Wi-Fi PCI state observation + USB - TEST','Wi-Fi OEM init mode + USB - TEST',1)
+    if qualification.get('sideband_pins_trial'):
+        if not qualification.get('wifi_battery_runtime_trial'):raise ValueError('Sideband requires its qualified real power owner')
+        text=text.replace('Wi-Fi PCI state observation + USB - TEST','Wi-Fi board sideband pins + USB - TEST',1)
     return text

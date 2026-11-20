@@ -170,6 +170,16 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated OEM-init contract accepted: '+name)
+    if report.get('sideband_pins_trial'):
+        for name in ('pins','cold','retained','report'):
+            selected=copy.deepcopy(report)
+            if name=='pins':selected['battery_admission']['sideband_gpio_indices']=[18,19,201]
+            elif name=='cold':selected['battery_admission']['sideband_cold_before_votes']=False
+            elif name=='retained':selected['battery_admission']['sideband_unknown_state_retained']=False
+            else:selected['sideband_pins_trial']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated sideband pin contract accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

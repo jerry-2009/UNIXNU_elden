@@ -1,5 +1,21 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 SIDEBAND signed: actualstock pinctrl18/19func1input and
+202outlow4mA matches ArmadaTB322FC; native WCN didnot initialize these.
+Exactcold-only helper reads allbeforewrites/refusesIRQ/unknownmux/eGPIO;
+sets18/19mux only,HOST_SOL202low,partialerrors held.23actual ASan/UBSan+61
+qualifier/fullkernel/Apple30/entry7124/package1 pass. Image562e846c/
+sessionf7d71c6050ef6775/floor1738713600/0/3 NOThardwaretested. PriorOEMmode
+trial stillCE3zero/BSS0; fullstock restored, no gracefulfence. FullGoal active,
+Wi-Fi incomplete; stateobserver/battery/epd0 retained.
+
+Latest20261120 OEM INIT HARDWARE: preferred5/physicalbands2 prepared,
+postreadyDBSswitch omitted; CE3stilllost beforePMF (sw4/4then12/4), BSS0.
+No mode-root-cause claim; mode-only contrast not repeat. No put/netdrain/fence
+observed;resources retained until typedphysicalreset. Fullstock/root/green/
+settings restored/alljobs terminal. NEXT exact board pinctrl/hostSOL/runtime
+lowpower audit beforenewwrites. FullGoal active/Wi-Fi incomplete.
+
 Latest20261120 OEM INIT signed: commandlease cold-loss handshake really
 timesout50ms beforePMF; no wake-only repeats. OEM init source supplies preferred
 mode plus physicalbandmaps; current singlepdev path omittedthenrequestedDBS1

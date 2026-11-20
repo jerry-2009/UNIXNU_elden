@@ -36,7 +36,12 @@ def main():
         for name,digest in battery['source_inputs'].items():
             if sha(ROOT/name)!=digest:raise ValueError('Radio-only battery source changed')
         sys.path.insert(0,str(ROOT/'drivers/EldenWifi'));import BatteryAdmissionSource as battery_source
-        for unit,data in [('PmicClient',battery_source.client()),('WcnPowerNative',battery_source.wcn())]:
+        wcn_data=battery_source.wcn()
+        if battery.get('sideband_pins_trial'):
+            from SidebandSource import source as sideband_source
+            if battery.get('sideband_gpio_indices')!=[18,19,202] or not battery.get('sideband_cold_before_votes') or not battery.get('sideband_unknown_state_retained'):raise ValueError('Unqualified sideband pin scope')
+            wcn_data=sideband_source()
+        for unit,data in [('PmicClient',battery_source.client()),('WcnPowerNative',wcn_data)]:
             row=battery['consumers'][unit]
             if row['source_sha256']!=hashlib.sha256(data).hexdigest() or sha(args.battery_admission_build/(unit+'.o'))!=row['object_sha256']:
                 raise ValueError('Battery admission consumer changed')
@@ -219,6 +224,7 @@ def main():
         window_reselect_trial=bool(stride and stride.get('window_reselect_trial')),
         pci_state_trace_trial=bool(stride and stride.get('pci_state_trace_trial')),
         wifi_battery_runtime_trial=bool(battery),battery_admission=battery,
+        sideband_pins_trial=bool(battery and battery.get('sideband_pins_trial')),
         umac_access_trial=bool(stride and stride.get('umac_access_trial')),
         umac_command_lease_trial=bool(stride and stride.get('umac_command_lease_trial')),
         oem_init_mode_trial=bool(stride and stride.get('oem_init_mode_trial')),
