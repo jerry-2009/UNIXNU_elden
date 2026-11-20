@@ -26,7 +26,7 @@ def qualify_ce3_inspect(runtime,worker):
 
 
 def qualify_ce3_timeline(runtime):
-    exports=['_elden_ce3_timeline']+(['_elden_wifi_umac_access_first'] if runtime.get('umac_access_trial') else [])
+    exports=['_elden_ce3_timeline']+(['_elden_wifi_umac_access_first'] if runtime.get('umac_access_trial') else ['_elden_wifi_umac_command_begin','_elden_wifi_umac_command_end'] if runtime.get('umac_command_lease_trial') else [])
     if runtime.get('ce3_inspect_trial') is not True or runtime.get('ce3_direct_trial') or runtime.get('timeline_delta_reversible') is not True or (runtime.get('timeline_events_max'),runtime.get('timeline_reads_per_event'))!=(16,9) or runtime.get('runtime_added_exports')!=exports or runtime.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o','ath12k_core.o']:
         raise ValueError('Wrong bounded CE3 start timeline')
 
@@ -43,6 +43,10 @@ def qualify_pci_state_trace(runtime):
 
 def qualify_umac_access(runtime):
     if runtime.get('pci_state_trace_trial') is not True or runtime.get('umac_access_reversible') is not True or runtime.get('umac_access_first_pmf_only') is not True or runtime.get('umac_access_balanced_extra_mhi') is not True or (runtime.get('umac_access_poll_bound_ms'),runtime.get('umac_access_ring_writes'))!=(50,0):raise ValueError('Wrong first-access OEM contrast')
+
+
+def qualify_umac_command_lease(runtime):
+    if runtime.get('pci_state_trace_trial') is not True or runtime.get('umac_access_trial') or runtime.get('umac_access_reversible') is not True or runtime.get('umac_access_first_pmf_only') is not False or runtime.get('umac_access_balanced_extra_mhi') is not True or runtime.get('umac_lease_spans_original_send') is not True or (runtime.get('umac_access_poll_bound_ms'),runtime.get('umac_access_ring_writes'))!=(50,0):raise ValueError('Wrong command-scoped OEM lease')
 
 
 def qualify_components(report):
@@ -77,6 +81,7 @@ def qualify_components(report):
     if bool(report.get('window_reselect_trial'))!=bool(stride and stride.get('window_reselect_trial')):raise ValueError('Window reselection report mismatch')
     if bool(report.get('pci_state_trace_trial'))!=bool(stride and stride.get('pci_state_trace_trial')):raise ValueError('PCI state observation report mismatch')
     if bool(report.get('umac_access_trial'))!=bool(stride and stride.get('umac_access_trial')):raise ValueError('UMAC first-access report mismatch')
+    if bool(report.get('umac_command_lease_trial'))!=bool(stride and stride.get('umac_command_lease_trial')):raise ValueError('UMAC command lease report mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
         raise ValueError('Network bridge source differs')
@@ -117,6 +122,7 @@ def qualify_components(report):
         if stride.get('window_reselect_trial'):qualify_window_reselect(stride)
         if stride.get('pci_state_trace_trial'):qualify_pci_state_trace(stride)
         if stride.get('umac_access_trial'):qualify_umac_access(stride)
+        if stride.get('umac_command_lease_trial'):qualify_umac_command_lease(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -150,6 +156,7 @@ def qualify(report_path,entry_path,runtime):
     result['pci_state_trace_trial']=report.get('pci_state_trace_trial') is True
     result['wifi_battery_runtime_trial']=report.get('wifi_battery_runtime_trial') is True
     result['umac_access_trial']=report.get('umac_access_trial') is True
+    result['umac_command_lease_trial']=report.get('umac_command_lease_trial') is True
     return result
 
 
@@ -204,4 +211,7 @@ def menu(qualification):
     if qualification.get('umac_access_trial'):
         if not qualification.get('pci_state_trace_trial'):raise ValueError('First-access contrast requires its state parent')
         text=text.replace('Wi-Fi PCI state observation + USB - TEST','Wi-Fi OEM first-access wake + USB - TEST',1)
+    if qualification.get('umac_command_lease_trial'):
+        if not qualification.get('pci_state_trace_trial') or qualification.get('umac_access_trial'):raise ValueError('Command lease requires its exact state parent')
+        text=text.replace('Wi-Fi PCI state observation + USB - TEST','Wi-Fi OEM command wake + USB - TEST',1)
     return text

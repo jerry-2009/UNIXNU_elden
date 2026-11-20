@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 UMAC COMMAND signed: first-access trial reached realINFO0/
+SCAN request andCE3TP100(25desc), thenscanstart wait/STOP12290 timeout;
+first UMAccess already1/2, so lost-state recovery/causation unproved. Fullstock
+restored; no gracefulfence/put. Command-scoped exactOEM MHI+UMAC begin/end
+now spans originalWMI send/creditwait;82actual host+65qualifier/fullkernel/
+Apple30/entry7124/package1 pass. Image60826ee5/session4da4681ed533ada2/
+floor1738713600/0/3 NOT hardwaretested. No ringwrites/FW/credit/timeoutchange.
+FullGoal active/Wi-Fi incomplete; stockcurrent.
+
 Latest20261120 UMAC ACCESS signed: MHIrawM0+refs1/1 whileUMAC/CE3zero
 was captured without selectedCPUwrite. ExactOEM get_sync+3004=1/status2
 recipe now once before firstPMF; extraMHI balanced/<=50ms/realerrors, no ring
