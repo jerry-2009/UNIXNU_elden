@@ -49,6 +49,10 @@ def qualify_umac_command_lease(runtime):
     if runtime.get('pci_state_trace_trial') is not True or runtime.get('umac_access_trial') or runtime.get('umac_access_reversible') is not True or runtime.get('umac_access_first_pmf_only') is not False or runtime.get('umac_access_balanced_extra_mhi') is not True or runtime.get('umac_lease_spans_original_send') is not True or (runtime.get('umac_access_poll_bound_ms'),runtime.get('umac_access_ring_writes'))!=(50,0):raise ValueError('Wrong command-scoped OEM lease')
 
 
+def qualify_oem_init(runtime):
+    if runtime.get('pci_state_trace_trial') is not True or runtime.get('umac_access_trial') or runtime.get('umac_command_lease_trial') or any(runtime.get(k) is not True for k in ['oem_init_delta_reversible','oem_init_peach_only','oem_init_firmware_preferred_mode','oem_init_firmware_physical_band_map','oem_init_single_pdev_alias_unchanged','oem_init_no_post_ready_switch']):raise ValueError('Wrong exact OEM initialization mode/map contract')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -82,6 +86,7 @@ def qualify_components(report):
     if bool(report.get('pci_state_trace_trial'))!=bool(stride and stride.get('pci_state_trace_trial')):raise ValueError('PCI state observation report mismatch')
     if bool(report.get('umac_access_trial'))!=bool(stride and stride.get('umac_access_trial')):raise ValueError('UMAC first-access report mismatch')
     if bool(report.get('umac_command_lease_trial'))!=bool(stride and stride.get('umac_command_lease_trial')):raise ValueError('UMAC command lease report mismatch')
+    if bool(report.get('oem_init_mode_trial'))!=bool(stride and stride.get('oem_init_mode_trial')):raise ValueError('OEM init report mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
         raise ValueError('Network bridge source differs')
@@ -123,6 +128,7 @@ def qualify_components(report):
         if stride.get('pci_state_trace_trial'):qualify_pci_state_trace(stride)
         if stride.get('umac_access_trial'):qualify_umac_access(stride)
         if stride.get('umac_command_lease_trial'):qualify_umac_command_lease(stride)
+        if stride.get('oem_init_mode_trial'):qualify_oem_init(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -157,6 +163,7 @@ def qualify(report_path,entry_path,runtime):
     result['wifi_battery_runtime_trial']=report.get('wifi_battery_runtime_trial') is True
     result['umac_access_trial']=report.get('umac_access_trial') is True
     result['umac_command_lease_trial']=report.get('umac_command_lease_trial') is True
+    result['oem_init_mode_trial']=report.get('oem_init_mode_trial') is True
     return result
 
 
@@ -214,4 +221,7 @@ def menu(qualification):
     if qualification.get('umac_command_lease_trial'):
         if not qualification.get('pci_state_trace_trial') or qualification.get('umac_access_trial'):raise ValueError('Command lease requires its exact state parent')
         text=text.replace('Wi-Fi PCI state observation + USB - TEST','Wi-Fi OEM command wake + USB - TEST',1)
+    if qualification.get('oem_init_mode_trial'):
+        if not qualification.get('pci_state_trace_trial') or qualification.get('umac_access_trial') or qualification.get('umac_command_lease_trial'):raise ValueError('OEM init requires its exact state parent')
+        text=text.replace('Wi-Fi PCI state observation + USB - TEST','Wi-Fi OEM init mode + USB - TEST',1)
     return text

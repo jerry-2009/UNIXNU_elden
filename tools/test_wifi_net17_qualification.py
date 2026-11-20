@@ -162,6 +162,14 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated command-scoped lease accepted: '+name)
+    if report.get('oem_init_mode_trial'):
+        for name in ('oem_init_delta_reversible','oem_init_peach_only','oem_init_firmware_preferred_mode','oem_init_firmware_physical_band_map','oem_init_single_pdev_alias_unchanged','oem_init_no_post_ready_switch','report'):
+            selected=copy.deepcopy(report)
+            if name=='report':selected['oem_init_mode_trial']=False
+            else:selected['mac_phy_stride_runtime'][name]=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated OEM-init contract accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

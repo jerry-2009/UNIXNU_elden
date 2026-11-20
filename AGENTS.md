@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 OEM INIT signed: commandlease cold-loss handshake really
+timesout50ms beforePMF; no wake-only repeats. OEM init source supplies preferred
+mode plus physicalbandmaps; current singlepdev path omittedthenrequestedDBS1
+althoughFW modes0/5. New Peach-only WMI_INIT mode/maps derived from realcaps,
+no post-ready switch/logicalalias change.34actualinitmodel+64qualifier/full
+kernel/Apple30/entry7124/package1 pass. Imageb918e48a/session62c15de2bfc17d05/
+floor1738713600/0/3 NOT hardwaretested. Stateobserver/battery/epd0 retained;
+prior fullfence/put/stock restore. FullGoal active/Wi-Fi incomplete.
+
 Latest20261120 UMAC COMMAND signed: first-access trial reached realINFO0/
 SCAN request andCE3TP100(25desc), thenscanstart wait/STOP12290 timeout;
 first UMAccess already1/2, so lost-state recovery/causation unproved. Fullstock
