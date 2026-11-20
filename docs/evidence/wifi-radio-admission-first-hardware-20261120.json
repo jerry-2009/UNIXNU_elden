@@ -1,0 +1,29 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": true,
+  "candidate": "136b6d82d2531968f752ea2c5114e94ea01b39c3f74355108b0de4d7ace33d49",
+  "session": "fa862840b5e44469",
+  "raw": {
+    "path": "edl_work\\live-radio-admission-20261120\\usb\\20261120-021622.bin",
+    "bytes": 102391,
+    "sha256": "3b151ec9eb38c3ade0b80cd276459b9c17546291e1a872d18f22d4da5a9cff95",
+    "drop_max": 0,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "radio_only_cache_hardware_ready": true,
+  "hardware_health_raw": 12,
+  "hardware_temp_centi_c": 1670,
+  "pci_root_stage": 2,
+  "pci_root_error": -11,
+  "wifi_runtime_entered": false,
+  "diagnostic_runtime_not_exercised": true,
+  "implementation_error": "Compiled WCN replacement was declared but only PCIe archive rebuilt; actual shared WCN is in libEldenBluetooth.a and remained old.",
+  "candidate_withdrawn": true,
+  "stock_full_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "stock_root_green_original_settings_restored": true,
+  "build_job_terminal": true,
+  "next": "Replace and verify actual shared WCN Bluetooth archive member; preserve failed candidate and report.",
+  "goal": "active and incomplete"
+}

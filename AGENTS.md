@@ -1,5 +1,13 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 RADIO LOADED signed: first radio-only cache succeeds on
+hardware, but retained BTarchive still contained oldWCN, stoppingrootstage2.
+136b6d82 withdrawn, fullstock/root/green/settings restored. ActualBluetooth
+WcnPowerNative member now replaced and SHA-bound with PMIC and linkcmd.
+57qualifier/fullkernel/Apple30/entry7124/package2 pass. Image4513068b/
+session4df02d420655a9e7/floor1738713600/0/3 NOThardware tested.
+Battery/thermal/recovery guards retained;epd0. FullGoal active/Wi-Fi incomplete.
+
 Latest20261120 RADIO BATTERY signed: two PCIstate trials refused beforeWLAN:
 rawhealth12/OEMCool at18--20C rejected by chargerGood1 dependency; both
 fullstock/root/green/settings restored. Radio-only readonly cache now checks

@@ -1,6 +1,6 @@
 """Qualify only the new iOS17 network bridge and its retained service runtime."""
 from pathlib import Path
-import hashlib,importlib.util,json,sys
+import hashlib,importlib.util,json,sys,subprocess
 ROOT=Path(__file__).resolve().parents[1]
 PARENT_KERNEL='b6b0d1b8daa2e19f69b3e3a909a6654ba148289da79b180cd25ee49d3cb873b4'
 
@@ -89,6 +89,12 @@ def qualify_components(report):
             if sha(ROOT/name)!=digest:raise ValueError('Radio-only admission input changed')
         if sha(Path(battery['pmic_archive']))!=battery['pmic_archive_sha256']:raise ValueError('Radio-only PMIC archive differs')
         if worker.get('battery_provider_sha256')!=battery['consumers']['PmicClient']['object_sha256']:raise ValueError('Radio-only worker provider differs')
+        loaded=report.get('battery_loaded_archives',{})
+        if set(loaded)!={'pmic','wcn'}:raise ValueError('Actual PMIC/WCN archive binding missing')
+        for key,unit,member in [('pmic','PmicClient','PmicClient.o'),('wcn','WcnPowerNative','WcnPowerNative.o')]:
+            row=loaded[key]
+            if row['member']!=member or row['member_sha256']!=battery['consumers'][unit]['object_sha256'] or sha(Path(row['path']))!=row['sha256'] or hashlib.sha256(subprocess.check_output(['ar','p',row['path'],member])).hexdigest()!=row['member_sha256']:
+                raise ValueError('Actual loaded battery provider member differs')
         wcn=components['WcnPowerNative.o']
         if wcn['sha256']!=battery['consumers']['WcnPowerNative']['object_sha256'] or sha(Path(wcn['path']))!=wcn['sha256']:raise ValueError('Radio-only WCN consumer differs')
     if stride:

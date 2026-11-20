@@ -131,6 +131,22 @@ def main():
         if sha(oldpmic)!=battery['parent_pmic_archive_sha256'] or sha(newpmic)!=battery['pmic_archive_sha256'] or sum(v.endswith(str(oldpmic)) for v in command)!=1:
             raise ValueError('Loaded battery admission archive pair differs')
         command=[v.replace(str(oldpmic),str(newpmic)) for v in command]
+        # The shared WCN object is linked from Bluetooth, not from the PCIe
+        # archive. Verify the actual loaded member and replace it there.
+        oldbt,=[Path(v.split(',')[-1]) for v in command if v.endswith('/libEldenBluetooth.a')]
+        btfolder=out/'bluetooth';btfolder.mkdir();btnames=[n for n in subprocess.check_output(['ar','t',oldbt],text=True).splitlines() if not n.startswith('__.SYMDEF')]
+        if len(btnames)!=len(set(btnames)) or btnames.count('WcnPowerNative.o')!=1:raise ValueError('Ambiguous loaded shared WCN member')
+        btretained={};btmembers={}
+        for name in btnames:
+            data=subprocess.check_output(['ar','p',oldbt,name]);btretained[name]=hashlib.sha256(data).hexdigest()
+            if name=='WcnPowerNative.o':
+                if btretained[name]!=battery['consumers']['WcnPowerNative']['parent_object_sha256']:raise ValueError('Loaded shared WCN parent differs')
+                data=(args.battery_admission_build/'WcnPowerNative.o').read_bytes()
+            (btfolder/name).write_bytes(data);btmembers[name]=hashlib.sha256(data).hexdigest()
+        newbt=btfolder/'libEldenBluetooth.a';subprocess.run(['ar','rcs',str(newbt),*btnames],cwd=btfolder,env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
+        loaded=subprocess.check_output(['ar','p',newbt,'WcnPowerNative.o'])
+        if hashlib.sha256(loaded).hexdigest()!=battery['consumers']['WcnPowerNative']['object_sha256']:raise ValueError('Actual loaded WCN replacement differs')
+        command=[v.replace(str(oldbt),str(newbt)) for v in command]
     write(out/'link-command.json',command)
     env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as log:subprocess.run(command,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
@@ -195,6 +211,9 @@ def main():
         pci_state_trace_trial=bool(stride and stride.get('pci_state_trace_trial')),
         wifi_battery_runtime_trial=bool(battery),battery_admission=battery,
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
+    if battery:
+        proof['battery_loaded_archives']=dict(pmic=dict(path=str(newpmic),sha256=sha(newpmic),member='PmicClient.o',member_sha256=battery['consumers']['PmicClient']['object_sha256']),
+            wcn=dict(path=str(newbt),sha256=sha(newbt),member='WcnPowerNative.o',member_sha256=battery['consumers']['WcnPowerNative']['object_sha256'],retained_members=btretained,members=btmembers))
     write(out/'result.json',proof)
     print(json.dumps({key:proof[key] for key in ('profile','kernel_sha256','native_sha256','all_actual_imports_resolved','hardware_tested')}))
 

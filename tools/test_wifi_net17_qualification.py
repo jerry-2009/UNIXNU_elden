@@ -123,14 +123,16 @@ def main():
             except ValueError:cases+=1
             else:raise AssertionError('Mutated PCI state observation accepted: '+name)
     if report.get('wifi_battery_runtime_trial'):
-        for name in ('pair','chemistry','no_set','controls','report','archive'):
+        for name in ('pair','chemistry','no_set','controls','report','archive','loaded','loaded-member'):
             selected=copy.deepcopy(report)
             if name=='pair':selected['network_worker']['wifi_battery_runtime_trial']=False
             elif name=='chemistry':selected['battery_admission']['chemistry_two_gauges_epoch_age_checked']=False
             elif name=='no_set':selected['battery_admission']['radio_only_no_charger_set']=False
             elif name=='controls':selected['battery_admission']['controls_and_charger_permission_unchanged']=False
             elif name=='report':selected['wifi_battery_runtime_trial']=False
-            else:selected['battery_admission']['pmic_archive_sha256']='0'*64
+            elif name=='archive':selected['battery_admission']['pmic_archive_sha256']='0'*64
+            elif name=='loaded':selected.pop('battery_loaded_archives')
+            else:selected['battery_loaded_archives']['wcn']['member_sha256']='0'*64
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated radio-only admission accepted: '+name)
