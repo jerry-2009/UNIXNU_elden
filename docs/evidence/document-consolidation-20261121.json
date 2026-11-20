@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-21",
+  "snapshots": [
+    {
+      "old": "docs/CURRENT-STATUS.md",
+      "archive": "docs/archive/20261121/CURRENT-STATUS.md",
+      "sha256": "9f8694936b5a12adfcd24e081eaa340652b306eaec28fd9054414fea6ee36d5f",
+      "bytes": 47837
+    },
+    {
+      "old": "docs/PLAN.md",
+      "archive": "docs/archive/20261121/PLAN.md",
+      "sha256": "f786f958fc7ecbb67606a403a0d7b21a8f41f3dd55247f8a5de6bb8d586d66cb",
+      "bytes": 38618
+    },
+    {
+      "old": "docs/WIFI-STATUS.md",
+      "archive": "docs/archive/20261121/WIFI-STATUS.md",
+      "sha256": "00b0427a1feec86ef70cfca8a3312b39d93ca79285cd6eaac84008ed0c1475b4",
+      "bytes": 23505
+    },
+    {
+      "old": "docs/HANDOVER-20261118.md",
+      "archive": "docs/archive/20261121/HANDOVER-20261118.md",
+      "sha256": "0b476308df98547a6b9b0f2d3c2742f706dbf4b018f0ce6b06d646d5dd35cf9e",
+      "bytes": 19971
+    }
+  ],
+  "old_bytes_preserved": true,
+  "current_docs_rewritten": true,
+  "goal_state_changed": false
+}

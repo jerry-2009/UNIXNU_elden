@@ -78,3 +78,16 @@ Windows每六小时的任务只更新工作台 `research/` 引用仓，不会同
 过时整包移走前另存其顶层结果和日志；原包仍可从Trash恢复。
 当前v146/PD/GUI构建依赖、原始OS/触控/WCN/Crypto、签名模板、恢复输入和实验原始
 记录保留。macOS Trash仍占磁盘；回收不等于已增加可用空间。
+
+## 2026-11-21 本周整理
+
+当前文档入口为[INDEX](INDEX.md)。CURRENT-STATUS/PLAN/WIFI-STATUS和AGENTS已
+精简为当前事实及执行规则；原逐轮内容与11月18交接原样保存于
+[docs/archive/20261121](archive/20261121/README.md)，不改历史指纹。
+
+Mac原生Trash回收137项旧产物（21.25GiB allocated）及18项小型一次性文件／源码快照。
+所有目录和文件SHA/inode核验通过；原结果/日志另留，22658项当前传递依赖保留。
+垃圾桶未清空，回收不等于释放空间；剩余约62.5GiB。
+[摘要证据](evidence/maintenance-macos-20261121.json)；完整恢复清单在工作台
+maintenance/cleanup-20261121/mac-evidence/{verified-receipts,finish-receipts}.json。
+当前候选、回退、原OS/固件/Crypto/签名、GUI/电源/Data及其他工作树保留。

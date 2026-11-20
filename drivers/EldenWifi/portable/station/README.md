@@ -70,3 +70,15 @@ key completions and authorization, BSD RX/TX, DHCP/traffic, then bounded
 protocol teardown and actual BM/transaction/MSI/PERST fence, physical fastboot,
 full stock/root/green/original-setting restoration. A stage or queued request
 alone does not satisfy those gates. Full peripheral Goal stays active.
+
+## First full hardware result
+
+The real Y700 scan, VDEV start, authentication and association passed. The
+iPadOS17 network bridge started at stage4 and the exact signed helper launched.
+Three EAPOL frames were received; three transmit descriptors were submitted,
+but no TCL/WBM transmit completion was observed. Keys0/port closed: WPA2,
+DHCP and usable data traffic remain unaccepted. Submission is not an RF ACK.
+Protocol drain timed out; actual BM-off/transaction-idle/MSI4/PERST-low,
+typed physical fastboot/full stock/root/green/original-setting restoration
+passed independently. See [hardware evidence](../../../../docs/evidence/wifi-portable-station-hardware-20261121.json).
+Next compare the successful donor's TCL/WBM/peer setup before more hardware.
