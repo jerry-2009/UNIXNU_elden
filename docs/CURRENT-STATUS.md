@@ -1,5 +1,10 @@
 # Elden 当前状态 · 2026-11-21
 
+下一份完整station候选补齐已核漏接的HIF INIT_DONE／UMAC绑定及真实MHI wake生命周期，
+保留已成功扫描／关联与数据/helper。bb3a7d0e签包通过，未实机；11helper模型、12资格反例通过。
+[修补范围](../drivers/EldenWifi/portable/station/HIF-LIFETIME.md)。数据发送阻塞根因仍未证明，
+下一轮集中EAPOL完成／keys／DHCP／流量与回程验收。Mac整理已完成，Trash未清空。
+
 Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚未完成WPA2／DHCP／可用流量。
 这份文档只列当前事实；逐轮旧记录已原样保存在[历史快照](archive/20261121/CURRENT-STATUS.md)，
 源码／构建与实机日志各自保持原SHA。

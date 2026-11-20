@@ -1,5 +1,10 @@
 # Wi-Fi当前主线 · 2026-11-21
 
+下一份完整station候选补齐已核漏接的HIF INIT_DONE／UMAC绑定及真实MHI wake生命周期，
+保留已成功扫描／关联与数据/helper。bb3a7d0e签包通过，未实机；11helper模型、12资格反例通过。
+[修补范围](../drivers/EldenWifi/portable/station/HIF-LIFETIME.md)。数据发送阻塞根因仍未证明，
+下一轮集中EAPOL完成／keys／DHCP／流量与回程验收。Mac整理已完成，Trash未清空。
+
 Y700 TB322FC／SM8750／Peach HW2.0的真实扫描、VDEV启动、认证和关联已通过。
 WPA2／DHCP／流量未通过：当前3个EAPOL RX／3个TCL TX提交、0发送完成、keys0、port0。
 下一步核数据发送完成，沿已成功的transport继续，不再返回单项pin/wake探针。

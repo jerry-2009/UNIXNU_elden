@@ -10,6 +10,8 @@ def defs(p):return {n for n,v in global_symbols(Path(p)).items() if v[0]&0x0e}
 def refs(p):return {n for n,v in global_symbols(Path(p)).items() if not v[0]&0x0e}
 
 def qualify_runtime(r):
+    if r.get('station_hif'):
+        return qualify_hif(r)
     if r.get('station_trial') is not True or r.get('compiled') is not True or r.get('runtime_count')!=126:
         raise ValueError('Unqualified station runtime')
     if r.get('firmware_board_power_retained') is not True or r.get('actual_wpa2_helper') is not True:
@@ -34,6 +36,24 @@ def qualify_runtime(r):
         raise ValueError('Station native/binding differs')
     for name,digest in r['source_inputs'].items():
         if sha(ROOT/name)!=digest:raise ValueError('Station source pin differs: '+name)
+    return True
+
+def qualify_hif(r):
+    if any(r.get(k) is not True for k in ['compiled','station_hif','init_done_and_owned_umac','held_real_mhi_wake','release_after_protocol_stop','no_linux_ce_start','no_board_or_firmware_change']):
+        raise ValueError('Wrong owned portable HIF lifetime')
+    qualify_runtime(r['base'])
+    from PortableHifPatch import EXPECTED as expected,patch as hif_patch
+    if set(r['units'])!=set(expected) or len(r['retained_objects'])!=124:raise ValueError('HIF object boundary differs')
+    for name,row in r['units'].items():
+        if sha(row['parent_source'])!=expected[name] or hif_patch(name,Path(row['parent_source']).read_bytes())!=Path(row['source']).read_bytes() or sha(row['object'])!=row['object_sha256'] or sha(row['source'])!=row['source_sha256']:
+            raise ValueError('HIF actual consumed source differs')
+        for path,digest in row['consumed_inputs'].items():
+            if sha(path)!=digest:raise ValueError('HIF header differs')
+    for path,digest in r['retained_objects'].items():
+        if sha(path)!=digest:raise ValueError('Retained HIF object differs')
+    if sha(r['link'][r['link'].index('-o')+1])!=r['binding_sha256']:raise ValueError('HIF binding differs')
+    for name,digest in r['source_inputs'].items():
+        if sha(ROOT/name)!=digest:raise ValueError('HIF source pin differs: '+name)
     return True
 
 def qualify_native(r,folder):
@@ -88,7 +108,8 @@ def qualify_components(report):
     folder=Path(report['station_worker']['command'][report['station_worker']['command'].index('-o')+1]).parent
     qualify_native(report['station_worker'],folder)
     if parent['kernel_sha256']!=report['station_parent_kernel_sha256'] or report['profile']!='wifi-network-17':raise ValueError('Station parent differs')
-    if report['station_runtime']['scan_parent']!=parent['portable_scan_runtime']:raise ValueError('Station scan chain differs')
+    original=report['station_runtime']['base'] if report['station_runtime'].get('station_hif') else report['station_runtime']
+    if original['scan_parent']!=parent['portable_scan_runtime']:raise ValueError('Station scan chain differs')
     if report['network_bridge']!=parent['network_bridge'] or report['optional_runtime']!=parent['optional_runtime']:
         raise ValueError('Station OS bridge/rules changed')
     if report['entry_delta']!=7124 or report['original_apple_executables_hashed']!=30 or not report['original_physical_return_preserved']:

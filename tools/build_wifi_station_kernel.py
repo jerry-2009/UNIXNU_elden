@@ -17,7 +17,8 @@ def main():
     a=p.parse_args();parent,out=a.parent_build.resolve(),a.output.resolve();prior=read(parent/'result.json');runtime=read(a.runtime_build/'result.json');worker=read(a.native_build/'result.json');core=read(a.core_build/'result.json');assets=read(a.assets/'result.json')
     from wifi_station import qualify_runtime,qualify_native
     qualify_runtime(runtime);qualify_native(worker,a.native_build)
-    if runtime['scan_parent']!=prior['portable_scan_runtime'] or core['base']!=prior['core'] or worker['base']!=prior['network_worker'] or core['assets']!=assets:
+    original=runtime['base'] if runtime.get('station_hif') else runtime
+    if original['scan_parent']!=prior['portable_scan_runtime'] or core['base']!=prior['core'] or worker['base']!=prior['network_worker'] or core['assets']!=assets:
         raise ValueError('Station actual component parents differ')
     for name in ['native','kernel']:
         if sha(parent/(name+'.macho'))!=prior[name+'_sha256']:raise ValueError('Station parent changed')

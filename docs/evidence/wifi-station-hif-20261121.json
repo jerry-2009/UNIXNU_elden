@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-21",
+  "hardware_tested": false,
+  "purpose": "Restore real portable HIF INIT_DONE/UMAC/MHI lifetime before full station CE/DP programming.",
+  "source_gap_proven": true,
+  "data_timeout_root_cause_proven": false,
+  "scope": {
+    "identity": "Peach HW2.0 / MissionMode",
+    "init_done": true,
+    "existing_umac_bind": true,
+    "real_mhi_get_sync": true,
+    "single_owned_wake_release": true,
+    "no_linux_ce_handlers": true,
+    "no_board_clock_credit_timeout_firmware_change": true
+  },
+  "build": {
+    "changed_units": 2,
+    "retained_objects": 124,
+    "binding_sha256": "773156008691954b2a053a4c8a010626ac72a386dd11270d6a112add44574a2e",
+    "kernel_sha256": "c44454c384decf4f880eb26564b9b3f64d0a2a0fe61c7e16a4765fdbcce933b3",
+    "warnings": {
+      "core.c": 157,
+      "pci.c": 120
+    }
+  },
+  "verification": {
+    "actual_helper_scenarios": 11,
+    "asan_ubsan": true,
+    "hardware_modeled": true,
+    "composition_mutations": 12,
+    "apple_executables": 30,
+    "entry_delta": 7124,
+    "signed_package": true
+  },
+  "image_sha256": "bb3a7d0e78778a8750fea145fadd410086648698658dbc253f9c43e08a2c1824",
+  "session": "8d353d51bfe5c226",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "next": "One combined functional EAPOL completion/WPA2 keys/DHCP/traffic plus full physical return and stock restoration.",
+  "wifi_network_accepted": false,
+  "goal": "active and incomplete"
+}
