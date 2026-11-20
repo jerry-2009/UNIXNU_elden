@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 STARTUP CONTRACT HARDWARE: parsedWMI_INIT status0/reason0/
+module0/wait0/ready1. CPU BAR PAR maps40400000/40403000/40486000 correctly;
+not device-translation proof. MHIwake_set1/refs1/1/ctl200/status201 remains
+whilefirstPMF UMAC0/0+CE3zero;selectedCPUwrites0, originunproved. BSS0/
+28timeouts. No put/netdrain/gracefulfence; resources retained to typedreset.
+Fullstock/root/green/settings restored/alljobs terminal;raw260183/drop0/
+59status/no reconnect, postdisconnect unknown. Focus exactOEM early-events/
+fullpower-state contract; no more GPIO/mode/wake-only repeats. Goal active.
+
 Latest20261120 STARTUP CONTRACT signed: GPIOhandoff actualpass yetCE3still
 lost beforefirstPMF. Consolidated parsedWMI_INITstatus/reason/module, existing
 MHIwakeDBwrites+softwarewake_set, firstlostCPU-PAR3 records added; no new
