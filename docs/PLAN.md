@@ -1,5 +1,10 @@
 # Elden 基本可用实施计划
 
+2026-11-20Wi-Fi两轮因原厂Cool12、18--20°C被充电Good1准入连带拒绝，未启动radio。
+已单独接入只读双电池/电压/温度/epoch/时效准入，并关epd试验；充电控制仍保持原限制。
+85实际ASan/UBSan、55资格反例及整核/签包通过，候选136b6d82未上机。
+[复现与证据](evidence/wifi-radio-admission-20261120.json)。继续追CE3/MHI状态变化。
+
 2026-11-20新边界实测：pdev创建/IRQ启用/rfkill后CE3仍完整，首次PMF前CE3和
 UMAC请求/状态一起变零，根因未定。真实物理fence与stock/root/green/原设置恢复通过。
 [实录](evidence/wifi-window-boundaries-hardware-20261120.json)。下一份只记录既有CPU写入与

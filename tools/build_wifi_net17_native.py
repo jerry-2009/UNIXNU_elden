@@ -24,14 +24,17 @@ def main():
     group.add_argument('--mhi-hold',action='store_true',help='Expose only the bounded opt-in MHI power-state lease')
     group.add_argument('--umac-hold',action='store_true',help='Expose only the OEM MHI+UMAC wake trial')
     parser.add_argument('--dma-inspect',action='store_true',help='Expose bounded first-failure DMA inspection on the UMAC worker')
+    parser.add_argument('--battery-only',action='store_true',help='Use qualified read-only battery admission independent of charger policy')
+    parser.add_argument('--battery-provider',type=Path,help='Actual qualified PMIC provider object for --battery-only')
     args=parser.parse_args();parent=args.parent_native.resolve();out=args.output.resolve()
+    if args.battery_only!=bool(args.battery_provider):raise ValueError('Radio-only admission requires its actual provider object')
     prior=json.loads((parent/'result.json').read_text());net=json.loads((args.net_build/'result.json').read_text())
     if not prior.get('service_scan') or not prior.get('platform_physical_fence_preserved') or not net['compiled']:
         raise ValueError('Qualified service-scan worker and net bridge required')
     if sha(parent/'Native.o')!=prior['object_sha256'] or sha(args.net_build/'EldenWifiNet17.late.o')!=net['object_sha256']:
         raise ValueError('Parent component identity mismatch')
     out.mkdir(parents=True,exist_ok=False);source=out/'source';source.mkdir()
-    new=generated(args.mhi_hold,args.umac_hold,args.dma_inspect)
+    new=generated(args.mhi_hold,args.umac_hold,args.dma_inspect,args.battery_only)
     for name,data in new.items():(source/name).write_bytes(data)
     private=parent/'EldenWifiFactoryMac.h'
     if sha(private)!=prior['private_assets']['header_sha256']:raise ValueError('Original factory identity input changed')
@@ -66,6 +69,10 @@ def main():
     if args.dma_inspect:additions.add('_elden_wifi_dma_inspect')
     if defs(obj)!=defs(parent/'Native.o')|additions:raise ValueError('Unexpected worker exports')
     bridge=defs(args.net_build/'EldenWifiNet17.late.o');available=defs(args.reference_kernel)|bridge
+    if args.battery_provider:
+        provider_defs=defs(args.battery_provider)
+        if '_elden_wifi_battery_ready' not in provider_defs:raise ValueError('Radio-only provider missing')
+        available|=provider_defs
     missing=refs(obj)-available
     if missing:raise ValueError('Unresolved real worker imports: '+', '.join(sorted(missing)))
     if any(n.endswith('/__mod_init_func') for n in sections(obj)):raise ValueError('Unexpected worker initializer')
@@ -76,6 +83,7 @@ def main():
         if sha(Path(name))!=digest:raise ValueError('Retained input changed: '+name)
     own=['tools/build_wifi_net17_native.py','drivers/EldenWifi/net/Net17NativeSource.py','drivers/EldenWifi/net/EldenNet17.h']
     if args.dma_inspect:own+=['drivers/EldenWifi/DmaInspect.h','drivers/EldenWifi/DmaInspect.inc']
+    if args.battery_only:own+=['drivers/EldenWifi/BatteryAdmissionSource.py','drivers/EldenWifi/BatteryAdmission.h','drivers/EldenWifi/BatteryAdmission.inc']
     proof=dict(compiled=True,object_sha256=sha(obj),base_object_sha256=prior['object_sha256'],
         source_inputs={name:sha(ROOT/name) for name in own},retained_parent_source_inputs=prior['source_inputs'],
         generated_sources={name:hashlib.sha256(data).hexdigest() for name,data in new.items()},
@@ -85,6 +93,8 @@ def main():
         no_initializers=True,scalar=True,platform_physical_fence_preserved=True,
         no_ce_wmi_firmware_changes=True,mhi_hold_trial=args.mhi_hold,umac_hold_trial=args.umac_hold,
         ce3_inspect_trial=args.dma_inspect,
+        wifi_battery_runtime_trial=args.battery_only,
+        battery_provider_sha256=sha(args.battery_provider) if args.battery_provider else None,
         full_kernel_linked=False,hardware_tested=False)
     (out/'result.json').write_text(json.dumps(proof,indent=2)+'\n')
     print(json.dumps({key:proof[key] for key in ('compiled','object_sha256','warnings','imports_missing','hardware_tested')}))

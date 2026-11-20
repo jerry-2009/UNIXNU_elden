@@ -47,7 +47,9 @@ def qualify_components(report):
     if report['retained_parent_kernel_sha256']!=PARENT_KERNEL or report['retained_parent_native_sha256']!=parent['native_sha256']:
         raise ValueError('Wrong retained native baseline')
     stride=report.get('mac_phy_stride_runtime')
-    if report.get('ce_wmi_firmware_objects_unchanged') is not (not bool(stride)) or report.get('core_filelist_unchanged') is not True or (report['changed_core_objects'],report['changed_native_objects'],report['added_native_objects'])!=(0,2 if stride else 1,1):
+    battery=report.get('battery_admission')
+    if bool(report.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission report mismatch')
+    if report.get('ce_wmi_firmware_objects_unchanged') is not (not bool(stride)) or report.get('core_filelist_unchanged') is not True or (report['changed_core_objects'],report['changed_native_objects'],report['added_native_objects'])!=(0,(2 if stride else 1)+int(bool(battery)),1):
         raise ValueError('Wrong network-only composition')
     for name in ('core','service_assets','optional_runtime','service_native','runtime_snapshot'):
         if report.get(name)!=parent.get(name):raise ValueError('Retained service changed: '+name)
@@ -69,13 +71,26 @@ def qualify_components(report):
     if timeline!=bool(stride and stride.get('ce3_timeline_trial')):raise ValueError('CE3 timeline report mismatch')
     if bool(report.get('window_reselect_trial'))!=bool(stride and stride.get('window_reselect_trial')):raise ValueError('Window reselection report mismatch')
     if bool(report.get('pci_state_trace_trial'))!=bool(stride and stride.get('pci_state_trace_trial')):raise ValueError('PCI state observation report mismatch')
-    if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect).items()}:
+    if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
+    if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
         raise ValueError('Network bridge source differs')
     if not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes'] or not net['late_initializer_owned'] or not net['other_sections_preserved']:
         raise ValueError('Network lifecycle/late initializer not qualified')
     for name,digest in {**net['source_inputs'],**worker['source_inputs']}.items():
         if sha(ROOT/name)!=digest:raise ValueError('Network input changed: '+name)
     components=report['component_objects']
+    if battery:
+        if battery.get('compiled') is not True or battery.get('radio_only_no_charger_set') is not True or battery.get('chemistry_two_gauges_epoch_age_checked') is not True or battery.get('controls_and_charger_permission_unchanged') is not True:raise ValueError('Radio-only admission gates not qualified')
+        sys.path.insert(0,str(ROOT/'drivers/EldenWifi'));import BatteryAdmissionSource as battery_source
+        for unit,data in [('PmicClient',battery_source.client()),('WcnPowerNative',battery_source.wcn())]:
+            row=battery['consumers'][unit]
+            if hashlib.sha256(data).hexdigest()!=row['source_sha256']:raise ValueError('Radio-only consumer source differs')
+        for name,digest in battery['source_inputs'].items():
+            if sha(ROOT/name)!=digest:raise ValueError('Radio-only admission input changed')
+        if sha(Path(battery['pmic_archive']))!=battery['pmic_archive_sha256']:raise ValueError('Radio-only PMIC archive differs')
+        if worker.get('battery_provider_sha256')!=battery['consumers']['PmicClient']['object_sha256']:raise ValueError('Radio-only worker provider differs')
+        wcn=components['WcnPowerNative.o']
+        if wcn['sha256']!=battery['consumers']['WcnPowerNative']['object_sha256'] or sha(Path(wcn['path']))!=wcn['sha256']:raise ValueError('Radio-only WCN consumer differs')
     if stride:
         if stride.get('mac_phy_stride_fix') is not True or (not (hold or umac) and (stride.get('imports_exports_unchanged') is not True or stride.get('other_ce_mhi_pci_irq_firmware_objects_unchanged') is not True or stride.get('changed_units')!=['ath12k_wmi.o'])) or stride['base_binding_sha256']!=parent['component_objects']['WifiRuntimeMsiBinding.o']['sha256']:
             raise ValueError('Wrong MAC/PHY-only runtime repair')
@@ -98,7 +113,7 @@ def qualify_components(report):
         if components[name]['sha256']!=proof['object_sha256'] or sha(Path(components[name]['path']))!=proof['object_sha256']:
             raise ValueError('Network component object differs')
     for name,component in parent['component_objects'].items():
-        if name!='Native.o' and not (stride and name=='WifiRuntimeMsiBinding.o') and components[name]!=component:raise ValueError('Retained hardware component changed')
+        if name!='Native.o' and not (stride and name=='WifiRuntimeMsiBinding.o') and not (battery and name=='WcnPowerNative.o') and components[name]!=component:raise ValueError('Retained hardware component changed')
 
 
 def qualify(report_path,entry_path,runtime):
@@ -120,6 +135,7 @@ def qualify(report_path,entry_path,runtime):
     result['ce3_timeline_trial']=report.get('ce3_timeline_trial') is True
     result['window_reselect_trial']=report.get('window_reselect_trial') is True
     result['pci_state_trace_trial']=report.get('pci_state_trace_trial') is True
+    result['wifi_battery_runtime_trial']=report.get('wifi_battery_runtime_trial') is True
     return result
 
 
@@ -163,4 +179,12 @@ def menu(qualification):
     if qualification.get('pci_state_trace_trial'):
         if not qualification.get('window_reselect_trial'):raise ValueError('PCI state observation requires its window parent')
         text=text.replace('Wi-Fi window reselection + USB - TEST','Wi-Fi PCI state observation + USB - TEST',1)
+    if qualification.get('wifi_battery_runtime_trial'):
+        import tomllib
+        from battery_boot import arguments
+        before=tomllib.loads(text);first=before['entry'][0];args=first['args']
+        if arguments(args).get('epd')!='2' or args.split().count('epd=2')!=1:raise ValueError('Unexpected PD trial parent')
+        value=args.replace('epd=2','epd=0',1)
+        text=text.replace('args = "'+args+'"','args = "'+value+'"',1)
+        if tomllib.loads(text)['entry'][1:]!=before['entry'][1:] or tomllib.loads(text)['boot']!=before['boot']:raise ValueError('Radio-only fallback changed')
     return text

@@ -5,7 +5,7 @@ import importlib.util
 ROOT=Path(__file__).resolve().parents[3]
 
 
-def generated(mhi_hold=False, umac_hold=False, dma_inspect=False):
+def generated(mhi_hold=False, umac_hold=False, dma_inspect=False, battery_only=False):
     if mhi_hold and umac_hold:
         raise ValueError('Select only one explicit wake trial')
     if dma_inspect and not umac_hold:
@@ -93,4 +93,7 @@ extern "C" int elden_wifi_umac_hold_requested(void){
         files['Native.cpp']=replace(files['Native.cpp'].decode(),
             '#include "EldenNet17.h"','#include "EldenNet17.h"\n#include "DmaInspect.h"').encode()
         files['NativeExports.inc']+=b'\n#include "DmaInspect.inc"\n'
+    if battery_only:
+        spec=importlib.util.spec_from_file_location('net17_battery_admission',ROOT/'drivers/EldenWifi/BatteryAdmissionSource.py')
+        m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);files=m.worker(files)
     return files

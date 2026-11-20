@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 RADIO BATTERY signed: two PCIstate trials refused beforeWLAN:
+rawhealth12/OEMCool at18--20C rejected by chargerGood1 dependency; both
+fullstock/root/green/settings restored. Radio-only readonly cache now checks
+bothgauges/V>=3.8/SOC>=40/10..35C (Cool<=22C)/epoch/age/linkloss; thermal/
+watchdog/physicalfence retained, chargerSET permission unchanged,epd0.85actual
+ASan/UBSan+55qualification/fullkernel/Apple30/entry7124/package1 pass.
+Image136b6d82/sessionfa862840b5e44469/floor1738713600/0/3 NOThardware tested.
+Passive PCIwrite/MHIobserver retained. FullGoal active/Wi-Fi incomplete;stock.
+
 Latest20261120 PCI STATE signed: prior boundaries hardware leaves CE3 and
 UMAC1/2 valid through pdev/IRQ/rfkill, firstPMF seesCE3zero/UMAC0/0. Origin
 unproved. New passive actualMMIOhook records<=32 selected CPUwrites inRAM and

@@ -24,9 +24,23 @@ def main():
     for name in ('parent-build','worker-build','net-build','clean-build','original-kernelcache','output'):
         parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--mac-phy-runtime',type=Path,help='Explicit qualified full-stride WMI allocation repair')
+    parser.add_argument('--battery-admission-build',type=Path,help='Matched radio-only PMIC/WCN admission; PD trial disabled')
     args=parser.parse_args();parent=args.parent_build.resolve();out=args.output.resolve()
     prior=read(parent/'result.json');worker=read(args.worker_build/'result.json');net=read(args.net_build/'result.json')
     stride=read(args.mac_phy_runtime/'result.json') if args.mac_phy_runtime else None
+    battery=read(args.battery_admission_build/'result.json') if args.battery_admission_build else None
+    if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Battery admission worker pair mismatch')
+    if battery:
+        if not battery.get('compiled') or not battery.get('radio_only_no_charger_set') or not battery.get('chemistry_two_gauges_epoch_age_checked') or not battery.get('controls_and_charger_permission_unchanged'):
+            raise ValueError('Unqualified radio-only battery admission')
+        for name,digest in battery['source_inputs'].items():
+            if sha(ROOT/name)!=digest:raise ValueError('Radio-only battery source changed')
+        sys.path.insert(0,str(ROOT/'drivers/EldenWifi'));import BatteryAdmissionSource as battery_source
+        for unit,data in [('PmicClient',battery_source.client()),('WcnPowerNative',battery_source.wcn())]:
+            row=battery['consumers'][unit]
+            if row['source_sha256']!=hashlib.sha256(data).hexdigest() or sha(args.battery_admission_build/(unit+'.o'))!=row['object_sha256']:
+                raise ValueError('Battery admission consumer changed')
+        if worker.get('battery_provider_sha256')!=battery['consumers']['PmicClient']['object_sha256']:raise ValueError('Radio-only worker provider differs')
     if stride:
         base_runtime=prior['component_objects']['WifiRuntimeMsiBinding.o']
         hold=stride.get('mhi_hold_trial') is True
@@ -93,7 +107,9 @@ def main():
     retained={};members={}
     for name in names:
         old=subprocess.check_output(['ar','p',oldar,name]);retained[name]=hashlib.sha256(old).hexdigest()
-        data=(args.worker_build/'Native.o').read_bytes() if name=='Native.o' else (args.mac_phy_runtime/'WifiRuntimeMsiBinding.o').read_bytes() if stride and name=='WifiRuntimeMsiBinding.o' else old
+        if battery and name=='WcnPowerNative.o' and retained[name]!=battery['consumers']['WcnPowerNative']['parent_object_sha256']:
+            raise ValueError('Loaded WCN admission parent differs')
+        data=(args.worker_build/'Native.o').read_bytes() if name=='Native.o' else (args.mac_phy_runtime/'WifiRuntimeMsiBinding.o').read_bytes() if stride and name=='WifiRuntimeMsiBinding.o' else (args.battery_admission_build/'WcnPowerNative.o').read_bytes() if battery and name=='WcnPowerNative.o' else old
         (folder/name).write_bytes(data);members[name]=hashlib.sha256(data).hexdigest()
     name='EldenWifiNet17.late.o';data=(args.net_build/name).read_bytes();(folder/name).write_bytes(data)
     names.append(name);members[name]=hashlib.sha256(data).hexdigest()
@@ -110,10 +126,16 @@ def main():
     if len(oldlists)!=1:raise ValueError('Expected one core filelist')
     command=[value.replace(str(parent/'native.macho'),str(out/'native.macho')).replace(str(oldar),str(archive))
                    .replace(oldlists[0],str(out/'link.filelist')) for value in command]
+    if battery:
+        oldpmic=Path(battery['parent_pmic_archive']);newpmic=Path(battery['pmic_archive'])
+        if sha(oldpmic)!=battery['parent_pmic_archive_sha256'] or sha(newpmic)!=battery['pmic_archive_sha256'] or sum(v.endswith(str(oldpmic)) for v in command)!=1:
+            raise ValueError('Loaded battery admission archive pair differs')
+        command=[v.replace(str(oldpmic),str(newpmic)) for v in command]
     write(out/'link-command.json',command)
     env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as log:subprocess.run(command,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
     added=set(worker['added_exports'])|new_net_defs|set(stride.get('runtime_added_exports',[]) if stride else [])
+    if battery:added.add('_elden_wifi_battery_ready')
     if defs(out/'native.macho')!=old_defs|added:raise ValueError('Unexpected complete native export set')
     if refs(out/'native.macho')!=refs(parent/'native.macho'):raise ValueError('Unresolved complete native imports changed')
     for path,digest in inherited.items():
@@ -135,6 +157,7 @@ def main():
     s,c,h=native_identity(out/'native.macho');write(out/'native-contract.json',dict(sections=s,commands=c,symbols=h))
     own={**net['source_inputs'],**worker['source_inputs'],'tools/build_wifi_net17_kernel.py':sha(Path(__file__))}
     if stride:own.update(stride['source_inputs'])
+    if battery:own.update(battery['source_inputs'])
     policy=['tools/wifi_network17_boot.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py',
             'tools/build_charge_verification.py','tools/build_wifi_service_native.py','tools/build_wifi_service_kernel.py']
     changed_policy={name:dict(parent_sha256=prior['source_inputs'].get(name),current_sha256=sha(ROOT/name)) for name in policy}
@@ -150,12 +173,13 @@ def main():
     components=dict(prior['component_objects']);components['Native.o']=dict(path=str(args.worker_build/'Native.o'),sha256=worker['object_sha256'])
     components['EldenWifiNet17.late.o']=dict(path=str(args.net_build/'EldenWifiNet17.late.o'),sha256=net['object_sha256'])
     if stride:components['WifiRuntimeMsiBinding.o']=dict(path=str(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o'),sha256=stride['binding_sha256'])
+    if battery:components['WcnPowerNative.o']=dict(path=str(args.battery_admission_build/'WcnPowerNative.o'),sha256=battery['consumers']['WcnPowerNative']['object_sha256'])
     proof=dict(prior)
     proof.update(profile='wifi-network-17',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
         retained_parent_profile=prior['profile'],retained_parent_kernel_sha256=prior['kernel_sha256'],
         retained_parent_native_sha256=prior['native_sha256'],retained_parent_source_inputs=prior['source_inputs'],
         retained_parent_report=prior,source_inputs=inputs,changed_core_objects=0,
-        changed_native_objects=2 if stride else 1,added_native_objects=1,retained_pcie_members=retained,archive_members=members,
+        changed_native_objects=(2 if stride else 1)+int(bool(battery)),added_native_objects=1,retained_pcie_members=retained,archive_members=members,
         core_filelist_unchanged=(out/'link.filelist').read_bytes()==filelist,ce_wmi_firmware_objects_unchanged=not bool(stride),
         all_actual_imports_resolved=True,original_apple_executables_hashed=30,entry_return_target=hex(after[1]),entry_delta=7124,
         native_contract_sha256=sha(out/'native-contract.json'),hardware_tested=False,boot_packaged=False,
@@ -169,6 +193,7 @@ def main():
         ce3_timeline_trial=bool(stride and stride.get('ce3_timeline_trial')),
         window_reselect_trial=bool(stride and stride.get('window_reselect_trial')),
         pci_state_trace_trial=bool(stride and stride.get('pci_state_trace_trial')),
+        wifi_battery_runtime_trial=bool(battery),battery_admission=battery,
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     write(out/'result.json',proof)
     print(json.dumps({key:proof[key] for key in ('profile','kernel_sha256','native_sha256','all_actual_imports_resolved','hardware_tested')}))

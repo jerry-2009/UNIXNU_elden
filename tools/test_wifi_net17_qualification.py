@@ -122,6 +122,18 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated PCI state observation accepted: '+name)
+    if report.get('wifi_battery_runtime_trial'):
+        for name in ('pair','chemistry','no_set','controls','report','archive'):
+            selected=copy.deepcopy(report)
+            if name=='pair':selected['network_worker']['wifi_battery_runtime_trial']=False
+            elif name=='chemistry':selected['battery_admission']['chemistry_two_gauges_epoch_age_checked']=False
+            elif name=='no_set':selected['battery_admission']['radio_only_no_charger_set']=False
+            elif name=='controls':selected['battery_admission']['controls_and_charger_permission_unchanged']=False
+            elif name=='report':selected['wifi_battery_runtime_trial']=False
+            else:selected['battery_admission']['pmic_archive_sha256']='0'*64
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated radio-only admission accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,
@@ -139,6 +151,11 @@ def main():
         if tomllib.loads(menu(held))['entry'][0]['args']!=tomllib.loads(menu(q))['entry'][0]['args']:
             raise AssertionError('UMAC trial changed inherited boot arguments')
     text=menu(q)
+    if report.get('wifi_battery_runtime_trial'):
+        import tomllib
+        original=tomllib.loads(text);new=tomllib.loads(menu(dict(q,wifi_battery_runtime_trial=True)))
+        if new['entry'][0]['args']!=original['entry'][0]['args'].replace('epd=2','epd=0',1) or new['entry'][1:]!=original['entry'][1:] or new['boot']!=original['boot']:
+            raise AssertionError('Radio-only mode changed options beyond disabling PD experiment')
     import tomllib
     config=tomllib.loads(text)
     if config['boot']!={'timeout':8,'fallback_timeout':120,'default':'xnu'}:raise AssertionError('Countdown or fallback changed')

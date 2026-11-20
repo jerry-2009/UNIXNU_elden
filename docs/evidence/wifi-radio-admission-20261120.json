@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "hardware_tested": false,
+  "problem": "OEM health12 Cool at18--20C was rejected by charge-policy Good1 dependency before radio startup.",
+  "admission": {
+    "radio_only": true,
+    "no_charger_set": true,
+    "health_raw": [
+      1,
+      12
+    ],
+    "cool_max_centi_c": 2200,
+    "temperature_range_centi_c": [
+      1000,
+      3500
+    ],
+    "each_gauge_temperature_range_deci_c": [
+      100,
+      350
+    ],
+    "minimum_voltage_uv": 3800000,
+    "minimum_soc_centipercent": 4000,
+    "freshness_ms": 10000,
+    "two_gauges": true,
+    "epoch_link_loss_fenced": true,
+    "thermal_and_recovery_unchanged": true,
+    "pd_experiment_disabled": true
+  },
+  "host": {
+    "passed": true,
+    "actual_helper_cache": true,
+    "asan_ubsan": true,
+    "mmio_xnu_modeled": true,
+    "no_charger_set": true,
+    "hardware_tested": false,
+    "summary": "PASS 85 radio-only admission/cache cases; chemistry, two gauges, age, epoch and link-loss fenced; no charger SET",
+    "source_inputs": {
+      "tools/test_wifi_battery_admission.py": "ad807b0b6f70754b6dc0934b91e2e73b114c234cc206a6f489f71c732d06572e",
+      "drivers/EldenWifi/BatteryAdmissionSource.py": "49c3016d721890626f4d4dc65e7248df59b50f5023247372d8bdb3f6ab4ecb0e",
+      "drivers/EldenWifi/BatteryAdmission.h": "ed76a4fa23b48f023e7f0928a920d1659b0cc0031068b2776265d14382467ab0",
+      "drivers/EldenWifi/BatteryAdmission.inc": "a839090772b5bfc1c08f762d00b7820263c96edf1be49a4f653c49af46bd4fc9"
+    }
+  },
+  "consumers": {
+    "PmicClient": {
+      "source_sha256": "cf3994a4a90d06781c8368f5757ecd321d072c56872ff404c718d7cd32ff090f",
+      "object_sha256": "6041ff93ee4731980e853a82d4582412805540027aa6f78852b1576ac9fa8084",
+      "parent_object_sha256": "d4e6273f9d81e77452dba1f61388896c61acd297ea551ba660a93e7fe83bf501",
+      "warnings": 0
+    },
+    "WcnPowerNative": {
+      "source_sha256": "1cc908cc9c5506b1bd07b99688ee76dc0f6d7081f869b29f187c84265cae027a",
+      "object_sha256": "8d67658deae92747cc1c61000dcef88df994190fb1e6eb05bf58962de0418859",
+      "parent_object_sha256": "86cd7057eab3842f83ffcc21a5698354ec654ed7b97b42d6207689d5f62c5cdf",
+      "warnings": 1
+    }
+  },
+  "worker": {
+    "object_sha256": "f25d1083674674bf419c202bb879e02a4b8f292396506b77067c36daa37252d4",
+    "warnings": 1,
+    "battery_provider_sha256": "6041ff93ee4731980e853a82d4582412805540027aa6f78852b1576ac9fa8084"
+  },
+  "kernel": {
+    "kernel_sha256": "dbeb7fd58ae2e5b4dfafa1c8bbf01ba4361384307983a526ce8a2b04bc7cd167",
+    "native_sha256": "292faa781daa0e9a974601a53a1dbeaec0c2ceac2d330e7ba54f02e59901adde",
+    "apple_regions": 30,
+    "entry_delta": 7124
+  },
+  "qualification": {
+    "passed": true,
+    "mutation_cases": 55,
+    "menu_dispatch": true,
+    "countdown_and_fallback_preserved": true,
+    "actual_component_report_qualified": true,
+    "hardware_tested": false
+  },
+  "package": {
+    "image_sha256": "136b6d82d2531968f752ea2c5114e94ea01b39c3f74355108b0de4d7ace33d49",
+    "session": "fa862840b5e44469",
+    "accepted_static": true,
+    "floor": [
+      1738713600,
+      0,
+      3
+    ]
+  },
+  "failed_builds_retained": [
+    "battery1: optimizer retained original transcript signed-add UBSan import; fixed bounded snprintf addition",
+    "worker1: missing actual new provider; worker2 requires explicit provider object"
+  ],
+  "next": "One bounded live MHI/write-history trial then full physical stock recovery.",
+  "goal": "active and incomplete"
+}
