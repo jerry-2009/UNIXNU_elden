@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 UMAC REGISTER HARDWARE: initialactualper-registerhandshake
+passes;firstPMFbefore forcedRDDMreal scratch0/11checks/-110 thenlatches.
+Subsequentffffffff are refusalSENTINELS,NOTrawCE3/hardwaredecode proof.
+StillBSS0/noassociation/DHCP/traffic;resources retained totypedphysicalreset.
+Fullstock/root/green/originalcharge+radio+scan settings/sleep restored;
+alljobs terminal. Raw260694/drop14/59status/no reconnect/postdisconnect
+unknown. Image32f7f14d/sessionaa2fc405656107a0/floor1738713600/0/3.
+No morewake/reset/pin-only repeats; nextoneconsolidated earliestfailure
+endpointconfig/internalreset+power/FWstarttimeline audit. FullGoalactive.
+
 Latest20261120 UMAC REGISTER signed: actualOEMd50b305f uses balanced
 per-registerMHI+UMAC request/poll/release; previousstart/commandhold scopes
 differed. ExactPCIrawnonrecursive wrappers/refusal/latch/no-startupref;

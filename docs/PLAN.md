@@ -1,5 +1,12 @@
 # Elden 基本可用实施计划
 
+2026-11-20逐寄存器唤醒实测：初期真实握手成功，第一条PMF前scratch0、11次检查后−110。
+后续ffffffff均为拒绝访问的返回值，不能当硬件CE3／链路读数；发生在强制RDDM之前。
+BSS仍0，未关联／DHCP／流量，完整stock/root/green/原充电无线扫描设置恢复并熄屏。
+[实录](evidence/wifi-umac-register-hardware-20261120.json)。停止重复纯wake／reset／pin测试；
+下一步集中核首失效时endpoint配置/BAR解码、内部复位与电源状态和固件启动事件时序。
+这些路径尚未定位根因，不能估算联网完成百分比。完整Goal active，所有设备任务已结束。
+
 2026-11-20复位回读实测仍CE3失效、BSS0，已完整恢复stock/root/green/原设置。
 下一份按真实原厂HAL访问时机，逐寄存器平衡MHI／UMAC唤醒并拒绝失败访问；34helper模型、
 107资格反例和整核签包通过，32f7f14d未实机。
