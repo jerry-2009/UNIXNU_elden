@@ -136,6 +136,18 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated radio-only admission accepted: '+name)
+    if report.get('umac_access_trial'):
+        for name in ('reversible','first','pair','bound','ring','report'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='reversible':runtime['umac_access_reversible']=False
+            elif name=='first':runtime['umac_access_first_pmf_only']=False
+            elif name=='pair':runtime['umac_access_balanced_extra_mhi']=False
+            elif name=='bound':runtime['umac_access_poll_bound_ms']=500
+            elif name=='ring':runtime['umac_access_ring_writes']=1
+            else:selected['umac_access_trial']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated first-access contrast accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

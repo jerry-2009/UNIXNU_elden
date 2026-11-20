@@ -1,5 +1,22 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 UMAC ACCESS signed: MHIrawM0+refs1/1 whileUMAC/CE3zero
+was captured without selectedCPUwrite. ExactOEM get_sync+3004=1/status2
+recipe now once before firstPMF; extraMHI balanced/<=50ms/realerrors, no ring
+writes/credits/timeouts/FWchange.20actual ASan/UBSan+63qualifier/fullkernel/
+Apple30/entry7124/package1 pass. Imagef616aad7/sessione1945a9f5238edc4/
+floor1738713600/0/3 NOThardwaretested. Qualified battery/loadedWCN/epd0
+retained. Prior fullphysicalreset/stock restored; fullGoal active/Wi-Fi incomplete.
+
+Latest20261120 PCI STATE HARDWARE: correct loadedWCN+readonlybattery runs.
+CE3/UMAC1/2 valid throughpdev/IRQ/rfkill; beforefirstPMF UMAC0/0+CE3zero,
+while rawMHIctl200/status201/PM4(stateM0)/EE2 and bothrefs1.32-slottrace
+records0 selected CPUwrites/overflow0; not allhostwriter proof.30PDEVtimeouts/
+BSS0. No netdrain/put/fence observed; WCNbound expires,resources retained to
+physicalreset. Typedphysicalfastboot/fullstock/root/green/settings restored.
+Raw259679B/alljobs terminal. NEXT exactOEM/firmware contract audit; no hold-only
+repeat or speculative ring reinstall. FullGoal active/Wi-Fi incomplete.
+
 Latest20261120 RADIO LOADED signed: first radio-only cache succeeds on
 hardware, but retained BTarchive still contained oldWCN, stoppingrootstage2.
 136b6d82 withdrawn, fullstock/root/green/settings restored. ActualBluetooth

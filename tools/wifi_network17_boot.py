@@ -26,7 +26,8 @@ def qualify_ce3_inspect(runtime,worker):
 
 
 def qualify_ce3_timeline(runtime):
-    if runtime.get('ce3_inspect_trial') is not True or runtime.get('ce3_direct_trial') or runtime.get('timeline_delta_reversible') is not True or (runtime.get('timeline_events_max'),runtime.get('timeline_reads_per_event'))!=(16,9) or runtime.get('runtime_added_exports')!=['_elden_ce3_timeline'] or runtime.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o','ath12k_core.o']:
+    exports=['_elden_ce3_timeline']+(['_elden_wifi_umac_access_first'] if runtime.get('umac_access_trial') else [])
+    if runtime.get('ce3_inspect_trial') is not True or runtime.get('ce3_direct_trial') or runtime.get('timeline_delta_reversible') is not True or (runtime.get('timeline_events_max'),runtime.get('timeline_reads_per_event'))!=(16,9) or runtime.get('runtime_added_exports')!=exports or runtime.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o','ath12k_core.o']:
         raise ValueError('Wrong bounded CE3 start timeline')
 
 
@@ -38,6 +39,10 @@ def qualify_window_reselect(runtime):
 def qualify_pci_state_trace(runtime):
     if runtime.get('window_reselect_trial') is not True or runtime.get('pci_state_trace_reversible') is not True or (runtime.get('pci_state_write_records_max'),runtime.get('pci_state_read_records_max'))!=(32,16) or runtime.get('pci_state_no_new_mmio_writes') is not True or runtime.get('pci_state_existing_hook_not_replaced') is not True or runtime.get('pci_state_hook_owned_restore') is not True or runtime.get('pci_state_payload_logging') is not False:
         raise ValueError('Wrong bounded passive PCI state observation')
+
+
+def qualify_umac_access(runtime):
+    if runtime.get('pci_state_trace_trial') is not True or runtime.get('umac_access_reversible') is not True or runtime.get('umac_access_first_pmf_only') is not True or runtime.get('umac_access_balanced_extra_mhi') is not True or (runtime.get('umac_access_poll_bound_ms'),runtime.get('umac_access_ring_writes'))!=(50,0):raise ValueError('Wrong first-access OEM contrast')
 
 
 def qualify_components(report):
@@ -71,6 +76,7 @@ def qualify_components(report):
     if timeline!=bool(stride and stride.get('ce3_timeline_trial')):raise ValueError('CE3 timeline report mismatch')
     if bool(report.get('window_reselect_trial'))!=bool(stride and stride.get('window_reselect_trial')):raise ValueError('Window reselection report mismatch')
     if bool(report.get('pci_state_trace_trial'))!=bool(stride and stride.get('pci_state_trace_trial')):raise ValueError('PCI state observation report mismatch')
+    if bool(report.get('umac_access_trial'))!=bool(stride and stride.get('umac_access_trial')):raise ValueError('UMAC first-access report mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
         raise ValueError('Network bridge source differs')
@@ -110,6 +116,7 @@ def qualify_components(report):
         if timeline:qualify_ce3_timeline(stride)
         if stride.get('window_reselect_trial'):qualify_window_reselect(stride)
         if stride.get('pci_state_trace_trial'):qualify_pci_state_trace(stride)
+        if stride.get('umac_access_trial'):qualify_umac_access(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -142,6 +149,7 @@ def qualify(report_path,entry_path,runtime):
     result['window_reselect_trial']=report.get('window_reselect_trial') is True
     result['pci_state_trace_trial']=report.get('pci_state_trace_trial') is True
     result['wifi_battery_runtime_trial']=report.get('wifi_battery_runtime_trial') is True
+    result['umac_access_trial']=report.get('umac_access_trial') is True
     return result
 
 
@@ -193,4 +201,7 @@ def menu(qualification):
         value=args.replace('epd=2','epd=0',1)
         text=text.replace('args = "'+args+'"','args = "'+value+'"',1)
         if tomllib.loads(text)['entry'][1:]!=before['entry'][1:] or tomllib.loads(text)['boot']!=before['boot']:raise ValueError('Radio-only fallback changed')
+    if qualification.get('umac_access_trial'):
+        if not qualification.get('pci_state_trace_trial'):raise ValueError('First-access contrast requires its state parent')
+        text=text.replace('Wi-Fi PCI state observation + USB - TEST','Wi-Fi OEM first-access wake + USB - TEST',1)
     return text
