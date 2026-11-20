@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+2026-11-20新边界实测：pdev创建/IRQ启用/rfkill后CE3仍完整，首次PMF前CE3和
+UMAC请求/状态一起变零，根因未定。真实物理fence与stock/root/green/原设置恢复通过。
+[实录](evidence/wifi-window-boundaries-hardware-20261120.json)。下一份只记录既有CPU写入与
+MHI硬件/引用状态，17实际模型/49资格反例/整核签包通过；未上机。
+[候选](evidence/wifi-pci-state-20261120.json)。Wi-Fi未联网，完整Goal active。
+
 2026-11-20原厂无缓存选窗修补实机生效：stage9窗口维持37，CE3配置仍base0/size0/MSI0、
 MISC80，首次PDEV超时。缓存缺陷已修但非完整根因。首轮PD准入拒绝保留，同像重试
 真实运行及完整物理fence/stock恢复通过。

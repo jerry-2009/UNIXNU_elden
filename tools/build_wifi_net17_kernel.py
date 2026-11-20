@@ -59,6 +59,9 @@ def main():
         if stride.get('window_reselect_trial'):
             from wifi_network17_boot import qualify_window_reselect
             qualify_window_reselect(stride)
+        if stride.get('pci_state_trace_trial'):
+            from wifi_network17_boot import qualify_pci_state_trace
+            qualify_pci_state_trace(stride)
         if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
             raise ValueError('MAC/PHY stride runtime artifact changed')
         for name,digest in stride['source_inputs'].items():
@@ -165,6 +168,7 @@ def main():
         ce3_inspect_trial=bool(stride and stride.get('ce3_inspect_trial')),
         ce3_timeline_trial=bool(stride and stride.get('ce3_timeline_trial')),
         window_reselect_trial=bool(stride and stride.get('window_reselect_trial')),
+        pci_state_trace_trial=bool(stride and stride.get('pci_state_trace_trial')),
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     write(out/'result.json',proof)
     print(json.dumps({key:proof[key] for key in ('profile','kernel_sha256','native_sha256','all_actual_imports_resolved','hardware_tested')}))

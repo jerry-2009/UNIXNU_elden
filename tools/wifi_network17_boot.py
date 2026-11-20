@@ -35,6 +35,11 @@ def qualify_window_reselect(runtime):
         raise ValueError('Wrong exact OEM window reselection')
 
 
+def qualify_pci_state_trace(runtime):
+    if runtime.get('window_reselect_trial') is not True or runtime.get('pci_state_trace_reversible') is not True or (runtime.get('pci_state_write_records_max'),runtime.get('pci_state_read_records_max'))!=(32,16) or runtime.get('pci_state_no_new_mmio_writes') is not True or runtime.get('pci_state_existing_hook_not_replaced') is not True or runtime.get('pci_state_hook_owned_restore') is not True or runtime.get('pci_state_payload_logging') is not False:
+        raise ValueError('Wrong bounded passive PCI state observation')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -63,6 +68,7 @@ def qualify_components(report):
     if inspect!=bool(stride and stride.get('ce3_inspect_trial')) or inspect!=bool(worker.get('ce3_inspect_trial')):raise ValueError('CE3 inspection report mismatch')
     if timeline!=bool(stride and stride.get('ce3_timeline_trial')):raise ValueError('CE3 timeline report mismatch')
     if bool(report.get('window_reselect_trial'))!=bool(stride and stride.get('window_reselect_trial')):raise ValueError('Window reselection report mismatch')
+    if bool(report.get('pci_state_trace_trial'))!=bool(stride and stride.get('pci_state_trace_trial')):raise ValueError('PCI state observation report mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect).items()}:
         raise ValueError('Network bridge source differs')
     if not worker['platform_physical_fence_preserved'] or not worker['no_ce_wmi_firmware_changes'] or not net['late_initializer_owned'] or not net['other_sections_preserved']:
@@ -82,6 +88,7 @@ def qualify_components(report):
         if inspect:qualify_ce3_inspect(stride,worker)
         if timeline:qualify_ce3_timeline(stride)
         if stride.get('window_reselect_trial'):qualify_window_reselect(stride)
+        if stride.get('pci_state_trace_trial'):qualify_pci_state_trace(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -112,6 +119,7 @@ def qualify(report_path,entry_path,runtime):
     result['ce3_inspect_trial']=report.get('ce3_inspect_trial') is True
     result['ce3_timeline_trial']=report.get('ce3_timeline_trial') is True
     result['window_reselect_trial']=report.get('window_reselect_trial') is True
+    result['pci_state_trace_trial']=report.get('pci_state_trace_trial') is True
     return result
 
 
@@ -152,4 +160,7 @@ def menu(qualification):
     if qualification.get('window_reselect_trial'):
         if not qualification.get('ce3_timeline_trial'):raise ValueError('Window repair requires its exact timeline parent')
         text=text.replace('Wi-Fi CE3 start timeline + USB - TEST','Wi-Fi window reselection + USB - TEST',1)
+    if qualification.get('pci_state_trace_trial'):
+        if not qualification.get('window_reselect_trial'):raise ValueError('PCI state observation requires its window parent')
+        text=text.replace('Wi-Fi window reselection + USB - TEST','Wi-Fi PCI state observation + USB - TEST',1)
     return text

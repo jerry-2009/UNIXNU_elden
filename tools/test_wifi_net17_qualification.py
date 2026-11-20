@@ -108,6 +108,20 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated window reselection accepted: '+name)
+    if report.get('pci_state_trace_trial'):
+        for name in ('reversible','count','reads','writes','existing','restore','privacy','report'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='reversible':runtime['pci_state_trace_reversible']=False
+            elif name=='count':runtime['pci_state_write_records_max']=100
+            elif name=='reads':runtime['pci_state_read_records_max']=100
+            elif name=='writes':runtime['pci_state_no_new_mmio_writes']=False
+            elif name=='existing':runtime['pci_state_existing_hook_not_replaced']=False
+            elif name=='restore':runtime['pci_state_hook_owned_restore']=False
+            elif name=='privacy':runtime['pci_state_payload_logging']=True
+            else:selected['pci_state_trace_trial']=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated PCI state observation accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

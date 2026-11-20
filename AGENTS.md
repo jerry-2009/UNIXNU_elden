@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 PCI STATE signed: prior boundaries hardware leaves CE3 and
+UMAC1/2 valid through pdev/IRQ/rfkill, firstPMF seesCE3zero/UMAC0/0. Origin
+unproved. New passive actualMMIOhook records<=32 selected CPUwrites inRAM and
+<=16 MHIhardware/software reference snapshots; never adds/suppresses writes
+or replaces existinghook.17actual ASan/UBSan models/49qualifier/fullkernel/
+Apple30/entry7124/package1 pass. Imageba1f8861/session62948d684fb1ada9/floor
+1738713600/0/3 NOT hardware-tested. Prior trial287058B/df61a538/drop6/full
+fence/stock/root/green/settings restore. FullGoal active/Wi-Fi incomplete.
+
 Latest20261120 CE3 BOUNDARIES signed: extends timeline to16events/9reads
 with corepdev alloc/IRQenable/rfkill and actualUMAC3004/scratch status. Retains
 qualifiedwindow reselection, inspector, originalshadow, nativeworker/other
