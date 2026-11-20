@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest 20261120 PORTABLE SCAN HARDWARE accepted: actual Y700 completed
+two-roundscan,32retainedBSS(cap32)/113managementframes/6HTTrings,
+CE24sent/24completed/0drop,realcredits/state629/error0. Protocolstopidle1/rc0,
+realBMoff/transactionidle/MSI4/PERSTlow,typedphysicalfastboot/fullstockSHA/
+root/green/originalcharge+radio+scansettings/sleep restored;alljobs terminal.
+Image8ecacf44/session104b424f174e7b92/floor1738713600/0/3.
+WarmMHIreset unproved;association/WPA2/DHCP/traffic/UI remain incomplete.
+Nextreuse same proven transport for station/keys/data/iOS17 bridge, one
+combined functional acceptance. Full Goal active; reduce repeated probes.
+
 Latest 20261120 PORTABLE SCAN signed: selected hardware-success Piano2438556c
 portable CE/HTC/WMI/HTT on real Y700 OEM MHI/QMI/PCIe/NC32bit DMA.
 Explicit compile-only trial; direct CE/no oldshadow table, original factoryMAC,

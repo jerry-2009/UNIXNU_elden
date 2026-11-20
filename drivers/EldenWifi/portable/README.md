@@ -85,3 +85,16 @@ Association, DHCP, traffic, sleep and charging remain separate unmet goals.
 Mac `lab/wifi-portable-scan-20261120/{runtime3,kernel1,entry1,package1}` and
 workbench `edl_work/wifi-portable-scan-20261120` hold generated build outputs.
 [Evidence](../../../docs/evidence/wifi-portable-scan-20261120.json).
+
+## Hardware result
+
+The single consolidated trial completed the actual two-round scan on Y700:
+32 retained BSS (list capacity32),113 management frames,6HTT receive rings,
+24CE sends/24completions/0CE drops. The final state629/error0 and actual
+credit reports were observed. Protocol stop idle1/rc0, real BM-off/idle
+transactions/MSI4/PERST-low, typed physical fastboot and full stock SHA/
+root/green/original charge+radio+scan settings/sleep restoration passed.
+The capture is310307B; the raw USB drop counter is recorded separately in
+[hardware evidence](../../../docs/evidence/wifi-portable-scan-hardware-20261120.json).
+Warm MHI reset is still unverified. Association/WPA2/DHCP/traffic and iPadOS
+network publication are the next combined functional step, not already done.

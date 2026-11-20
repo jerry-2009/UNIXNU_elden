@@ -1,5 +1,11 @@
 # Elden 基本可用实施计划
 
+本轮真机扫描通过：两轮完成，保留32个BSS（列表上限32）、113管理帧、HTT6环，CE24发送／
+24回收／0丢弃，state629/error0。真实协议停止及BM关闭／transaction idle／MSI4／PERST、
+物理fastboot、全SHA stock/root/green/原充电无线扫描设置恢复均通过，所有任务已结束。
+[实机证据](evidence/wifi-portable-scan-hardware-20261120.json)。本机联网仍待WPA2／DHCP／流量；
+下一步沿已成功transport移植关联、密钥和数据／iOS17桥，集中一次功能验收。完整Goal active。
+
 成功SM8750参考的整条portable扫描链已构建并签名：4C＋1原生C++，121原对象保留，
 原Apple30区域／入口7124／128既有及11新资格反例／完整打包核验通过。沿用本机原厂固件、
 PCIe和DMA准入，真实credit／regulatory／HTT接收缓冲，不生成虚假站点。8ecacf44、
