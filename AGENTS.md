@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 SIDEBAND eGPIO signed: prior real trial refused exact cold
+GPIO18/19=1/0/742 and202=801/0/742 before writes/radio; full stock restored.
+Original6f97250e msm_pinmux_set_mux claims eGPIO for AP via bit12; only this
+observed GPIO202 state now accepted, outputlow before OE, expected1a41.
+27actual ASan/UBSan+61qualifier/fullkernel/Apple30/entry7124/package2 pass.
+Image2447dfd2/sessiona600174c63405fec/floor1738713600/0/3 NOThardwaretested.
+Next one real sideband/CE3/WMI scan trial. FullGoal active/Wi-Fi incomplete;
+charger/FW/credit/timeout and peer work unchanged. Evidence wifi-sideband-egpio.
+
 Latest20261120 SIDEBAND signed: actualstock pinctrl18/19func1input and
 202outlow4mA matches ArmadaTB322FC; native WCN didnot initialize these.
 Exactcold-only helper reads allbeforewrites/refusesIRQ/unknownmux/eGPIO;

@@ -23,14 +23,20 @@ static inline int elden_wifi_sideband_prepare(EldenWifiSideband *p)
     for(unsigned i=0;i<3;i++){
         uint32_t ctl=p->before[i][0],io=p->before[i][1],irq=p->before[i][2];
         unsigned mux=(ctl>>2)&15;
+        /* GPIO202's exact cold handoff801/low0/IRQ742 was observed. The
+         * original msm_pinmux_set_mux claims an eGPIO-capable pin for GPIO
+         * by setting bit12; stock Android does so for its HOST_SOL output.
+         * No other remote-eGPIO state is accepted or transferred. */
+        bool known_sol=i==2&&ctl==0x801U&&io==0&&irq==0x742U;
         if(ctl==UINT32_MAX||io==UINT32_MAX||irq==UINT32_MAX||(irq&1)||
-           ((ctl&0x800)&&!(ctl&0x1000))||(i<2?mux>1:(mux!=0)))return -19;
+           ((ctl&0x800)&&!(ctl&0x1000)&&!known_sol)||(i<2?mux>1:(mux!=0)))return -19;
         /* These two signals belong to the target; do not drive them. */
         if(i<2&&(ctl&(1u<<9)))return -19;
     }
     for(unsigned i=0;i<3;i++){
         uint32_t wanted=i<2?(p->before[i][0]&~0x3cu)|4u:
             (p->before[i][0]&~0x3ffu)|0x241u;
+        if(i==2&&(p->before[i][0]&0x800U))wanted|=0x1000U;
         if(i==2){
             p->writes++;int rc=p->write(p->context,i,4,p->before[i][1]&~2u);
             if(rc){p->held=true;return rc;}

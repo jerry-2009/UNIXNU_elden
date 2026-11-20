@@ -24,6 +24,8 @@ int main(){
  for(unsigned field=0;field<4;field++){good(&m);m.fail_write=field;p=(EldenWifiSideband){.context=&m,.read=read,.write=write};assert(elden_wifi_sideband_prepare(&p)==-5&&p.held);cases++;}
  for(unsigned pin=0;pin<3;pin++){good(&m);m.regs[pin][2]|=1;p=(EldenWifiSideband){.context=&m,.read=read,.write=write};assert(elden_wifi_sideband_prepare(&p)==-19&&!m.writes);cases++;}
  for(unsigned pin=0;pin<3;pin++){good(&m);m.regs[pin][0]|=0x800;p=(EldenWifiSideband){.context=&m,.read=read,.write=write};assert(elden_wifi_sideband_prepare(&p)==-19&&!m.writes);cases++;}
+ good(&m);m.regs[2][0]=0x801;m.regs[2][1]=0;m.regs[2][2]=0x742;p=(EldenWifiSideband){.context=&m,.read=read,.write=write};assert(!elden_wifi_sideband_prepare(&p)&&p.ready&&m.regs[2][0]==0x1a41&&m.regs[2][1]==0);cases++;
+ for(unsigned fault=0;fault<3;fault++){good(&m);m.regs[2][0]=0x801;m.regs[2][1]=0;m.regs[2][2]=0x742;if(!fault)m.regs[2][0]^=0x40;else if(fault==1)m.regs[2][1]=1;else m.regs[2][2]^=2;p=(EldenWifiSideband){.context=&m,.read=read,.write=write};assert(elden_wifi_sideband_prepare(&p)==-19&&!m.writes);cases++;}
  for(unsigned pin=0;pin<2;pin++){good(&m);m.regs[pin][0]|=1u<<9;p=(EldenWifiSideband){.context=&m,.read=read,.write=write};assert(elden_wifi_sideband_prepare(&p)==-19&&!m.writes);cases++;}
  good(&m);m.regs[0][0]=m.regs[1][0]=5;m.regs[2][0]=0x241;m.regs[2][1]=0;p=(EldenWifiSideband){.context=&m,.read=read,.write=write};assert(!elden_wifi_sideband_prepare(&p)&&p.writes==1);cases++;
  printf("PASS %u actual sideband cases; three board pins only, all guards before writes, unknown partial state held\n",cases);
