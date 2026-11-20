@@ -20,6 +20,7 @@ archive/host-differences/** -text -whitespace
 archive/kshimc-wsl-20261111/** -text -whitespace
 archive/lilac-toolkit-20261101/** -text -whitespace
 docs/archive/** -whitespace
+docs/archive/20261121/** -text -whitespace
 drivers/EldenCpuPower/upstream/** -text -whitespace
 drivers/EldenWifi/net/upstream17/** -text -whitespace
 drivers/EldenWifi/net/tests/upstream/** -text -whitespace
