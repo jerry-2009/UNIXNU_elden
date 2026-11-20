@@ -1,5 +1,19 @@
 # Wi-Fi：固件与服务已接通，WMI完成仍待修复
 
+成功SM8750参考的整条portable扫描链已构建并签名：4C＋1原生C++，121原对象保留，
+原Apple30区域／入口7124／128既有及11新资格反例／完整打包核验通过。沿用本机原厂固件、
+PCIe和DMA准入，真实credit／regulatory／HTT接收缓冲，不生成虚假站点。8ecacf44、
+session104b424f174e7b92未实机。[源码与复现](../drivers/EldenWifi/portable/README.md)／
+[构建证据](evidence/wifi-portable-scan-20261120.json)。下一轮只做一次真实扫描/BSS与回程
+综合验证，减少无谓重复探针；完整Goal active，联网与其余外设仍未完成。
+
+已找到同SM8750实际联网成功参考：lenzhang/piano，固定2438556c；实测扫描／WPA2／DHCP／公网、
+睡眠及固件崩溃后重连。记录的系统为macOS27.3，保留本机原厂固件／板级owner及iPadOS17接口。
+[23仓审核](SM8750-WIFI-REUSE-AUDIT-20261120.md)。上一轮真实PMF／INFO0／SCAN请求已到达；首次
+超时变为VDEV0x5008，CE3消费16描述符，BSS仍0。后续forcedRDDM之后的UMAC失效不作独立根因。
+[实录](evidence/wifi-eager-memory-hardware-20261120.json)。下一步接入成功portable整条功能链，
+先真实扫描与回程，再关联／系统服务；不再重复失败的单项探针。设备完整恢复stock，完整Goal active。
+
 2026-11-20合并实录：首次失效时PCIe端点、BAR/iATU/解码、时钟和PERST保持；变化在raw
 WLAON状态d→1d、warm位及CE3。MSI使能ffffffff是正常完整掩码，诊断−5不能当解码失败。
 [实录](evidence/wifi-first-failure-hardware-20261120.json)。实际原厂Host Capability表没有TLV33，

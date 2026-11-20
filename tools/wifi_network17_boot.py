@@ -237,7 +237,14 @@ def qualify_components(report):
         if stride.get('first_failure_trial'):qualify_first_failure(stride,worker)
         if stride.get('eager_memory_trial'):qualify_eager_memory(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
-        if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
+        portable=report.get('portable_scan_runtime')
+        if bool(report.get('portable_scan_trial'))!=bool(portable):raise ValueError('Portable report pairing differs')
+        if portable:
+            from wifi_portable_scan import qualify as qualify_portable
+            qualify_portable(portable)
+            if portable['portable_parent']!=stride:raise ValueError('Portable inherited runtime differs')
+        runtime_hash=portable['binding_sha256'] if portable else stride['binding_sha256']
+        if runtime['sha256']!=runtime_hash or sha(Path(runtime['path']))!=runtime_hash:
             raise ValueError('MAC/PHY runtime object differs')
         for name,digest in stride['source_inputs'].items():
             if sha(ROOT/name)!=digest:raise ValueError('MAC/PHY input changed')
@@ -279,6 +286,7 @@ def qualify(report_path,entry_path,runtime):
     result['umac_register_trial']=report.get('umac_register_trial') is True
     result['first_failure_trial']=report.get('first_failure_trial') is True
     result['eager_memory_trial']=report.get('eager_memory_trial') is True
+    result['portable_scan_trial']=report.get('portable_scan_trial') is True
     return result
 
 
@@ -345,4 +353,9 @@ def menu(qualification):
     if qualification.get('startup_contract_trial'):
         if not qualification.get('pci_state_trace_trial'):raise ValueError('Startup evidence requires its actual observer parent')
         text=text.replace('Wi-Fi board sideband pins + USB - TEST','Wi-Fi startup contract + USB - TEST',1)
+    if qualification.get('portable_scan_trial'):
+        if not qualification.get('eager_memory_trial'):raise ValueError('Portable scan requires the fixed OEM firmware parent')
+        import tomllib
+        current=tomllib.loads(text)['entry'][0]['name'] if 'name' in tomllib.loads(text)['entry'][0] else tomllib.loads(text)['entry'][0]['title']
+        text=text.replace(current,'Wi-Fi SM8750 portable scan + USB - TEST',1)
     return text

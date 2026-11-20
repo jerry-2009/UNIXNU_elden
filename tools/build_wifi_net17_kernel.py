@@ -27,7 +27,12 @@ def main():
     parser.add_argument('--battery-admission-build',type=Path,help='Matched radio-only PMIC/WCN admission; PD trial disabled')
     args=parser.parse_args();parent=args.parent_build.resolve();out=args.output.resolve()
     prior=read(parent/'result.json');worker=read(args.worker_build/'result.json');net=read(args.net_build/'result.json')
-    stride=read(args.mac_phy_runtime/'result.json') if args.mac_phy_runtime else None
+    selected_runtime=read(args.mac_phy_runtime/'result.json') if args.mac_phy_runtime else None
+    portable=selected_runtime if selected_runtime and selected_runtime.get('portable_scan_trial') else None
+    stride=portable['portable_parent'] if portable else selected_runtime
+    if portable:
+        from wifi_portable_scan import qualify as qualify_portable
+        qualify_portable(portable)
     battery=read(args.battery_admission_build/'result.json') if args.battery_admission_build else None
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Battery admission worker pair mismatch')
     if battery:
@@ -111,7 +116,7 @@ def main():
         if stride.get('eager_memory_trial'):
             from wifi_network17_boot import qualify_eager_memory
             qualify_eager_memory(stride)
-        if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
+        if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=(portable['binding_sha256'] if portable else stride['binding_sha256']):
             raise ValueError('MAC/PHY stride runtime artifact changed')
         for name,digest in stride['source_inputs'].items():
             if sha(ROOT/name)!=digest:raise ValueError('MAC/PHY stride source changed')
@@ -186,6 +191,9 @@ def main():
     env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
     with (out/'link.log').open('x') as log:subprocess.run(command,cwd=out,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
     added=set(worker['added_exports'])|new_net_defs|set(stride.get('runtime_added_exports',[]) if stride else [])
+    if portable:
+        from wifi_portable_scan import added_exports
+        added.update(added_exports(portable))
     if battery:added.add('_elden_wifi_battery_ready')
     if battery and battery.get('board_state_trial'):added.add('_elden_wifi_board_state')
     if defs(out/'native.macho')!=old_defs|added:raise ValueError('Unexpected complete native export set')
@@ -209,6 +217,7 @@ def main():
     s,c,h=native_identity(out/'native.macho');write(out/'native-contract.json',dict(sections=s,commands=c,symbols=h))
     own={**net['source_inputs'],**worker['source_inputs'],'tools/build_wifi_net17_kernel.py':sha(Path(__file__))}
     if stride:own.update(stride['source_inputs'])
+    if portable:own.update(portable['source_inputs'])
     if battery:own.update(battery['source_inputs'])
     policy=['tools/wifi_network17_boot.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py',
             'tools/build_charge_verification.py','tools/build_wifi_service_native.py','tools/build_wifi_service_kernel.py']
@@ -224,7 +233,7 @@ def main():
     shutil.copytree(parent/'runtime',out/'runtime')
     components=dict(prior['component_objects']);components['Native.o']=dict(path=str(args.worker_build/'Native.o'),sha256=worker['object_sha256'])
     components['EldenWifiNet17.late.o']=dict(path=str(args.net_build/'EldenWifiNet17.late.o'),sha256=net['object_sha256'])
-    if stride:components['WifiRuntimeMsiBinding.o']=dict(path=str(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o'),sha256=stride['binding_sha256'])
+    if stride:components['WifiRuntimeMsiBinding.o']=dict(path=str(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o'),sha256=portable['binding_sha256'] if portable else stride['binding_sha256'])
     if battery:components['WcnPowerNative.o']=dict(path=str(args.battery_admission_build/'WcnPowerNative.o'),sha256=battery['consumers']['WcnPowerNative']['object_sha256'])
     proof=dict(prior)
     proof.update(profile='wifi-network-17',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
@@ -236,7 +245,7 @@ def main():
         all_actual_imports_resolved=True,original_apple_executables_hashed=30,entry_return_target=hex(after[1]),entry_delta=7124,
         native_contract_sha256=sha(out/'native-contract.json'),hardware_tested=False,boot_packaged=False,
         component_objects=components,network_worker=worker,network_bridge=net,parent_policy_updates=changed_policy,
-        mac_phy_stride_runtime=stride,station_ready_before_network_publication=True,
+        mac_phy_stride_runtime=stride,portable_scan_trial=bool(portable),portable_scan_runtime=portable,station_ready_before_network_publication=True,
         mhi_hold_trial=bool(stride and stride.get('mhi_hold_trial')),
         umac_hold_trial=bool(stride and stride.get('umac_hold_trial')),
         vdev_empty_mlo_array=bool(stride and stride.get('vdev_empty_mlo_array')),

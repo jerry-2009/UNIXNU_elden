@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": true,
+  "image_sha256": "a7482ae7af18e2729db19c42175d1a95a4ce57c5f7bf9a75587657dd90a02065",
+  "session": "57ed88147f0b6257",
+  "raw": {
+    "path": "edl_work/live-eager-memory-20261120/usb/20261120-120439.bin",
+    "bytes": 268530,
+    "sha256": "eee529eb218146b767b9da2857b54fb3903153105ab856f7a4bace803d29ecdc",
+    "drop_max": 2,
+    "status_samples": 59,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "first_timeout": "ELDEN_ATH12K level=4 wmi command 20488 timeout",
+  "ce3_at_first_timeout": "ELDEN_ATH12K level=4 ELDEN_CE3_INSPECT command=5008 sw=16 write=16 hp=64 dma=64/64 flags=20000",
+  "wmi_timeout_count": 28,
+  "observations": [
+    "PMF passes while CE3 configuration is still populated; actual INFO succeeds and SCAN opcode2 is delivered.",
+    "First failure moved to VDEV_SET_PARAM0x5008; CE3 reports16 descriptors consumed.",
+    "This is one run, not stable acceptance. Later forced RDDM precedes UMAC failure; do not treat its CE3 clearing as a new independent first failure."
+  ],
+  "bss": 0,
+  "association": false,
+  "dhcp": false,
+  "traffic": false,
+  "graceful_dma_fence_proven": false,
+  "physical_fastboot": true,
+  "full_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "stock_root_green_original_settings_restored": true,
+  "all_device_jobs_terminal": true,
+  "radio_restore_attempts": 4,
+  "radio_restore_startup_errors": 2,
+  "goal": "active and incomplete"
+}

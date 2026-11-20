@@ -1,5 +1,25 @@
 # UniXNU elden — authoritative source repository
 
+Latest 20261120 PORTABLE SCAN signed: selected hardware-success Piano2438556c
+portable CE/HTC/WMI/HTT on real Y700 OEM MHI/QMI/PCIe/NC32bit DMA.
+Explicit compile-only trial; direct CE/no oldshadow table, original factoryMAC,
+real credits/two-round passive scan/HTT buffers. No invented station/interface;
+protocol failure retained to physical reset.4C+1scalarCPP/121retained/fullkernel/
+Apple30/entry7124/128+11qualification/package pass. Image8ecacf44/
+session104b424f174e7b92/floor1738713600/0/3 NOT hardware tested yet.
+Next ONE functional scan+BSS and full physical return/stock restore. Reduce
+repeated probes per owner. Full Goal active; Wi-Fi/network/charging incomplete.
+
+Latest 20261120 SM8750 donor audit: official catalog11 models/23 entries;
+lenzhang Piano2438556c has real scans/WPA2/DHCP/public traffic/sleep and
+firmware-crash recovery on macOS27.3. Clone under research; portable sources
+frozen with BSD license. Y700 firmware/board/iOS17 ABI preserved. Eager-memory
+actual trial passed PMF/INFO0/SCANopcode2; first timeoutVDEV0x5008,CE3HP64/TP64
+(16desc),BSS0. Later forcedRDDM precedes UMACfailure, not new first cause.
+Full stock/root/green/original settings/sleep restored, all jobs terminal.
+Next integrate complete successful portable CE/HTC/WMI/HTT path, then one
+functional scan+BSS/return trial. Full Goal active; Wi-Fi still incomplete.
+
 Latest20261120 EAGER MEMORY signed: actualstockQMIHostCap69elementtable/
 EOT andpublicOEMd50b305f lackTLV33; preparedsourceunconditionallydeclaredit.
 Peach-only omitextension; originalmemoryrequest/response/FW/credits/power

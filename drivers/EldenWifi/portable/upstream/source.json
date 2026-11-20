@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "repository": "https://github.com/lenzhang/UniXNU-xiaomipad8pro",
+  "commit": "2438556c77c90c22c7b76e57eb8b40c44b35f1af",
+  "license": "BSD-2-Clause-Patent",
+  "files": [
+    {
+      "path": "WifiHw.h",
+      "upstream_path": "package/PianoWifi/WifiHw.h",
+      "bytes": 101933,
+      "sha256": "b86a369d2df15bdd1eebb71fc15012ee01afca9e878a6064da07f00414320530"
+    },
+    {
+      "path": "WifiMhi.h",
+      "upstream_path": "package/PianoWifi/WifiMhi.h",
+      "bytes": 27162,
+      "sha256": "89540097413e5fd72c013d99570e9a12c95a387d9df6f72e8ebcf16731ec05b7"
+    },
+    {
+      "path": "WifiCe.h",
+      "upstream_path": "package/PianoWifi/WifiCe.h",
+      "bytes": 18711,
+      "sha256": "8d706d0995947a76d928da31d931219d0cf491372d86f871b97a8ed35d12eb74"
+    },
+    {
+      "path": "WifiHtc.h",
+      "upstream_path": "package/PianoWifi/WifiHtc.h",
+      "bytes": 13284,
+      "sha256": "59754701917451ed2872f4c6271092a1b85fbba36058ca22403643b8de7421bb"
+    },
+    {
+      "path": "WifiWmi.h",
+      "upstream_path": "package/PianoWifi/WifiWmi.h",
+      "bytes": 36242,
+      "sha256": "2f469578e4e7829551e3be68eee36d26e15941a5d4c27646a3267586c19c29ae"
+    },
+    {
+      "path": "WifiHtt.h",
+      "upstream_path": "package/PianoWifi/WifiHtt.h",
+      "bytes": 16922,
+      "sha256": "2807bcef32b6f8dfea5c35eb5997e27eb6dbc8eb8c4f1c9371e38c3f9ec23ca9"
+    },
+    {
+      "path": "WifiAssoc.h",
+      "upstream_path": "package/PianoWifi/WifiAssoc.h",
+      "bytes": 35026,
+      "sha256": "6ed5ee4f27ea0550b82ab536f9eec52dc76542cba9b06fae5b67ad5f8a59e788"
+    },
+    {
+      "path": "WifiLink.h",
+      "upstream_path": "package/PianoWifi/WifiLink.h",
+      "bytes": 48118,
+      "sha256": "b2f6085333811d104b5ac4e7a7f3448ee91ad69b704cedfb6206be1f3e2684d4"
+    },
+    {
+      "path": "LICENSE",
+      "upstream_path": "package/PianoWifi/LICENSE",
+      "bytes": 2663,
+      "sha256": "c3b5bc2960852a3a6e3c7cae1f52486e21fd6115e925a3353e10214792ce88fb"
+    },
+    {
+      "path": "UPSTREAM",
+      "upstream_path": "package/PianoWifi/UPSTREAM",
+      "bytes": 32876,
+      "sha256": "036ec183715df5b458cb6d58def38fcc7a4f39fc343035a41208ab1729a77c8b"
+    },
+    {
+      "path": "tests/wmi_host.cpp",
+      "upstream_path": "package/PianoWifi/tests/wmi_host.cpp",
+      "bytes": 84313,
+      "sha256": "9cd5f15f85a3e57b1887f698915ce3bf030b2c6fd562896c5eb420872e52b563"
+    }
+  ],
+  "hardware_evidence": [
+    {
+      "path": "docs/results-2026-11-13.md",
+      "sha256": "72589a5cec50e061b634f81107bc0c71d89dec3da17fdba3346d1800ff00f526",
+      "url": "https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/results-2026-11-13.md"
+    },
+    {
+      "path": "docs/results-2026-11-14.md",
+      "sha256": "ea6654baee3b5306359825cab569f307e7bc1479747b82205f100e362fc27c0d",
+      "url": "https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/results-2026-11-14.md"
+    },
+    {
+      "path": "docs/results-2026-11-17.md",
+      "sha256": "21d68154f8180c678c244179a24db5ac2ce1fa410b23d6ebbdf9b3cada066ad6",
+      "url": "https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/results-2026-11-17.md"
+    },
+    {
+      "path": "docs/drivers/wifi.md",
+      "sha256": "29d63f258eec4d4a186deb99836d209b898aa5a2ab1b23f62eec0674f504e9b0",
+      "url": "https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/drivers/wifi.md"
+    }
+  ],
+  "scope": "Portable CE/HTC/WMI/HTT protocol code only; no Piano IOKit, root power, firmware, SMMU or macOS27 ABI.",
+  "donor_os": "macOS 27.3",
+  "target_os": "iPadOS 17.7.10 / 21H461",
+  "candidate_hardware_tested": false
+}
