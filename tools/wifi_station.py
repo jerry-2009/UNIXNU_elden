@@ -10,6 +10,8 @@ def defs(p):return {n for n,v in global_symbols(Path(p)).items() if v[0]&0x0e}
 def refs(p):return {n for n,v in global_symbols(Path(p)).items() if not v[0]&0x0e}
 
 def qualify_runtime(r):
+    if r.get('station_diagnostic'):
+        return qualify_diagnostic(r)
     if r.get('station_hif'):
         return qualify_hif(r)
     if r.get('station_trial') is not True or r.get('compiled') is not True or r.get('runtime_count')!=126:
@@ -36,6 +38,20 @@ def qualify_runtime(r):
         raise ValueError('Station native/binding differs')
     for name,digest in r['source_inputs'].items():
         if sha(ROOT/name)!=digest:raise ValueError('Station source pin differs: '+name)
+    return True
+
+def qualify_diagnostic(r):
+    if any(r.get(k) is not True for k in ['compiled','station_diagnostic','readonly_registers','no_payload_logging','one_first_tx_sample']):raise ValueError('Wrong consolidated TX diagnostic')
+    qualify_runtime(r['base'])
+    from StationDiagnosticSource import source,EXPECTED
+    if sha(r['parent_source'])!=EXPECTED or source(Path(r['parent_source']).read_bytes())!=Path(r['source']).read_bytes() or sha(r['source'])!=r['source_sha256'] or sha(r['object'])!=r['object_sha256']:
+        raise ValueError('TX diagnostic source/object differs')
+    if len(r['retained_objects'])!=125:raise ValueError('TX diagnostic retained objects differ')
+    for path,digest in {**r['retained_objects'],**r['consumed_inputs']}.items():
+        if sha(path)!=digest:raise ValueError('TX diagnostic actual input changed')
+    if sha(r['link'][r['link'].index('-o')+1])!=r['binding_sha256']:raise ValueError('TX diagnostic binding differs')
+    for name,digest in r['source_inputs'].items():
+        if sha(ROOT/name)!=digest:raise ValueError('TX diagnostic source pin differs')
     return True
 
 def qualify_hif(r):
@@ -108,7 +124,8 @@ def qualify_components(report):
     folder=Path(report['station_worker']['command'][report['station_worker']['command'].index('-o')+1]).parent
     qualify_native(report['station_worker'],folder)
     if parent['kernel_sha256']!=report['station_parent_kernel_sha256'] or report['profile']!='wifi-network-17':raise ValueError('Station parent differs')
-    original=report['station_runtime']['base'] if report['station_runtime'].get('station_hif') else report['station_runtime']
+    original=report['station_runtime']
+    while original.get('station_hif') or original.get('station_diagnostic'):original=original['base']
     if original['scan_parent']!=parent['portable_scan_runtime']:raise ValueError('Station scan chain differs')
     if report['network_bridge']!=parent['network_bridge'] or report['optional_runtime']!=parent['optional_runtime']:
         raise ValueError('Station OS bridge/rules changed')

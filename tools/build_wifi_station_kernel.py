@@ -17,7 +17,8 @@ def main():
     a=p.parse_args();parent,out=a.parent_build.resolve(),a.output.resolve();prior=read(parent/'result.json');runtime=read(a.runtime_build/'result.json');worker=read(a.native_build/'result.json');core=read(a.core_build/'result.json');assets=read(a.assets/'result.json')
     from wifi_station import qualify_runtime,qualify_native
     qualify_runtime(runtime);qualify_native(worker,a.native_build)
-    original=runtime['base'] if runtime.get('station_hif') else runtime
+    original=runtime
+    while original.get('station_hif') or original.get('station_diagnostic'):original=original['base']
     if original['scan_parent']!=prior['portable_scan_runtime'] or core['base']!=prior['core'] or worker['base']!=prior['network_worker'] or core['assets']!=assets:
         raise ValueError('Station actual component parents differ')
     for name in ['native','kernel']:
@@ -64,7 +65,10 @@ def main():
     # evolution can leave the executable source and public wire identical.
     # Require all effective native/runtime pins to win; verify separately that
     # the signed helper/source has not changed in the asset qualifier.
-    inputs.update(runtime['source_inputs']);inputs.update(worker['source_inputs'])
+    def live_inputs(value):
+        inherited=live_inputs(value['base']) if value.get('station_hif') or value.get('station_diagnostic') else {}
+        inherited.update(value['source_inputs']);return inherited
+    inputs.update(live_inputs(runtime));inputs.update(worker['source_inputs'])
     for n,h in inputs.items():
         if sha(ROOT/n)!=h:raise ValueError('Station consumed input changed: '+n)
     components=dict(prior['component_objects']);components['Native.o']=dict(path=str(a.native_build/'Native.o'),sha256=worker['object_sha256']);components['WifiRuntimeMsiBinding.o']=dict(path=str(binding),sha256=runtime['binding_sha256'])

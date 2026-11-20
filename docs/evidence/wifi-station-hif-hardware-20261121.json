@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-21",
+  "hardware_tested": true,
+  "image_sha256": "bb3a7d0e78778a8750fea145fadd410086648698658dbc253f9c43e08a2c1824",
+  "session": "8d353d51bfe5c226",
+  "source_commit": "0d8474f",
+  "raw": {
+    "path": "edl_work/live-station-hif-20261121/usb/20261120-204451.bin",
+    "bytes": 395866,
+    "sha256": "3981a5959d3ea0f2e652f9077cecf16762db04450de1358c0e6011b910e47b4e",
+    "drop_max": 19,
+    "status_samples": 104,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "hif": [
+    "ELDEN_ATH12K level=4 ELDEN_STATION HIF prepared=1 init-done=1 umac=1 wake-lease=1; portable CE poll",
+    "ELDEN_ATH12K level=4 ELDEN_STATION HIF wake-release=1; protocol stop before physical fence"
+  ],
+  "final_state": "ELDEN_ATH12K level=4 ELDEN_STATION stage=714 error=0 failed=0 start=1 auth=1 assoc=1 port=0 keys=0 RX=3 TX=3 EAPOL=3/3 done=0 ack=0",
+  "physical_fence": "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+  "hif_lifetime_accepted": true,
+  "tx_completion_accepted": false,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "protocol_stop_accepted": false,
+  "warm_mhi_reset_accepted": false,
+  "full_stock_root_green_original_settings_restored": true,
+  "all_device_jobs_terminal": true,
+  "next": "One consolidated full station TX pointer/config/metadata observation; do not repeat HIF/wake-only trial.",
+  "goal": "active and incomplete"
+}

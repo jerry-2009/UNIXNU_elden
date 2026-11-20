@@ -10,7 +10,8 @@ def main():
     count=0
     for name in ['station','donor','object','native','owner','firmware','return','profile','entry','helper','trust','private']:
         changed=copy.deepcopy(r)
-        runtime=changed['station_runtime']['base'] if changed['station_runtime'].get('station_hif') else changed['station_runtime']
+        runtime=changed['station_runtime']
+        while runtime.get('station_hif') or runtime.get('station_diagnostic'):runtime=runtime['base']
         if name=='station':changed['station_trial']=False
         elif name=='donor':runtime['station_donor']['commit']='0'*40
         elif name=='object':changed['station_runtime']['binding_sha256']='0'*64
