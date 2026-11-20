@@ -218,6 +218,20 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated host wake capability accepted: '+name)
+    if report.get('posted_reset_trial'):
+        for name in ('report','posted_reset_reversible','posted_reset_writes_unchanged',
+                     'posted_reset_ring_credit_firmware_unchanged','posted_reset_readbacks',
+                     'posted_reset_delay_ms','posted_reset_upstream_commit',
+                     'posted_reset_parent_source_sha256','posted_reset_source_sha256',
+                     'posted_reset_object_sha256'):
+            selected=copy.deepcopy(report)
+            if name=='report':selected['posted_reset_trial']=False
+            elif name in ('posted_reset_readbacks','posted_reset_delay_ms'):selected['mac_phy_stride_runtime'][name]=0
+            elif name.endswith(('commit','sha256')):selected['mac_phy_stride_runtime'][name]='0'*64
+            else:selected['mac_phy_stride_runtime'][name]=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated posted-reset contract accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

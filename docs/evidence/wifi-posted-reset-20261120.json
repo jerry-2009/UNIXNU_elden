@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "upstream_fix": "55f3aa06951cac78b0206bde961c8cf11929a27a",
+  "board_source": "h0cheung/tb322fc-linux-kernel@6f97250ead155fc3b980856323e99a4623dae73d",
+  "board": "Lenovo TB322FC / SM8750 / Elden, also referenced by ArmadaOS",
+  "upstream_reported_hardware": "QCN9274 hw2.0, not an Elden acceptance claim",
+  "patch": {
+    "register": "0x3008 / PCIE_SOC_GLOBAL_RESET",
+    "readbacks_added": 2,
+    "delay_ms_unchanged": 10,
+    "writes_unchanged": true,
+    "reversible_to_exact_parent": true,
+    "parent_source_sha256": "d50605c5a03a0c5b2b8b949a2ebc02c3329cd7e683746f47d8765eeb38acb84c",
+    "source_sha256": "ad5d2a2bb68a68b3f047abd5d0cc9abf38c7c06c83ca40fa56c1408fe99ae082",
+    "object_sha256": "85f5d01bb253cb969f768855df1ea53fce6517dadf7006aa9f8cc69e0ca10c7f",
+    "recompiled_units": 1,
+    "retained_units": 124,
+    "ring_credit_firmware_changes": false,
+    "pci_warnings_retained": 120
+  },
+  "verification": {
+    "actual_old_new_reset_body_scenarios": 49,
+    "asan_ubsan": true,
+    "pci_posted_io_modeled": true,
+    "qualification_mutations_rejected": 93,
+    "full_kernel": true,
+    "original_apple_regions_preserved": 30,
+    "entry_branch_delta": 7124,
+    "package_audit": true,
+    "clean_build_rerun": false
+  },
+  "binding_sha256": "08aec3c83c2be2720eec045e0d1ba85f6ee7d54e3369018fe61fab264469a0f6",
+  "kernel_sha256": "928839d1c5f790be0f2c5636e7e6960c67183508cddd277f9c18eb41abf477c9",
+  "native_sha256": "11855f1335b0a1df40c5125dcd48e6c83651b1d2ba378574d90b12ce38636de7",
+  "image_sha256": "7fb65c74f24938563ee4e4524b71f3a54d257711769aae900ff06666048a2e43",
+  "session": "30069a6f1ee677de",
+  "floor": [1738713600, 0, 3],
+  "workbench_build": "edl_work/wifi-posted-reset-20261120",
+  "next": "One combined first-WMI/real-scan functional trial, then complete stock restoration. No presumption of CE3 root cause.",
+  "wifi_network_accepted": false,
+  "goal": "active and incomplete"
+}

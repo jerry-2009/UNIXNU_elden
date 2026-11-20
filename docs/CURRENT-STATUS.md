@@ -1,4 +1,9 @@
-# 当前状态 · 2026-11-18
+# 当前状态 · 2026-11-20
+
+Wi-Fi固件初始化成功、网络接口已接通，首次WMI之后CE3仍失效；BSS0、未关联／DHCP／流量。
+原厂WAKE能力修补已实测但未解决。四代Linux的复位回读差量已合并构建并签名，候选7fb65c74
+未实机；下一步一次WMI／扫描功能对照。[证据](evidence/wifi-posted-reset-20261120.json)。
+平板已完整恢复stock Android/root/green/原设置，所有前轮设备任务已结束。Goal active未完成。
 
 2026-11-20 sideband实测：GPIO18/19及GPIO202原厂归属切换、输出低和回读通过，
 但第一条PMF之前CE3仍变零，BSS0，尚未联网。完整回程/stock/root/green/原设置恢复通过；

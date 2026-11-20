@@ -75,6 +75,27 @@ def qualify_host_wake_capability(runtime):
         raise ValueError('Wrong OEM callback-derived WAKE host capability')
 
 
+def qualify_posted_reset(runtime):
+    sys.path.insert(0, str(ROOT / 'drivers/EldenWifi/peach'))
+    from PostedResetPatch import EXPECTED, UPSTREAM, READBACK, patch
+    flags = ['posted_reset_reversible', 'posted_reset_writes_unchanged',
+             'posted_reset_ring_credit_firmware_unchanged']
+    if runtime.get('host_wake_capability_trial') is not True or any(runtime.get(k) is not True for k in flags) or (runtime.get('posted_reset_readbacks'), runtime.get('posted_reset_delay_ms'), runtime.get('posted_reset_upstream_commit'), runtime.get('posted_reset_parent_source_sha256')) != (2, 10, UPSTREAM, EXPECTED):
+        raise ValueError('Wrong pinned TB322FC posted-reset contract')
+    command = runtime['pci_state_command']
+    candidates = [Path(v) for v in command if v.endswith('/pci.c')]
+    if len(candidates) != 1:
+        raise ValueError('Posted-reset consumed source missing')
+    source = candidates[0]
+    data = source.read_bytes()
+    restored = data.decode().replace(READBACK, '').encode()
+    if hashlib.sha256(restored).hexdigest() != EXPECTED or patch(restored) != data or sha(source) != runtime['posted_reset_source_sha256'] or runtime['pci_state_source_sha256'] != runtime['posted_reset_source_sha256']:
+        raise ValueError('Posted-reset source does not reproduce the exact patch')
+    obj = source.parent / 'ath12k_pci.o'
+    if sha(obj) != runtime['posted_reset_object_sha256'] or runtime['pci_state_object_sha256'] != runtime['posted_reset_object_sha256']:
+        raise ValueError('Posted-reset consumed object differs')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -113,6 +134,7 @@ def qualify_components(report):
     if bool(report.get('startup_contract_trial'))!=bool(stride and stride.get('startup_contract_trial')):raise ValueError('Startup contract report mismatch')
     if bool(report.get('board_state_trial'))!=bool(stride and stride.get('board_state_trial')) or bool(report.get('board_state_trial'))!=bool(battery and battery.get('board_state_trial')):raise ValueError('Board-state pair mismatch')
     if bool(report.get('host_wake_capability_trial'))!=bool(stride and stride.get('host_wake_capability_trial')):raise ValueError('Host wake capability report mismatch')
+    if bool(report.get('posted_reset_trial'))!=bool(stride and stride.get('posted_reset_trial')):raise ValueError('Posted-reset report mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
         raise ValueError('Network bridge source differs')
@@ -163,6 +185,7 @@ def qualify_components(report):
         if stride.get('startup_contract_trial'):qualify_startup_contract(stride)
         if stride.get('board_state_trial'):qualify_board_state(stride,battery)
         if stride.get('host_wake_capability_trial'):qualify_host_wake_capability(stride)
+        if stride.get('posted_reset_trial'):qualify_posted_reset(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -202,6 +225,7 @@ def qualify(report_path,entry_path,runtime):
     result['startup_contract_trial']=report.get('startup_contract_trial') is True
     result['board_state_trial']=report.get('board_state_trial') is True
     result['host_wake_capability_trial']=report.get('host_wake_capability_trial') is True
+    result['posted_reset_trial']=report.get('posted_reset_trial') is True
     return result
 
 

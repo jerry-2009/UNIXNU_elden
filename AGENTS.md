@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 POSTED RESET signed: pinnedTB322FC6f97250e includesQualcomm
+55f3aa06 twoSOC_GLOBAL_RESET readbacks before original10msdelays; currentPCI
+omittedthem. Exactreversibleoneunit/124retained,49actualoldnew ASan/UBSan
+posted-I/O models/93qualifier/fullkernel/Apple30/entry7124/package1pass.
+Image7fb65c74/session30069a6f1ee677de/floor1738713600/0/3 NOThardwaretested.
+HostWAKE previoushardware stillCE3lost/BSS0/27timeouts; fullstock/root/green/
+settings restored. NextonecombinedWMI/scan trial; no wake-only repeat.
+NoCE3causation claim; fullGoal active/Wi-Fi incomplete, stockcurrent.
+
 Latest20261120 HOST WAKE signed: exactCNSShostcap includes actualWAKE MSI
 TLV11, omitted by LinuxPeach. Callbackderives ownedonevector/base13;
 errors/stale capability refuse,noring/credit/timeoutchange.30actual ASan/UBSan+

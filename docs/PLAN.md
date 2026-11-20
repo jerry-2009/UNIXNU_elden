@@ -1,5 +1,10 @@
 # Elden 基本可用实施计划
 
+当前集中Wi-Fi：合并已核初始化修补及四代Linux复位回读，做一次首次WMI／真实扫描对照。
+通过后依次验收BSS、关联、DHCP、双向流量和重连；失败则以首个具体失效阶段核原厂访问
+契约，避免重复纯wake／pin／rail探针。签包7fb65c74未实机；
+[构建](evidence/wifi-posted-reset-20261120.json)。Wi-Fi未联网，完整Goal active。
+
 2026-11-20 sideband实测：GPIO18/19及GPIO202原厂归属切换、输出低和回读通过，
 但第一条PMF之前CE3仍变零，BSS0，尚未联网。完整回程/stock/root/green/原设置恢复通过；
 未证明graceful DMA fence，不扩称硬件停机完成。不重复pin/wake-only试验，集中实际BAR

@@ -1,5 +1,12 @@
 # Wi-Fi：固件与服务已接通，WMI完成仍待修复
 
+2026-11-20最新结论：原厂WAKE MSI能力已补齐并实测，CE3仍失效、BSS0，尚未联网。
+固定四代Linux含有复位posted-write回读修补，我们此前遗漏；现补两次读回，原10ms等待
+保持。49实际旧新函数模型／93资格反例／整核签包通过，候选7fb65c74，未实机。
+[修补](../drivers/EldenWifi/peach/POSTED-RESET.md)／[构建](evidence/wifi-posted-reset-20261120.json)／
+[前轮实录](evidence/wifi-host-wake-capability-hardware-20261120.json)。下一轮只做合并WMI／扫描
+对照；不再重复纯pin／wake测试。完整Goal active，根因仍未证明。
+
 2026-11-20 sideband实测：GPIO18/19及GPIO202原厂归属切换、输出低和回读通过，
 但第一条PMF之前CE3仍变零，BSS0，尚未联网。完整回程/stock/root/green/原设置恢复通过；
 未证明graceful DMA fence，不扩称硬件停机完成。不重复pin/wake-only试验，集中实际BAR
