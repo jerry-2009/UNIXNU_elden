@@ -206,6 +206,18 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated board state accepted: '+name)
+    if report.get('host_wake_capability_trial'):
+        for name in ('host_wake_callback_derived','host_wake_capability_peach_only',
+                     'host_wake_no_credit_timeout_ring_change','base','count','tlv','report'):
+            selected=copy.deepcopy(report)
+            if name=='report':selected['host_wake_capability_trial']=False
+            elif name=='base':selected['mac_phy_stride_runtime']['host_wake_msi_base']=14
+            elif name=='count':selected['mac_phy_stride_runtime']['host_wake_msi_vector_count']=2
+            elif name=='tlv':selected['mac_phy_stride_runtime']['host_wake_qmi_tlv']=0x12
+            else:selected['mac_phy_stride_runtime'][name]=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated host wake capability accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,

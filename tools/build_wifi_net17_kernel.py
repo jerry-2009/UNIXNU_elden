@@ -59,7 +59,7 @@ def main():
         if hold and (stride.get('lease_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o'] or stride.get('added_native_import')!='_elden_wifi_mhi_hold_requested' or worker.get('mhi_hold_trial') is not True):
             raise ValueError('MHI wake lease requires the exact opt-in runtime/worker pair')
         if bool(worker.get('mhi_hold_trial'))!=hold:raise ValueError('MHI wake worker/runtime mismatch')
-        if umac and (stride.get('umac_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o']+(['w7_hal.o'] if direct else ['ath12k_core.o'] if timeline else []) or stride.get('added_native_import')!='_elden_wifi_umac_hold_requested' or worker.get('umac_hold_trial') is not True or stride.get('mhi_reference_and_umac_handshake') is not True or (stride.get('umac_request_offset'),stride.get('umac_status_offset'),stride.get('umac_ready_value'),stride.get('umac_polling_bound_ms'))!=(0x3004,0x1e04040,2,50)):
+        if umac and (stride.get('umac_delta_reversible') is not True or stride.get('native_opt_in_only') is not True or stride.get('changed_units')!=['ath12k_wmi.o','ath12k_pci.o']+(['w7_hal.o'] if direct else ['ath12k_core.o'] if timeline else [])+(['ath12k_qmi.o'] if stride.get('host_wake_capability_trial') else []) or stride.get('added_native_import')!='_elden_wifi_umac_hold_requested' or worker.get('umac_hold_trial') is not True or stride.get('mhi_reference_and_umac_handshake') is not True or (stride.get('umac_request_offset'),stride.get('umac_status_offset'),stride.get('umac_ready_value'),stride.get('umac_polling_bound_ms'))!=(0x3004,0x1e04040,2,50)):
             raise ValueError('OEM UMAC wake requires exact contract and runtime/worker pair')
         if bool(worker.get('umac_hold_trial'))!=umac:raise ValueError('UMAC wake worker/runtime mismatch')
         if stride.get('vdev_empty_mlo_array'):
@@ -96,6 +96,9 @@ def main():
         if stride.get('board_state_trial'):
             from wifi_network17_boot import qualify_board_state
             qualify_board_state(stride,battery)
+        if stride.get('host_wake_capability_trial'):
+            from wifi_network17_boot import qualify_host_wake_capability
+            qualify_host_wake_capability(stride)
         if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
             raise ValueError('MAC/PHY stride runtime artifact changed')
         for name,digest in stride['source_inputs'].items():
@@ -237,6 +240,7 @@ def main():
         oem_init_mode_trial=bool(stride and stride.get('oem_init_mode_trial')),
         startup_contract_trial=bool(stride and stride.get('startup_contract_trial')),
         board_state_trial=bool(stride and stride.get('board_state_trial')),
+        host_wake_capability_trial=bool(stride and stride.get('host_wake_capability_trial')),
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     if battery:
         proof['battery_loaded_archives']=dict(pmic=dict(path=str(newpmic),sha256=sha(newpmic),member='PmicClient.o',member_sha256=battery['consumers']['PmicClient']['object_sha256']),

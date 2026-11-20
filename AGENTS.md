@@ -1,5 +1,22 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 HOST WAKE signed: exactCNSShostcap includes actualWAKE MSI
+TLV11, omitted by LinuxPeach. Callbackderives ownedonevector/base13;
+errors/stale capability refuse,noring/credit/timeoutchange.30actual ASan/UBSan+
+83qualifier/fullkernel/Apple30/entry7124/package1 pass. Image60cb0e5e/
+sessionead53ba67b241ea2/floor1738713600/0/3 NOThardwaretested;QMI152warnings.
+Prior boardstates prove externalpins/rails good atCE3loss;S7istatus7 later,
+notrootcause. FullGoal active/Wi-Fi incomplete;stock current.
+
+Latest20261120 BOARD STATE HARDWARE: GPIO16/18/19/202 unchanged across
+ready/firstPMF/firstfailure; allsix externalrails voltage/mode/enable/status
+and GPLL0parents good whenCE3alreadyzero. S7i status7 attimeoutend is later,
+notproved causal. No guessed externalrail/pinchange. BSS0/27timeouts;no
+put/netdrain/gracefulfence,resources retained to typedphysicalreset. Fullstock/
+root/green/settings restored/alljobs terminal;raw264251/drop29/59status/
+no reconnect, postdisconnect unknown. Next exactFW-sidehostcap/wake contract
+andfunctional earlyMAC/scan, no more standalonepin/rail probes. Goal active.
+
 Latest20261120 BOARD STATE signed: OEMmode+sideband combinedstillCE3loss/
 BSS0/fullstockrestore. Next reads alreadyownedGPIO16/18/19/202,sixrails,
 PLLparents atready/firstPMF/firstfailure;no controlwrites/maps.30actual
