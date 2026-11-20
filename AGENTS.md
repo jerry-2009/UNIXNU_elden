@@ -1,5 +1,14 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 UMAC REGISTER signed: actualOEMd50b305f uses balanced
+per-registerMHI+UMAC request/poll/release; previousstart/commandhold scopes
+differed. ExactPCIrawnonrecursive wrappers/refusal/latch/no-startupref;
+34actualhelper ASan/UBSan/107qualifier/fullkernel/Apple30/entry7124/package1
+pass,120PCIwarnings. Image32f7f14d/sessionaa2fc405656107a0/floor1738713600/0/3
+NOThardwaretested. Posted-reset realtrial stillCE3lost/BSS0/28timeouts,
+raw263430/drop2/59status/fullstock/root/green/settings restored;nograceful
+fenceclaim. Nextonefunctional WMI/scan trial,fullGoal active/incomplete.
+
 Latest20261120 POSTED RESET signed: pinnedTB322FC6f97250e includesQualcomm
 55f3aa06 twoSOC_GLOBAL_RESET readbacks before original10msdelays; currentPCI
 omittedthem. Exactreversibleoneunit/124retained,49actualoldnew ASan/UBSan

@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "vendor_source": "SM8750-fw-api@d50b305f7da9e14715a25120a4ac7b1a4b8b97c3",
+  "loaded_module": "qca_cld3_peach_v2.ko@33869cd6",
+  "adaptation": {
+    "scope": "each original post-init register access at or above0xfe0",
+    "startup_hold": false,
+    "balanced_mhi_umac_reference": true,
+    "raw_helpers_no_recursion": true,
+    "failed_handshake_latched": true,
+    "failed_access_suppressed": true,
+    "poll_checks": 11,
+    "poll_delay_us": 5000,
+    "ring_credit_firmware_unchanged": true,
+    "reversible_to_exact_parent": true
+  },
+  "build": {
+    "parent_pci_source_sha256": "ad5d2a2bb68a68b3f047abd5d0cc9abf38c7c06c83ca40fa56c1408fe99ae082",
+    "pci_source_sha256": "8bf572fb51ca83bcacbaa20ee8e0ef562ab6888e226c975c51cc38a11e522bba",
+    "pci_object_sha256": "847d3f65b162ba019c5bad07dc07badf59416dd7bd76185e64bbd9e3b94c5619",
+    "binding_sha256": "6093a4b470b14cdea427aaa1fe09892bcc2341ba0c4064640dcf36363b4831d1",
+    "kernel_sha256": "3ebd9ec748bcd4f45fa218d3fba7a56e4c428d01242def9c7fcbbaea2bfa8b43",
+    "native_sha256": "92163b89a87fe7baff32a755d9c7b311be7c42315f6b962bd6d17d3b939622f4",
+    "recompiled_units": 1,
+    "retained_units": 124,
+    "pci_warnings": 120,
+    "source_inputs": {
+      "tools/build_wifi_umac_register_access.py": "a984656b77023a6b479e2b244067697972e333b2ead98915e636bb076245ba1c",
+      "tools/test_wifi_umac_register_access.py": "b68e644bdda1aa0d92265d359db71b15cb90aaf81d70d73b70c7e93159492898",
+      "drivers/EldenWifi/peach/UmacRegisterPatch.py": "514ba7102aaa466a23ac34dc94ae725afe520f6aba6fa004d59ee18373faa331",
+      "drivers/EldenWifi/UmacRegisterAccess.inc": "b29099d8614db73e7f5b62242e9eb12d59d588f28ba91e00ebbb581af95e8435"
+    }
+  },
+  "verification": {
+    "actual_helper_scenarios": 34,
+    "asan_ubsan": true,
+    "mhi_mmio_executor_modeled": true,
+    "failed_host1_retained": "counter names clashed with libc; corrected host2",
+    "qualification_mutations_rejected": 107,
+    "original_apple_regions_preserved": 30,
+    "entry_branch_delta": 7124,
+    "package_audit": true,
+    "clean_build_rerun": false
+  },
+  "image_sha256": "32f7f14d076b55b2da4b727796eacc4b775c22d248d21885871fd9c8cb539f83",
+  "session": "aa2fc405656107a0",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "workbench_build": "edl_work/wifi-umac-register-20261120",
+  "next": "One combined WMI/scan functional trial then full stock restoration; do not infer root cause before its hardware result.",
+  "wifi_network_accepted": false,
+  "goal": "active and incomplete"
+}

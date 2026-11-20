@@ -88,12 +88,31 @@ def qualify_posted_reset(runtime):
         raise ValueError('Posted-reset consumed source missing')
     source = candidates[0]
     data = source.read_bytes()
+    if runtime.get('umac_register_trial'):
+        data = Path(runtime['umac_register_parent_source']).read_bytes()
     restored = data.decode().replace(READBACK, '').encode()
-    if hashlib.sha256(restored).hexdigest() != EXPECTED or patch(restored) != data or sha(source) != runtime['posted_reset_source_sha256'] or runtime['pci_state_source_sha256'] != runtime['posted_reset_source_sha256']:
+    if hashlib.sha256(restored).hexdigest() != EXPECTED or patch(restored) != data or hashlib.sha256(data).hexdigest() != runtime['posted_reset_source_sha256'] or (not runtime.get('umac_register_trial') and runtime['pci_state_source_sha256'] != runtime['posted_reset_source_sha256']):
         raise ValueError('Posted-reset source does not reproduce the exact patch')
-    obj = source.parent / 'ath12k_pci.o'
-    if sha(obj) != runtime['posted_reset_object_sha256'] or runtime['pci_state_object_sha256'] != runtime['posted_reset_object_sha256']:
+    obj = (Path(runtime['umac_register_parent_source']) if runtime.get('umac_register_trial') else source).parent / 'ath12k_pci.o'
+    if sha(obj) != runtime['posted_reset_object_sha256'] or (not runtime.get('umac_register_trial') and runtime['pci_state_object_sha256'] != runtime['posted_reset_object_sha256']):
         raise ValueError('Posted-reset consumed object differs')
+
+
+def qualify_umac_register(runtime):
+    sys.path.insert(0,str(ROOT/'drivers/EldenWifi/peach'))
+    from UmacRegisterPatch import EXPECTED, VENDOR, patch
+    flags=['umac_register_reversible','umac_register_peach_only','umac_register_raw_no_recursion',
+           'umac_register_balanced_refs','umac_register_failure_suppresses_access',
+           'umac_register_ring_credit_firmware_unchanged','umac_register_failed_handshake_latched']
+    if runtime.get('posted_reset_trial') is not True or any(runtime.get(k) is not True for k in flags) or runtime.get('umac_register_startup_hold') is not False or (runtime.get('umac_register_threshold'),runtime.get('umac_register_checks'),runtime.get('umac_register_vendor_commit'),runtime.get('umac_register_parent_source_sha256'))!=(0xfe0,11,VENDOR,EXPECTED):
+        raise ValueError('Wrong OEM per-register UMAC contract')
+    parent=Path(runtime['umac_register_parent_source'])
+    candidates=[Path(v) for v in runtime['pci_state_command'] if v.endswith('/pci.c')]
+    if len(candidates)!=1 or sha(parent)!=EXPECTED or patch(parent.read_bytes())!=candidates[0].read_bytes() or sha(candidates[0])!=runtime['umac_register_source_sha256'] or runtime['pci_state_source_sha256']!=runtime['umac_register_source_sha256']:
+        raise ValueError('UMAC register source does not reproduce the exact patch')
+    obj=candidates[0].parent/'ath12k_pci.o'
+    if sha(obj)!=runtime['umac_register_object_sha256'] or runtime['pci_state_object_sha256']!=runtime['umac_register_object_sha256']:
+        raise ValueError('UMAC register consumed object differs')
 
 
 def qualify_components(report):
@@ -135,6 +154,7 @@ def qualify_components(report):
     if bool(report.get('board_state_trial'))!=bool(stride and stride.get('board_state_trial')) or bool(report.get('board_state_trial'))!=bool(battery and battery.get('board_state_trial')):raise ValueError('Board-state pair mismatch')
     if bool(report.get('host_wake_capability_trial'))!=bool(stride and stride.get('host_wake_capability_trial')):raise ValueError('Host wake capability report mismatch')
     if bool(report.get('posted_reset_trial'))!=bool(stride and stride.get('posted_reset_trial')):raise ValueError('Posted-reset report mismatch')
+    if bool(report.get('umac_register_trial'))!=bool(stride and stride.get('umac_register_trial')):raise ValueError('UMAC register report mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery)).items()}:
         raise ValueError('Network bridge source differs')
@@ -186,6 +206,7 @@ def qualify_components(report):
         if stride.get('board_state_trial'):qualify_board_state(stride,battery)
         if stride.get('host_wake_capability_trial'):qualify_host_wake_capability(stride)
         if stride.get('posted_reset_trial'):qualify_posted_reset(stride)
+        if stride.get('umac_register_trial'):qualify_umac_register(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -226,6 +247,7 @@ def qualify(report_path,entry_path,runtime):
     result['board_state_trial']=report.get('board_state_trial') is True
     result['host_wake_capability_trial']=report.get('host_wake_capability_trial') is True
     result['posted_reset_trial']=report.get('posted_reset_trial') is True
+    result['umac_register_trial']=report.get('umac_register_trial') is True
     return result
 
 

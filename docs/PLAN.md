@@ -1,5 +1,12 @@
 # Elden 基本可用实施计划
 
+2026-11-20复位回读实测仍CE3失效、BSS0，已完整恢复stock/root/green/原设置。
+下一份按真实原厂HAL访问时机，逐寄存器平衡MHI／UMAC唤醒并拒绝失败访问；34helper模型、
+107资格反例和整核签包通过，32f7f14d未实机。
+[访问契约](../drivers/EldenWifi/peach/UMAC-REGISTER-ACCESS.md)／[构建](evidence/wifi-umac-register-20261120.json)／
+[前轮实录](evidence/wifi-posted-reset-hardware-20261120.json)。下一轮一次WMI／扫描对照，
+不重复原来的启动hold。Wi-Fi未联网、根因未证明，完整Goal active。
+
 当前集中Wi-Fi：合并已核初始化修补及四代Linux复位回读，做一次首次WMI／真实扫描对照。
 通过后依次验收BSS、关联、DHCP、双向流量和重连；失败则以首个具体失效阶段核原厂访问
 契约，避免重复纯wake／pin／rail探针。签包7fb65c74未实机；

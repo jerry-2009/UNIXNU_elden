@@ -1,5 +1,12 @@
 # Wi-Fi：固件与服务已接通，WMI完成仍待修复
 
+2026-11-20复位回读实测仍CE3失效、BSS0，已完整恢复stock/root/green/原设置。
+下一份按真实原厂HAL访问时机，逐寄存器平衡MHI／UMAC唤醒并拒绝失败访问；34helper模型、
+107资格反例和整核签包通过，32f7f14d未实机。
+[访问契约](../drivers/EldenWifi/peach/UMAC-REGISTER-ACCESS.md)／[构建](evidence/wifi-umac-register-20261120.json)／
+[前轮实录](evidence/wifi-posted-reset-hardware-20261120.json)。下一轮一次WMI／扫描对照，
+不重复原来的启动hold。Wi-Fi未联网、根因未证明，完整Goal active。
+
 2026-11-20最新结论：原厂WAKE MSI能力已补齐并实测，CE3仍失效、BSS0，尚未联网。
 固定四代Linux含有复位posted-write回读修补，我们此前遗漏；现补两次读回，原10ms等待
 保持。49实际旧新函数模型／93资格反例／整核签包通过，候选7fb65c74，未实机。

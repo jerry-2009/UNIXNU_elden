@@ -232,6 +232,22 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated posted-reset contract accepted: '+name)
+    if report.get('umac_register_trial'):
+        for name in ('report','umac_register_reversible','umac_register_peach_only',
+                     'umac_register_raw_no_recursion','umac_register_balanced_refs',
+                     'umac_register_failure_suppresses_access','umac_register_failed_handshake_latched',
+                     'umac_register_ring_credit_firmware_unchanged','umac_register_startup_hold',
+                     'umac_register_threshold','umac_register_checks','umac_register_vendor_commit',
+                     'umac_register_source_sha256','umac_register_object_sha256'):
+            selected=copy.deepcopy(report)
+            if name=='report':selected['umac_register_trial']=False
+            elif name=='umac_register_startup_hold':selected['mac_phy_stride_runtime'][name]=True
+            elif name in ('umac_register_threshold','umac_register_checks'):selected['mac_phy_stride_runtime'][name]=0
+            elif name.endswith(('commit','sha256')):selected['mac_phy_stride_runtime'][name]='0'*64
+            else:selected['mac_phy_stride_runtime'][name]=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated UMAC register contract accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,
