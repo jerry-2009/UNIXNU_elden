@@ -108,6 +108,9 @@ def main():
         if stride.get('first_failure_trial'):
             from wifi_network17_boot import qualify_first_failure
             qualify_first_failure(stride,worker)
+        if stride.get('eager_memory_trial'):
+            from wifi_network17_boot import qualify_eager_memory
+            qualify_eager_memory(stride)
         if sha(args.mac_phy_runtime/'WifiRuntimeMsiBinding.o')!=stride['binding_sha256']:
             raise ValueError('MAC/PHY stride runtime artifact changed')
         for name,digest in stride['source_inputs'].items():
@@ -253,6 +256,7 @@ def main():
         posted_reset_trial=bool(stride and stride.get('posted_reset_trial')),
         umac_register_trial=bool(stride and stride.get('umac_register_trial')),
         first_failure_trial=bool(stride and stride.get('first_failure_trial')),
+        eager_memory_trial=bool(stride and stride.get('eager_memory_trial')),
         native_identity_contract=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=sha(out/'native.macho')))
     if battery:
         proof['battery_loaded_archives']=dict(pmic=dict(path=str(newpmic),sha256=sha(newpmic),member='PmicClient.o',member_sha256=battery['consumers']['PmicClient']['object_sha256']),

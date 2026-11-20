@@ -1,5 +1,15 @@
 # UniXNU elden — authoritative source repository
 
+Latest20261120 EAGER MEMORY signed: actualstockQMIHostCap69elementtable/
+EOT andpublicOEMd50b305f lackTLV33; preparedsourceunconditionallydeclaredit.
+Peach-only omitextension; originalmemoryrequest/response/FW/credits/power
+unchanged.86actualhostcap ASan/UBSanmodels/128qualifier/fullkernel/Apple30/
+entry7124/package1pass;QMI152warnings. Imagea7482ae7/session57ed88147f0b6257/
+floor1738713600/0/3 NOThardwaretested. FirststatehardwarePCI/BAR/iATU/GCC/
+PERST unchanged,rawWLAONd->1d/warmbit1->0/CE3zero. MSIenableffffffff is
+expectedfullmask,observer-5NOTdecodefault. Fullstock/root/green/settings
+restored/alljobs terminal. Nextonefunctionaltrial;Goalactive/Wi-Fiincomplete.
+
 Latest20261120 FIRST FAILURE signed: exactUMACregister parent nowobserves
 ready12/actualfirsthandshakefailure90,21rawBAR+47ownedphysicalreads;
 no newwake/controlmaps,readclearresetcauseexcluded,nonatomicstatusretained.

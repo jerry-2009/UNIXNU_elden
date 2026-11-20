@@ -131,6 +131,15 @@ def qualify_first_failure(runtime,worker):
         if sha(old)!=EXPECTED[n] or sha(old)!=parent['source_sha256'] or patch(n,old.read_bytes())!=source.read_bytes() or sha(source)!=row['source_sha256'] or sha(obj)!=row['object_sha256']:raise ValueError('First-failure source/object differs: '+n)
 
 
+def qualify_eager_memory(runtime):
+    sys.path.insert(0,str(ROOT/'drivers/EldenWifi/peach'))
+    from EagerMemoryPatch import EXPECTED,VENDOR,patch
+    flags=['eager_memory_peach_only','eager_memory_reversible','eager_memory_oem_tlv33_absent','eager_memory_memory_request_protocol_unchanged','eager_memory_no_firmware_power_ring_change']
+    if runtime.get('first_failure_trial') is not True or any(runtime.get(k) is not True for k in flags) or runtime.get('eager_memory_vendor_commit')!=VENDOR:raise ValueError('Wrong OEM eager-memory capability contract')
+    original=Path(runtime['eager_memory_parent_source']);source=Path(runtime['eager_memory_source']);obj=Path(runtime['eager_memory_object'])
+    if sha(original)!=EXPECTED or sha(original)!=runtime['eager_memory_parent_source_sha256'] or patch(original.read_bytes())!=source.read_bytes() or sha(source)!=runtime['eager_memory_source_sha256'] or sha(obj)!=runtime['eager_memory_object_sha256']:raise ValueError('Eager memory consumed source/object differs')
+
+
 def qualify_components(report):
     parent=report['retained_parent_report']
     if report['profile']!='wifi-network-17' or parent['profile']!='wifi-service-scan' or parent['kernel_sha256']!=PARENT_KERNEL:
@@ -172,6 +181,7 @@ def qualify_components(report):
     if bool(report.get('posted_reset_trial'))!=bool(stride and stride.get('posted_reset_trial')):raise ValueError('Posted-reset report mismatch')
     if bool(report.get('umac_register_trial'))!=bool(stride and stride.get('umac_register_trial')):raise ValueError('UMAC register report mismatch')
     if bool(report.get('first_failure_trial'))!=bool(stride and stride.get('first_failure_trial')) or bool(report.get('first_failure_trial'))!=bool(worker.get('first_failure_physical')):raise ValueError('First-failure report mismatch')
+    if bool(report.get('eager_memory_trial'))!=bool(stride and stride.get('eager_memory_trial')):raise ValueError('Eager memory report mismatch')
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission worker mismatch')
     if net['source_sha256']!=hashlib.sha256(source()).hexdigest() or worker['generated_sources']!={name:hashlib.sha256(data).hexdigest() for name,data in generated(hold,umac,inspect,bool(battery),bool(report.get('first_failure_trial'))).items()}:
         raise ValueError('Network bridge source differs')
@@ -225,6 +235,7 @@ def qualify_components(report):
         if stride.get('posted_reset_trial'):qualify_posted_reset(stride)
         if stride.get('umac_register_trial'):qualify_umac_register(stride)
         if stride.get('first_failure_trial'):qualify_first_failure(stride,worker)
+        if stride.get('eager_memory_trial'):qualify_eager_memory(stride)
         runtime=components['WifiRuntimeMsiBinding.o']
         if runtime['sha256']!=stride['binding_sha256'] or sha(Path(runtime['path']))!=stride['binding_sha256']:
             raise ValueError('MAC/PHY runtime object differs')
@@ -267,6 +278,7 @@ def qualify(report_path,entry_path,runtime):
     result['posted_reset_trial']=report.get('posted_reset_trial') is True
     result['umac_register_trial']=report.get('umac_register_trial') is True
     result['first_failure_trial']=report.get('first_failure_trial') is True
+    result['eager_memory_trial']=report.get('eager_memory_trial') is True
     return result
 
 

@@ -1,5 +1,13 @@
 # Elden 基本可用实施计划
 
+2026-11-20合并实录：首次失效时PCIe端点、BAR/iATU/解码、时钟和PERST保持；变化在raw
+WLAON状态d→1d、warm位及CE3。MSI使能ffffffff是正常完整掩码，诊断−5不能当解码失败。
+[实录](evidence/wifi-first-failure-hardware-20261120.json)。实际原厂Host Capability表没有TLV33，
+准备代码却无条件声明按需内存；现仅Peach省略该扩展，保留原分配／请求／响应。
+86实际函数模型、128资格反例、整核签包通过，a7482ae7未实机。
+[修补](../drivers/EldenWifi/peach/EAGER-MEMORY.md)／[构建](evidence/wifi-eager-memory-20261120.json)。
+下一轮一次WMI／扫描功能对照，根因仍未证明。stock已恢复，完整Goal active、Wi-Fi未联网。
+
 2026-11-20首失效合并观察候选已签：初始化完成和真实握手失败各采一次，21个raw BAR读数加
 47个已持有物理映射读数，保留逐项返回码；不增加唤醒／复位／映射，不读读后清零原因寄存器。
 13实际函数模型、119资格反例、整核和签包通过；ddd1352e未实机。

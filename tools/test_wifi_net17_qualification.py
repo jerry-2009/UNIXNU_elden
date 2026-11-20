@@ -265,6 +265,17 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated first-failure contract accepted: '+name)
+    if report.get('eager_memory_trial'):
+        for name in ('report','eager_memory_peach_only','eager_memory_reversible','eager_memory_oem_tlv33_absent',
+                     'eager_memory_memory_request_protocol_unchanged','eager_memory_no_firmware_power_ring_change',
+                     'eager_memory_vendor_commit','eager_memory_source_sha256','eager_memory_object_sha256'):
+            selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']
+            if name=='report':selected['eager_memory_trial']=False
+            elif name.endswith(('commit','sha256')):runtime[name]='0'*64
+            else:runtime[name]=False
+            try:qualify_components(selected)
+            except ValueError:cases+=1
+            else:raise AssertionError('Mutated eager-memory contract accepted: '+name)
     q=dict(profile='wifi-network-17',network_bridge=True,wifi_service=True,
         mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,
         segmented_memory=True,unique_memory=True,prefault_memory=True,mhi_runtime=True,
