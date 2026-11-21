@@ -10,6 +10,8 @@ def defs(p):return {n for n,v in global_symbols(Path(p)).items() if v[0]&0x0e}
 def refs(p):return {n for n,v in global_symbols(Path(p)).items() if not v[0]&0x0e}
 
 def qualify_runtime(r):
+    if r.get('oem_eapol_critical'):
+        return qualify_oem_eapol_critical(r)
     if r.get('station_ready'):
         return qualify_ready(r)
     if r.get('station_wire'):
@@ -42,6 +44,65 @@ def qualify_runtime(r):
         raise ValueError('Station native/binding differs')
     for name,digest in r['source_inputs'].items():
         if sha(ROOT/name)!=digest:raise ValueError('Station source pin differs: '+name)
+    return True
+
+
+def qualify_oem_eapol_critical(r):
+    fields = ['compiled', 'oem_eapol_critical', 'station_tx_critical',
+              'oem_flow_override', 'oem_high_priority_notify', 'no_board_ring_bank_clock_timeout_change',
+              'no_payload_logging']
+    if any(r.get(k) is not True for k in fields):
+        raise ValueError('Unqualified OEM EAPOL critical TX path')
+    if r.get('hardware_tested') is not False:
+        raise ValueError('An offline descriptor build cannot claim hardware acceptance')
+    if len(r.get('retained_objects', {})) != 125:
+        raise ValueError('OEM EAPOL TX did not retain the qualified station ring')
+    prior=r['base']
+    if (not prior.get('station_ready') or prior.get('oem_eapol_critical') or
+            any(prior.get(k) or r.get(k) for k in ('eapol_voice','oem_tcl_v1'))):
+        raise ValueError('Critical TX requires the original eight-byte HTT station baseline')
+    qualify_runtime(prior)
+    from StationOemEapolCritical import DP_SOURCE_SHA, dp_header, station
+    parent_source = Path(r['parent_source']).read_bytes()
+    expected_source = station(parent_source)
+    if (r['parent_source'] != prior['source'] or sha(r['parent_source']) != r['parent_source_sha256'] or
+            expected_source != Path(r['source']).read_bytes()):
+        raise ValueError('OEM EAPOL station source derivation differs')
+    original_dp = STA / 'upstream/WifiDp.h'
+    generated_dp = dp_header(original_dp.read_bytes())
+    if (sha(original_dp) != DP_SOURCE_SHA or generated_dp != Path(r['dp_header']).read_bytes() or
+            sha(r['dp_header']) != r['dp_header_sha256']):
+        raise ValueError('OEM TCL critical field derivation differs')
+    headers=dict(prior['consumed_inputs'])
+    headers.pop(prior['source'])
+    dp_paths=[path for path in headers if Path(path).name=='WifiDp.h']
+    if len(dp_paths)!=1 or headers.pop(dp_paths[0])!=DP_SOURCE_SHA:
+        raise ValueError('Missing original DP header')
+    expected_overlay = read(prior['base']['overlay'])
+    expected_overlay['roots'].append({
+        'type': 'file',
+        'name': dp_paths[0],
+        'external-contents': r['dp_header'],
+    })
+    if (read(r['overlay']) != expected_overlay or
+            sha(r['overlay']) != r['overlay_sha256'] or
+            r['command'].count('-ivfsoverlay') != 1 or
+            r['command'][r['command'].index('-ivfsoverlay') + 1] != r['overlay']):
+        raise ValueError('OEM TCL critical overlay differs')
+    if r['retained_objects']!=prior['retained_objects'] or r['consumed_inputs']!={**headers,r['source']:r['source_sha256'],r['dp_header']:r['dp_header_sha256']}:
+        raise ValueError('OEM TCL critical compile inputs differ')
+    for key, digest in (('source', 'source_sha256'), ('object', 'object_sha256')):
+        if sha(r[key]) != r[digest]:
+            raise ValueError('OEM critical station ' + key + ' changed')
+    for path, digest in {**r['retained_objects'], **r['consumed_inputs']}.items():
+        if sha(path) != digest:
+            raise ValueError('OEM critical input changed: ' + path)
+    binding = r['link'][r['link'].index('-o') + 1]
+    if sha(binding) != r['binding_sha256']:
+        raise ValueError('OEM critical combined binding changed')
+    for name, digest in r['source_inputs'].items():
+        if sha(ROOT / name) != digest:
+            raise ValueError('OEM critical source pin differs: ' + name)
     return True
 
 def qualify_ready(r):
@@ -192,12 +253,14 @@ def qualify_components(report):
     folder=Path(report['station_worker']['command'][report['station_worker']['command'].index('-o')+1]).parent
     qualify_native(report['station_worker'],folder)
     if parent['kernel_sha256']!=report['station_parent_kernel_sha256'] or report['profile']!='wifi-network-17':raise ValueError('Station parent differs')
-    original=report['station_runtime']
+    station_runtime=report['station_runtime']
+    while station_runtime.get('oem_eapol_critical'):station_runtime=station_runtime['base']
+    original=station_runtime
     while original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire') or original.get('station_ready'):original=original['base']
     if original['scan_parent']!=parent['portable_scan_runtime']:raise ValueError('Station scan chain differs')
     if report['network_bridge']!=parent['network_bridge'] or report['optional_runtime']!=parent['optional_runtime']:
         raise ValueError('Station OS bridge/rules changed')
-    if bool(report['station_runtime'].get('station_ready'))!=bool(report['service_assets'].get('helper_profile_ready')):
+    if bool(station_runtime.get('station_ready'))!=bool(report['service_assets'].get('helper_profile_ready')):
         raise ValueError('Readiness kernel/helper pairing differs')
     if report['entry_delta']!=7124 or report['original_apple_executables_hashed']!=30 or not report['original_physical_return_preserved']:
         raise ValueError('Station entry/return changed')

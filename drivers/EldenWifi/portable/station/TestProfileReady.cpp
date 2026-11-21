@@ -52,9 +52,36 @@ static void test_oem_metadata(const EldenPortableIo &io){
     eapol[13]=0x8e;
     assert(dpSend(dp,{io.owner,io.read,io.write},eapol,sizeof eapol));
     assert(dpdetail::get32(dp.tcl.va+12)==0x04010000);
-    assert(dpdetail::get32(dp.tcl.va+20)==1);
     dpTxStop(dp);
     live=false;
+}
+#endif
+#if ELDEN_TEST_OEM_EAPOL_CRITICAL
+static void test_oem_critical(const EldenPortableIo &io){
+    uint8_t version[8]={};
+    assert(httBuildVersionReq(version,sizeof version)==8);
+    dpTxSetup(dp,{io.owner,io.read,io.write},0,kDpPdevSingle,0,0);
+    uint8_t eapol[14]={};
+    eapol[12]=0x88;eapol[13]=0x8e;
+    assert(netQueuePut(tx_queue,eapol,sizeof eapol,true));
+    transmit();
+    assert(dpdetail::get32(dp.tcl.va+8)==0x300);
+    assert(dpdetail::get32(dp.tcl.va+12)==0x00010000);
+    assert(dpdetail::get32(dp.tcl.va+20)==0x07); // Legacy TID 0 with critical routing
+    sta.phy.qos=true;
+    assert(netQueuePut(tx_queue,eapol,sizeof eapol,true));
+    transmit();
+    assert(dpdetail::get32(dp.tcl.va+52)==0x77); // WMM TID 7 with critical routing
+    sta.authorized=true;
+    uint8_t ordinary[14]={};
+    ordinary[12]=0x08;
+    assert(netQueuePut(tx_queue,ordinary,sizeof ordinary,false));
+    transmit();
+    assert(dpdetail::get32(dp.tcl.va+72)==0);
+    assert(dpdetail::get32(dp.tcl.va+84)==1);
+    assert(!netQueueCount(tx_queue) && dp.tid==0);
+    sta.authorized=false;
+    dpTxStop(dp);
 }
 #endif
 
@@ -82,6 +109,9 @@ int main(){
     assert(!live&&!sta.authorized);station_turn(2);assert(station_began);
 #if ELDEN_TEST_OEM_METADATA
     test_oem_metadata(io);
+#endif
+#if ELDEN_TEST_OEM_EAPOL_CRITICAL
+    test_oem_critical(io);
 #endif
     elden_wifi_station_port_close(7);assert(!profile_ready);
     station_began=0;profile_pending=true;leave_pending=false;

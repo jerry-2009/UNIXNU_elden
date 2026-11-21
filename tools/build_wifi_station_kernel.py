@@ -18,7 +18,7 @@ def main():
     from wifi_station import qualify_runtime,qualify_native
     qualify_runtime(runtime);qualify_native(worker,a.native_build)
     original=runtime
-    while original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire') or original.get('station_ready'):original=original['base']
+    while original.get('oem_eapol_critical') or original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire') or original.get('station_ready'):original=original['base']
     if original['scan_parent']!=prior['portable_scan_runtime'] or core['base']!=prior['core'] or worker['base']!=prior['network_worker'] or core['assets']!=assets:
         raise ValueError('Station actual component parents differ')
     for name in ['native','kernel']:
@@ -66,7 +66,7 @@ def main():
     # Require all effective native/runtime pins to win; verify separately that
     # the signed helper/source has not changed in the asset qualifier.
     def live_inputs(value):
-        inherited=live_inputs(value['base']) if value.get('station_hif') or value.get('station_diagnostic') or value.get('station_wire') or value.get('station_ready') else {}
+        inherited=live_inputs(value['base']) if value.get('oem_eapol_critical') or value.get('station_hif') or value.get('station_diagnostic') or value.get('station_wire') or value.get('station_ready') else {}
         inherited.update(value['source_inputs']);return inherited
     inputs.update(live_inputs(runtime));inputs.update(worker['source_inputs'])
     for n,h in inputs.items():

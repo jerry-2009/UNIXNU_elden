@@ -43,7 +43,17 @@ def main():
             try:qualify_components(changed)
             except (ValueError,KeyError):count+=1
             else:raise AssertionError('Malformed station wire accepted: '+name)
-    if r['station_runtime'].get('station_ready'):
+    if r['station_runtime'].get('oem_eapol_critical'):
+        for name in ('critical-declaration','flow-override','high-priority-notify'):
+            changed=copy.deepcopy(r)
+            value=changed['station_runtime']
+            if name=='critical-declaration':value['station_tx_critical']=False
+            elif name=='flow-override':value['oem_flow_override']=False
+            else:value['oem_high_priority_notify']=False
+            try:qualify_components(changed)
+            except (ValueError,KeyError):count+=1
+            else:raise AssertionError('Malformed OEM critical TX declaration accepted: '+name)
+    elif r['station_runtime'].get('station_ready'):
         for name in ['ready-disabled','enqueue-as-ready','wrong-session-generation','unpaired-helper']:
             changed=copy.deepcopy(r);value=changed['station_runtime']
             if name=='ready-disabled':value['station_ready']=False

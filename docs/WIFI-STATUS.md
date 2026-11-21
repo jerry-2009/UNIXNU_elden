@@ -6,7 +6,7 @@
 
 八字节基线采用 legacy PHY，实际描述符 TID 为 0。成功供体的 10f-c 在该模式完成 WPA2，随后 10g 验证 DHCP 与网关。[小米 Pad 8 Pro 实录](https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/drivers/wifi.md#88-the-batched-tablet-test-list)
 
-WMM voice TID 7 和 OEM EAPOL critical flow override 是两套优先级/通知机制。尚需映射原厂临界包识别和半硬完成回调，不能只凭 EAPOL EtherType/软件队列布尔值宣称移植了 OEM 行为。尚未完成该派生分支的资格测试或构建。
+候选 `60ca685d` 在八字节 HTT 基线上仅为站点队列中的 EAPOL 增加 critical flow override 和 semi-hard notify。保持原 TCL 元数据及 legacy TID 0。真实站点队列到描述符的主机测试、ARM64 整核及签名审查已通过，发送回执仍需实机确认。[派生与范围](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md)
 
 成功参考是[小米Pad8Pro lenzhang](https://github.com/lenzhang/UniXNU-xiaomipad8pro)，
 固定2438556c，其记录有WPA2／DHCP／公网、睡眠及固件崩溃恢复实证。

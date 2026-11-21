@@ -17,4 +17,8 @@ python tools/build_wifi_station_tx_priority.py --oem-metadata \
 
 用 Apple clang 运行了 `TestProfileReady.cpp` 的 `ELDEN_TEST_OEM_METADATA` 分支，直接包含生成的 station 源码。它核对 4 字节请求，确认 PDEV 2 不能启用当前单 PDEV 发送路径，使用 PDEV 1 启用后实际入环的描述符第 3 字为 `0x04010000`、第 5 字保持 TID 0。寄存器与 DMA 在这项测试中由宿主模型提供。
 
-原厂 `send_setup_install_key_cmd_tlv` 的固定体为 100 字节，与现有 donor 的 25 字匹配。密钥、计数器和完成事件状态的位置也已按原厂函数核对。下一轮沿同一 WPA2 状态机验收。
+原厂 `send_setup_install_key_cmd_tlv` 的固定体为 100 字节，与现有 donor 的 25 字匹配。密钥、计数器和完成事件状态的位置也已按原厂函数核对。
+
+单字 HTT 候选实测在第二轮扫描前退回。新的发送候选使用八字节 HTT 和原 TCL 元数据，在已有 EAPOL 控制端口发送路径提交 critical flow override 与 semi-hard notify。Legacy 保持 TID 0，WMM 仍用 TID 7。分类来自当前站点发送队列，范围为 EAPOL，原厂通用 critical 分类仍由其上层决定。
+
+用 `--oem-eapol-critical` 从同一 profile-ready 父构建，再按 station 路径合成和审查。测试执行真实队列到 TCL 发送函数，核对 legacy、WMM 和后续普通数据，并确认 HTT 长度及 TX 元数据保持。该测试用宿主 MMIO/DMA。签名实测候选为 `60ca685d`，会话 `e29fe911571aa175`。
