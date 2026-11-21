@@ -1,7 +1,6 @@
 # 充电当前状态 · 2026-11-21
 
-断链恢复版已有签名候选 `ed063e4b`，源码 `13508ff`，session `916665e1c3e24274`。
-CiscoMac 与工作台的静态审查一致，工作台镜像 SHA-256 匹配，回滚索引仍为 1738713600／0／3。
+最新空目录 clean build 候选 SHA `89d37ae3c38a1053805a0ecb3c0b90423ace65dddde632204474f6cf6b9a426a`，session `7825ecbd7e13597e`；之前独立签名候选是 `ed063e4b`，session `916665e1c3e24274`。两者回滚索引均为 1738713600／0／3，均通过静态审查，尚未刷入。
 断链后的原厂放行、双口净充、物理旁路及保护周期仍待实机验收。[复现与候选](../profiles/charge-link-recovery/README.md)
 
 从空输出目录的完整 build_clean.py --charge-link-recovery 构建已通过，28 阶段包含 firmware、loader、entry、signed boot 和独立 AVB 静态审查。BaseCrypto 994 个文件的官方 v1.1.3 manifest 均经 SHA 校验，并复制到临时 EDK II package path，外部解压目录未修改。详细结果见[clean-build 证据](evidence/clean-charge-link-20261121.json)。

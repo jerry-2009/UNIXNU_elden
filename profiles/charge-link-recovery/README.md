@@ -66,6 +66,8 @@ run passed through all 28 stages. It staged the hash-locked 994-file CryptoBin
 release under the exported Mu Platforms/EldenBaseCrypto package path, then built
 and independently audited the signed boot. The output was not flashed. Hardware
 checks remain pending. See [clean-build evidence](../../docs/evidence/clean-charge-link-20261121.json).
+The clean candidate SHA-256 is `89d37ae3c38a1053805a0ecb3c0b90423ace65dddde632204474f6cf6b9a426a`,
+session `7825ecbd7e13597e`, rollback `1738713600/0/3`.
 
 For an existing **source-built** address17 parent:
 
