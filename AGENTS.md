@@ -8,13 +8,11 @@
 ## 当前事实
 
 - Wi-Fi portable扫描实机通过：32BSS（cap32）、113管理帧、HTT6环、CE24/24/drop0。
-- 最新61f9066f/sessionfa7b794966c5f32c实机OEM格式收到peer确认21ms；VDEV/auth/assoc/
-  iOS17桥和helper message2通过。4EAPOL RX／4TX提交、完成0/ACK0、keys0/port0。
-  本轮快照TCL HP32/TP8、WBM0/0；前轮TCL消费3是独立结果，不能混作本轮终态。未联网。
-- 协议stop超时；独立BM-off/transaction-idle/MSI4/PERST/真实fastboot与完整stock/root/
-  green/原充电无线扫描设置恢复通过。全部设备任务结束。完整Goal active/incomplete。
+- 最新Wi-Fi实机通过PMK准入及VDEV/auth/assoc；上一轮原候选提交1个EAPOL message2，TCL已消费、WBM/keys/port仍为0。本机OEM HTT/TCL新候选待实机测试。
+- 当前Y700离线。最近一次候选结束于真实fastboot，stock Android、root、green及原充电／无线／扫描设置均已恢复。
+- 断链恢复充电profile完整28阶段空目录clean build与静态签名审查通过，未刷机。双口净充、物理旁路和保护阈值周期仍待实机验收。
 - Mac本周清理／文档整合已完成（137旧产物+18临时内容进原生Trash，未清空）。
-  下一步核OEM／成功donor数据TX路由/bank/VDEV响应物理MAC/描述符，不重复wire/wake/credit/BAR。
+  Wi-Fi下一步对照固定成功donor的HTT、TCL和WBM完成路径，不重复wire/wake/credit/BAR探针。离线RTC owner仍待真实持久NVMEM与alarm provider。
 
 ## 执行边界
 

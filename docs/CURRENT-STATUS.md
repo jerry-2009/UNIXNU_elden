@@ -16,18 +16,18 @@ Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚�
 | CPU／RAM | 八核实际online/work/timers/ipis=ff；本轮诊断RAM6GiB，GUI8GiB有独立实录 | 全16GB、安全地址压力验证；不要强制全核满载 |
 | UFS／Data | 多槽IRQ/DMA与自动空闲唤醒已有实机；2GiB sparse Data独立GUI路径通过 | 诊断仍用旧RAM Data；持久Data、完整应用容量与压力 |
 | USB／回程 | 内核CDC日志、会话绑定RPC、panic定时SDAM返回fastboot，完整stock恢复 | 断线／异常供电长期恢复 |
-| 电源 | 本机原厂ADSP/GLINK/PD与BMS、单短口供电及模式请求已有实录 | 双口净充、稳定旁路、80%与40–60%完整周期和持久化 |
-| Wi-Fi | SM8750成功donor移植：32个BSS、真实VDEV/auth/assoc、iOS17桥；OEM命令格式收到peer确认21ms | EAPOL message2已生成，WBM完成0，keys0/port0；WPA2、DHCP、流量、重连／睡眠 |
+| 电源 | 原厂ADSP/GLINK/PD与BMS、单短口供电及模式请求有实录；断链恢复版完整28阶段源码clean build和静态签名审查通过 | 双口净充、稳定旁路、80%与40–60%完整周期和持久化，候选未实机测试 |
+| Wi-Fi | SM8750成功donor移植：扫描、VDEV/auth/assoc与iOS17桥；原TID0候选有PMK准入、peer确认、EAPOL message2提交 | 最新本机OEM HTT/TCL候选待实机验收；WBM回执、message3/keys、DHCP和流量 |
 | 蓝牙 | 原厂HCI／用户态与扫描链已有阶段性记录，Settings选项可见 | 配对、双向数据、持续使用／睡眠 |
-| 其他外设 | offline-peripheral-fixes独立成果，GPU独立工作树 | 主线评审／集成／实机；马达和喇叭未经校准保持禁用 |
+| 其他外设 | offline-peripheral-fixes有笔/触觉/运动/RTC/相机离线交付；GPU另在独立工作树 | 主线逐项评审及实机；RTC NVMEM/alarm provider未绑定，马达和喇叭未经实测校准保持禁用 |
 
 上一轮实机源码提交 `c62a26e`，session `80ad897d6443755d`。本轮 build-only 源码为 `0a72509`。message 3、密钥、端口授权和网络流量仍未通过。按成功供体的 legacy 模式及本机原厂 HTC/WMI/DMA 完成契约继续核对。[Wi-Fi 状态](WIFI-STATUS.md)
 扫描通过来自前一份[8ecacf44实录](evidence/wifi-portable-scan-hardware-20261120.json)，不是host模型。
 
-平板已完整恢复stock Android、root、green、原充电／无线／扫描设置并请求熄屏。所有设备任务已结束。
+平板已由用户带走；离开前完整恢复stock Android、root、green及原充电／无线／扫描设置，并请求熄屏。
 协议teardown超时，独立BM-off／transaction idle／MSI4／PERST-low和物理fastboot通过；
 暖 MHI 复位待验证。最新日志 441810 B，观测掉字计数最高 87，无重连。设备已由用户带走，进入离线阶段。
 
 源码唯一入口是本仓main。新克隆在工作台research，研究笔记在lab/reference-reviews。
-完整 Goal active，Y700 目前离线。接回后优先测试新 OEM HTT/TCL 候选及 WPA2→DHCP/流量，再按有效窗口验收充电断链恢复与双口净充。
+完整 Goal active，Y700 目前离线。接回后优先测试新 OEM HTT/TCL 候选及 WPA2→DHCP/流量，再按有效窗口验收充电断链恢复与双口净充。RTC离线owner未合入主线，且没有硬件持久化/闹钟验收。
 Mac Trash与文档整合已完成，恢复清单见[维护记录](MAINTENANCE.md)。后续真机测试合并功能点，不重复已通过探针。
