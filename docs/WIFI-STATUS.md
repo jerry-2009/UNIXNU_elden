@@ -2,7 +2,7 @@
 
 最新实机确认 PMK 就绪、PEER_ASSOC 21ms、收到并提交各 1 个 EAPOL。TCL 快照 HP=TP=8 words，WBM HP=TP=0，密钥与受控端口仍为零。原厂 Android、root、green、原充电与无线设置已恢复。[本轮实录](evidence/wifi-station-tx-priority-hardware-20261121.json)
 
-本轮关联采用 legacy PHY，实际描述符 TID 为 0。WMM 模式下才会采用候选的 EAPOL TID 7 分支。固定成功供体的 10f-c 在 legacy 模式完成 WPA2，两个 EAPOL 完成项由固件返回，随后 10g 验证 DHCP 与网关。当前沿该成功组合核查本机 OEM 发送分类与固件完成返回路径。[小米 Pad 8 Pro 实录](https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/drivers/wifi.md#88-the-join-and-the-data-path)
+本轮关联采用 legacy PHY，实际描述符 TID 为 0。WMM 模式下才会采用候选的 EAPOL TID 7 分支。固定成功供体的 10f-c 在 legacy 模式完成 WPA2，两个 EAPOL 完成项由固件返回，随后 10g 验证 DHCP 与网关。当前沿该成功组合核查本机 OEM 发送分类与固件完成返回路径。[小米 Pad 8 Pro 实录](https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/drivers/wifi.md#88-the-batched-tablet-test-list)
 
 成功参考是[小米Pad8Pro lenzhang](https://github.com/lenzhang/UniXNU-xiaomipad8pro)，
 固定2438556c，其记录有WPA2／DHCP／公网、睡眠及固件崩溃恢复实证。
@@ -21,6 +21,8 @@ macOS27系统ABI与Y700固件不整包覆盖。
 | 回程 | 独立BM-off/idle/MSI4/PERST-low、真实fastboot与完整stock恢复通过 | station协议drain超时仍保留 |
 
 当前候选 `9c9fc5d3`，源码 `c62a26e`，session `80ad897d6443755d`，floor 1738713600／0／3。CiscoMac 的 ARM64 对象、整核、20 项拒绝用例及签名包静态审查通过。增量入口为 `tools/build_wifi_station_tx_priority.py`，沿用原 PMK 就绪 runtime2。四份旧构建输入逐字恢复了冻结的 CRLF，Git 保留原字节。
+
+下一轮候选 `3f8f74e1` 已在 CiscoMac 构建并签名，源码 `6a573e6`，session `2471600257fe1d70`。静态审查通过，回滚索引为 1738713600／0／3，21 项错误组合均被拒绝。平板已离线，等待实机验收。[OEM HTT/TCL 适配](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md)
 
 实际OEM模块排除隐式RBM：相关helper为ret，TCL0→WBM0/RBM5与donor一致。
 单设备vdev-ID检查和物理MAC选择有差异，尚未证明是TX原因；没有因此猜写bank。
