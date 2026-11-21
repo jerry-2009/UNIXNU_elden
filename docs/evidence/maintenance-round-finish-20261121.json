@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-21",
+  "scope": "Finish the requested weekly Mac cleanup after the complete station wire trial",
+  "prior_weekly_cleanup": "maintenance-macos-20261121.json",
+  "prior_artifact_items": 137,
+  "prior_extra_items": 18,
+  "additional_items": 3,
+  "additional_logical_bytes": 20285247,
+  "additional_items_description": [
+    "Temporary OEM module transfer in /private/tmp; original Windows input retained",
+    "Failed runtime1 compile directory; successful runtime2 and all final dependencies retained",
+    "Regenerable host wire-test.dSYM; executable and test logs retained"
+  ],
+  "native_trash": true,
+  "full_hash_inode_verified": true,
+  "permanent_deletion": false,
+  "trash_emptying": false,
+  "space_freed_claimed": false,
+  "final_candidate_dependencies_retained": true,
+  "mac_source_synced_before_closure": "49d374cea514cd7448f28d7841317ff2a4147b54",
+  "source_refresh_fast_forward_only": true,
+  "current_document_entry": "docs/INDEX.md",
+  "historical_document_archive": "docs/archive/20261121",
+  "source_worktree_branches_preserved": true,
+  "gpu_and_other_peripheral_worktrees_untouched": true,
+  "restore_manifest": "workbench maintenance/cleanup-20261121/round-finish/verified-receipts.json",
+  "current_device_result": "wifi-station-wire-hardware-20261121.json",
+  "device_restored_stock_root_green_original_settings": true,
+  "all_trial_build_device_listener_jobs_terminal": true,
+  "goal": "active and incomplete",
+  "mac_free_kib_at_receipt": 62166920
+}

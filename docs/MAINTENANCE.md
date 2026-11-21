@@ -91,3 +91,12 @@ Mac原生Trash回收137项旧产物（21.25GiB allocated）及18项小型一次�
 [摘要证据](evidence/maintenance-macos-20261121.json)；完整恢复清单在工作台
 maintenance/cleanup-20261121/mac-evidence/{verified-receipts,finish-receipts}.json。
 当前候选、回退、原OS/固件/Crypto/签名、GUI/电源/Data及其他工作树保留。
+
+本轮完整station测试结束后又回收3项：/private/tmp的OEM反汇编输入、未成功的runtime1
+目录和host wire-test.dSYM，共20,285,247B逻辑文件。原始输入、成功runtime2/kernel1/
+entry1/package1、host执行件及日志保留，逐文件SHA/inode一致；仍未清空Trash。
+追加恢复清单为工作台maintenance/cleanup-20261121/round-finish/verified-receipts.json。
+[收尾证据](evidence/maintenance-round-finish-20261121.json)单独保存，不改最初回收凭据。
+Mac主源码已仅快进到已发布49d374c；当前文档与实录同步，固定构建快照保持自己的指纹。
+收尾时数据卷约59.3GiB可用，垃圾桶继续占空间。所有本轮构建/设备/监听任务结束，
+平板已恢复完整stock Android/root/green/原充电无线扫描设置并请求熄屏。完整Goal仍未完成。
