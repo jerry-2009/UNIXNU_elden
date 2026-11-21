@@ -1,6 +1,6 @@
 # Elden 当前状态 · 2026-11-21
 
-最新 Wi-Fi 源码候选 `3f8f74e1` 已在 CiscoMac clean build 环境签名并通过静态审查，设备离线，尚未实机测试。上一轮 `9c9fc5d3` 在 PMK 就绪后提交 1 个 EAPOL message 2，TCL 已消费，WBM/keys/port 均为 0，设备已完整恢复 Android。[离线候选](evidence/clean-charge-link-20261121.json) · [最近实机记录](evidence/wifi-station-tx-priority-hardware-20261121.json)
+最新 Wi-Fi 源码候选 `3f8f74e1` 已在 CiscoMac clean build 环境签名并通过静态审查，设备离线，尚未实机测试。上一轮 `9c9fc5d3` 在 PMK 就绪后提交 1 个 EAPOL message 2，TCL 已消费，WBM/keys/port 均为 0，设备已完整恢复 Android。[候选实现与构建步骤](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md) · [最近实机记录](evidence/wifi-station-tx-priority-hardware-20261121.json)
 
 充电断链恢复 profile 的完整 28 阶段空目录 clean build 也已通过。BaseCrypto 994 个固定输入逐件校验并以包路径复制到临时 EDK II workspace，signed boot 通过静态 AVB/rollback 审核。它没有刷入设备，不能视为充电功能验收。
 Mac本周整理已完成，137项旧产物及18项临时内容仅入Trash，未清空。
