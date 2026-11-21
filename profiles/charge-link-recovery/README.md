@@ -52,9 +52,10 @@ Hardware acceptance is pending. [Original build evidence](../../docs/evidence/ch
 The updated kernel passed 34 charge reconnect scenarios and both existing
 window and policy suites with ASan and UBSan. CiscoMac rebuilt both ARM64
 consumers over the existing address17 parent, linked the kernel and verified
-the entry derivative. The CiscoMac Python environment lacks the existing
-build tool's `Crypto` import, so packaging stopped before signing. The
-previous signed images predate automatic recovery on GLINK reconnect.
+the entry derivative. Packaging used a hash-verified PyCryptodome wheel
+extracted into the temporary build directory for that invocation. The signed
+image `f68f681d` (session `f642cda0d1e652d5`, rollback `1738713600/0/3`) passed
+static admission and Windows copy verification. Hardware acceptance is pending.
 [Updated build evidence](../../docs/evidence/charge-link-auto-stock-20261122.json)
 
 ## Rebuild

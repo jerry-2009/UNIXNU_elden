@@ -22,8 +22,23 @@
     "changed_entry_bytes": 38,
     "entry_stub_bytes": 104,
     "object_compile_logs_empty": true,
-    "signed_boot": false,
-    "packaging_error": "Existing Python environment cannot import Crypto"
+    "packaging_initial_error": "Existing Python environment could not import Crypto",
+    "packaging_dependency": {
+      "wheel": "pycryptodome-3.23.0-cp37-abi3-macosx_10_9_universal2.whl",
+      "sha256": "187058ab80b3281b1de11c2e6842a357a1f71b42cb1e15bce373f3d238135c27",
+      "isolated_temporary_import": true
+    }
+  },
+  "boot": {
+    "source_commit": "6b1dbef",
+    "image_sha256": "f68f681d8e39078e7e47dade0f906b6f56f96bbd712ded0b12234185b472c084",
+    "session": "f642cda0d1e652d5",
+    "rollback_index": 1738713600,
+    "footer_location": 0,
+    "parent_boot_chain_location": 3,
+    "accepted_static": true,
+    "windows_copy_sha256_verified": true,
+    "workbench_directory": "edl_work/charge-link-auto-stock-20261122"
   },
   "hardware_tested": false,
   "device_written": false,
