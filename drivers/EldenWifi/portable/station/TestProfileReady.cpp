@@ -21,6 +21,43 @@ static int message(void *,uint64_t session,const void *data,uint32_t){
     }
     return send_error;
 }
+#if ELDEN_TEST_OEM_METADATA
+static void test_oem_metadata(const EldenPortableIo &io){
+    uint8_t version[8];
+    std::memset(version,0xff,sizeof version);
+    assert(!httBuildVersionReq(version,3));
+    assert(httBuildVersionReq(version,sizeof version)==4);
+    assert(dpdetail::get32(version)==0 && dpdetail::get32(version+4)==0xffffffff);
+    assert(eldenOemTclMetadata(3,1)==0x40d);
+
+    uint8_t event[44]={};
+    WmiWriter wire;
+    wmiBegin(wire,event,sizeof event,kWmiEvtVdevStartResp);
+    uint8_t *reply=wmiStruct(wire,kWmiTagVdevStartRespEvent,9);
+    assert(reply);
+    for(uint32_t target : {2u,1u}){
+        sta.step=kStaVdevStart;
+        sta.vdevStartSent=true;
+        wmiPut(reply,6,target);
+        assert(hook(nullptr,kWmiEvtVdevStartResp,event+4,wmiEnd(wire)-4,10));
+        sta.assocAnswered=true;
+        sta.assocStatus=0;
+        sta.step=kStaAssociated;
+        sta.vdevUp=true;
+        follow(11);
+        assert(dp.txReady==(target==1));
+    }
+    uint8_t eapol[14]={};
+    eapol[12]=0x88;
+    eapol[13]=0x8e;
+    assert(dpSend(dp,{io.owner,io.read,io.write},eapol,sizeof eapol));
+    assert(dpdetail::get32(dp.tcl.va+12)==0x04010000);
+    assert(dpdetail::get32(dp.tcl.va+20)==1);
+    dpTxStop(dp);
+    live=false;
+}
+#endif
+
 int main(){
     int owner;EldenStationPort port={&owner,take,give,message};assert(!elden_wifi_station_port_install(&port));
     uint8_t mac[6]={2,1,2,3,4,5};void *memory=std::aligned_alloc(4u<<20,4u<<20);assert(memory);
@@ -43,6 +80,9 @@ int main(){
     assert(!elden_wifi_station_port_receive(7,ready,sizeof ready)&&profile_ready);
     // ACK does not authorize a port or create a peer/association by itself.
     assert(!live&&!sta.authorized);station_turn(2);assert(station_began);
+#if ELDEN_TEST_OEM_METADATA
+    test_oem_metadata(io);
+#endif
     elden_wifi_station_port_close(7);assert(!profile_ready);
     station_began=0;profile_pending=true;leave_pending=false;
     assert(!elden_wifi_station_port_open(9));synchronous=true;port_profile();

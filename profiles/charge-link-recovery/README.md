@@ -36,8 +36,12 @@ no warnings; inherited linker warnings remain in the evidence.
 
 The qualifier rejects an old or missing consumer, a stale state-header alias,
 an altered object, or a native identity declaration not bound to its artifact.
-See [evidence](../../docs/evidence/charge-link-recovery-20261119.json).
-This result is **not packaged, flashed, or hardware accepted**.
+The original evidence covers the native build. The subsequent entry, signing
+and static audit produced boot SHA-256
+`ed063e4be3be281c62cf27d655a21facf0f2e01be0f00a2a1fe3edab0e45fdae`,
+session `916665e1c3e24274` and rollback contract `1738713600/0/3`.
+The workbench receipt is `edl_work/charge-link-20261119/package-publication.json`.
+Hardware acceptance is pending. [Original build evidence](../../docs/evidence/charge-link-recovery-20261119.json)
 
 ## Rebuild
 
@@ -58,8 +62,8 @@ or private retained CryptoBin package is required.
 `--charge-link-recovery` implies window handoff and verification. It requires the
 qualified Bluetooth/address17 baseline and rejects mixed PD, backlight, CPU, UFS,
 translation and 2GiB Data experiments. The full new combined empty-output command
-has not run; the component build, full native link and prelink have run. Packaging
-and the normal fresh-device/floor/readback/return/restoration checks remain ahead.
+is pending. The component build, full native link, prelink, signing and static
+audit have run. Fresh-device, readback, return and restoration are hardware checks.
 
 For an existing **source-built** address17 parent:
 

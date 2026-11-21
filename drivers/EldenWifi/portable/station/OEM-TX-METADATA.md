@@ -14,3 +14,7 @@ python tools/build_wifi_station_tx_priority.py --oem-metadata \
 ~~~
 
 随后按 [完整 station](README.md) 链接整核并运行资格检查。CiscoMac 输出 ARM64 绑定 `bfe30098`、内核 `ce445c6a`、签名 boot `3f8f74e1`。21 项错误组合被拒绝，30 个原始 Apple 执行区及入口返回通过审查。下一次实机先确认本轮发送元数据和 WBM 来源，再通过 message 3/4、密钥、授权及 DHCP 和流量判定连通。
+
+用 Apple clang 运行了 `TestProfileReady.cpp` 的 `ELDEN_TEST_OEM_METADATA` 分支，直接包含生成的 station 源码。它核对 4 字节请求，确认 PDEV 2 不能启用当前单 PDEV 发送路径，使用 PDEV 1 启用后实际入环的描述符第 3 字为 `0x04010000`、第 5 字保持 TID 0。寄存器与 DMA 在这项测试中由宿主模型提供。
+
+原厂 `send_setup_install_key_cmd_tlv` 的固定体为 100 字节，与现有 donor 的 25 字匹配。密钥、计数器和完成事件状态的位置也已按原厂函数核对。下一轮沿同一 WPA2 状态机验收。
