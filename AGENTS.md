@@ -1,6 +1,7 @@
 # UniXNU Elden 工作规则
 
 本仓 `D:\Desktop\Git\UniXNU_elden` main 为唯一有效源码；配套工作台为Patch/Y700-Elden。
+简版交接含 CiscoMac 和工作区入口。[basic-agents.md](basic-agents.md)
 最新实况见[CURRENT-STATUS](docs/CURRENT-STATUS.md)、[PLAN](docs/PLAN.md)、[WIFI-STATUS](docs/WIFI-STATUS.md)。
 全部旧AGENTS流水记录已原样归档到docs/archive/20261121/AGENTS-source-20261121.md，历史SHA保持。
 

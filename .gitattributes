@@ -24,3 +24,8 @@ docs/archive/20261121/** -text -whitespace
 drivers/EldenCpuPower/upstream/** -text -whitespace
 drivers/EldenWifi/net/upstream17/** -text -whitespace
 drivers/EldenWifi/net/tests/upstream/** -text -whitespace
+# These files are byte-pinned by the original portable Wi-Fi build reports.
+drivers/EldenWifi/portable/upstream/source.json -text -whitespace
+drivers/EldenWifi/portable/station/upstream/source.json -text -whitespace
+drivers/EldenWifi/portable/station/StationRuntimeSource.py -text -whitespace
+drivers/EldenWifi/portable/station/StationWireSource.py -text -whitespace
