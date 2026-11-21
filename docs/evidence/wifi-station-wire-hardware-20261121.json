@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-21",
+  "hardware_tested": true,
+  "source_commit": "0573b38",
+  "image_sha256": "61f9066fa6cb26c102528454ce5426072635acef3f4e8ceecd06d40f9e134a53",
+  "session": "fa7b794966c5f32c",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "raw": {
+    "path": "edl_work/live-station-wire-20261121/usb/20261121-002456.bin",
+    "bytes": 354403,
+    "sha256": "3ca7de74b0b8db6292e1469e974709eb8b92a7cf0db2b5772b84b593bc6f8224",
+    "drop_max": 2,
+    "status_samples": 89,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "build": {
+    "runtime": "runtime2",
+    "kernel": "kernel1",
+    "entry": "entry1",
+    "package": "package1",
+    "binding_sha256": "a57efb1789508fc61663a517f0888b43d02c363c1e567ae811d2482c018db4bc",
+    "kernel_sha256": "bc12ef0ea47e828b83d7c80e6e582295cb3b9de27d478d7562834181d75ca2f9",
+    "scalar_cpp_warnings": 0,
+    "original_apple_executables_hashed": 30,
+    "entry_delta": 7124,
+    "qualification_mutations": 16,
+    "host_codec_cases_over_100000": true,
+    "hardware_not_implied_by_host": true
+  },
+  "replies": [
+    "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 STATION_REPLY kind/status-or-confirmed/ms 00000003 00000000 000000bb",
+    "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 STATION_REPLY kind/status-or-confirmed/ms 00000007 00000001 00000015"
+  ],
+  "eapol_tx": [
+    "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 EAPOL_TX message/bytes 00000002 00000079",
+    "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 EAPOL_TX message/bytes 00000002 00000079",
+    "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 EAPOL_TX message/bytes 00000002 00000079",
+    "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 EAPOL_TX message/bytes 00000002 00000079"
+  ],
+  "observations": {
+    "MODE_REPLY": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 MODE_REPLY pdev/status/configured/mappings 00000000 00000000 00000001 00000000",
+    "TX_STATE": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 TX_STATE submitted/completed/acked TCL-own/device WBM-own/device ready peer/hw/m 00000004 00000000 00000000 00000004 00000008 00000000 00000000 00000001 00000002 0000001b 00000001 0000001b 0000000b 00000001",
+    "TCL_CONFIG": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 TCL_CONFIG base/msb/id/misc/tp-lo/tp-hi/HP/TP 11d77800 00020000 00000008 00000042 11d77000 00000000 00000020 00000008",
+    "WBM_CONFIG": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 WBM_CONFIG base/msb/id/misc/hp-lo/hp-hi/HP/TP 11d78000 00020000 00008008 000000c0 11d77004 00000000 00000000 00000000",
+    "TX_CONTRACT": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 TX_CONTRACT bank-config/id/frequency/up/RSN/HTTmajor/minor/wake/MHIcontrol/statu 00004a04 00000000 00001464 00000001 00000001 00000003 0000008a 00000001 00000200 00000201",
+    "TX_DESC": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 TX_DESC metadata-only words2..7 00000000 00010000 00000087 00000001 00b0001b 00000000"
+  },
+  "final_state": "ELDEN_ATH12K level=4 ELDEN_STATION stage=714 error=0 failed=0 start=1 auth=1 assoc=1 port=0 keys=0 RX=4 TX=4 EAPOL=4/4 done=0 ack=0",
+  "vdev_start_accepted": true,
+  "authentication_accepted": true,
+  "association_accepted": true,
+  "peer_assoc_confirmation_accepted": true,
+  "peer_assoc_confirmation_ms": 21,
+  "no_claim_previous_codec_was_the_only_failure": true,
+  "helper_message2_generated": true,
+  "eapol_message3_received": false,
+  "tx_completion_accepted": false,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "snapshot": {
+    "tcl_host_words": 32,
+    "tcl_device_words": 8,
+    "tcl_misc": "00000042",
+    "wbm_host_words": 0,
+    "wbm_device_words": 0,
+    "bank": "00004a04",
+    "htt_version": [
+      3,
+      138
+    ]
+  },
+  "snapshot_not_terminal_ring_state": true,
+  "protocol_stop_accepted": false,
+  "warm_mhi_reset_accepted": false,
+  "physical_fence": "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+  "shutdown_umac_refusal": "At controlled stop after ~200s, original observation latches UMAC timeout; not evidence of the first data-TX cause.",
+  "full_stock_root_green_original_settings_restored": true,
+  "all_device_jobs_terminal": true,
+  "next": "Audit OEM data-TX routing/bank and missing physical MAC fields in VDEV_START response against fixed successful donor. Do not repeat wire-only or wake-only tests.",
+  "goal": "active and incomplete"
+}

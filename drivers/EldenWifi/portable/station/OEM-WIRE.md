@@ -59,3 +59,12 @@ Workbench source/disassembly evidence:
 Final prepared build: `wifi-station-wire-20261121/runtime2` and `kernel1`.
 The initial compile rejected an explicit integer narrowing in the new
 metadata observer; it was fixed before any signing or device write.
+
+The full trial is now complete: VDEV/auth/association pass and the genuine
+peer-association confirmation arrived after21ms. Four EAPOL message2 replies
+were generated and submitted; WBM completion0/ACK0, no message3/keys/port.
+The one TX snapshot was TCL HP32/TP8, WBM0/0. This is not the preceding
+candidate's TCL consumed3 snapshot. Codec completion is accepted; network
+completion remains unaccepted. Physical fence, fastboot/full stock/root/
+green/original settings restoration pass; protocol drain timeout and late
+shutdown UMAC refusal remain distinct. See [hardware result](../../../../docs/evidence/wifi-station-wire-hardware-20261121.json).

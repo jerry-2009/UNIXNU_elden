@@ -89,6 +89,7 @@ The consolidated TX trial proves TCL consumption3, WBM completion0 and
 status0/configured1 from the real mode response. HIF lifetime is already
 accepted. The loaded OEM has newer VDEV_START/UP and PEER_ASSOC envelopes;
 the prepared [OEM wire adaptation](OEM-WIRE.md) adds only their proven
-lengths and disabled non-MLO tails. Its codec and full build checks pass;
-hardware WPA2/DHCP/traffic acceptance is still pending. Old donor blobs and
+lengths and disabled non-MLO tails. The real peer-association confirmation
+now returns in21ms; helper message2 is generated, but TX/WBM completion0
+and WPA2/DHCP/traffic remain unaccepted. Old donor blobs and
 older candidate/result hashes remain unchanged.

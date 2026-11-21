@@ -7,13 +7,13 @@
 ## 当前事实
 
 - Wi-Fi portable扫描实机通过：32BSS（cap32）、113管理帧、HTT6环、CE24/24/drop0。
-- 最新1a7a7133/session43cd42ead32ff3bd实机VDEV/auth/assoc和iOS17桥通过；模式status0/
-  configured1，HIF引用生效。3EAPOL RX／3TX提交，TCL消费3描述符（HP=TP24words），
-  WBM HP=TP0、完成0/ACK0、keys0/port0，WPA2/DHCP/流量未通过。TCL消费非RF证明。
+- 最新61f9066f/sessionfa7b794966c5f32c实机OEM格式收到peer确认21ms；VDEV/auth/assoc/
+  iOS17桥和helper message2通过。4EAPOL RX／4TX提交、完成0/ACK0、keys0/port0。
+  本轮快照TCL HP32/TP8、WBM0/0；前轮TCL消费3是独立结果，不能混作本轮终态。未联网。
 - 协议stop超时；独立BM-off/transaction-idle/MSI4/PERST/真实fastboot与完整stock/root/
   green/原充电无线扫描设置恢复通过。全部设备任务结束。完整Goal active/incomplete。
 - Mac本周清理／文档整合已完成（137旧产物+18临时内容进原生Trash，未清空）。
-  下一步核本机OEM／成功donor TCL→TQM→WBM返回buffer路由/bank/描述符，不重复wake/credit/BAR。
+  下一步核OEM／成功donor数据TX路由/bank/VDEV响应物理MAC/描述符，不重复wire/wake/credit/BAR。
 
 ## 执行边界
 
