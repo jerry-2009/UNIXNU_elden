@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-22",
+  "profile": "charge-link-recovery",
+  "scope": "incremental ARM64 rebuild over frozen address17 parent",
+  "host": {
+    "reconnect_scenarios": 34,
+    "automatic_stock_recovery_scenarios": 4,
+    "window_scenarios": 18,
+    "base_policy_checks": 146,
+    "artifact_qualification_tests": 8,
+    "sanitizers": ["ASan", "UBSan"],
+    "firmware_behavior_modeled": true
+  },
+  "macos": {
+    "host": "CiscoMac",
+    "changed_native_objects": 2,
+    "changed_core_objects": 0,
+    "scalar": true,
+    "native_sha256": "4c2729ae92eb4559e6901af3d9a8f5016dc090e830ca9eaa87631d6aa076e9db",
+    "kernel_sha256": "4aef53a079cbf57a67e7305980e4f782f4b4db80ae9c3a70d7fa8f0da165fc9b",
+    "entry_derivative_sha256": "3f5cef0f4e2c60777e824a5ff56f19bc7cae94bab33e27550f75d9493d25832b",
+    "changed_entry_bytes": 38,
+    "entry_stub_bytes": 104,
+    "object_compile_logs_empty": true,
+    "signed_boot": false,
+    "packaging_error": "Existing Python environment cannot import Crypto"
+  },
+  "hardware_tested": false,
+  "device_written": false,
+  "toolchain_install": false
+}

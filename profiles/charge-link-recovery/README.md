@@ -13,6 +13,12 @@ refused before queue insertion restores the previous ownership fact. The real
 `adspSend()` returns errors before inserting a message; zero means queued, not
 successful DSP execution.
 
+The current source cancels a bypass request when PMIC GLINK loses its epoch.
+On reconnect it restores the original automatic window and releases any
+manual inhibit the prior request may have applied. This runs even if the
+host cannot send a cleanup RPC. A new bypass request requires fresh telemetry
+from the new epoch. A request still queued on the old epoch is discarded.
+
 Normal/EU window selection and hysteresis remain owned by the original firmware.
 The policy still requires the existing fresh complete readback before publishing
 an applied mode. An effective charging value of zero after release can be a
@@ -42,6 +48,14 @@ and static audit produced boot SHA-256
 session `916665e1c3e24274` and rollback contract `1738713600/0/3`.
 The workbench receipt is `edl_work/charge-link-20261119/package-publication.json`.
 Hardware acceptance is pending. [Original build evidence](../../docs/evidence/charge-link-recovery-20261119.json)
+
+The updated kernel passed 34 charge reconnect scenarios and both existing
+window and policy suites with ASan and UBSan. CiscoMac rebuilt both ARM64
+consumers over the existing address17 parent, linked the kernel and verified
+the entry derivative. The CiscoMac Python environment lacks the existing
+build tool's `Crypto` import, so packaging stopped before signing. The
+previous signed images predate automatic recovery on GLINK reconnect.
+[Updated build evidence](../../docs/evidence/charge-link-auto-stock-20261122.json)
 
 ## Rebuild
 

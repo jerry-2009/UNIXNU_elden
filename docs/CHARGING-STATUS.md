@@ -19,6 +19,11 @@ ArmadaOS 的 `0903` 添加了电池恒流限制。TB322FC 原厂 Android 的对�
 恢复；已经发送的 stock 命令只等待回读。模拟串口验证了掉线、重连、恢复及回程命令的顺序。
 断开主机 USB 的这项保护与候选内的 PMIC GLINK 断链恢复分别验收。[操作说明](../profiles/charge-link-recovery/README.md)
 
+PMIC GLINK 断链后，旧候选可能重放已选旁路。主线现在取消旧旁路请求，重新连接并取得合格
+遥测后恢复原厂窗口及可能残留的手动停充状态。这条路径可独立于主机恢复命令运行。34 项
+主机断链场景及 CiscoMac ARM64 整核链接通过。新版停在签名前，现有 `89d37ae3` 签名镜像
+仍是旧实现。[构建证据](evidence/charge-link-auto-stock-20261122.json)
+
 最新空目录 clean build 候选 SHA `89d37ae3c38a1053805a0ecb3c0b90423ace65dddde632204474f6cf6b9a426a`，session `7825ecbd7e13597e`；之前独立签名候选是 `ed063e4b`，session `916665e1c3e24274`。两者回滚索引均为 1738713600／0／3，均通过静态审查，尚未刷入。
 断链后的原厂放行、双口净充、物理旁路及保护周期仍待实机验收。[复现与候选](../profiles/charge-link-recovery/README.md)
 

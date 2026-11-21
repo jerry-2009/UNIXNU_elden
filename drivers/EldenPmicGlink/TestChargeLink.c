@@ -81,6 +81,20 @@ int main(void){
     assert(!s.manual_inhibit_possible);assert(!elden_charge_policy_select(&s,EldenChargeStock));
     elden_charge_policy_link(&s,false);elden_charge_policy_link(&s,true);settle(&s,&f);
     assert(!f.manual&&!f.enable_writes&&!f.disable_writes);cases++;
+    /* The host may disappear along with GLINK. Recover without a fresh RPC,
+     * including a break before the ACK and a break after confirmed bypass. */
+    for(unsigned state=0;state<4;state++){
+        setup(&s,&f,0,5500);select_mode(&s,&f,EldenChargeWindow4060);
+        inhibit_request(&s,&f,state);
+        elden_charge_policy_link(&s,false);
+        elden_charge_policy_link(&s,true);settle(&s,&f);
+        assert(s.applied_mode==EldenChargeStock&&f.window==95100);
+        assert(!s.manual_inhibit_possible&&!f.manual&&f.enabled);
+        assert(f.enable_writes==(state!=3)&&f.disable_writes==(state!=3));
+        select_mode(&s,&f,EldenChargeBypass);
+        assert(f.manual&&f.disable_writes==1u+(state!=3));
+        cases++;
+    }
 #endif
     printf("PASS %u actual charge-policy reconnect scenarios; partial writes and original threshold ownership\n",cases);
     return 0;

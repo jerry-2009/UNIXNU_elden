@@ -1,4 +1,4 @@
-"""Retain possible ownership of manual charge inhibit across transport loss.
+"""Recover manual charge inhibit across transport loss.
 
 The frozen v139/v140 inputs remain unchanged. Both the policy and its native
 consumer must be rebuilt with header() for this explicit derived variant.
@@ -33,6 +33,14 @@ def policy():
     text = replace(original.decode("utf-8"),
                    "if(s->applied_mode==EldenChargeBypass){",
                    "if(s->manual_inhibit_possible){")
+    text = replace(text, "    if(up){++s->epoch;if(s->requested_mode)++s->request_sequence;}", """    if(up){
+        ++s->epoch;
+        if(s->requested_mode)++s->request_sequence;
+    }else if(s->requested_mode==EldenChargeBypass){
+        /* Do not re-enter manual inhibit after a broken transport. Restore
+         * the original automatic window and release any inhibit we may own. */
+        s->requested_mode=EldenChargeStock;
+    }""")
     old = "    s->last_opcode=op;s->last_property=prop;s->last_value=value;s->pending=true;return 24;"
     new = """    if(op==0x61&&prop==28&&value==0){
         s->manual_inhibit_before_send=s->manual_inhibit_possible;
@@ -57,6 +65,39 @@ def policy():
 
 
 def client():
-    # Its existing transport callback calls unsent only on a known failed send.
-    # Recompile this actual consumer with the derived header, never an old object.
-    return verified_client()
+    text = verified_client().decode("utf-8")
+    text = replace(text, """    if (__atomic_exchange_n(&linkUp,up,__ATOMIC_ACQ_REL)!=up)
+        __atomic_add_fetch(&linkEpoch,1,__ATOMIC_RELEASE);""", """    if (__atomic_exchange_n(&linkUp,up,__ATOMIC_ACQ_REL)!=up) {
+        __atomic_store_n(&policyAvailable,0,__ATOMIC_RELEASE);
+        __atomic_add_fetch(&linkEpoch,1,__ATOMIC_RELEASE);
+    }""")
+    old = """            if(policyEnable==1){elden_charge_policy_link(&chargePolicy,false);elden_charge_policy_link(&chargePolicy,nowUp);}"""
+    text = replace(text, old, """            if(policyEnable==1){
+                const unsigned request=__atomic_load_n(&policyRequestSequence,__ATOMIC_ACQUIRE);
+                if(request!=policySeenRequest && __atomic_load_n(&policyRequested,__ATOMIC_ACQUIRE)==EldenChargeBypass)
+                    policySeenRequest=request;
+                elden_charge_policy_link(&chargePolicy,false);
+                elden_charge_policy_link(&chargePolicy,nowUp);
+            }""")
+    old = """                if(available&&!__atomic_load_n(&policyAvailable,__ATOMIC_ACQUIRE)){
+                    __atomic_store_n(&policyAvailable,1,__ATOMIC_RELEASE);"""
+    text = replace(text, old, """                IOLockLock(lock);
+                const bool publishReady=available&&__atomic_load_n(&linkUp,__ATOMIC_ACQUIRE)&&
+                    __atomic_load_n(&linkEpoch,__ATOMIC_ACQUIRE)==seen&&
+                    !__atomic_load_n(&policyAvailable,__ATOMIC_ACQUIRE);
+                if(publishReady)__atomic_store_n(&policyAvailable,1,__ATOMIC_RELEASE);
+                IOLockUnlock(lock);
+                if(publishReady){""")
+    old = """    if(!__atomic_load_n(&policyAvailable,__ATOMIC_ACQUIRE))return -2;
+    __atomic_store_n(&policyRequested,mode,__ATOMIC_RELEASE);
+    __atomic_add_fetch(&policyRequestSequence,1,__ATOMIC_RELEASE);"""
+    text = replace(text, old, """    if(!__atomic_load_n(&policyAvailable,__ATOMIC_ACQUIRE))return -2;
+    IOLockLock(lock);
+    if(!__atomic_load_n(&policyAvailable,__ATOMIC_ACQUIRE)){
+        IOLockUnlock(lock);
+        return -2;
+    }
+    __atomic_store_n(&policyRequested,mode,__ATOMIC_RELEASE);
+    __atomic_add_fetch(&policyRequestSequence,1,__ATOMIC_RELEASE);
+    IOLockUnlock(lock);""")
+    return text.encode("utf-8")
