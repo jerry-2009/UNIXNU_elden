@@ -8,11 +8,11 @@
 ## 当前事实
 
 - Wi-Fi portable扫描实机通过：32BSS（cap32）、113管理帧、HTT6环、CE24/24/drop0。
-- 最新Wi-Fi实机通过PMK准入及VDEV/auth/assoc；上一轮原候选提交1个EAPOL message2，TCL已消费、WBM/keys/port仍为0。本机OEM HTT/TCL新候选待实机测试。
-- 当前Y700离线。最近一次候选结束于真实fastboot，stock Android、root、green及原充电／无线／扫描设置均已恢复。
-- 断链恢复充电profile完整28阶段空目录clean build与静态签名审查通过，未刷机。双口净充、物理旁路和保护阈值周期仍待实机验收。
+- 最新 Wi-Fi 实机 `3f8f74e1` 首轮被动扫描启动，第二轮未启动，UMAC `-110`。八字节 HTT 基线通过 PMK/VDEV/auth/assoc，TCL 消费 1 个 EAPOL message 2，WBM/keys/port 为 0。成功 donor 在 legacy WPA2 使用 TID 0，收到 message 3/4 并通过 DHCP。
+- 最新候选已返回真实 fastboot，整像读回核对通过，stock Android、root、green 及原充电／无线／扫描设置已恢复。
+- 断链恢复充电 profile 已在空输出目录完成28阶段clean build并通过静态签名审查，未刷机。双口净充、物理旁路和保护阈值周期仍待实机验收。
 - Mac本周清理／文档整合已完成（137旧产物+18临时内容进原生Trash，未清空）。
-  Wi-Fi下一步对照固定成功donor的HTT、TCL和WBM完成路径，不重复wire/wake/credit/BAR探针。离线RTC owner仍待真实持久NVMEM与alarm provider。
+  Wi-Fi 从八字节 HTT 基线继续，优先对照本机 OEM 与成功 donor 的 TX/WBM 完成路径。离线 RTC owner 仍缺真实持久 NVMEM 与 alarm provider。
 
 ## 执行边界
 

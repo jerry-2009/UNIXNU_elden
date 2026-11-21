@@ -1,8 +1,12 @@
-# Wi-Fi当前主线 · 2026-11-21
+# Wi-Fi当前主线 · 2026-11-22
 
-最新实机确认 PMK 就绪、PEER_ASSOC 21ms、收到并提交各 1 个 EAPOL。TCL 快照 HP=TP=8 words，WBM HP=TP=0，密钥与受控端口仍为零。原厂 Android、root、green、原充电与无线设置已恢复。[本轮实录](evidence/wifi-station-tx-priority-hardware-20261121.json)
+最新实机候选 `3f8f74e1` 启动了第一轮被动扫描。HTT 版本及六个 RX 环已通告，第二轮扫描未启动，同一时段 UMAC 访问 `0x1b86400` 超时（`-110`），最终停在 `state=612 error=-8`。本轮未到达 station 交接或 EAPOL 发送。原厂 Android、root、green、原充电与无线设置已恢复。[本轮实录](evidence/wifi-station-oem-metadata-hardware-20261122.json)
 
-本轮关联采用 legacy PHY，实际描述符 TID 为 0。WMM 模式下才会采用候选的 EAPOL TID 7 分支。固定成功供体的 10f-c 在 legacy 模式完成 WPA2，两个 EAPOL 完成项由固件返回，随后 10g 验证 DHCP 与网关。当前沿该成功组合核查本机 OEM 发送分类与固件完成返回路径。[小米 Pad 8 Pro 实录](https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/drivers/wifi.md#88-the-batched-tablet-test-list)
+八字节 HTT 请求的上一轮已通过第二轮扫描、PMK 准入及 21 ms 的 PEER_ASSOC，收到并提交各 1 个 EAPOL。TCL 快照 HP=TP=8 words，WBM HP=TP=0，密钥与受控端口仍为零。[八字节 HTT 基线实录](evidence/wifi-station-tx-priority-hardware-20261121.json)
+
+八字节基线采用 legacy PHY，实际描述符 TID 为 0。成功供体的 10f-c 在该模式完成 WPA2，随后 10g 验证 DHCP 与网关。[小米 Pad 8 Pro 实录](https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/drivers/wifi.md#88-the-batched-tablet-test-list)
+
+WMM voice TID 7 和 OEM EAPOL critical flow override 是两套优先级/通知机制。尚需映射原厂临界包识别和半硬完成回调，不能只凭 EAPOL EtherType/软件队列布尔值宣称移植了 OEM 行为。尚未完成该派生分支的资格测试或构建。
 
 成功参考是[小米Pad8Pro lenzhang](https://github.com/lenzhang/UniXNU-xiaomipad8pro)，
 固定2438556c，其记录有WPA2／DHCP／公网、睡眠及固件崩溃恢复实证。
@@ -16,18 +20,18 @@ macOS27系统ABI与Y700固件不整包覆盖。
 | portable扫描 | 两轮，32保留BSS（上限32）、113管理帧、HTT6环、CE24/24/drop0 | [scan](evidence/wifi-portable-scan-hardware-20261120.json) |
 | station与iOS桥 | VDEV/auth/assoc，stage714；iOS桥start0；helper精确签名准入 | [station](evidence/wifi-portable-station-hardware-20261121.json) |
 | 本机OEM命令格式 | station peer确认21ms；helper生成4次message2 | [wire](evidence/wifi-station-wire-hardware-20261121.json) |
-| EAPOL发送完成／密钥 | 当前 TCL 消费 1，WBM 完成 0，keys0／port0 | [本轮](evidence/wifi-station-tx-priority-hardware-20261121.json) · [早期独立轮次](evidence/wifi-station-tx-hardware-20261121.json) |
+| EAPOL发送完成／密钥 | 八字节基线 TCL 消费 1，WBM 完成 0，keys0／port0 | [基线](evidence/wifi-station-tx-priority-hardware-20261121.json) · [早期独立轮次](evidence/wifi-station-tx-hardware-20261121.json) |
 | WPA2／DHCP／流量／重连／睡眠 | 未完成 | 下一次综合窗口 |
 | 回程 | 独立BM-off/idle/MSI4/PERST-low、真实fastboot与完整stock恢复通过 | station协议drain超时仍保留 |
 
-当前候选 `9c9fc5d3`，源码 `c62a26e`，session `80ad897d6443755d`，floor 1738713600／0／3。CiscoMac 的 ARM64 对象、整核、20 项拒绝用例及签名包静态审查通过。增量入口为 `tools/build_wifi_station_tx_priority.py`，沿用原 PMK 就绪 runtime2。四份旧构建输入逐字恢复了冻结的 CRLF，Git 保留原字节。
+八字节基线候选 `9c9fc5d3`，源码 `c62a26e`，session `80ad897d6443755d`，floor 1738713600／0／3。CiscoMac 的 ARM64 对象、整核、20 项拒绝用例及签名包静态审查通过。增量入口为 `tools/build_wifi_station_tx_priority.py`，沿用原 PMK 就绪 runtime2。四份旧构建输入逐字恢复了冻结的 CRLF，Git 保留原字节。
 
-下一轮候选 `3f8f74e1` 已在 CiscoMac 构建并签名，源码 `6a573e6`，session `2471600257fe1d70`。静态审查通过，回滚索引为 1738713600／0／3，21 项错误组合均被拒绝。平板已离线，等待实机验收。[OEM HTT/TCL 适配](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md)
+已实测候选 `3f8f74e1`，源码 `6a573e6`，session `2471600257fe1d70`。候选与恢复镜像均通过整像读回校验，回滚索引为 1738713600／0／3。单字 HTT 版本请求是扫描回退的待验证因素。下一轮沿用八字节 HTT 基线，从单一 TX 改动开始，合并扫描、关联、WBM、WPA2、DHCP 和流量验收。[OEM HTT/TCL 适配](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md)
 
 实际OEM模块排除隐式RBM：相关helper为ret，TCL0→WBM0/RBM5与donor一致。
 单设备vdev-ID检查和物理MAC选择有差异，尚未证明是TX原因；没有因此猜写bank。
 命令格式的新增字段与尾部数组来自已加载模块的尺寸/指令，原donor blob保持。
-本轮受控退出仍协议drain超时，晚期UMAC refusal和真实物理fence通过分开记录。
+八字节基线受控退出有协议 drain 超时。最新 OEM 候选记录了物理 fastboot 和完整原厂恢复。
 
 复现源码及准确依赖：[portable scan](../drivers/EldenWifi/portable/README.md)、
 [完整station](../drivers/EldenWifi/portable/station/README.md)。基础从零build已单独验收；

@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-22",
+  "hardware_tested": true,
+  "source_commit": "6a573e6",
+  "session": "2471600257fe1d70",
+  "boot_nonce": "9971123109daea70",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "image_sha256": "3f8f74e113dc65566c29c0dfe74cbd316dd865b890addbf86c3ebe99cecd6748",
+  "full_readback_sha256": "3f8f74e113dc65566c29c0dfe74cbd316dd865b890addbf86c3ebe99cecd6748",
+  "raw_path": "edl_work/live-station-oem-metadata-20261122/usb/20261121-161857.bin",
+  "raw_sha256": "11b27924cd7a257346ec47e1af2d9423469a59bd76166086810febb4ac18b41e",
+  "raw_bytes": 304811,
+  "scan_round_1": {
+    "started": true,
+    "completed": false
+  },
+  "scan_round_2": {
+    "started": false,
+    "completed": false,
+    "htt_rx_rings_announced": 6,
+    "umac_access_error": -110,
+    "umac_access_offset": "0x1b86400",
+    "portable_state": 612,
+    "portable_error": -8
+  },
+  "station_handoff_reached": false,
+  "eapol_tx_submitted": 0,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "raw_line_ranges": [
+    [
+      1583,
+      1595
+    ],
+    [
+      1663,
+      1793
+    ],
+    [
+      2482,
+      2484
+    ]
+  ],
+  "working_scan_baseline": "wifi-station-tx-priority-hardware-20261121.json",
+  "regression_cause_confirmed": false,
+  "physical_fastboot": true,
+  "full_readback_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "stock_boot_root_green_and_settings_verified": true,
+  "restore_local_time": "2026-11-22T00:21:32+08:00",
+  "supervisor_complete": true
+}

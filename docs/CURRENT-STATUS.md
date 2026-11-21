@@ -1,6 +1,6 @@
-# Elden 当前状态 · 2026-11-21
+# Elden 当前状态 · 2026-11-22
 
-最新 Wi-Fi 源码候选 `3f8f74e1` 已在 CiscoMac clean build 环境签名并通过静态审查，设备离线，尚未实机测试。上一轮 `9c9fc5d3` 在 PMK 就绪后提交 1 个 EAPOL message 2，TCL 已消费，WBM/keys/port 均为 0，设备已完整恢复 Android。[候选实现与构建步骤](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md) · [最近实机记录](evidence/wifi-station-tx-priority-hardware-20261121.json)
+最新 Wi-Fi 候选 `3f8f74e1` 已实测。首轮被动扫描启动，第二轮未启动，当时 UMAC 访问超时。上一轮八字节 HTT 基线 `9c9fc5d3` 到达关联和 EAPOL message 2 提交，TCL 已消费，WBM/keys/port 均为 0。[本轮实录](evidence/wifi-station-oem-metadata-hardware-20261122.json) · [八字节 HTT 基线实录](evidence/wifi-station-tx-priority-hardware-20261121.json)
 
 充电断链恢复 profile 的完整 28 阶段空目录 clean build 也已通过。BaseCrypto 994 个固定输入逐件校验并以包路径复制到临时 EDK II workspace，signed boot 通过静态 AVB/rollback 审核。它没有刷入设备，不能视为充电功能验收。
 Mac本周整理已完成，137项旧产物及18项临时内容仅入Trash，未清空。
@@ -17,17 +17,15 @@ Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚�
 | UFS／Data | 多槽IRQ/DMA与自动空闲唤醒已有实机；2GiB sparse Data独立GUI路径通过 | 诊断仍用旧RAM Data；持久Data、完整应用容量与压力 |
 | USB／回程 | 内核CDC日志、会话绑定RPC、panic定时SDAM返回fastboot，完整stock恢复 | 断线／异常供电长期恢复 |
 | 电源 | 原厂ADSP/GLINK/PD与BMS、单短口供电及模式请求有实录；断链恢复版完整28阶段源码clean build和静态签名审查通过 | 双口净充、稳定旁路、80%与40–60%完整周期和持久化，候选未实机测试 |
-| Wi-Fi | SM8750成功donor移植：扫描、VDEV/auth/assoc与iOS17桥；原TID0候选有PMK准入、peer确认、EAPOL message2提交 | 最新本机OEM HTT/TCL候选待实机验收；WBM回执、message3/keys、DHCP和流量 |
+| Wi-Fi | SM8750成功donor移植：扫描、VDEV/auth/assoc与iOS17桥；原TID0候选有PMK准入、peer确认、EAPOL message2提交 | 本机 OEM HTT/TCL 候选出现第二轮扫描回退。基线仍缺 WBM 回执、message 3/keys、DHCP 和流量 |
 | 蓝牙 | 原厂HCI／用户态与扫描链已有阶段性记录，Settings选项可见 | 配对、双向数据、持续使用／睡眠 |
 | 其他外设 | offline-peripheral-fixes有笔/触觉/运动/RTC/相机离线交付；GPU另在独立工作树 | 主线逐项评审及实机；RTC NVMEM/alarm provider未绑定，马达和喇叭未经实测校准保持禁用 |
 
-上一轮实机源码提交 `c62a26e`，session `80ad897d6443755d`。本轮 build-only 源码为 `0a72509`。message 3、密钥、端口授权和网络流量仍未通过。按成功供体的 legacy 模式及本机原厂 HTC/WMI/DMA 完成契约继续核对。[Wi-Fi 状态](WIFI-STATUS.md)
+最新实机源码为 `6a573e6`，session `2471600257fe1d70`。下一轮沿用通过扫描和关联的八字节 HTT 基线，核对本机与成功供体的 TX 完成路径。[Wi-Fi 状态](WIFI-STATUS.md)
 扫描通过来自前一份[8ecacf44实录](evidence/wifi-portable-scan-hardware-20261120.json)，不是host模型。
 
-平板已由用户带走；离开前完整恢复stock Android、root、green及原充电／无线／扫描设置，并请求熄屏。
-协议teardown超时，独立BM-off／transaction idle／MSI4／PERST-low和物理fastboot通过；
-暖 MHI 复位待验证。最新日志 441810 B，观测掉字计数最高 87，无重连。设备已由用户带走，进入离线阶段。
+北京时间 11 月 22 日 00:21:32，实测候选已返回物理 fastboot，并完成 stock Android 整像回读及 root、green、原充电／无线／扫描设置恢复。监督进程已结束。
 
 源码唯一入口是本仓main。新克隆在工作台research，研究笔记在lab/reference-reviews。
-完整 Goal active，Y700 目前离线。接回后优先测试新 OEM HTT/TCL 候选及 WPA2→DHCP/流量，再按有效窗口验收充电断链恢复与双口净充。RTC离线owner未合入主线，且没有硬件持久化/闹钟验收。
+完整 Goal 仍在进行。下一次 Wi-Fi 窗口合并扫描、关联、发送完成、WPA2、DHCP 与流量验收。充电断链恢复和双口净充仍待实机。RTC 离线 owner 未合入主线，持久化与闹钟仍待硬件验收。
 Mac Trash与文档整合已完成，恢复清单见[维护记录](MAINTENANCE.md)。后续真机测试合并功能点，不重复已通过探针。
