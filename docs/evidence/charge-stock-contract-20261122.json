@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-22",
+  "board": "TB322FC",
+  "os": "stock Android",
+  "verified_boot": "green",
+  "observations": {
+    "soc_percent": 100,
+    "battery_status": "full",
+    "battery_voltage_uv": [
+      4456000,
+      4453000
+    ],
+    "battery_current_ua": 0,
+    "battery_driver": "qti_battery_charger",
+    "charge_control_limit_ua": 6500000,
+    "charge_control_limit_max_ua": 13000000,
+    "both_charge_control_limit_files_read_only": true,
+    "ucsi_connectors_online": [
+      1,
+      1
+    ],
+    "ucsi_connector_2_contract_voltage_uv": 5000000,
+    "ucsi_connector_2_reported_current_ua": 3000000,
+    "qti_usb_type": "SDP",
+    "qti_usb_voltage_uv": 4984000,
+    "qti_usb_current_ua": 47000,
+    "qti_usb_input_current_limit_ua": 500000,
+    "inline_meter_sample": false
+  },
+  "sources": {
+    "armadaos_revision": "d4c3b13a96c5fca9899368e141da2620e9b42e98",
+    "armadaos_charge_limit_patch": "packages/kernel/patches/0903-power-supply-qcom-battmgr-expose-the-charge-current-limit.patch",
+    "tb322fc_linux_revision": "bf96c3d4048973298ede78487177c6f1b4f6bc0f",
+    "tb322fc_linux_charge_limit_change": "8644bba2785496bdaebd9c50034f60352422c11b",
+    "tb322fc_linux_usb_role_change": "162315e856e3c12f9b606139700c562670d45d8d",
+    "stock_reference": "lab/records/lenovo-power-official-20261108/turbo-boo__android_kernel_lenovo_sm8750-qti_battery_charger.c",
+    "sheng_report_revision": "c477570bb91b2971f90919f3e59d0f056cf0a1de",
+    "sheng_report": "reports/sheng-linux-charge-734.json"
+  },
+  "candidate": {
+    "session": "7825ecbd7e13597e",
+    "sha256": "89d37ae3c38a1053805a0ecb3c0b90423ace65dddde632204474f6cf6b9a426a",
+    "hash_rechecked": true,
+    "hardware_tested": false
+  },
+  "device_reads_only": true,
+  "charging_settings_changed": false
+}

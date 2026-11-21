@@ -33,6 +33,25 @@ UCSI 即时分发表也有同一上界，默认路径返回 `0x202`。已有 v13
 固定四代 Linux 的 `qcom_smbx.c` 仅定义 `INPUT_PRIORITY_BIT`，所查文件无使用处。
 该旧直接 PMIC 驱动不是本机 PMIH 寄存器映射证据，不能猜测平移到 `0x2962` 写入。
 
+## 四代参考与原厂对照（2026-11-22）
+
+- ArmadaOS `0903` 通过 `BATTMGR_BAT_PROPERTY_SET`（`0x31`）写入
+  `BATT_CHG_CTRL_LIM`（10），并读取 10／11。补丁描述把电池恒流设为 0 的旁路用法。
+  本机原厂运行的是 `qti_battery_charger`，两个对应 sysfs 文件权限均为只读，实读
+  6,500,000／13,000,000 µA。原厂源码的内部写路径会施加温控和限制策略，
+  sysfs 可写的 start/end threshold 是另一条接口。复制 Linux 写法前需要证明原厂固件
+  如何聚合恒流限额、恢复后是否保留温控限制，以及系统负载是否确由适配器承担。
+  [ArmadaOS 0903](https://github.com/ArmadaOS-Freedom/armadaos-freedom/blob/d4c3b13a96c5fca9899368e141da2620e9b42e98/packages/kernel/patches/0903-power-supply-qcom-battmgr-expose-the-charge-current-limit.patch) · [原厂实录](evidence/charge-stock-contract-20261122.json)
+- 四代 Linux 的 `162315e856e3c` 实机区分手柄、PC 和纯电源伙伴，令无 USB 能力的
+  电源伙伴释放数据 mux。`bf96c3d404897` 把共享 DWC3 数据角色切换移入工作队列，
+  保留长边数据优先。其作用范围是数据角色与共享 PHY/mux。短边输入是否承担系统负载
+  仍需测量。[四代实机记录](https://github.com/h0cheung/tb322fc-linux-kernel/commit/162315e856e3c12f9b606139700c562670d45d8d)
+- 四代 `ucsi/psy.c` 用 PD RDO 的工作电流实现 `current_now`。原厂满电快照的
+  第二连接器报告 5 V／3 A，聚合 USB 报 SDP／500 mA 限额，电池为 0 mA。
+  三者分别用于判断合同、输入限额和电池端状态。Sheng 也将原厂 ADSP、USB 电源
+  与电池读数分别采集，其 CDP 实录只用于核对采集结构。
+  [Sheng 充电记录](https://github.com/UniXNU/UniXNU-sheng/blob/c477570bb91b2971f90919f3e59d0f056cf0a1de/reports/sheng-linux-charge-734.json)
+
 ## 证据与复现
 
 [核对结果](evidence/dual-input-contract.json)保存完整输入 SHA、12 个指令检查、
