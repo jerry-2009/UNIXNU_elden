@@ -1,6 +1,8 @@
 # Elden 当前状态 · 2026-11-21
 
-最新候选 `9c9fc5d3` 已实机确认 PMK 就绪、PEER_ASSOC 21ms、EAPOL RX/TX 各 1。TCL 快照 HP=TP=8 words，WBM 仍为零。实机走 legacy PHY，EAPOL 描述符采用 TID 0。[最新实录](evidence/wifi-station-tx-priority-hardware-20261121.json)
+最新 Wi-Fi 源码候选 `3f8f74e1` 已在 CiscoMac clean build 环境签名并通过静态审查，设备离线，尚未实机测试。上一轮 `9c9fc5d3` 在 PMK 就绪后提交 1 个 EAPOL message 2，TCL 已消费，WBM/keys/port 均为 0，设备已完整恢复 Android。[离线候选](evidence/clean-charge-link-20261121.json) · [最近实机记录](evidence/wifi-station-tx-priority-hardware-20261121.json)
+
+充电断链恢复 profile 的完整 28 阶段空目录 clean build 也已通过。BaseCrypto 994 个固定输入逐件校验并以包路径复制到临时 EDK II workspace，signed boot 通过静态 AVB/rollback 审核。它没有刷入设备，不能视为充电功能验收。
 Mac本周整理已完成，137项旧产物及18项临时内容仅入Trash，未清空。
 
 Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚未完成WPA2／DHCP／可用流量。
@@ -19,7 +21,7 @@ Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚�
 | 蓝牙 | 原厂HCI／用户态与扫描链已有阶段性记录，Settings选项可见 | 配对、双向数据、持续使用／睡眠 |
 | 其他外设 | offline-peripheral-fixes独立成果，GPU独立工作树 | 主线评审／集成／实机；马达和喇叭未经校准保持禁用 |
 
-实机源提交 `c62a26e`，session `80ad897d6443755d`。当前仍缺 message 3、密钥和端口授权。按成功供体的 legacy 模式与固件 EAPOL 完成路径继续核对。[Wi-Fi 状态](WIFI-STATUS.md)
+上一轮实机源码提交 `c62a26e`，session `80ad897d6443755d`。本轮 build-only 源码为 `0a72509`。message 3、密钥、端口授权和网络流量仍未通过。按成功供体的 legacy 模式及本机原厂 HTC/WMI/DMA 完成契约继续核对。[Wi-Fi 状态](WIFI-STATUS.md)
 扫描通过来自前一份[8ecacf44实录](evidence/wifi-portable-scan-hardware-20261120.json)，不是host模型。
 
 平板已完整恢复stock Android、root、green、原充电／无线／扫描设置并请求熄屏。所有设备任务已结束。
@@ -27,5 +29,5 @@ Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚�
 暖 MHI 复位待验证。最新日志 441810 B，观测掉字计数最高 87，无重连。设备已由用户带走，进入离线阶段。
 
 源码唯一入口是本仓main。新克隆在工作台research，研究笔记在lab/reference-reviews。
-完整Goal active，当前重点为数据发送完成→WPA2→DHCP／流量；之后回到电源剩余验收。
+完整 Goal active，Y700 目前离线。接回后优先测试新 OEM HTT/TCL 候选及 WPA2→DHCP/流量，再按有效窗口验收充电断链恢复与双口净充。
 Mac Trash与文档整合已完成，恢复清单见[维护记录](MAINTENANCE.md)。后续真机测试合并功能点，不重复已通过探针。

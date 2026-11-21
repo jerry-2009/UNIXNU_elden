@@ -4,13 +4,14 @@
 CiscoMac 与工作台的静态审查一致，工作台镜像 SHA-256 匹配，回滚索引仍为 1738713600／0／3。
 断链后的原厂放行、双口净充、物理旁路及保护周期仍待实机验收。[复现与候选](../profiles/charge-link-recovery/README.md)
 
+从空输出目录的完整 build_clean.py --charge-link-recovery 构建已通过，28 阶段包含 firmware、loader、entry、signed boot 和独立 AVB 静态审查。BaseCrypto 994 个文件的官方 v1.1.3 manifest 均经 SHA 校验，并复制到临时 EDK II package path，外部解压目录未修改。详细结果见[clean-build 证据](evidence/clean-charge-link-20261121.json)。
+
 2026-11-19充电断链修复：旧v140在SET28=0已排队、但旁路完成前断链时会漏清手动禁止充电。
 新独立策略保存“可能已禁止”的事实，只有有效SET28=1成功ACK才清除；已知未入队发送失败则
 回退。实际旧24／新30重连场景、18窗口场景、146检查和ASan/UBSan通过；固件行为仍是模型。
 两件原生对象均绑定同一新增状态头、完整内核通过；8项打包资格测试及实际导入／导出／30个
 Apple执行区／入口7124／菜单ADT信任审查通过，编译0警告、原有链接10警告保留。
 [复现入口](../profiles/charge-link-recovery/README.md)及[证据](evidence/charge-link-recovery-20261119.json)。
-原始报告记录的是整核完成时的状态。后续独立完成了 entry、签名和静态审查，完整空目录 build 命令仍待验证。
 实机功能验收应按同机接线、SOC 和实际电池电流记录双口数据、电源状态与恢复过程。
 
 2026-11-19重新核对四份历史实机日志与完整stock恢复摘要。v144低背光798的

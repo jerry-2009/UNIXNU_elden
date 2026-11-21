@@ -1,0 +1,34 @@
+{
+  "date": "2026-11-21",
+  "source_commit": "6c54f8a",
+  "profile": "charge-link-recovery",
+  "source_root_clean_build": true,
+  "completed_stage_count": 28,
+  "build_state_sha256": "fc090623d9e40a74f321caad1b80fb70eb98d79f2f562be28f9d74d26434e580",
+  "source_identity_sha256": "9bff1f9e78d45256da9504252cc9dc4ad3b18b4b857c336891613caa28efba28",
+  "firmware": {
+    "bytes": 4194304,
+    "sha256": "c71d1596d686e366e3901c904f2345c751bd5c87173a4ab5e211d22e20739284",
+    "returncode": 0,
+    "all_executable_bytes_equal": true,
+    "cryptobin_release": "Microsoft Project Mu CryptoBin v1.1.3",
+    "cryptobin_manifest_sha256": "46beb5b88ea589988f8596a8cd1ceb2284cfe9a6b04a51fb252ec46771ec0ca2",
+    "cryptobin_verified_files": 994,
+    "cryptobin_staged_package": "Platforms/EldenBaseCrypto",
+    "cryptobin_staged_sha_verified": true
+  },
+  "boot": {
+    "accepted_static": true,
+    "image_sha256": "89d37ae3c38a1053805a0ecb3c0b90423ace65dddde632204474f6cf6b9a426a",
+    "kernel_sha256": "f991bd09c53b2766c02c86513b41c57b75b638f7db4c9db38606ade9f7553676",
+    "session": "7825ecbd7e13597e",
+    "rollback_index": 1738713600,
+    "footer_location": 0,
+    "parent_boot_chain_location": 3,
+    "full_asset_source_closure": true,
+    "hardware_tested": false
+  },
+  "device_operation": false,
+  "postbuild_sdk_or_compiler_install": false,
+  "failed_attempt_before_fix": "The external CryptoBin extraction passed its 994-file SHA lock but was outside EDK II PACKAGES_PATH, so BaseTools could not resolve CryptoDriver.inc.dsc."
+}

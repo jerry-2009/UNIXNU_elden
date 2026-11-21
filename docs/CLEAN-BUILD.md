@@ -4,7 +4,8 @@
 
 充电断链恢复有独立选项 `--charge-link-recovery`，完整前置选项与验收范围见
 [构建说明](../profiles/charge-link-recovery/README.md)。已完成两件原生对象与完整内核构建；
-这条新选项的空输出完整boot构建和实机验收尚未执行。
+2026-11-21，该profile的全部28个构建阶段已在CiscoMac新输出目录通过，生成签名boot并
+通过独立静态审核。镜像未刷入。[构建证据](evidence/clean-charge-link-20261121.json)
 
 2026-11-18空输出复测发现蓝牙基线误从当前仓读取已更新的WcnPower.c，导致原指纹拒绝。
 现在该基线只读仓内固定源码快照，字节来自89b31f6599068d63792c3b124f775fcac0f6c2da，
@@ -48,7 +49,7 @@ FAT16由仓库自己的写入器产生，已用独立fsck.fat核验，不依赖m
 | os_image | 原21H461 OS裸镜像，Data种子清单核SHA和所需文件；不是旧Data分区 |
 | nvt_firmware | TB322FC原厂novatek_ts_csot_3k_fw.bin，253952B/SHA413216d0…；生成完整头文件 |
 | wcn_firmware | 目录下包含qca/brhbtfw20.tlv、qca/brhperifw20.tlv、qca/brhperinv20.bin、qca/tmel_peach_20.elf、qca/lenovo/tb322fc/brhbtnv20.bin；全SHA在profiles/v110-bt-fifo/plan.json |
-| crypto | Microsoft Project Mu CryptoBin v1.1.3的解压根目录；先运行 `python3 tools/fetch_basecrypto.py --output ../inputs/basecrypto`，填入其输出的绝对路径。官方链接和994件核验见CLEAN-INPUTS.md |
+| crypto | Microsoft Project Mu CryptoBin v1.1.3的解压根目录；先运行 `python3 tools/fetch_basecrypto.py --output ../inputs/basecrypto`，填入其输出的绝对路径。构建器依锁定清单验证994个文件，再复制到本轮临时Mu Platforms/EldenBaseCrypto包目录供EDK II PACKAGES_PATH查找。官方链接和输入核验见[CLEAN-INPUTS.md](CLEAN-INPUTS.md) |
 | mu_repository | mu_wide_platforms Git源和初始化子模块，必须包含firmware-build/plan.json的mu_commit及子模块Git对象；builder只导出固定对象，不拿工作树修改 |
 | unixnu_repository | 官方UniXNU Git源，包含固定unixnu_commit与drivers/DarwinBoot子模块对象；同样只导出固定对象 |
 | stock_boot / parent_vbmeta | 本项目准确stock签名模板，供不抬升floor的审核/打包；不是待重编内核 |

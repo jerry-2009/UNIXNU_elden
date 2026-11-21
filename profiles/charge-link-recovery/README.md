@@ -61,9 +61,11 @@ or private retained CryptoBin package is required.
 
 `--charge-link-recovery` implies window handoff and verification. It requires the
 qualified Bluetooth/address17 baseline and rejects mixed PD, backlight, CPU, UFS,
-translation and 2GiB Data experiments. The full new combined empty-output command
-is pending. The component build, full native link, prelink, signing and static
-audit have run. Fresh-device, readback, return and restoration are hardware checks.
+translation and 2GiB Data experiments. The full combined empty-output build_clean.py
+run passed through all 28 stages. It staged the hash-locked 994-file CryptoBin
+release under the exported Mu Platforms/EldenBaseCrypto package path, then built
+and independently audited the signed boot. The output was not flashed. Hardware
+checks remain pending. See [clean-build evidence](../../docs/evidence/clean-charge-link-20261121.json).
 
 For an existing **source-built** address17 parent:
 
