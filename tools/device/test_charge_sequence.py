@@ -99,6 +99,43 @@ class ChargeSequenceTests(unittest.TestCase):
         self.assertEqual(s.update(status(11,3),46),'stock')
         self.assertEqual([e['mode'] for e in s.events if e['event']=='sent'],['80','stock'])
 
+    def test_transport_loss_discards_hold_and_allows_only_stock(self):
+        s=self.start(['bypass','80','stock'])
+        s.update(status(11,2),1)
+        s.transport_lost(3)
+        self.assertIsNone(s.update(status(11,2,False),16))
+        self.assertEqual(s.update(status(11,2),17),'stock')
+        s.update(status(12,1),18)
+        s.update(status(12,1),23)
+        self.assertTrue(s.done and s.restored and s.errors)
+        self.assertEqual([e['mode'] for e in s.events if e['event']=='sent'],['bypass','stock'])
+
+    def test_interruption_of_intermediate_stock_does_not_resume_trial(self):
+        s=self.start(['stock','80','stock'])
+        s.update(status(11,1),1)
+        s.transport_lost(2)
+        self.assertIsNone(s.update(status(11,1),15))
+        self.assertFalse(s.done)
+        self.assertIsNone(s.update(status(11,1),20))
+        self.assertTrue(s.done and s.restored and s.errors)
+        self.assertEqual([e['mode'] for e in s.events if e['event']=='sent'],['stock'])
+
+    def test_repeated_disconnect_cannot_extend_recovery(self):
+        s=self.start(['bypass','stock'])
+        s.transport_lost(1)
+        s.transport_lost(30)
+        self.assertIsNone(s.update(status(11,2),46))
+        self.assertTrue(s.done)
+        self.assertFalse(s.restored)
+        self.assertEqual([e['mode'] for e in s.events if e['event']=='sent'],['bypass'])
+
+    def test_disconnect_before_first_write_aborts_without_controls(self):
+        s=ChargeSequence(['bypass','stock'],60,5,max_status_gap=5)
+        s.transport_lost(20)
+        self.assertIsNone(s.update(status(),70))
+        self.assertTrue(s.done and s.errors)
+        self.assertFalse(s.events)
+
     def test_u32_limit_and_no_wrap_request(self):
         s=ChargeSequence(['stock'],0,5,max_status_gap=5)
         self.assertIsNone(s.update(status(0xffffffff),0));self.assertTrue(s.done)

@@ -69,6 +69,15 @@ checks remain pending. See [clean-build evidence](../../docs/evidence/clean-char
 The clean candidate SHA-256 is `89d37ae3c38a1053805a0ecb3c0b90423ace65dddde632204474f6cf6b9a426a`,
 session `7825ecbd7e13597e`, rollback `1738713600/0/3`.
 
+For the long-edge PC cable comparison, the host CDC logger accepts
+`--reconnect-seconds` with `--charge-sequence`. A broken USB connection ends the
+trial. After the same physical USB connection and boot nonce are verified and
+the charge controller reports fresh readiness, the logger may issue one stock
+restore. If a stock command was already sent, the logger waits for its fresh
+confirmation without sending it again. Capture metadata records the trial
+interruption and stock restore as separate results. USB CDC disconnect and
+the PMIC GLINK transport loss described above are separate events.
+
 For an existing **source-built** address17 parent:
 
 ```sh

@@ -4,7 +4,8 @@ Only the experimental 1209:7004 / ELDEN-XNU device is admitted. No flash, partit
 reads logs and optionally queries ping/status. --reboot-after-ready explicitly
 requests one session-bound fastboot RPC after observed startup readiness.
 --charge-sequence explicitly tests the board's charge modes and ends with a
-verified stock-policy restore before the ready reboot.
+verified stock-policy restore before the ready reboot. A CDC interruption
+ends the trial and allows only a bounded stock recovery on the same boot.
 """
 import argparse
 import datetime
@@ -56,6 +57,26 @@ class ChargeSequence:
         self.max_status_gap=max_status_gap
         self.confirmed_sample=None
         self.recovering=False;self.recovery_deadline=None;self.restored=False;self.errors=[];self.events=[]
+    def start_recovery(self,elapsed):
+        self.modes=['stock'];self.index=0;self.pending=None
+        self.recovering=True;self.recovery_deadline=elapsed+45
+
+    def transport_lost(self,elapsed):
+        if self.done:return
+        self.errors.append('Charge trial interrupted by USB transport loss')
+        self.applied_at=None
+        self.confirmed_sample=None
+        if self.recovering or self.pending=='stock':
+            # A stock command may already have reached the tablet. Wait for
+            # fresh confirmation of that same command within its old budget.
+            self.recovering=True
+            self.modes=['stock'];self.index=0
+            if self.recovery_deadline is None:self.recovery_deadline=self.sent_at+45
+        elif self.events:
+            self.start_recovery(elapsed)
+        else:
+            self.done=True
+
     def update(self,status,elapsed):
         if self.done:return None
         raw=status.get('charge_generation','')
@@ -86,7 +107,7 @@ class ChargeSequence:
             elif self.applied_at is None and elapsed-self.sent_at>=45:
                 self.errors.append('Unconfirmed charge command: '+self.pending)
                 if self.recovering:self.done=True;return None
-                self.modes=['stock'];self.index=0;self.pending=None;self.recovering=True;self.recovery_deadline=elapsed+45
+                self.start_recovery(elapsed)
         if self.pending:return None
         if self.recovering and elapsed>=self.recovery_deadline:self.done=True;return None
         if elapsed<self.delay or not available or generation is None:return None
@@ -185,7 +206,7 @@ def main():
     if a.home_count!=1 and not a.home_after_ready:p.error('home-count requires home-after-ready')
     if a.control_file and (not a.listen or not a.expect_session or not a.status_interval):p.error('control file requires a bound active status listener')
     if not 0<=a.reconnect_seconds<=60:p.error('reconnect-seconds must be0..60')
-    if a.reconnect_seconds and (not a.listen or not a.expect_session or not a.status_interval or a.charge_sequence):p.error('reconnect requires bound status capture without a host charge sequence')
+    if a.reconnect_seconds and (not a.listen or not a.expect_session or not a.status_interval):p.error('reconnect requires bound status capture')
     charge_modes=a.charge_sequence.split(',') if a.charge_sequence else []
     if charge_modes:
         if not a.reboot_after_ready or not 1<=len(charge_modes)<=8 or charge_modes[-1]!='stock':p.error('charge tests require ready reboot and a final stock restore')
@@ -209,7 +230,7 @@ def main():
                 raw_log=str(raw),bytes=0,query=a.query,device_operations='CDC read; optional ping/status only')
     report['verified_pnp_instance']=getattr(selected,'elden_verified_instance',None)
     if a.reboot_after_ready:report['device_operations']='CDC read/status; one explicitly requested session-bound fastboot RPC after readiness'
-    if charge_modes:report['device_operations']='CDC read/status; explicit bounded charge-mode RPC sequence with stock restore and fastboot return'
+    if charge_modes:report['device_operations']='CDC read/status; explicit bounded charge-mode RPC sequence with stock restore and fastboot return; stock recovery only after reconnect'
     if a.home_after_ready:report['device_operations']='CDC read/status; explicit session-bound Home sequence'
     if a.control_file:report['device_operations']+='; explicit control-file home/tap-settings/swipe-up/fastboot commands'
     report['recovery_events']=[]
@@ -325,6 +346,9 @@ def main():
                                 events.append(dict(line=line,elapsed=time.monotonic()-started,utc=datetime.datetime.now(datetime.timezone.utc).isoformat()))
                 except (serial.SerialException,OSError) as error:
                     if not a.reconnect_seconds or reboot_sent or returning or not continuity.nonce or len(report['reconnections'])>=3:raise
+                    if charge_modes:
+                        charge.transport_lost(time.monotonic()-started)
+                        report['charge_events']=charge.events;report['charge_errors']=charge.errors
                     output.flush();os.fsync(output.fileno())
                     report['discontinuities'].append(dict(offset=report['bytes'],utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),error=str(error),partial_line_chars=len(lines.pending)))
                     tracker.first=None;tracker.confirmed=False;last_status=None
