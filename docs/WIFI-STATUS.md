@@ -32,6 +32,12 @@ macOS27系统ABI与Y700固件不整包覆盖。
 设备已Android/root/green/原设置恢复并熄屏，所有设备任务terminal。
 当前充电／内存／GPU分支不顺带改变，减少重复冒烟。
 
+本轮源码修补已把 EAPOL 控制端口帧的 TCL HLOS TID 从普通数据 TID 0
+改为仅对 EAPOL 使用 TID 7，依据成功 donor 的 mac80211/ath12k 路径和
+本机 OEM `hal_tx_desc_set_hlos_tid` 契约。普通数据保持原 TID。WSL donor
+host ring test 已通过，macOS arm64 链和实机验证仍待下一次合并构建，不能
+把此改动宣称为 WPA2 成功。
+
 实际OEM模块排除隐式RBM：相关helper为ret，TCL0→WBM0/RBM5与donor一致。
 单设备vdev-ID检查和物理MAC选择有差异，尚未证明是TX原因；没有因此猜写bank。
 命令格式的新增字段与尾部数组来自已加载模块的尺寸/指令，原donor blob保持。

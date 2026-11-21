@@ -208,7 +208,13 @@ static void transmit(){
         if(!f){unlock();return;}
         if(f->eapol&&live&&!dp.txReady){unlock();return;}
         if(!dp.txReady||(!f->eapol&&!sta.authorized)){netQueuePop(tx_queue,false);unlock();continue;}
+        // mac80211/ath12k sends control-port EAPOL at WMM voice priority.
+        // Select that TID only for this descriptor and preserve the station's
+        // normal data TID for every other queued frame.
+        const uint32_t normal_tid=dp.tid;
+        if(f->eapol)dp.tid=7;
         const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length);
+        dp.tid=normal_tid;
         if(sent)netQueuePop(tx_queue,true);unlock();if(!sent)return;
     }
 }

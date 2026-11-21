@@ -72,12 +72,15 @@ static void station_report(void *,uint32_t what,uint32_t a,uint32_t b){
         ('sta.note=sta_notice;sta.ctx=owner_io.owner;staBegin(sta,o,environment,now);',
          'sta.note=sta_notice;sta.report=station_report;sta.ctx=owner_io.owner;staBegin(sta,o,environment,now);'),
         ('        const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length);',
-         '''        if(f->eapol){
+        '''        if(f->eapol){
             const auto kind=netEapolKind(f->bytes+14,f->length-14);
             const uint32_t values[]={kind.message,uint32_t(f->length-14)};
             diag_line("EAPOL_TX message/bytes",values,2);
         }
-        const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length);'''),
+        const uint32_t normal_tid=dp.tid;
+        if(f->eapol)dp.tid=7;
+        const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length);
+        dp.tid=normal_tid;'''),
     ]
     original = text
     for before, after in anchors:
