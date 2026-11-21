@@ -1,0 +1,159 @@
+{
+  "host": {
+    "passed": true,
+    "result": "122 boot/route scenarios / 11494 checks passed; original rejection reproduced; MMIO modeled",
+    "asan_ubsan": true,
+    "source_sha256": {
+      "drivers/EldenSmmu/BootRoute.c": "c6827601374a1b3dd8fdad4eca399f45f1a0ae001177ab2536bc048ddeca11ed",
+      "drivers/EldenSmmu/BootRoute.h": "03e94e52dea7ab6a7a85bf3f2d17ce9fb3f19882811619b63c07b78fa78f0c0b",
+      "drivers/EldenSmmu/TouchSource.py": "744be2e98925b5dd3b4196990d604fb99da23bc9901a332c6ced068a2c8966bc",
+      "drivers/EldenSmmu/TestBootRoute.c": "b09ddda5300129179005d5a9f9d175c599c50628d2b50977f8518f4ab9c97afa",
+      "drivers/EldenNvt36536/DmaRoute.c": "a8272e1348b597bd0b71eedbd62c905b065db03978ed69ba6fe49728d408e142",
+      "drivers/EldenNvt36536/DmaRoute.h": "fdf8e16c273691ed300320d270b46377c3c3eba6be4c81ec1734705cdc256e00",
+      "package/EldenTouchBoard.h": "aaddf2d19b174d9401dccb3232c96ed220d919c481ad174d49db007c71e60bce",
+      "soc/sm8750/include/EldenTouchResources.h": "043b635b05372782e765d95be65c42441c3c6d3616b874c4484449385d33d780"
+    },
+    "derived_route_sha256": "e316c6f0765ab88009833be6024629c58b3cc977711df9b71d528c79dc10d714",
+    "hardware_mmio_modeled": true,
+    "hardware": false
+  },
+  "native": {
+    "compiled": true,
+    "objects": {
+      "BootRoute": {
+        "object_sha256": "98fa93ae710bf6adbd7e3ce0a80874dc89324c4368e386cad945edc9421f831b",
+        "source_sha256": "c6827601374a1b3dd8fdad4eca399f45f1a0ae001177ab2536bc048ddeca11ed",
+        "exports": [
+          "_elden_smmu_boot_route_commit",
+          "_elden_smmu_boot_route_expected",
+          "_elden_smmu_boot_route_poison",
+          "_elden_smmu_boot_route_reserve",
+          "_elden_smmu_boot_route_seal",
+          "_elden_smmu_boot_route_state"
+        ],
+        "imports": [],
+        "warnings": 0
+      },
+      "DmaRoute": {
+        "object_sha256": "583804370e602bc23efcaf200493d917e2af62929b01b5f1aa1a0fb631eb8c79",
+        "source_sha256": "e316c6f0765ab88009833be6024629c58b3cc977711df9b71d528c79dc10d714",
+        "exports": [
+          "_elden_touch_route_attach",
+          "_elden_touch_route_detach",
+          "_elden_touch_route_observe"
+        ],
+        "imports": [
+          "_elden_smmu_boot_route_expected",
+          "_elden_smmu_boot_route_seal"
+        ],
+        "warnings": 0
+      }
+    },
+    "binding_sha256": "f86a473329c73e25101daffb73937f78233e93dee4f3c1469f8dc056e43deb68",
+    "source_inputs": {
+      "drivers/EldenSmmu/BootRoute.c": "c6827601374a1b3dd8fdad4eca399f45f1a0ae001177ab2536bc048ddeca11ed",
+      "drivers/EldenSmmu/BootRoute.h": "03e94e52dea7ab6a7a85bf3f2d17ce9fb3f19882811619b63c07b78fa78f0c0b",
+      "drivers/EldenSmmu/TouchSource.py": "744be2e98925b5dd3b4196990d604fb99da23bc9901a332c6ced068a2c8966bc",
+      "drivers/EldenNvt36536/DmaRoute.c": "a8272e1348b597bd0b71eedbd62c905b065db03978ed69ba6fe49728d408e142",
+      "drivers/EldenNvt36536/DmaRoute.h": "fdf8e16c273691ed300320d270b46377c3c3eba6be4c81ec1734705cdc256e00",
+      "package/EldenTouchBoard.h": "aaddf2d19b174d9401dccb3232c96ed220d919c481ad174d49db007c71e60bce",
+      "soc/sm8750/include/EldenTouchResources.h": "043b635b05372782e765d95be65c42441c3c6d3616b874c4484449385d33d780"
+    },
+    "scalar": true,
+    "native_hardware_provider": false,
+    "kernel_linked": false,
+    "hardware_tested": false
+  },
+  "source_audit": {
+    "passed": true,
+    "inputs": {
+      "83969cd874503e65997ff7639f7dcf3d0a92cd17:ArmSmmu4KContext.c": "fb993f53ef899b9969a71311b61b5dbe9446c515d7a6e6ad7d4840796eb1b6a3",
+      "83969cd874503e65997ff7639f7dcf3d0a92cd17:ArmSmmu4KStreams.c": "359610de6974c1885b4b7bbf72e6b321a013e1cc44200e1a8f566d09722c009a",
+      "6f97250ead155fc3b980856323e99a4623dae73d:drivers/net/wireless/ath/ath12k/pci.c": "9a97838cc28065fd6c02bb89862ab598f836932d984dd84f198e2b602f409019",
+      "6f97250ead155fc3b980856323e99a4623dae73d:drivers/iommu/arm/arm-smmu/arm-smmu-qcom.c": "8e2cf1c588f280b6e8c3f8ffc14349802ecc9f198a28626a0eefb698f02433ef",
+      "24aab96163799cb1db083d94539a5eefc07e0475:package/WifiProbe.cpp": "e449a40b423ed0f4b0750cb5c1edcd8139cbe9bd11b73a82d2885c8ad21060a5"
+    },
+    "stock": {
+      "node": "/soc/apps-smmu@15000000",
+      "reg_cells": [
+        352321536,
+        1048576
+      ],
+      "interrupt_count": 113,
+      "first_interrupts": [
+        [
+          0,
+          65,
+          4
+        ],
+        [
+          0,
+          97,
+          4
+        ],
+        [
+          0,
+          98,
+          4
+        ],
+        [
+          0,
+          99,
+          4
+        ],
+        [
+          0,
+          100,
+          4
+        ],
+        [
+          0,
+          101,
+          4
+        ],
+        [
+          0,
+          102,
+          4
+        ],
+        [
+          0,
+          103,
+          4
+        ],
+        [
+          0,
+          104,
+          4
+        ],
+        [
+          0,
+          105,
+          4
+        ]
+      ],
+      "source_fdt_sha256": "b060f1001c4907895656c967fe3b2e5f6fb4d350be65cd79e4e3f4cdff1a8a45"
+    },
+    "historical_touch_slots": 132,
+    "historical_touch_banks": 83,
+    "historical_id2": 20753,
+    "decoded_historical_input_output_upper_bits": [
+      36,
+      36,
+      36
+    ],
+    "linux_pci_streaming_and_coherent_mask_bits": 36,
+    "new_context_cbar": 127744,
+    "inherited_cb0_cbar": 126976,
+    "scope": "Source/retained stock facts only; no new SMMU read, ownership, table or hardware verification",
+    "remaining": [
+      "Native early allocator/context/ASID/fault-handler preflight before UFS/Data publication",
+      "Only then reserve/program/read back/commit immutable Wi-Fi route before touch seals",
+      "Qualify owned data/table pages, translations and DMA drain before MSI/MHI"
+    ]
+  },
+  "native_provider_implemented": false,
+  "kernel_built": false,
+  "hardware_tested": false,
+  "next": "Actual early bank/ASID/RAM/fault/table/translation provider, then full kernel; preserve immutable route until reset"
+}

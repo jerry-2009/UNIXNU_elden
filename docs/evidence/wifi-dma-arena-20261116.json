@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-16",
+  "host": {
+    "passed": true,
+    "result": "4000 upstream allocation/free comparisons; 1554917 checks passed, boundary/metadata/epoch/stop failures rejected",
+    "asan_ubsan": true,
+    "hardware": false,
+    "actual_functions_compared": true,
+    "sheng_commit": "e8937177309d88c93b305a57bad147fd5fac8a86",
+    "sheng_wifi_probe_sha256": "e449a40b423ed0f4b0750cb5c1edcd8139cbe9bd11b73a82d2885c8ad21060a5",
+    "legacy_functions_sha256": {
+      "void *arenaAlloc(": "0a72f72c027565b5ea0cb24e3b9da0ab218a0de2cb0f5d703a9f165c0169fc6d",
+      "void arenaFree(": "ebd6d1da372b74ff1866db18581bee4f9e191012a2a8f8de580138fa3da5772f",
+      "uint64_t pDmaMap(": "6f9e9b0da8590ba4fd5c3e8ecce91090da9e04454d124b3c3aef2aafb4821b55"
+    },
+    "source_inputs": {
+      "drivers/EldenWifi/DmaArena.c": "8faed3957a939ba9c5528cdd355640f4bdd622d57522e1c3166d9fae5c5f542f",
+      "drivers/EldenWifi/DmaArena.h": "c6736a8a33f015c4948b96e3d1073aec57134faa0de5d77c10ed39e1d73dbc4a",
+      "drivers/EldenWifi/TestDmaArena.cpp": "4e0d8737f7080fffa3195d5be27216969d19fc9dc6022cd3edb565ca1c994d7b",
+      "tools/test_wifi_dma_arena.py": "f8dece49d426fbb059af747718a7dccf301333fb0b29c688455ecefd0c6fd150"
+    }
+  },
+  "native": {
+    "compiled": true,
+    "scalar": true,
+    "warnings": 0,
+    "object_sha256": "b9b5a93bbfa252d5d536527ef9c8f7d52c1349cd9f93ab3250fd9afb6e7c7791",
+    "exports": [
+      "_elden_wifi_dma_arena_alloc",
+      "_elden_wifi_dma_arena_bus_range",
+      "_elden_wifi_dma_arena_free",
+      "_elden_wifi_dma_arena_init",
+      "_elden_wifi_dma_arena_map",
+      "_elden_wifi_dma_arena_stop"
+    ],
+    "imports": [
+      "_bzero",
+      "_memmove"
+    ],
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-target",
+      "arm64-apple-ios17.0",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-ffreestanding",
+      "-fno-builtin",
+      "-fno-stack-protector",
+      "-mgeneral-regs-only",
+      "-I/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-dma-arena-20261116/source2/drivers/EldenWifi",
+      "-c",
+      "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-dma-arena-20261116/source2/drivers/EldenWifi/DmaArena.c",
+      "-o",
+      "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-dma-arena-20261116/native2/DmaArena.o"
+    ],
+    "kernel_imports_verified": true,
+    "reference_kernel_sha256": "1303419f6b15d409c1fb5e16e5c26c34a1a7f901c494c949645f5853000e89d0",
+    "source_inputs": {
+      "drivers/EldenWifi/DmaArena.c": "8faed3957a939ba9c5528cdd355640f4bdd622d57522e1c3166d9fae5c5f542f",
+      "drivers/EldenWifi/DmaArena.h": "c6736a8a33f015c4948b96e3d1073aec57134faa0de5d77c10ed39e1d73dbc4a",
+      "tools/build_wifi_dma_arena.py": "10ba3ef327fa8198c74605cfa9befd8e1f8c766f72545460eaefda5a2d276496"
+    },
+    "native_provider_integrated": false,
+    "kernel_linked": false,
+    "hardware": false
+  },
+  "source_inputs": {
+    "drivers/EldenWifi/DmaArena.c": "8faed3957a939ba9c5528cdd355640f4bdd622d57522e1c3166d9fae5c5f542f",
+    "drivers/EldenWifi/DmaArena.h": "c6736a8a33f015c4948b96e3d1073aec57134faa0de5d77c10ed39e1d73dbc4a",
+    "drivers/EldenWifi/TestDmaArena.cpp": "4e0d8737f7080fffa3195d5be27216969d19fc9dc6022cd3edb565ca1c994d7b",
+    "tools/test_wifi_dma_arena.py": "f8dece49d426fbb059af747718a7dccf301333fb0b29c688455ecefd0c6fd150",
+    "tools/build_wifi_dma_arena.py": "10ba3ef327fa8198c74605cfa9befd8e1f8c766f72545460eaefda5a2d276496"
+  },
+  "license_sha256": "5b1d3d911103cb0f41641ec0964c5ac1f7e229f57aa072b6ac38bae913a1307b",
+  "sources_verified": true,
+  "kernel_linked": false,
+  "hardware_tested": false,
+  "latest_hardware_candidate": "v163 smmu-prefault-memory",
+  "device_untouched": true,
+  "next": "Native serialized arena/ABI callbacks, TB322FC MSI ownership and actual drain before bus mastering and MHI",
+  "failed_attempt": "native1 checker expected memset, actual Apple lowering bzero; final kernel imports verified",
+  "final_outputs": "Mac lab/wifi-dma-arena-20261116/{source2,host2,native2}; workbench edl_work/wifi-dma-arena-20261116"
+}

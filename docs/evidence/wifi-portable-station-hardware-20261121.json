@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-21",
+  "run_utc_date": "2026-11-20",
+  "hardware_tested": true,
+  "source_commit": "876de4c",
+  "device": "TB322FC / SM8750 / Peach HW2.0",
+  "os": "iPadOS17 / 21H461",
+  "image_sha256": "87d1c43cce7d15a45794a8388948e59094209d95c924a746cfcb4410aeb4b915",
+  "session": "2661d591ea5855d4",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "raw": {
+    "path": "edl_work/live-portable-station-20261120/usb/20261120-183115.bin",
+    "bytes": 396713,
+    "sha256": "ad871e10d1d8ae06c577b184d466bea21df7361e11067784530703cf88b5eb2d",
+    "drop_max": 14,
+    "status_samples": 104,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "final_state": {
+    "stage": 714,
+    "error": 0,
+    "failed": 0,
+    "vdev_started": 1,
+    "auth_answered": 1,
+    "assoc_answered": 1,
+    "port_open": 0,
+    "keys": 0,
+    "rx": 3,
+    "tx": 3,
+    "rx_eapol": 3,
+    "tx_eapol": 3,
+    "tx_completed": 0,
+    "tx_acked": 0
+  },
+  "network_bridge_start": "ELDEN_WIFI_NET start=0 station-stage=4",
+  "helper_launch": "ELDEN_WIFI_OWNER_LAUNCH accepted pid=39 exact-cdhash=1 RAM-overlay=1 category6-volume-only",
+  "protocol_stop": "ELDEN_ATH12K level=4 ELDEN_PORTABLE stop idle=0 rc=-110; DMA retained until actual platform fence/PERST/reset",
+  "physical_fence": "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+  "scan_accepted": true,
+  "authentication_and_association_accepted": true,
+  "wpa2_handshake_accepted": false,
+  "dhcp": false,
+  "traffic": false,
+  "interpretation": [
+    "Actual VDEV start/auth/assoc reached714 and the original iPadOS17 BSD/IOKit bridge started atstage4.",
+    "EAPOL3 received and3transmit descriptors submitted, but no observed TCL/WBM transmit completion; no key installation/port authorization/DHCP.",
+    "Transmit submission is not an RF send/ACK proof. Exact blocked stage still needs comparison with the successful donor.",
+    "Protocol drain timed out; independent actual BM/transaction/MSI/PERST fence and full stock restoration passed. Do not call protocol/warm-MHI reset successful."
+  ],
+  "physical_fastboot": true,
+  "full_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "root_green_original_settings_restored": true,
+  "all_jobs_terminal": true,
+  "next": "Complete requested Mac recoverable cleanup/docs consolidation, then compare donor TCL/WBM/tx-setup facts and fix the actual data completion path. No scan-only repeats.",
+  "goal": "active and incomplete"
+}

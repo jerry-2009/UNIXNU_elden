@@ -1,0 +1,9 @@
+{
+  "original_commit": "89b31f6599068d63792c3b124f775fcac0f6c2da",
+  "original_path": "drivers/EldenBluetooth/WcnPower.c",
+  "snapshot_path": "profiles/current-build/frozen/WcnPower-feb9fefa74ee.c",
+  "source_sha256": "feb9fefa74ee07e39b7f5694c5921329d0017163a6391bdd82bf64a2ae9208c0",
+  "bytes": 10257,
+  "only_provider_location_changed": true,
+  "current_shared_source_untouched": true
+}

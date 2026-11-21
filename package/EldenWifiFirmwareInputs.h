@@ -9,4 +9,5 @@ static const struct {const char *path;unsigned bytes;const char *sha256;} elden_
     {"image/peach/data20.msc",1812314,"ee6a685014b02a7cc5ab48692e52cfce67145ad995183cac8b30acd27800c8fe"},
     {"image/peach/regdb.bin",24278,"84b55a5691d02b78b96face90b2ba69718a2e617434ffb888a4943b9d2ada5a5"},
     {"image/peach/bdwlan.elf",125420,"c6f861550a711335e682df1c8be4a0384ba361d560225c06da23e32de014a19e"},
+    {"image/peach/qdss_trace_config_v2.cfg",6237,"94251904525f36f69092db8abde1f5198bd32c8c5fa482448e7076e0e3bc0eab"},
 };

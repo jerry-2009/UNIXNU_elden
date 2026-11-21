@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "purpose": "Use the actual OEM Peach Host Capability memory declaration rather than the prepared unconditional TLV0x33 extension.",
+  "vendor_wire_evidence": {
+    "date": "2026-11-20",
+    "module_sha256": "fd8e10b29cf48d372e2c48dafc5e610e43801043f6e8fda21b6085c05df5bec4",
+    "qmi_module_sha256": "92ee9bf6dca2d93ab50b8cced33b327c0188a648b360e6acdb60940411f62c6f",
+    "host_cap_table_sha256": "ce36888bd8eb816998fe751472095492fde866196b860bae0b6b3c65f8dba268",
+    "host_cap_table_elements": 69,
+    "on_demand_tlv33_absent": true,
+    "exact_prepared_qmi_source_sha256": "4831562b8772516b52890c63c13e0ab9809da1ad708551c36cf840487c3ab205",
+    "prepared_declares_tlv33": true,
+    "prepared_on_demand_capability_unconditional": true,
+    "implementation_delta": "Stop sending theprepared TLV0x33 extension forPeach only; othertargets andactualmemory request/response path unchanged.",
+    "root_cause_proven": false
+  },
+  "scope": {
+    "peach_only": true,
+    "omitted_tlv": 51,
+    "other_host_capability_fields_unchanged": true,
+    "actual_memory_request_response_unchanged": true,
+    "firmware_power_credits_rings_unchanged": true
+  },
+  "build": {
+    "qmi_source_sha256": "0757a84e9d887205dc06e5aa52c06a7b2499bc84ed3d26bbc4122fa665817cca",
+    "qmi_object_sha256": "a51f96757122145b7bd2b811f4c441ca132231b6b2e22fb4d0acee8d5ffa4447",
+    "binding_sha256": "478b30e396197ce66ce1b883ccb9357ae2c29a80c552242f94765870b0389e9d",
+    "kernel_sha256": "307912622fc7680a2aa472bef3b5419d3000215c33cf5c6fc2aa9c6aaa5e1758",
+    "native_sha256": "16562b1cdc5e4e346626f6c5cd0e11df618c9c2e46997091c0efce98730abd72",
+    "qmi_warnings": 152,
+    "changed_units": 1,
+    "retained_units": 124
+  },
+  "verification": {
+    "actual_old_new_hostcap_scenarios": 86,
+    "asan_ubsan": true,
+    "qmi_transport_modeled": true,
+    "qualification_mutations": 128,
+    "original_apple_executables_preserved": 30,
+    "entry_branch_delta": 7124,
+    "package_audit": true,
+    "clean_build_rerun": false
+  },
+  "image_sha256": "a7482ae7af18e2729db19c42175d1a95a4ce57c5f7bf9a75587657dd90a02065",
+  "session": "57ed88147f0b6257",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "workbench_build": "edl_work/wifi-eager-memory-20261120",
+  "next": "One functional WMI/scan plus consolidated state trial, then full stock restoration; root cause remains unproved.",
+  "wifi_network_accepted": false,
+  "goal": "active and incomplete"
+}

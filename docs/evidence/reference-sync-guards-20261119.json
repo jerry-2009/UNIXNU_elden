@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-19",
+  "scope": "reference repository synchronization only",
+  "prior_source_sha256": "0f1c4042e165348b8d39de0320655471c1877fb6ad9d90c1346e8095fd78d42b",
+  "source_sha256": "49f0c93aa8bf88ce2d0940138c27847f4c2af08e67c4aede9ea8c5d32afa1d50",
+  "test_sha256": "eb3cf5ecc000acc9d5f1d85e8526225c33d7ca0603732bc1381e124aea16f2da",
+  "before_sha256": "5896e6b04fe6462fd8ef2f8207be27faf88e73c5ad6774558399480f010d44df",
+  "after_sha256": "08c3611f5b7d14113ccdb32682e42d89a7f7473a5fcfb10f5e5a9368948c4d39",
+  "real_local_git_scenarios": 11,
+  "reproduced_before": [
+    "wrong branch fast-forward after checkout",
+    "maintenance marker ignored after fetch"
+  ],
+  "fixed_cases": {
+    "branch-switch": "changed-during-sync",
+    "upstream-change": "changed-during-sync",
+    "head-change": "changed-during-sync",
+    "dirty-after-fetch": "changed-during-sync",
+    "pinned-target": "fast-forwarded",
+    "maintenance-start": "deferred-maintenance",
+    "maintenance-preexisting": "deferred-maintenance"
+  },
+  "earlier_clean_dirty_detached_diverged_cases_preserved": true,
+  "before_update_rechecks": [
+    "branch",
+    "HEAD",
+    "upstream",
+    "tracked and untracked edits",
+    "maintenance marker"
+  ],
+  "merge_target": "verified complete commit SHA",
+  "remaining_limit": "A final state check and Git merge are not one atomic cross-process transaction; maintenance waits for ongoing sync before editing a clone.",
+  "test_directories_retained_in_windows_temp": true,
+  "reference_clones_modified": false,
+  "candidate_inputs_changed": false,
+  "device_accessed": false,
+  "compiled_or_flashed": false,
+  "previously_filtered_operation_retried": false,
+  "goal_status_changed": false,
+  "evidence": "lab/records/reference-sync-guards-20261119",
+  "full_goal_complete": false
+}

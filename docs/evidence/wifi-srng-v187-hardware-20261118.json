@@ -1,0 +1,62 @@
+{
+  "candidate_sha256": "e1cedc01ab245120306d5126f024454e26e61e71de5e2f68f87aaaa2e0e1569f",
+  "session": "4bd7a57ef992f50e",
+  "first_failure_srng": [
+    "ELDEN_SRNG CFG ce=3 id=67 flags=20000 shadow=1 idx=34 off=984 target=1b86400 direct=1b86400 maps=36",
+    "ELDEN_SRNG HP sw=16 last=16 enter=4 exit=4 timer=0 lastoff=984 hw=0/0 dma-tp=8"
+  ],
+  "wmi_first_failure": [
+    "ELDEN_CREDIT WMI cmd=16387 calls=5 ok=4 result=-11 devflags=e40"
+  ],
+  "wmi_endpoint": [
+    "ELDEN_CREDIT CFG ep=2 alloc=2 flow=1 current=0 size=2176 ul=3 dl=2 service=100"
+  ],
+  "notification": {
+    "entered": 4,
+    "returned": 4,
+    "last_hp": 16,
+    "last_offset": 2436,
+    "shadow_index": 34,
+    "target_register": 28861440,
+    "configured_mappings": 36,
+    "shadow_timer_callbacks": 0
+  },
+  "hardware_read_via_hif": {
+    "hp": 0,
+    "tp": 0
+  },
+  "coherent_dma_tp": 8,
+  "source_software_hp": 16,
+  "interpretation": "Direct HIF0/0 differs from coherent DMA8. Validate PCI window/wakeup/access path and register semantics before inferring notification or firmware consumption failure.",
+  "capture": {
+    "path": "edl_work/live-srng-v187-20261118/usb/20261118-091854.bin",
+    "bytes": 190568,
+    "sha256": "f1f0ccf7a1f6e09100ef8e8281bf5524fb3551ff46391bf4eedba697b1098989",
+    "drop_max": 8,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false
+  },
+  "observed_panic": 0,
+  "wcn_stop": [
+    "ELDEN_WCN RPC stop=0; held or bounded wait expired, continuing reset"
+  ],
+  "native_physical_shutdown_completion_observed": false,
+  "typed_sync_physical_fastboot_full_stock_readback": true,
+  "android_restoration": {
+    "complete": true,
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "root": true,
+    "green": true,
+    "original_radios_equal": true,
+    "original_scans_equal": true,
+    "original_charging_equal": true,
+    "sleep_requested": true,
+    "initial_radio_restore_transient_failure_retained": true,
+    "all_device_jobs_terminal": true
+  },
+  "all_jobs_terminal": true,
+  "network_acceptance": false,
+  "daily_candidate_promoted": false,
+  "full_goal_complete": false
+}

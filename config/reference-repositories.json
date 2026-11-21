@@ -102,6 +102,16 @@
       "observed_head": "c58470091712d02975fc3671c62004522eb9c74b"
     },
     {
+      "name": "IOHIDFamily-2031",
+      "url": "https://github.com/apple-oss-distributions/IOHIDFamily.git",
+      "observed_head": "b126cf696bf1c6eede740b92d3bfca7e62d09c06"
+    },
+    {
+      "name": "IOKitUser-pen-reference",
+      "url": "https://github.com/apple-oss-distributions/IOKitUser.git",
+      "observed_head": "323ead896d04424f87184d8f6ff0cce811aab106"
+    },
+    {
       "name": "linux-ath12k-7.0.14",
       "url": "https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git",
       "observed_head": "458c6079fc1d41d564c37679c8ace02cd83ee817"
@@ -305,6 +315,36 @@
       "name": "XnuPrelink",
       "url": "https://github.com/UniXNU/XnuPrelink.git",
       "observed_head": "440589b0c31625f17edf363e24b3c82c51c70bb9"
+    },
+    {
+      "name": "IOStorageFamily",
+      "url": "https://github.com/apple-oss-distributions/IOStorageFamily.git",
+      "observed_head": "7edb88fbae296fb7c8ce2f64e115e116e566d51c"
+    },
+    {
+      "name": "AdrenoFirmware-a830",
+      "url": "https://github.com/IssacL04/AdrenoFirmware.git",
+      "observed_head": "20ad3d7aca14bd46aecab6335c780f5413fa054b"
+    },
+    {
+      "name": "linux-firmware-sm8750",
+      "url": "https://gitlab.com/kernel-firmware/linux-firmware.git",
+      "observed_head": "2b2c1f39d7ae274bfe56d829e62d3993249e3a82"
+    },
+    {
+      "name": "metal2vulkan-development",
+      "url": "https://github.com/steelbrain/metal2vulkan.git",
+      "observed_head": "d9236a8a11d3b90a1aa27b54e2d74d3891c4d2e5"
+    },
+    {
+      "name": "SM8750-fw-api",
+      "url": "https://github.com/OnePlusOSS/android_kernel_modules_and_devicetree_oneplus_sm8750.git",
+      "observed_head": "d50b305f7da9e14715a25120a4ac7b1a4b8b97c3"
+    },
+    {
+      "name": "UniXNU-xiaomipad8pro-lenzhang",
+      "url": "https://github.com/lenzhang/UniXNU-xiaomipad8pro.git",
+      "observed_head": "2438556c77c90c22c7b76e57eb8b40c44b35f1af"
     }
   ]
 }

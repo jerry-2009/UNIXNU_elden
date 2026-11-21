@@ -29,6 +29,19 @@ def discover():
 def remote_refs(repo):
     return dict(line.split(' ',1) for line in git(repo,'for-each-ref','--format=%(refname) %(objectname)','refs/remotes')[0].splitlines() if line)
 
+def maintenance_in_progress():
+    return (ROOT/'maintenance/IN_PROGRESS.json').exists()
+
+def checkout_matches(repo,record):
+    """A branch switch can leave HEAD unchanged; verify both before an update."""
+    branch=git(repo,'branch','--show-current')[0]
+    head=git(repo,'rev-parse','HEAD')[0]
+    upstream,rc=git(repo,'rev-parse','--abbrev-ref','--symbolic-full-name','@{upstream}',check=False)
+    current_upstream=upstream if rc==0 else None
+    dirty=bool(git(repo,'status','--porcelain=v1','--untracked-files=all')[0])
+    record['checkout_before_update']=dict(branch=branch,head=head,upstream=current_upstream,dirty=dirty)
+    return branch==record['branch'] and head==record['before'] and current_upstream==record['upstream'] and not dirty
+
 def record_remote_changes(repo,r,before):
     after=remote_refs(repo);changes=[]
     for ref in sorted(set(before)|set(after)):
@@ -45,6 +58,7 @@ def sync(repo,apply):
     r={'repo':str(repo.relative_to(ROOT)),'action':'pending'}
     refs_before=None
     try:
+        if maintenance_in_progress():r['action']='deferred-maintenance';return r
         r['before']=git(repo,'rev-parse','HEAD')[0]
         r['branch']=git(repo,'branch','--show-current')[0]
         dirty=bool(git(repo,'status','--porcelain=v1','--untracked-files=all')[0])
@@ -55,6 +69,7 @@ def sync(repo,apply):
         r['upstream']=upstream if rc==0 else None
         superproject=git(repo,'rev-parse','--show-superproject-working-tree')[0]
         if not apply:r['action']='planned';return r
+        if maintenance_in_progress():r['action']='deferred-maintenance';return r
         refs_before=remote_refs(repo)
         # A Linux reference need not transfer unrelated branch/tag history on
         # every cycle. Refresh its configured tracking ref; pinned clones have
@@ -65,19 +80,25 @@ def sync(repo,apply):
         if tracking.startswith('refs/remotes/') and remote in remote_names and merge.startswith('refs/heads/'):
             git(repo,'fetch','--no-tags','--recurse-submodules=no',remote,'+'+merge+':'+tracking,timeout=120)
         else:git(repo,'fetch','--all','--no-tags','--recurse-submodules=no',timeout=120)
-        if not r['branch']:r['action']='fetched-detached'
+        if maintenance_in_progress():r['action']='deferred-maintenance'
+        elif not r['branch']:r['action']='fetched-detached'
         elif superproject:r['action']='fetched-pinned-submodule'
         elif dirty:r['action']='fetched-dirty'
         elif not r['upstream']:r['action']='fetched-no-upstream'
         else:
-            ahead,behind=map(int,git(repo,'rev-list','--left-right','--count','HEAD...'+upstream)[0].split())
+            # Use the fetched commit throughout; a later reference move must
+            # not silently select another target between validation and merge.
+            target=git(repo,'rev-parse','--verify',upstream+'^{commit}')[0]
+            r['fetched_target']=target
+            ahead,behind=map(int,git(repo,'rev-list','--left-right','--count',r['before']+'...'+target)[0].split())
             r.update(ahead=ahead,behind=behind)
             if ahead and behind:r['action']='fetched-diverged'
             elif not behind:r['action']='local-ahead' if ahead else 'already-current'
-            elif git(repo,'rev-parse','HEAD')[0]!=r['before'] or git(repo,'status','--porcelain=v1','--untracked-files=all')[0]:
+            elif not checkout_matches(repo,r):
                 r['action']='changed-during-sync'
+            elif maintenance_in_progress():r['action']='deferred-maintenance'
             else:
-                git(repo,'merge','--ff-only','--no-edit','--',upstream)
+                git(repo,'merge','--ff-only','--no-edit','--',target)
                 r['action']='fast-forwarded'
         r['after']=git(repo,'rev-parse','HEAD')[0]
         if r['before']!=r['after']:
@@ -103,7 +124,7 @@ def main():
     if not RESEARCH.is_relative_to(ROOT):raise SystemExit('research escapes workbench')
     if a.inventory_only:
         print(json.dumps([r.name for r in discover()],indent=2));return
-    if (ROOT/'maintenance/IN_PROGRESS.json').exists():
+    if maintenance_in_progress():
         print('Deferred: workbench maintenance is in progress. No fetch or device operation.');return
     base=ROOT/'maintenance/reference-sync';base.mkdir(parents=True,exist_ok=True)
     lock=(base/'sync.lock').open('a+b');lock.seek(0)

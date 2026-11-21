@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-21",
+  "hardware_tested": false,
+  "scope": "One consolidated first-TX TCL/WBM ring configuration/pointer/descriptor metadata and actual mode-response observation; no device-control or protocol delta.",
+  "image_sha256": "1a7a713397cff3a35bfdfbb9d2c9e2ba4f3f2674277f9f1cd36cced1e6049c86",
+  "session": "43cd42ead32ff3bd",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "build": {
+    "changed_cpp_units": 1,
+    "retained_objects": 125,
+    "binding_sha256": "7cad7f10b8434ac601d19de78e455cb82365217771ebb7c61d72f1a805ba6164",
+    "kernel_sha256": "bbe10e92595c15efaead1dbf9240de8118ca63f7e4762e0d0f7051ef98f40348",
+    "entry_delta": 7124,
+    "apple_executables": 30,
+    "qualification_mutations": 12
+  },
+  "no_payload_logging": true,
+  "readonly_device_registers": true,
+  "real_full_station_path": true,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "goal": "active and incomplete"
+}

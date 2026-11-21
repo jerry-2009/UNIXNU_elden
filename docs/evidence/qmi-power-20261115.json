@@ -1,0 +1,203 @@
+{
+  "kind": "QMI/native power bridge and relocatable link",
+  "host": {
+    "passed": true,
+    "result": "47 native/WLAN GPIO/QMI scenarios, 423 checks passed",
+    "asan_ubsan": true,
+    "real_qmi_native_core_chain": true,
+    "physical_io_modeled": true,
+    "hardware": false,
+    "exact_linux_header_sha256": "09d5313e43cdcc0a57426d5aea26e25aea8a124411440c4cf3dd29a675319a1a",
+    "source_sha256": {
+      "drivers/EldenBluetooth/WcnPower.c": "8028445481b7012df33ce6ce13739171a17dfeb89fba4f84d30ca4af85fe16ab",
+      "drivers/EldenBluetooth/WcnPower.h": "2047193ec2337bf0ef83f4308c0a83d879fdd6738e80f422a6c1907111a6fff3",
+      "drivers/EldenBluetooth/WcnSharedPower.h": "9f7c484035ffaaec76946ececf52bda9227cd8139ffeca8684a659821f201266",
+      "drivers/EldenBluetooth/WcnSharedPower.inc": "4e2f63533c45003bd9ece5a9c8f16d7bae95c28444a20af818bfdd1e7a8d6190",
+      "drivers/EldenWifi/WlanPower.h": "37653822b99d9a2f7602627bed461ec28dca39848f93b7218ab9d0fd0a23f77d",
+      "drivers/EldenWifi/WlanGpio.h": "db9e4f66fc32f0bd5cb6571fb6667175633e281e9c5407b10222f9f756f4b571",
+      "drivers/EldenWifi/WlanPowerNative.inc": "aff19070e7f6aee24dbcb30254e709d19fa5a74185faca7fe722e16b0b167cf1",
+      "drivers/EldenWifi/WlanPowerExports.inc": "1f4e791cff1a4ee53726a514ad9c67014f4fd0ceebf073c72e0429088c987c49",
+      "drivers/EldenWifi/TestWlanNative.cpp": "364142b93b68f968e3c29f752bb17e379afd93d44eb60d6d5ba52e7a49796499",
+      "drivers/EldenWifi/TestQmiPower.inc": "84bc24ba0e6f960ab661dd4ca667e9b67ddb31d6c4f569552efa3eeec41a3ee0",
+      "drivers/EldenWifi/QmiPower.c": "f898f6c72b77a5f1caa0fb88b35764a216207ceb00cd991eeb0deeb137561031",
+      "drivers/EldenWifi/QmiPowerBinding.h": "1fc656dbfe3766ad10405f8ebb3e036ce1e8f46836552fa1de59eb58a185bbdf"
+    }
+  },
+  "native": {
+    "compiled": true,
+    "gateway_source_sha256": "f898f6c72b77a5f1caa0fb88b35764a216207ceb00cd991eeb0deeb137561031",
+    "gateway_object_sha256": "c39bf6e92c211b6b6610161b9ea0f112f807411e675dd22b2b2c7d6412b8ac01",
+    "exact_header_sha256": "09d5313e43cdcc0a57426d5aea26e25aea8a124411440c4cf3dd29a675319a1a",
+    "warnings": 14,
+    "wifi_runtime_report_sha256": "b5a7115dad78f9ed75485eb062bb979ef43ff1a0ffe585c928b4b8284d484adb",
+    "wifi_objects_unchanged": 125,
+    "relocatable_link_sha256": "f861c5022545c97cefec571ac2403afd12bb69aa8a3339024cea6ffc9396ab18",
+    "relocatable_link_succeeded": true,
+    "linux_qmi_symbol_bound": true,
+    "duplicate_definitions": {},
+    "remaining_imports": [
+      "_IODelay",
+      "_IOFree",
+      "_IOMalloc_internal",
+      "_IOSleep",
+      "_KHEAP_DEFAULT",
+      "_PE_parse_boot_argn",
+      "_Sm8750AossQmpInit",
+      "_Sm8750AossQmpSend",
+      "_Sm8750CmdDbCopy",
+      "_Sm8750CmdDbVrm",
+      "_Sm8750RpmhWriteActive",
+      "__ZN14IODeviceMemory9withRangeEyy",
+      "__ZN15IORegistryEntry8fromPathEPKcPK15IORegistryPlanePcPiPS_",
+      "__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass",
+      "__ZN6OSData9metaClassE",
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_bzero",
+      "_current_thread",
+      "_elden_bt_bootstrap_publish",
+      "_elden_bt_host_publish",
+      "_elden_bt_host_run",
+      "_elden_bt_runtime_ready",
+      "_elden_init_exec_accepted",
+      "_elden_recovery_armed",
+      "_elden_spmi_transaction_acquire",
+      "_elden_spmi_transaction_release",
+      "_elden_usb_log_putc",
+      "_elden_wcn_bt_nvm",
+      "_elden_wcn_bt_patch",
+      "_elden_wcn_hci_firmware_prepare",
+      "_elden_wcn_hci_prepare",
+      "_elden_wcn_hci_run",
+      "_elden_wcn_nvm",
+      "_elden_wcn_patch",
+      "_elden_wcn_peripheral_prepare",
+      "_elden_wcn_startup_prepare",
+      "_elden_wcn_startup_run",
+      "_elden_wcn_tmel",
+      "_elden_wcn_uart_backend_close",
+      "_elden_wcn_uart_backend_open",
+      "_gIODTPlane",
+      "_kernel_thread_start",
+      "_memcmp",
+      "_memcpy",
+      "_memmove",
+      "_memset",
+      "_native_owner_data_status",
+      "_pb_bdaddr_from_seed",
+      "_pb_bdaddr_written",
+      "_pb_spmi_find",
+      "_pb_spmi_read8",
+      "_snprintf",
+      "_sscanf",
+      "_strchr",
+      "_strcmp",
+      "_strlen",
+      "_strncpy",
+      "_strtoul",
+      "_thread_deallocate",
+      "_thread_terminate",
+      "_vsnprintf"
+    ],
+    "scalar": true,
+    "native_board_caller_added": false,
+    "kernel_linked": false,
+    "boot_created": false,
+    "hardware_tested": false,
+    "source_input_count": 44,
+    "object_count": 128,
+    "full_report_sha256": "a13bc17dab18802b003b0bbe526e4b32f8b93af9c6b1f6924c1e9a459167a57f",
+    "warning_details": [
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 256,
+        "column": 74,
+        "diagnostic": "implicit conversion loses integer precision: 'long' to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 257,
+        "column": 73,
+        "diagnostic": "implicit conversion loses integer precision: 'long' to 'u32' (aka 'unsigned int') [-Wshorten-64-to-32]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 285,
+        "column": 94,
+        "diagnostic": "implicit conversion loses integer precision: 'long' to 'int' [-Wshorten-64-to-32]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 286,
+        "column": 94,
+        "diagnostic": "implicit conversion loses integer precision: 'long' to 'u16' (aka 'unsigned short') [-Wimplicit-int-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 287,
+        "column": 111,
+        "diagnostic": "implicit conversion loses integer precision: 'long' to 'u16' (aka 'unsigned short') [-Wimplicit-int-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 387,
+        "column": 91,
+        "diagnostic": "implicit conversion loses integer precision: 'int' to 'u16' (aka 'unsigned short') [-Wimplicit-int-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 388,
+        "column": 120,
+        "diagnostic": "implicit conversion changes signedness: 'int' to 'u32' (aka 'unsigned int') [-Wsign-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 388,
+        "column": 105,
+        "diagnostic": "implicit conversion changes signedness: 'int' to 'u32' (aka 'unsigned int') [-Wsign-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_skb.h",
+        "line": 394,
+        "column": 60,
+        "diagnostic": "implicit conversion loses integer precision: 'int' to '__le16' (aka 'unsigned short') [-Wimplicit-int-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_pci.h",
+        "line": 52,
+        "column": 133,
+        "diagnostic": "implicit conversion loses integer precision: 'u32' (aka 'unsigned int') to 'u16' (aka 'unsigned short') [-Wimplicit-int-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_pci.h",
+        "line": 54,
+        "column": 133,
+        "diagnostic": "implicit conversion changes signedness: 'unsigned int' to 'int' [-Wsign-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_pci.h",
+        "line": 54,
+        "column": 135,
+        "diagnostic": "implicit conversion changes signedness: 'int' to 'unsigned int' [-Wsign-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_pci.h",
+        "line": 54,
+        "column": 151,
+        "diagnostic": "implicit conversion loses integer precision: 'u32' (aka 'unsigned int') to 'u16' (aka 'unsigned short') [-Wimplicit-int-conversion]"
+      },
+      {
+        "file": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-runtime-20261113/mhi-fixed/component/shim/include/lx_pci.h",
+        "line": 128,
+        "column": 9,
+        "diagnostic": "'list_for_each_entry_continue' macro redefined [-Wmacro-redefined]"
+      }
+    ]
+  },
+  "unchanged_runtime_source_inputs": 456,
+  "frozen_runtime_commit": "068f6f40d6c1b4688b0f57c39bf06de01e2b0e95",
+  "native_board_caller_registered": false,
+  "no_device_or_gpu_worktree_operations": true,
+  "goal_complete": false,
+  "next": "Actual PCIe/BAR/DMA/MSI/MHI lifecycle caller and binding, then full source-built kernel and recovery qualification"
+}

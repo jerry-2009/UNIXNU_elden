@@ -1,0 +1,83 @@
+{
+  "stage": "hardware-stage4-fallback-reset-restored-stock",
+  "date": "2026-11-16",
+  "profile": "wifi-qdss-config",
+  "kernel_sha256": "3465762aaf9d1152e28daabdea7639f95e3b02fbf8eea14ae4144e9d219afb16",
+  "native_sha256": "40a6af7f6a7d99878505de183c93456ddefb4d03521c004d3c0f060b2acbc4bf",
+  "firmware_binding_sha256": "5483cc1a2cc51cc16f3680951a1de4769e805f7a96adff9ac6d7302c983f22bc",
+  "native_worker_unchanged_sha256": "1dd01bae1e3d8520dd692288f2f7cdad01ee8c849ad5a72f95dfb06547ac55f4",
+  "stock_modem_sha256": "725134ea3cef706988e6f15813aaba41956a89f1f2a2a6bfd961c99cb56d0221",
+  "qdss": {
+    "request": "qdss_trace_config.bin",
+    "path": "image/peach/qdss_trace_config_v2.cfg",
+    "bytes": 6237,
+    "sha256": "94251904525f36f69092db8abde1f5198bd32c8c5fa482448e7076e0e3bc0eab"
+  },
+  "host": "9 actual firmware-cache scenarios / 72 checks passed using original modem FAT and real SHA256; kernel services modeled",
+  "host_kernel_services_modeled": true,
+  "native_warnings": 1,
+  "firmware_warnings": {
+    "FirmwareCache": 0,
+    "ModemFiles": 0
+  },
+  "source_inputs": 178,
+  "original_apple_regions": 30,
+  "direct_calls": 21,
+  "hardware_tested": true,
+  "image_sha256": "432fd68822dc7fe31c87ff097d96082286beb43727285c84d3e9b3bf0986e703",
+  "session": "1e5fdb6c5d47aa36",
+  "rollback": 1738713600,
+  "footer": 0,
+  "parent_location": 3,
+  "audit_sha256": "84773294b6d398c0f37b41bb171ec73d20330cd0c3954c641f87e7b265917787",
+  "init_returns": [
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:1 nw_mainline_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:1 register_pernet_device rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:2 wiphy_sysfs_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:3 register_netdevice_notifier rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:4 nl80211_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:5 regulatory_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:6 workqueue rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:2 lx_init_cfg80211_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:3 lx_init_ieee80211_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:4 mhi_init_hook rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:5 nw_qrtr_mhi_register rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:6 ath12k_wifi7_pci_init rc=0"
+  ],
+  "capture": {
+    "file": "edl_work\\live-qdss-v167-20261116\\usb\\20261116-022330.bin",
+    "bytes": 261567,
+    "sha256": "8e60881384c9f1054bcc876e08b28d4c7704c24eb210a1ad15c68229a62c695d",
+    "drop_max": 0,
+    "discontinuities": 0,
+    "reconnections": 0,
+    "post_disconnect_counter_available": false
+  },
+  "key_lines": [
+    "ELDEN_ATH12K level=6 qmi FW_INIT_DONE received: hang_offset_valid=0 hang_offset=0 hang_length_valid=0 hang_length=0 soft_sku_valid=1 soft_sku=0x1",
+    "ELDEN_ATH12K level=4 wifi: the firmware and the board give no address: a made-up one is used",
+    "ELDEN_WIFI_RUNTIME scan=0",
+    "ELDEN_ATH12K level=4 qmi failed to send mode request, mode: 4, err = -12",
+    "ELDEN_ATH12K level=4 qmi failed to send wlan mode off",
+    "ELDEN_WCN RPC stop=0; held or bounded wait expired, continuing reset",
+    "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+  ],
+  "max_stage": 4,
+  "max_msi_irqs": 80,
+  "max_bss": 0,
+  "scan_request_queued": true,
+  "radio_scan_completion_verified": false,
+  "network_or_userland_client_verified": false,
+  "graceful_wcn_stop": false,
+  "hardware_mhi_drain_verified": false,
+  "typed_reset_and_stock_sha_restore": true,
+  "android_root_green_settings_restored": true,
+  "jobs_terminal": true,
+  "notes": [
+    "QDSS mapping accepted enough for firmware FW_INIT_DONE and Linux ready stage4; no scan/network claim.",
+    "nw_wifi_scan success means UI request queued; native supplicant job is not installed.",
+    "Mode-off QMI failure -12 and bounded WCN stop expiry appeared only after reaching full stage4. Native RESET/master-off/IRQ/PERST completion not recorded this run.",
+    "Source closes DMA/firmware before nw_wifi_stop; WLAN admission also revokes platform_stopping and epoch. Must model/repair owned cleanup lifetime; exact branch yielding live -12 not separately recorded.",
+    "v166 reset1/1 evidence must not be carried over to v167."
+  ]
+}

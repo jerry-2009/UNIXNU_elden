@@ -1,0 +1,91 @@
+{
+  "native": {
+    "profile": "cpu-governor",
+    "kernel_sha256": "e5fb6973b094fb574bec58cdc2dd9e1c3700047eaaf9eb6c18e3a629b51bb253",
+    "native_sha256": "d5d011c2f2ddeaef07724388b564d99003e6752fd6b87e50f826e93e3785c7b1",
+    "changed_core_objects": 0,
+    "changed_native_objects": 2,
+    "scalar": true,
+    "original_apple_executables_hashed": 30,
+    "stop_hook": {
+      "provider": "0xfffffff007b6f8ec",
+      "calls": [
+        "0xfffffff007b3b350"
+      ],
+      "prelink_preserved": true
+    },
+    "generated_policy_sha256": "c78ae7b5a0080a76c3a1727fd067c56ebb77bc1387baef0e1f609e53661191d3"
+  },
+  "controller_host": {
+    "passed": true,
+    "result": "PASS 162 scenarios / 221812 checks: actual demand policy + SCMI transport + restore controller",
+    "asan_ubsan": true,
+    "policy_sha256": "c78ae7b5a0080a76c3a1727fd067c56ebb77bc1387baef0e1f609e53661191d3",
+    "source_inputs": {
+      "drivers/EldenCpuPower/GovernorSource.py": "71f0f1df50b11de1ae1491174583ddbf85a06076aae2e4c0ed4453720a80c401",
+      "drivers/EldenCpuPower/GovernorControl.h": "cd8499d01f5ede85fbece78627cced9fb205549c16821e46e2677f5551df6c29",
+      "drivers/EldenCpuPower/TestGovernor.cpp": "4b0c8665a7db380d9d0144d4b480af329cbc181eddcc3b6981bbb0b2da3eda23",
+      "drivers/EldenCpuPower/upstream/CpuFreqGovernor.h": "a65c3fad88ccd0e0bc56c2a930aef574d2a1ef30f194dad1005ff1c963604083",
+      "drivers/EldenCpuPower/upstream/LICENSE": "9e18e2c43ae4e51da2d11fd777b5b11056476d6ba395e5e2270467dbf02d0adf",
+      "drivers/EldenCpuPower/upstream/source.json": "3cea101fc2b597e88521c493ce17f29662342c0a0b663aa7e95b717a35159280",
+      "profiles/v91/sources/power/EldenScmiPerf.h": "9312e686b81d35455c815a13d400618929577326686560ee571f3e47688a4a82",
+      "profiles/v91/sources/power/CpuPerfAccess.h": "5aa66c636eba5844288a66a6936478598875cc4829df9a02d8d53811f2919c20",
+      "tools/test_cpu_governor.py": "5cd042676001f2ec523cf72c7ce6d9b0039dcb9801a970d04750168ec4575da9"
+    },
+    "hardware": false,
+    "limits": "Real policy/controller/SCMI functions against a fake firmware; not CPU transition, thermal or net-charge hardware acceptance."
+  },
+  "runtime_host": {
+    "passed": true,
+    "actual_runtime": true,
+    "actual_stop_callback": true,
+    "actual_controller_scmi": true,
+    "asan_ubsan": true,
+    "result": "PASS 16 runtime cases / 2754 checks",
+    "source_sha256": "8b1abbed4e27a40a2d5c43efe28d05243cdd8beb8bab0b119b14b3b79fa5c350",
+    "policy_sha256": "c78ae7b5a0080a76c3a1727fd067c56ebb77bc1387baef0e1f609e53661191d3",
+    "recovery_sha256": "3db3456277d362281f702a0c3d0dd3340fb87e82bd4a095d9d66c9b4dc76c088",
+    "source_inputs": {
+      "drivers/EldenCpuPower/Runtime.inc": "5f6d1c6e65c6c37cdcc2dce8488a934b45f43de64db641a365b66ef8d0fc3244",
+      "drivers/EldenCpuPower/RuntimeSource.py": "271e018c46ece68d9fe4f0779daa332c6aa0d314da57e757df3abd24c277f07b",
+      "drivers/EldenCpuPower/GovernorControl.h": "cd8499d01f5ede85fbece78627cced9fb205549c16821e46e2677f5551df6c29",
+      "drivers/EldenCpuPower/GovernorSource.py": "71f0f1df50b11de1ae1491174583ddbf85a06076aae2e4c0ed4453720a80c401",
+      "drivers/EldenCpuPower/TestGovernor.cpp": "4b0c8665a7db380d9d0144d4b480af329cbc181eddcc3b6981bbb0b2da3eda23",
+      "drivers/EldenCpuPower/Survey.inc": "7dd84180f15978227dd6edb700a9938318c864b8e17edf145b2ad77784651fa5",
+      "drivers/EldenCpuPower/SurveySource.py": "60c569fc3b8ec1095cc2c64e8186788da34147fe96f9ea4f256e02da1836b896",
+      "drivers/EldenCpuPower/CpuLoad.h": "9d38315819dea7439ee9d9bc043040c04513d152795d4f691c0acdaecd9a6a30",
+      "drivers/EldenCpuPower/upstream/CpuFreqGovernor.h": "a65c3fad88ccd0e0bc56c2a930aef574d2a1ef30f194dad1005ff1c963604083",
+      "drivers/EldenCpuPower/upstream/source.json": "3cea101fc2b597e88521c493ce17f29662342c0a0b663aa7e95b717a35159280",
+      "drivers/EldenCpuPower/upstream/LICENSE": "9e18e2c43ae4e51da2d11fd777b5b11056476d6ba395e5e2270467dbf02d0adf",
+      "tools/test_cpu_governor_runtime.py": "f5fdc9f832d7a39b92d1104938ab89f0fad5c714f0ef0b4ce892ef6dd1618123",
+      "profiles/v97-wcn/EldenSdamRecovery.inc": "ce63730b121d825dd9405cd9c537eaf7c0c73f78ed6dba0fe6c5021472a45781",
+      "profiles/v91/sources/power/EldenScmiPerf.h": "9312e686b81d35455c815a13d400618929577326686560ee571f3e47688a4a82",
+      "profiles/v91/sources/power/CpuPerfAccess.h": "5aa66c636eba5844288a66a6936478598875cc4829df9a02d8d53811f2919c20",
+      "profiles/v91/sources/power/CpuPerfSurvey.cpp": "6c71236e924895b4059264c30baa160a3304239923d7bdfb57ed40ae230e008c"
+    },
+    "hardware": false,
+    "native_compiled": false,
+    "limits": "Kernel readiness/load/MMIO are modeled; no device, no real concurrency or scheduler budget acceptance."
+  },
+  "warnings": {
+    "same_warning_diagnostics": true,
+    "count": 26,
+    "normalization": "line/column only; warning text and file retained",
+    "cpu_warnings": 0
+  },
+  "routing_tests": {
+    "passed": true,
+    "checks": 10,
+    "real_current_recovery_aliases": [
+      "@VROOT@/research/icon-fault-trace-20261111/src/EldenSdamRecovery.inc",
+      "@VROOT@/lab/fbwc-v94-20261112/build/native/build/project/records/icon-fault-trace-20261111/src/EldenSdamRecovery.inc"
+    ],
+    "legacy_recovery_rejected": true,
+    "menu_bytes": 1023,
+    "only_menu_semantic_delta": "ecp=2 -> ecp=3",
+    "native_compiled": false,
+    "hardware": false,
+    "limits": "Source mapping and synthetic Mach-O verifier tests only."
+  },
+  "full_clean_combined_rerun": false
+}

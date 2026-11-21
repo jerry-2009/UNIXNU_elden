@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "ce3_direct_trial": true,
+  "hardware_tested": false,
+  "question": "Does the previously mapped CE3 shadow producer path stop actual consumption?",
+  "donor": {
+    "plain_wifi7_hal_sha256": "08ad25eb9e2ddace5502a97207f1c89dbd9e404bef45cdd63e40086ee19c0b4e",
+    "original_direct_branch": true,
+    "board_source": "6f97250e/SM8750",
+    "vendor": "d50b305f7da9e14715a25120a4ac7b1a4b8b97c3 hal_srng_setup(ignore_shadow)",
+    "ring_id": 67,
+    "r2_offset": "0x01b86400",
+    "ce_base": "0x01b80000",
+    "ce_stride": "0x2000",
+    "hp_offset": "0x400"
+  },
+  "host": {
+    "passed": true,
+    "actual_hal_pointer_functions": true,
+    "mmio_not_executed": true,
+    "hardware_tested": false,
+    "summary": "PASS 144 actual HAL pointer scenarios; only exact Peach CE3 source selects original direct branch",
+    "sanitizers": [
+      "ASan",
+      "UBSan"
+    ],
+    "hal_source_sha256": "08ad25eb9e2ddace5502a97207f1c89dbd9e404bef45cdd63e40086ee19c0b4e",
+    "hal_fixed_sha256": "bd54ef49bcf649fcd81a1d774f0a828733330e7372aa8b26c50cb5d76c76fb12",
+    "source_inputs": {
+      "tools/test_wifi_ce3_direct.py": "1fb441d04a8c9d28021496c4c1fad5e0bf92a00eabd31567112d37c6baf036aa",
+      "drivers/EldenWifi/peach/Ce3DirectPointerPatch.py": "9606bb30abb800edaa81d4d83069703966924ea9880f450d40a47681b7ba3252"
+    }
+  },
+  "runtime": {
+    "binding_sha256": "5aead2005f57afc842488119853bcf590abff9b279b14ad13adc90ff72d13667",
+    "hal_object_sha256": "e914b200d0183dce596a37e70466a8e7c53105145ec19ba3fa9978e70a298061",
+    "hal_source_sha256": "bd54ef49bcf649fcd81a1d774f0a828733330e7372aa8b26c50cb5d76c76fb12",
+    "warnings": 71,
+    "retained_units": 124,
+    "changed_units": [
+      "ath12k_wmi.o",
+      "ath12k_pci.o",
+      "w7_hal.o"
+    ],
+    "qmi_shadow_table_unchanged": true,
+    "no_other_ce_or_credit_changes": true
+  },
+  "kernel": {
+    "native_sha256": "480cba0e2faef050a08a3b4c1840d3d4ace902c35d37114a29c87fe2641d21b8",
+    "kernel_sha256": "86985e2ed3aafe0d580c1c6ae56866dfc2d8403e81576a767e7cda1df5b51044",
+    "apple_execution_regions": 30,
+    "entry_delta": 7124,
+    "core_unchanged": true,
+    "native_worker_retained": true
+  },
+  "qualification": {
+    "passed": true,
+    "mutation_cases": 30,
+    "menu_dispatch": true,
+    "countdown_and_fallback_preserved": true,
+    "actual_component_report_qualified": true,
+    "hardware_tested": false
+  },
+  "package": {
+    "accepted_static": true,
+    "image_sha256": "771f524042a0c58406d22ac077bbb7fb0e4b64f0dcb8461c1cc3718594351639",
+    "session": "4e3c23ffa069941e",
+    "rollback": 1738713600,
+    "footer": 0,
+    "parent": 3
+  },
+  "source_inputs": {
+    "tools/build_wifi_mac_phy_stride.py": "db711b86ed45a131de5df0aef42aa9aa03b02653de90ca60b1f291abdef497e0",
+    "drivers/EldenWifi/peach/MacPhyStridePatch.py": "f44303dc0b7aca73ef8a4346d1ac4b88a0255da6b8d567c23ffe1f7438739186",
+    "tools/test_wifi_mac_phy_stride.py": "e30b29fe802b0e648d4acd2b3080f5b13ed3862623bfce7f344024d882760925",
+    "tools/build_wifi_umac_wake.py": "d9f99233622a857ec2d95667bea76b50c1d8053c69c9a115798d78492f1e6778",
+    "tools/test_wifi_umac_wake.py": "6bfe52f3efc6b7d37adc9bf1100979d41397a39bd4f86234e0ef51a6b7245b0f",
+    "drivers/EldenWifi/UmacWake.inc": "eef5c433dc92571cc277e7fdd06217059c52c9ad754f3f2212d61937ae6e9ee2",
+    "drivers/EldenWifi/peach/UmacWakePatch.py": "b1577baed5e9b2a9defa42504348ed973a4951a9dc4e76faf2260e6e6d7fe606",
+    "tools/build_wifi_vdev_mlo_array.py": "5df573c0fc56356f0276ebc422bb060a65a76b2d424164a33750d40b272f4048",
+    "tools/test_wifi_vdev_mlo_array.py": "7f4766cf453dfc5a9aa9902c53b2c1e586a06e8549d3acdec309433edc42abbf",
+    "drivers/EldenWifi/peach/VdevMloArrayPatch.py": "2816641a4170adf0577b0ed0a248c5a41b14f2e73b3125742e2dc92241fd46c9",
+    "tools/build_wifi_ce3_direct.py": "5f46b67ca6e6fbf0739d5698e78924354f358c9b2473756c74690f402c53ce9e",
+    "tools/test_wifi_ce3_direct.py": "1fb441d04a8c9d28021496c4c1fad5e0bf92a00eabd31567112d37c6baf036aa",
+    "drivers/EldenWifi/peach/Ce3DirectPointerPatch.py": "9606bb30abb800edaa81d4d83069703966924ea9880f450d40a47681b7ba3252"
+  },
+  "runtime1_rejected_wrong_quoted_header": true,
+  "runtime2_preserves_original_quoted_namespace": true,
+  "next": "One narrow CE3 direct producer notification contrast; no credit invention/timeout changes. Full physical stop and stock restoration required.",
+  "goal": "active and incomplete"
+}

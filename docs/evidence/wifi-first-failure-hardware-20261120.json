@@ -1,0 +1,724 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": true,
+  "image_sha256": "ddd1352ec03eeb3eb78841aa26abfb0b8811e7dddab3d081a9710488edcadf67",
+  "session": "72daf70592c1ce2a",
+  "raw": {
+    "path": "edl_work\\live-first-failure-20261120\\usb\\20261120-105235.bin",
+    "bytes": 277624,
+    "sha256": "269a6dd5dd30d398ae459261e9c678e212d21f0c0e4cfde602c2a87521e65346",
+    "drop_max": 11,
+    "status_samples": 60,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "physical_rows": {
+    "12": [
+      {
+        "map": 6,
+        "offset": "0x0",
+        "rc": 0,
+        "value": 286136267
+      },
+      {
+        "map": 6,
+        "offset": "0x4",
+        "rc": 0,
+        "value": 135266310
+      },
+      {
+        "map": 6,
+        "offset": "0x10",
+        "rc": 0,
+        "value": 1077936132
+      },
+      {
+        "map": 6,
+        "offset": "0x14",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 6,
+        "offset": "0x18",
+        "rc": 0,
+        "value": 1080033284
+      },
+      {
+        "map": 6,
+        "offset": "0x1c",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 6,
+        "offset": "0x78",
+        "rc": 0,
+        "value": 1050640
+      },
+      {
+        "map": 6,
+        "offset": "0x80",
+        "rc": 0,
+        "value": 269680640
+      },
+      {
+        "map": 4,
+        "offset": "0x728",
+        "rc": 0,
+        "value": 21560465
+      },
+      {
+        "map": 4,
+        "offset": "0x72c",
+        "rc": 0,
+        "value": 134217744
+      },
+      {
+        "map": 4,
+        "offset": "0x828",
+        "rc": -5,
+        "value": 4294967295
+      },
+      {
+        "map": 4,
+        "offset": "0x82c",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 4,
+        "offset": "0x830",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 5,
+        "offset": "0x200",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 5,
+        "offset": "0x204",
+        "rc": 0,
+        "value": 2147483648
+      },
+      {
+        "map": 5,
+        "offset": "0x208",
+        "rc": 0,
+        "value": 1076887552
+      },
+      {
+        "map": 5,
+        "offset": "0x20c",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 5,
+        "offset": "0x210",
+        "rc": 0,
+        "value": 1081081855
+      },
+      {
+        "map": 5,
+        "offset": "0x214",
+        "rc": 0,
+        "value": 1076887552
+      },
+      {
+        "map": 5,
+        "offset": "0x218",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b000",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6c01c",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b004",
+        "rc": 0,
+        "value": 4196595713
+      },
+      {
+        "map": 0,
+        "offset": "0x6b008",
+        "rc": 0,
+        "value": 67569664
+      },
+      {
+        "map": 0,
+        "offset": "0x6c000",
+        "rc": 0,
+        "value": 4196542465
+      },
+      {
+        "map": 0,
+        "offset": "0x6c004",
+        "rc": 0,
+        "value": 67569664
+      },
+      {
+        "map": 0,
+        "offset": "0x52000",
+        "rc": 0,
+        "value": 7880063
+      },
+      {
+        "map": 0,
+        "offset": "0x52008",
+        "rc": 0,
+        "value": 1580991103
+      },
+      {
+        "map": 0,
+        "offset": "0x5214c",
+        "rc": 0,
+        "value": 2
+      },
+      {
+        "map": 0,
+        "offset": "0x6b068",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b06c",
+        "rc": 0,
+        "value": 1541
+      },
+      {
+        "map": 0,
+        "offset": "0x6b080",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b084",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b088",
+        "rc": 0,
+        "value": 1
+      },
+      {
+        "map": 0,
+        "offset": "0x6b020",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x6b040",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x6b044",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x6b01c",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x10058",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x6b018",
+        "rc": 0,
+        "value": 2281701378
+      },
+      {
+        "map": 0,
+        "offset": "0x10050",
+        "rc": 0,
+        "value": 2281701378
+      },
+      {
+        "map": 0,
+        "offset": "0x6b064",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 1,
+        "offset": "0x8",
+        "rc": 0,
+        "value": 1
+      },
+      {
+        "map": 7,
+        "offset": "0x0",
+        "rc": 0,
+        "value": 513
+      },
+      {
+        "map": 7,
+        "offset": "0x4",
+        "rc": 0,
+        "value": 3
+      },
+      {
+        "map": 7,
+        "offset": "0x1000",
+        "rc": 0,
+        "value": 7
+      },
+      {
+        "map": 7,
+        "offset": "0x1004",
+        "rc": 0,
+        "value": 0
+      }
+    ],
+    "90": [
+      {
+        "map": 6,
+        "offset": "0x0",
+        "rc": 0,
+        "value": 286136267
+      },
+      {
+        "map": 6,
+        "offset": "0x4",
+        "rc": 0,
+        "value": 135266310
+      },
+      {
+        "map": 6,
+        "offset": "0x10",
+        "rc": 0,
+        "value": 1077936132
+      },
+      {
+        "map": 6,
+        "offset": "0x14",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 6,
+        "offset": "0x18",
+        "rc": 0,
+        "value": 1080033284
+      },
+      {
+        "map": 6,
+        "offset": "0x1c",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 6,
+        "offset": "0x78",
+        "rc": 0,
+        "value": 1050640
+      },
+      {
+        "map": 6,
+        "offset": "0x80",
+        "rc": 0,
+        "value": 269680640
+      },
+      {
+        "map": 4,
+        "offset": "0x728",
+        "rc": 0,
+        "value": 30525073
+      },
+      {
+        "map": 4,
+        "offset": "0x72c",
+        "rc": 0,
+        "value": 134217744
+      },
+      {
+        "map": 4,
+        "offset": "0x828",
+        "rc": -5,
+        "value": 4294967295
+      },
+      {
+        "map": 4,
+        "offset": "0x82c",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 4,
+        "offset": "0x830",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 5,
+        "offset": "0x200",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 5,
+        "offset": "0x204",
+        "rc": 0,
+        "value": 2147483648
+      },
+      {
+        "map": 5,
+        "offset": "0x208",
+        "rc": 0,
+        "value": 1076887552
+      },
+      {
+        "map": 5,
+        "offset": "0x20c",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 5,
+        "offset": "0x210",
+        "rc": 0,
+        "value": 1081081855
+      },
+      {
+        "map": 5,
+        "offset": "0x214",
+        "rc": 0,
+        "value": 1076887552
+      },
+      {
+        "map": 5,
+        "offset": "0x218",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b000",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6c01c",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b004",
+        "rc": 0,
+        "value": 4196595713
+      },
+      {
+        "map": 0,
+        "offset": "0x6b008",
+        "rc": 0,
+        "value": 67569664
+      },
+      {
+        "map": 0,
+        "offset": "0x6c000",
+        "rc": 0,
+        "value": 4196542465
+      },
+      {
+        "map": 0,
+        "offset": "0x6c004",
+        "rc": 0,
+        "value": 67569664
+      },
+      {
+        "map": 0,
+        "offset": "0x52000",
+        "rc": 0,
+        "value": 7880063
+      },
+      {
+        "map": 0,
+        "offset": "0x52008",
+        "rc": 0,
+        "value": 1580991103
+      },
+      {
+        "map": 0,
+        "offset": "0x5214c",
+        "rc": 0,
+        "value": 2
+      },
+      {
+        "map": 0,
+        "offset": "0x6b068",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b06c",
+        "rc": 0,
+        "value": 1541
+      },
+      {
+        "map": 0,
+        "offset": "0x6b080",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b084",
+        "rc": 0,
+        "value": 0
+      },
+      {
+        "map": 0,
+        "offset": "0x6b088",
+        "rc": 0,
+        "value": 1
+      },
+      {
+        "map": 0,
+        "offset": "0x6b020",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x6b040",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x6b044",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x6b01c",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x10058",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 0,
+        "offset": "0x6b018",
+        "rc": 0,
+        "value": 2281701378
+      },
+      {
+        "map": 0,
+        "offset": "0x10050",
+        "rc": 0,
+        "value": 2281701378
+      },
+      {
+        "map": 0,
+        "offset": "0x6b064",
+        "rc": 0,
+        "value": 134217728
+      },
+      {
+        "map": 1,
+        "offset": "0x8",
+        "rc": 0,
+        "value": 1
+      },
+      {
+        "map": 7,
+        "offset": "0x0",
+        "rc": 0,
+        "value": 513
+      },
+      {
+        "map": 7,
+        "offset": "0x4",
+        "rc": 0,
+        "value": 3
+      },
+      {
+        "map": 7,
+        "offset": "0x1000",
+        "rc": 0,
+        "value": 7
+      },
+      {
+        "map": 7,
+        "offset": "0x1004",
+        "rc": 0,
+        "value": 0
+      }
+    ]
+  },
+  "raw_bar_rows": {
+    "12": {
+      "0x38": "0x200",
+      "0x48": "0x201",
+      "0x3004": "0x0",
+      "0x3008": "0x4",
+      "0x3278": "0x4000003c",
+      "0x1b00000": "0x40210200",
+      "0x1e04040": "0x2",
+      "0x1e081b0": "0x111",
+      "0x1f80000": "0x28023917",
+      "0x1f80004": "0xffff",
+      "0x1f80008": "0x1ffff",
+      "0x1f8000c": "0x0",
+      "0x1f8002c": "0xd",
+      "0x1f80500": "0x0",
+      "0x1f80504": "0x14fac59",
+      "0x1b86000": "0x10001bc0",
+      "0x1b86004": "0x8000",
+      "0x1b86008": "0x4",
+      "0x1b86010": "0xc2",
+      "0x1b86400": "0x4",
+      "0x1b86404": "0x4"
+    },
+    "90": {
+      "0x38": "0x200",
+      "0x48": "0x201",
+      "0x3004": "0x0",
+      "0x3008": "0x4",
+      "0x3278": "0x4000003c",
+      "0x1b00000": "0x40210200",
+      "0x1e04040": "0x0",
+      "0x1e081b0": "0x111",
+      "0x1f80000": "0x28023917",
+      "0x1f80004": "0xffff",
+      "0x1f80008": "0x1ffff",
+      "0x1f8000c": "0x0",
+      "0x1f8002c": "0x1d",
+      "0x1f80500": "0x0",
+      "0x1f80504": "0x14fac58",
+      "0x1b86000": "0x0",
+      "0x1b86004": "0x0",
+      "0x1b86008": "0x0",
+      "0x1b86010": "0x80",
+      "0x1b86400": "0x0",
+      "0x1b86404": "0x0"
+    }
+  },
+  "states": {
+    "12": [
+      "ELDEN_ATH12K level=4 ELDEN_FIRST_STATE stage=12 result=-95 ms=48363 pm=4 state=2 ee=2 refs=0/0 ready=1 init=0 umacrefs=0 fault=0; raw-read-nonatomic no-wake",
+      "ELDEN_ATH12K level=4 ELDEN_FIRST_STATE stage=12 physical=-5; firmware/reset cause unproved"
+    ],
+    "90": [
+      "ELDEN_ATH12K level=4 ELDEN_FIRST_STATE stage=90 result=-110 ms=58194 pm=4 state=2 ee=2 refs=1/1 ready=1 init=0 umacrefs=0 fault=-110; raw-read-nonatomic no-wake",
+      "ELDEN_ATH12K level=4 ELDEN_FIRST_STATE stage=90 physical=-5; firmware/reset cause unproved"
+    ]
+  },
+  "physical_deltas": [
+    {
+      "map": 4,
+      "offset": "0x728",
+      "before": {
+        "rc": 0,
+        "value": 21560465
+      },
+      "after": {
+        "rc": 0,
+        "value": 30525073
+      }
+    }
+  ],
+  "bar_deltas": [
+    {
+      "offset": "0x1e04040",
+      "before": "0x2",
+      "after": "0x0"
+    },
+    {
+      "offset": "0x1f8002c",
+      "before": "0xd",
+      "after": "0x1d"
+    },
+    {
+      "offset": "0x1f80504",
+      "before": "0x14fac59",
+      "after": "0x14fac58"
+    },
+    {
+      "offset": "0x1b86000",
+      "before": "0x10001bc0",
+      "after": "0x0"
+    },
+    {
+      "offset": "0x1b86004",
+      "before": "0x8000",
+      "after": "0x0"
+    },
+    {
+      "offset": "0x1b86008",
+      "before": "0x4",
+      "after": "0x0"
+    },
+    {
+      "offset": "0x1b86010",
+      "before": "0xc2",
+      "after": "0x80"
+    },
+    {
+      "offset": "0x1b86400",
+      "before": "0x4",
+      "after": "0x0"
+    },
+    {
+      "offset": "0x1b86404",
+      "before": "0x4",
+      "after": "0x0"
+    }
+  ],
+  "interpretation": [
+    "Endpoint ID/command/BARs/memory decode/link/iATU/GCC/GDSCs/reset votes/PERST unchanged at UMAC loss. Root DEBUG0 changed its counters, with link-up fields retained.",
+    "MSI enable0xffffffff is the expected programmed full mask, not a decode failure; the observer incorrectly classified it as -5. Raw value is retained and not a WMI cause.",
+    "Raw UMACscratch2->0 and CE3configuration->0 confirmed, WLAON power status d->1d and warm-entry14fac59->14fac58; precise bit cause unproved. Later all-ones from guarded access are refusal sentinels.",
+    "OEM Host Capability QMI table lacksTLV0x33; prepared Ath12kWifi forcibly advertises it. Next source-supported Peach-only eager-memory capability contrast."
+  ],
+  "full_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "physical_fastboot": true,
+  "stock_root_green_original_settings_restored": true,
+  "all_device_jobs_terminal": true,
+  "radio_restore_attempts": 4,
+  "radio_restore_startup_errors": 2,
+  "graceful_fence_proven": false,
+  "net_drained": false,
+  "bss": 0,
+  "association": false,
+  "dhcp": false,
+  "traffic": false,
+  "goal": "active and incomplete"
+}

@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "repository": "https://github.com/lenzhang/UniXNU-xiaomipad8pro",
+  "commit": "2438556c77c90c22c7b76e57eb8b40c44b35f1af",
+  "license": "BSD-2-Clause-Patent",
+  "files": [
+    {
+      "path": "WifiSta.h",
+      "upstream_path": "package/PianoWifi/WifiSta.h",
+      "sha256": "ddd7780b195c3584cb023df121c6e3177154c078a469c0a84826431ea4bf629e",
+      "bytes": 56234
+    },
+    {
+      "path": "WifiDp.h",
+      "upstream_path": "package/PianoWifi/WifiDp.h",
+      "sha256": "e34fd826570c827b3c20790a895296a963066450790196df55b8d2d4a3afa5ef",
+      "bytes": 30362
+    },
+    {
+      "path": "WifiHtVht.h",
+      "upstream_path": "package/PianoWifi/WifiHtVht.h",
+      "sha256": "4994f45688e634d27b107f0fb31c5520d7e6d3e121bcbdb6625efe2463a536b2",
+      "bytes": 8744
+    },
+    {
+      "path": "WifiDot11.h",
+      "upstream_path": "package/PianoWifi/WifiDot11.h",
+      "sha256": "2a79048e74da29c66a896581cd2884c882beda65fd7a094b9714a16612e9b884",
+      "bytes": 15180
+    },
+    {
+      "path": "WifiNet.h",
+      "upstream_path": "package/PianoWifi/WifiNet.h",
+      "sha256": "23dc79e63c2d3fa33ffa44591c0865d35e8a918827e32b522a72982f61846182",
+      "bytes": 15517
+    },
+    {
+      "path": "WifiProfile.h",
+      "upstream_path": "package/PianoWifi/WifiProfile.h",
+      "sha256": "895719a21b200f8c6bcdfac375c907484fe24c83d879253a3225f40b2bbaa075",
+      "bytes": 9398
+    },
+    {
+      "path": "PianoWifiNet.h",
+      "upstream_path": "package/PianoWifi/PianoWifiNet.h",
+      "sha256": "6e4d9f7ff03a25106e192f6a8c4f9a5afe3545e45b3e645b1cbccbff9609ae8f",
+      "bytes": 12738
+    },
+    {
+      "path": "LICENSE",
+      "upstream_path": "package/PianoWifi/LICENSE",
+      "sha256": "c3b5bc2960852a3a6e3c7cae1f52486e21fd6115e925a3353e10214792ce88fb",
+      "bytes": 2663
+    },
+    {
+      "path": "tests/assoc_host.cpp",
+      "upstream_path": "package/PianoWifi/tests/assoc_host.cpp",
+      "sha256": "9149cbe03f6a019c728dc412740884582097f191487539dc59d0205e9845e3b7",
+      "bytes": 27576
+    },
+    {
+      "path": "tests/sta_host.cpp",
+      "upstream_path": "package/PianoWifi/tests/sta_host.cpp",
+      "sha256": "17c8668120c4d1ad864d18ca48ea6b5bfe8440b64c8dd0f41eaaa1b2f7b61512",
+      "bytes": 56817
+    },
+    {
+      "path": "tests/dp_host.cpp",
+      "upstream_path": "package/PianoWifi/tests/dp_host.cpp",
+      "sha256": "5b48ba556d1e7330da6a6f38cf36baf0b787d1066668c558249c61d9e0b09b38",
+      "bytes": 23684
+    },
+    {
+      "path": "tests/net_host.cpp",
+      "upstream_path": "package/PianoWifi/tests/net_host.cpp",
+      "sha256": "684a3dd1db7a14ec16f79d97c2d5a35151b8ac4adb3bb260f9ed8c4b117db913",
+      "bytes": 12501
+    },
+    {
+      "path": "piano-wifi-supplicant.c",
+      "upstream_path": "tooling/native/piano-wifi-supplicant/piano-wifi-supplicant.c",
+      "sha256": "d9913e519c003c0d937be8b166e947f107170f36ed40182a66a886674bcb0951",
+      "bytes": 35302
+    },
+    {
+      "path": "WifiUserControl.h",
+      "upstream_path": "package/PianoWifi/WifiUserControl.h",
+      "sha256": "802ed00ff27f512fca240dadcf4b29676fd894d4c4209ce66c01ee70b8639cdf",
+      "bytes": 3041
+    }
+  ],
+  "scan_lock": "../../upstream/source.json",
+  "macos_abi_not_imported": true,
+  "firmware_board_power_not_imported": true
+}

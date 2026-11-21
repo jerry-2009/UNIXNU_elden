@@ -45,6 +45,17 @@ py -3.12 tools/maintenance/sync_reference_repos.py --workbench D:\Desktop\Git\Pa
 只快进干净未分叉的跟踪分支；有本地修改或未跟踪文件的仓只 fetch，固定检出不换版本。
 报告写入 `maintenance/reference-sync`，不操作设备。
 
+2026-11-19补充：每仓开始、fetch前后及快进前检查整理标记；标记出现即以
+`deferred-maintenance`结束该仓。快进前重新核对分支、HEAD、跟踪分支和工作树，
+变化以`changed-during-sync`保留。快进使用已解析的完整commit，随后远端引用变化
+不会另选提交。11个实际本地Git场景覆盖正常快进、固定检出、脏树、分叉、切换分支、
+跟踪分支变化、fetch后修改和整理标记，以及目标引用再次变化。
+[修复前后证据](evidence/reference-sync-guards-20261119.json)。
+
+这些检查保护了已复现的变更窗口；最后一次核对与Git命令仍非跨进程原子事务。
+整理线程应先写标记并等待既有同步任务结束，不与同一参考仓同时checkout或修改。
+测试仓保留在Windows Temp，未重刷候选、更新子模块或改动冻结输入。
+
 ## macOS 编译端的源码与产物
 
 macOS 主源码仓是 `~/Desktop/UniXNU_elden`。`lab/clean-build-20261114/isolated/UniXNU_elden`
@@ -52,6 +63,8 @@ macOS 主源码仓是 `~/Desktop/UniXNU_elden`。`lab/clean-build-20261114/isola
 2026-11-15整理时，主仓还停在33b55083，隔离克隆停在cc7714d；两者均已在保存本地
 差异后快进到已发布v146源码8ceeb5f。449份旧文件来自三个Mac仓库的差异/同名未跟踪
 输入，保存于原生Trash快照中并按SHA核对；包含配套Lilac仓库，不把它们混进新源码提交。
+用户随后确认自行检查并清空了第一批Trash，故这批旧文件快照现已不可从Trash恢复。
+现行源码仍在已发布的Git提交中；回收时的验证记录与当前恢复可用性分开记载。
 
 Windows每六小时的任务只更新工作台 `research/` 引用仓，不会同步Mac的项目主仓。
 每轮编译先核对Mac HEAD与拟使用的完整源码提交；从Git固定对象或带完整源指纹的
@@ -65,3 +78,25 @@ Windows每六小时的任务只更新工作台 `research/` 引用仓，不会同
 过时整包移走前另存其顶层结果和日志；原包仍可从Trash恢复。
 当前v146/PD/GUI构建依赖、原始OS/触控/WCN/Crypto、签名模板、恢复输入和实验原始
 记录保留。macOS Trash仍占磁盘；回收不等于已增加可用空间。
+
+## 2026-11-21 本周整理
+
+当前文档入口为[INDEX](INDEX.md)。CURRENT-STATUS/PLAN/WIFI-STATUS和AGENTS已
+精简为当前事实及执行规则；原逐轮内容与11月18交接原样保存于
+[docs/archive/20261121](archive/20261121/README.md)，不改历史指纹。
+
+Mac原生Trash回收137项旧产物（21.25GiB allocated）及18项小型一次性文件／源码快照。
+所有目录和文件SHA/inode核验通过；原结果/日志另留，22658项当前传递依赖保留。
+垃圾桶未清空，回收不等于释放空间；剩余约62.5GiB。
+[摘要证据](evidence/maintenance-macos-20261121.json)；完整恢复清单在工作台
+maintenance/cleanup-20261121/mac-evidence/{verified-receipts,finish-receipts}.json。
+当前候选、回退、原OS/固件/Crypto/签名、GUI/电源/Data及其他工作树保留。
+
+本轮完整station测试结束后又回收3项：/private/tmp的OEM反汇编输入、未成功的runtime1
+目录和host wire-test.dSYM，共20,285,247B逻辑文件。原始输入、成功runtime2/kernel1/
+entry1/package1、host执行件及日志保留，逐文件SHA/inode一致；仍未清空Trash。
+追加恢复清单为工作台maintenance/cleanup-20261121/round-finish/verified-receipts.json。
+[收尾证据](evidence/maintenance-round-finish-20261121.json)单独保存，不改最初回收凭据。
+Mac主源码已仅快进到已发布49d374c；当前文档与实录同步，固定构建快照保持自己的指纹。
+收尾时数据卷约59.3GiB可用，垃圾桶继续占空间。所有本轮构建/设备/监听任务结束，
+平板已恢复完整stock Android/root/green/原充电无线扫描设置并请求熄屏。完整Goal仍未完成。

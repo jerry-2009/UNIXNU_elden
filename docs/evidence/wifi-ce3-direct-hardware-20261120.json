@@ -1,0 +1,69 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "ce3_direct_trial": true,
+  "hardware_tested": true,
+  "image_sha256": "771f524042a0c58406d22ac077bbb7fb0e4b64f0dcb8461c1cc3718594351639",
+  "session": "4e3c23ffa069941e",
+  "raw": {
+    "path": "edl_work\\live-ce3-direct-20261120\\usb\\20261119-214659.bin",
+    "bytes": 284574,
+    "sha256": "793f859ea828851b9e3bdff39ad3c892dcaad700bee0ba2c303d5044c244b75c",
+    "status_samples": 65,
+    "drop_max": 0,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "key_lines": [
+    "ELDEN_ATH12K level=4 ELDEN_CE3_DIRECT selected=1 hp-offset=1b86400; CE3 only",
+    "ELDEN_ATH12K level=4 ELDEN_UMAC_WAKE get=0 held=1 before=2 after=2 checks=1",
+    "ELDEN_ATH12K level=3 stuck: ce3 src sw 2 write 4 hp 16 reap 4 cached-tp 8 tp 8",
+    "ELDEN_WIFI_NET drain=0",
+    "ELDEN_ATH12K level=4 ELDEN_UMAC_WAKE put=1 held=0",
+    "ELDEN_WIFI_PLATFORM shutdown=0 config-error=0",
+    "ELDEN_WIFI_FENCE result=0 stage=6 master-off=1 transactions-sampled=1 idle=1 command=2 device-status=10 msi=4 perst=pending consumer=0",
+    "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+    "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+  ],
+  "ce3_direct_selected": true,
+  "ce3_exact_hp_offset": 28861440,
+  "umac_get_and_put_observed": true,
+  "first_timeout_command": "16387",
+  "wmi_timeouts": 30,
+  "ce3_sw": 2,
+  "ce3_write": 4,
+  "ce3_hp": 16,
+  "ce3_dma_tp": 8,
+  "direct_notification_removed_first_failure": false,
+  "all_notifications_proven": false,
+  "all_dma_mapping_and_lifetime_proven": false,
+  "scan_accepted": false,
+  "bss": 0,
+  "association": false,
+  "dhcp": false,
+  "traffic": false,
+  "network_drain_observed": true,
+  "physical_fence_observed": true,
+  "physical_perst_and_msi_stop_observed": true,
+  "warm_mhi_reset_proven": false,
+  "stock_restore_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_original_charge_radios_scans_restored": true,
+  "radio_restoration": {
+    "complete": true,
+    "attempts": 2,
+    "errors": [],
+    "actual_radios": [
+      "1",
+      "1"
+    ],
+    "actual_scans": [
+      "1",
+      "1"
+    ]
+  },
+  "device_jobs_terminal": true,
+  "result": "Exact direct CE3 producer path was selected, but the same early consumption failure remained. No direct-only repeat or default promotion.",
+  "next": "Consolidate first-command consumption and DMA ownership evidence. Retain no-hold functional baseline, source-tested VDEV contract, and bounded recovery; first-WMI root cause remains unknown.",
+  "goal": "active and incomplete"
+}

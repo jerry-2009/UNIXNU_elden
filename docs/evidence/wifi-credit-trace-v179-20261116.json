@@ -1,0 +1,59 @@
+{
+  "profile": "wifi-credit-trace",
+  "hardware_tested": true,
+  "image_sha256": "64c35c43a9e8097b9526c11b3fc0bd12cbb000719f1c81497e95ac16786486f9",
+  "session": "116614da0905d61b",
+  "kernel_sha256": "e1dc40fb01bbdcfccfe21235c56dbb6ee5d701aabac83f662f3470f2a21bcb07",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "credit_lines": [
+    "ELDEN_CREDIT WMI cmd=16387 calls=5 ok=4 result=-11 devflags=e40",
+    "ELDEN_CREDIT CFG ep=0 alloc=0 flow=0 current=0 size=2176 ul=0 dl=2 service=1",
+    "ELDEN_CREDIT TX ep=0 ok=3 attempts=3 shortage=0 errors=0 header=c0000/200",
+    "ELDEN_CREDIT RX ep=0 frames=5 trailers=1 reports=0 added=0 cb=0 header=0/1100",
+    "ELDEN_CREDIT CFG ep=1 alloc=0 flow=0 current=0 size=2176 ul=4 dl=1 service=300",
+    "ELDEN_CREDIT TX ep=1 ok=9 attempts=9 shortage=0 errors=0 header=440001/800",
+    "ELDEN_CREDIT RX ep=1 frames=2 trailers=0 reports=0 added=0 cb=0 header=140001/e00",
+    "ELDEN_CREDIT CFG ep=2 alloc=2 flow=1 current=0 size=2176 ul=3 dl=2 service=100",
+    "ELDEN_CREDIT TX ep=2 ok=4 attempts=2595 shortage=2591 errors=0 header=140102/300",
+    "ELDEN_CREDIT RX ep=2 frames=11 trailers=1 reports=2 added=2 cb=1 header=200202/1008",
+    "ELDEN_CREDIT CE=0 irq=210 flag-off=207 enter=3 exit=3",
+    "ELDEN_CREDIT CE=1 irq=208 flag-off=207 enter=1 exit=1",
+    "ELDEN_CREDIT CE=2 irq=216 flag-off=207 enter=9 exit=9",
+    "ELDEN_CREDIT CE=3 irq=209 flag-off=207 enter=2 exit=2",
+    "ELDEN_CREDIT CE=5 irq=207 flag-off=207 enter=0 exit=0"
+  ],
+  "wmi_ring": [
+    "ELDEN_ATH12K level=3 stuck: ce3 src sw 2 write 4 hp 16 reap 4 cached-tp 8 tp 8"
+  ],
+  "wmi_endpoint": 2,
+  "wmi_service": "100",
+  "wmi_ul_ce": 3,
+  "wmi_dl_ce": 2,
+  "initial_credits": 2,
+  "credits_added": 2,
+  "credit_reports": 2,
+  "htc_sends_accepted": 4,
+  "shortage_retry_checks": 2591,
+  "next": "Inspect CE3 source head/shadow/notification path; do not mistake HTT CE4 consumption for WMI or claim no credits ever returned.",
+  "scanning_accepted": false,
+  "networking_accepted": false,
+  "capture": {
+    "bytes": 299369,
+    "sha256": "9d782bef6d15185905c201fbc4bc24fae312076f7f61ef8a991baf1acbc3317b",
+    "reported_drop_max": 124,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false
+  },
+  "physical_fence_and_typed_return": true,
+  "stock_android_root_green_restored": true,
+  "original_settings_restored": true,
+  "sleep_requested": true,
+  "source_inputs": 216,
+  "all_diagnostic_jobs_terminal": true,
+  "full_goal_complete": false
+}

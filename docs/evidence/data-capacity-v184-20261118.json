@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "profile": "data-capacity-2g-key",
+    "image_sha256": "ea3b1393c6cbe7b29b6b91db594f32d2416a4d90c54cc634ab3d8853c4dddf03",
+    "session": "5a36ec4091564a51",
+    "kernel_sha256": "5483b1ee274e436588eab56289afbc3f17b853e3e28f7f9c79f34aa2325972f9",
+    "data_packed_sha256": "139c013b76e73c0d83327d369fffca62450362307c031905c8b9629e6d35834a",
+    "expected_data_bytes": 2147483648,
+    "accepted_static": true,
+    "keystore_capacity_updated": true,
+    "keep_packed_data": true,
+    "tablet_accessed": false,
+    "hardware_tested": false
+  },
+  "source_commit": "11fce166c4ac37d7dc5ef8f54610b37afba54ed8",
+  "pure_git_archive": true,
+  "all_code_inputs_match_git_blobs": true,
+  "source_count": 30,
+  "kernel_predicates": {
+    "kern_exec": 3,
+    "ShengUfs": 5,
+    "EldenKeyEventsGlue": 2
+  },
+  "historical_v183_rewritten": false,
+  "complete_clean_command_validated": false,
+  "hardware_tested": false,
+  "records": "edl_work/data-capacity-v184-20261118"
+}

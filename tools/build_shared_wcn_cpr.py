@@ -22,17 +22,19 @@ def main():
         symbols=global_symbols(target);imports=sorted(n for n,v in symbols.items() if not v[0]&0x0e)
         records[name]={'source_sha256':sha(source),'object_sha256':sha(target),'exports':sorted(exports(target)),'imports':imports,'scalar':True,'command':command}
     shared={'_elden_wcn_cpr_adjust','_elden_wcn_cpr_plan_details','_elden_wcn_cpr_rail_name','_elden_wcn_cpr_pdc_name'}
+    owners={'_elden_wcn_shared_acquire','_elden_wcn_shared_stop','_elden_wcn_shared_cpr','_elden_wcn_shared_snapshot','_elden_wcn_shared_check'}
     legacy={'_elden_wcn_rail_specs','_elden_wcn_power_acquire','_elden_wcn_power_stop','_elden_wcn_power_finish','_elden_wcn_power_check','_elden_wcn_parent_decode','_elden_wcn_cpr_plan','_elden_wcn_power_cpr'}
-    if set(records['WcnPower']['exports'])!=shared|legacy:raise ValueError('Provider exports changed unexpectedly')
+    if set(records['WcnPower']['exports'])!=shared|legacy|owners:raise ValueError('Provider exports changed unexpectedly')
     if set(records['OlCprPlan']['exports'])!={'_elden_olcpr_prepare','_elden_olcpr_adjust','_elden_olcpr_rail_name','_elden_olcpr_pdc_name'}:raise ValueError('Adapter exports changed')
     if not shared<=set(records['OlCprPlan']['imports']):raise ValueError('Adapter bypassed shared provider')
-    unresolved=(set(records['WcnPower']['imports'])|set(records['OlCprPlan']['imports']))-shared-legacy
+    unresolved=(set(records['WcnPower']['imports'])|set(records['OlCprPlan']['imports']))-shared-legacy-owners
     if not unresolved<={'_memcpy','_memset','_bzero','_strcmp'}:raise ValueError('Unexpected external dependency')
     archive=out/'libEldenWcnPower.a'
     subprocess.run(['/usr/bin/ar','rcs',str(archive),str(out/'WcnPower.o')],env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
-    result={'objects':records,'headers_sha256':{'WcnPower.h':sha(bt/'WcnPower.h'),'OlCprPlan.h':sha(wifi/'OlCprPlan.h')},'provider_archive_sha256':sha(archive),
+    result={'objects':records,'headers_sha256':{'WcnPower.h':sha(bt/'WcnPower.h'),'OlCprPlan.h':sha(wifi/'OlCprPlan.h'),
+            'WcnSharedPower.h':sha(bt/'WcnSharedPower.h'),'WcnSharedPower.inc':sha(bt/'WcnSharedPower.inc')},'provider_archive_sha256':sha(archive),
             'shared_provider_bound':True,'remaining_imports':sorted(unresolved),'legacy_exports_preserved':True,
             'integration_rule':'Link libEldenWcnPower.a once and OlCprPlan.o; omit any duplicate WcnPower.o from Bluetooth/Wi-Fi archives.',
-            'native_runtime_gateway_added':False,'kernel_linked':False,'hardware_operations':False}
+            'shared_consumer_controller':True,'native_runtime_gateway_added':False,'kernel_linked':False,'hardware_operations':False}
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'shared_provider_bound':True,'remaining_imports':sorted(unresolved),'kernel_linked':False}))
 if __name__=='__main__':main()

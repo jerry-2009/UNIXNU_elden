@@ -1,0 +1,300 @@
+PianoWifi is new code for UniXNU-piano (BSD-2-Clause-Patent, LICENSE). Levels 1 (read-only survey), 2 (power), 3 (the PCIe0 link),
+4 (the firmware over MHI), 5 (the IPC router's channels, QRTR and the WLAN firmware's QMI service) and 6 (the copy engine, the
+host transport, the firmware's message interface and a passive scan), with the macOS side of level 6 in PianoWifiEthernet.cpp.
+What it takes from other work, and from where:
+
+UniXNU-sheng (unixnu-research/UniXNU-sheng, main 00ba90984e831e4c6ce30ec3d8a56e6434e9f1af), BSD-2-Clause-Patent (LICENSE sha256
+5b1d3d911103cb0f41641ec0964c5ac1f7e229f57aa072b6ac38bae913a1307b; SM8550 + WCN7850, the Wi-Fi path hardware-verified there per its
+porting.toml), package/WifiProbe.cpp (sha256 72f46e8229865eff68feae9a3002b919ad3b610e634d93877879f4960d5b01a0):
+  Design only, re-implemented (no code copied): a level that only looks before any level powers anything; the controller's
+  registers read only when its power domain is on and its interface clocks run ("a read of an unclocked block stalls the bus");
+  the TLMM pin layout (also used by PianoPower and PianoDwc3); the SMPS peripheral page rule 0x9b + 3 * (n - 1). Its SM8550
+  addresses (DBI 0x60000000, GCC branch offsets, the v6 PHY layout) are NOT piano's and are not used.
+
+UniXNU-Pagani-Drivers (github.com/Shad0w23333/UniXNU-Pagani-Drivers 3d570b7653bf9831def8fe49b339b42990508d83, also
+IssacL04/UniXNU-Pagani-Drivers), drivers/PaganiWifi, BSD-2-Clause-Patent (LICENSE sha256 as UniXNU-sheng's; SM8750 + the same
+17cb:110e chip on the OnePlus 13T; host-tested only, never run on a device), PaganiWifiTables.h (sha256
+001f808ba5dd4356b1e31efcfd9631c0a1064d71201c29f73cf55f3efb859516), WifiBringup.cpp (sha256
+bb40a62361e06870348cd66eecca0634fb0e48d36a60afcb3f3acb0035ab3cd2):
+  Facts only, cross-checked against mainline Linux (below) where mainline has them: the SM8750 PCIe0 GDSC, collapse vote, branch
+  CBCR / vote bit / hardware-gating table, BCRs, RCGs and pipe mux; the v7 PHY layout; the LDO page rule 0xc0 + n on SM8750's
+  PMICs (its running DT's OCP notifier names); the PMK8550 gpio3 sleep clock pin; gpio19 / 202 / 203; the cmd-db names of the
+  supplies and the PCIe NoC BCM (SN4); the PARF offsets of the SM8550 programming model, the BDF-to-SID hash rule (CRC-8,
+  polynomial 7, high byte first) and the chip's BAR0 remap window register (0x3278 for 0x110e). Board values of the 13T (its rails,
+  PPIDs, pin states) are not piano's and are not used: every rail, voltage range and pin of levels 2 and 3 comes from piano's own
+  boot DT.
+  Also taken, with its provenance question recorded in WifiPhySeq.h and docs/drivers/wifi.md section 10.4:
+    PaganiWifiTables.h phy::kSequence (the 128 writes of the QMP v7 PHY initialisation, which PaganiWifi read out of the 13T's
+    running device tree property qcom,phy-sequence) -> WifiPhySeq.h kPhySequence, the same offsets and values in the same order.
+    It is not mainline's GPL table (it differs in five writes, which PaganiWifi lists), it reached this repository through
+    BSD-licensed code, and each entry is a register value; whether a vendor DT sequence and Qualcomm's own driver tables are
+    "independent" cannot be settled from here, and the alternative (reading the sequence from piano's own stock DT at run time) is
+    written down in wifi.md.
+  Design re-expressed, no code copied (the structures and names are ours; the steps and their order are theirs):
+    WifiBringup.cpp powerOn / linkUp / endpoint (sha256 bb40a62361e06870348cd66eecca0634fb0e48d36a60afcb3f3acb0035ab3cd2)
+      -> WifiBringup.h powerUp / linkUp: the order rails -> WLAN_EN -> GDSC -> clocks -> resets -> PARF -> PHY -> BDF-to-SID ->
+      root port -> PERST# -> LTSSM -> L0 -> configuration window -> memory window -> BAR0, the "a vote only adds" rule for the
+      rails, the pin-write order (level, configuration, level again, from sheng's setPin), PERST# low for at least 100 ms, and the
+      idea of a portable sequence over callbacks so that a host model checks the order and the values.
+    MhiBoot.c / MhiBoot.h (sha256 32b78ccb4e127b52296d34f4be4b431b9d311c105296b66c799d6d247b653b92,
+      0a5bbf7c07cd2022e2e5e8e219526540a009d37743ddd381936169baf63634e6; themselves ported from UniXNU-sheng package/MhiBoot.c,
+      sha256 9743ba00f26520b9322eba71ff3721d77216e3882dedbec23757d20b645f3c67) -> WifiMhi.h: the BHI/BHIe phase machine (PBL check,
+      reset on a system error, the image doorbell, READY, the contexts, M0, the vector table, mission mode), the firmware file's
+      split rule (a second ELF at the boot loader's size), and the register and bit facts.
+    WifiMhiLoad.c (sha256 947df29b8f0cf3c158f528dae86ab8e58abcca631627fe2133a4bd72fb65d15d) -> WifiMhi.h mhiContextsPlan /
+      mhiContextsProgram / mhiEventAck: 128 channel contexts left disabled, two event rings (32 on vector 1, 256 on vector 2), the
+      primary command ring, the host address range 0..2^36-1, and giving the device its contexts both before the boot loader starts
+      and again after it resets the registers.
+    WifiDma.c / WifiDma.h (sha256 6e7f0311e724d424723c7edc0117fdb85c7ba41931b42eb0a2fef1aad57c2115) -> WifiMhi.h Arena: one
+      contiguous window, every buffer aligned to its own size rounded up to a power of two (sheng saw the boot loader refuse an
+      image buffer that was only page aligned). Ours is a bump allocator, not their first-fit list with merging: level 4 never
+      frees a buffer.
+    PaganiWifi.cpp dmaWindow / cleanToPoc / chipAt (part of sha256 of the file in that tree) -> PianoWifi.cpp dmaWindow,
+      cleanToPoc, chipRead: a 36-bit contiguous buffer whose cacheable alias is cleaned once and then only reached through a
+      write-combined mapping, and the chip's register window arithmetic.
+
+UniXNU-piano (this repository), BSD-2-Clause-Patent:
+  package/PianoPower/SpmiObserver.h (sha256 4805d4fb7af91c210d75b9791e125f3789b7671e895afe6f80af27a36a849b07) -> SpmiObserver.h:
+    copied, namespace pianowifi and the include guard changed, one provenance line added.
+  package/PianoKeyboard/CmdDb.h (sha256 794cf39c76e2c903d79cc1146ae25d946946862daa9b8848d616e9ad8107c716): cmdDbFind re-expressed
+    in WifiSurvey.h (same layout, 64-bit sizes), and its way of reading cmd-db (one mapping, copied out word by word).
+  package/PianoPower/QcomQrtr.c (sha256 ac9800cc8faf6f0bdd59a95df398df3c7d996986f001f4013e8e38e043b6f257) and QcomQrtr.h
+    (sha256 d82bb7ba7ce870258c227c513e8e297cf71b6be9855b80f00e4804c0460c51fa) -> WifiQrtr.c / WifiQrtr.h: copied with the include
+    guard changed, provenance lines added, and two additions marked "PianoWifi addition" in both files (level 5's link is the
+    chip's MHI IPCR channels, not the DSP's GLINK, and its messages are far larger than the DSP's):
+      qcom_qrtr_send_buffer: a data packet whose payload the caller has already put at buffer + 32, so that the board file's and
+        the calibration data's 6144-byte segments are never copied again and never stand on a kernel stack (the copied
+        qcom_qrtr_send_data builds its packet on the stack and is bounded by QCOM_QRTR_MAX_DATA = 1024);
+      qcom_qrtr_find_service: the node and port of a remote service matched on its instance word as well, which is how the WLAN
+        firmware's service (69, version 1, instance 1) is told from another version of itself on the same link;
+      and (WifiQrtr.c only, 2026-11-12 sixth round) the received header read by a helper that takes the protocol's version 2
+        header as well as version 1 (qcom_qrtr_receive's first lines changed to call it; the rest of it as copied), since the
+        chip's router may speak version 2 while this side sends version 1 (net/qrtr's two header layouts, facts only);
+      and one "PianoWifi change" (2026-11-12 seventh round, P21 in docs/drivers/wifi.md section 10.26): the flow-control answer.
+        The copied qcom_qrtr_receive answered a data packet's confirm_rx with control(RESUME_TX, {sender's node, sender's port})
+        from the control port; it now calls resume_tx, which sends RESUME_TX from our port to the sender's node:port with our
+        node and port in the payload, and keeps an answer the link refuses for qcom_qrtr_poll (new, with the rx_confirms /
+        resume_owed / resume_node / resume_port / resume_from fields in QcomQrtr). Facts from net/qrtr/af_qrtr.c (behaviour only,
+        no code): a sender counts its packets per destination node:port, sets confirm_rx on the fifth (QRTR_TX_FLOW_LOW) and
+        waits at the tenth (QRTR_TX_FLOW_HIGH) until a RESUME_TX whose payload's client node and port are that destination; the
+        receiver sends it from the packet's destination to its source, filling the payload with its own address.
+    PianoPower is not modified; its own QRTR path (the DSP) keeps using its file (which still has the old answer: noted in
+    wifi.md section 10.26 for its owner).
+  package/PianoDpu/DpuSmmu.h (sha256 9cc7d830e27084905081222f6ab4ebe17786709dac869649e706504303f1ae30) and
+  package/PianoUsbHost/SmmuIdentity.h (sha256 d0cdab46fc2815d45895d6c652e610b0d9969b5bdbed6496aea3ecd5b4cba949) -> WifiSmmuWindow.h:
+    reused by copying, in this namespace: from DpuSmmu.h the context bank register offsets and their fields, the VMSAv8-64
+    descriptor helpers, the "non-cacheable walks, attribute 0 Normal non-cacheable" choice (our window is reached write-combined,
+    so nothing keeps caches and the device coherent), and the TLBIALL/TLBSYNC/TLBSTATUS sequence with non-zero written values and
+    bounded waits; from SmmuIdentity.h the plan/apply split for a stream with no translating bank of its own (a free group or the
+    stream's own exact entry redirected in place, a free bank found from one below the top, the whole bank programmed before the
+    one store that switches the stream to it). Ours: the 32-bit input space (T0SZ 32, the walk from level 1), the two-page table,
+    and the window's 2 MiB blocks over level 4's contiguous range. Neither package is modified.
+  package/PianoDwc3/SmmuStream.h (sha256 8f566938f259730d15407aa2d84abb3f6ec3b06c7bf3dabaef78c7e7fbb930a3): the SMMU geometry
+    checks and the stream-match decode, re-expressed read-only in surveySmmu (no plan, no write); and copied byte for byte as
+    SmmuStream.h but for its first three lines (the namespace pianousb -> pianowifi and one provenance line), which level 3 uses for
+    stream 0x1401. PianoDwc3 is not modified.
+  package/PianoPower/FatVolume.c (sha256 a078920a1da5b073dad36817838cda66c7b1176399db48fb904776a5bd271932) and FatVolume.h
+    (sha256 7e4107f10c6a157ac167575a4ac7c02cfdfc678d8077717490e015fffa85bf45) -> FatVolume.c / FatVolume.h: copied byte for byte but
+    for two added provenance lines each (the build script checks they have not drifted). PianoPower is not modified.
+  package/PianoPower/PianoAdspFirmware.c (sha256 85dade1f9003e9acd80c1bfeb9799c57350f57b73df2267fe52d27fb38f78793): how the
+    firmware partition is read (NativeUfs's GPT lookup, 4096-byte block reads, one block cached for the ends of a range, FatVolume
+    over them), re-expressed in WifiFirmware.c for the Wi-Fi files; nothing of the MDT / segment logic is used.
+  package/PianoKeyboard/PianoKeyboard.cpp and package/PianoPower/PianoAdsp.cpp (the DRV-2 lock and the active-TCS transaction, both
+    hardware-verified on piano): the same protocol in PianoWifi.cpp vrmLocked / hwVrm (up to three commands of one VRM resource per
+    transaction), and PianoTouch.cpp's protocol for the GCC vote lock word in hwVoteLock. The lock words themselves are
+    PianoA830's (adreno830/platform/sm8750/Sm8750Rpmh.h, Sm8750GpuPower.c); PianoWifi only declares them, as those drivers do.
+
+Specifications only for level 5 (behaviour and wire facts; no code, comment or table copied): the Ubuntu kernel
+yzddmr6/linux-sm8750-piano piano/dev 7f8d6bedde479a01f4a05d6d0581b43c7fd20a01 (GPL-2.0), read for what the WLAN firmware expects
+and in which order — drivers/net/wireless/ath/ath12k/qmi.c and qmi.h (the WLFW message identifiers, each field's tag and type, the
+order of the exchange, the memory-region types and the "ask again in smaller pieces" fallback, the board-file and trace-configuration
+segmentation at 6144 bytes, the host capability bits of a platform with an internal sleep clock, the feature bits of this chip's
+entry), ath12k/wifi7/mhi.c (this chip's MHI configuration: the two IPC router channels 20 and 21, 64 elements each, on the second
+event ring, 8 KiB buffers), ath12k/wifi7/ce.c and ath12k/wifi7/hw.c (the nine copy-engine pipes, the fourteen service-to-pipe
+entries and the board-file size cap of this chip's entry), ath12k/wifi7/hal.c, hal_qcc2072.c and hal.h (the ring head-pointer
+register offsets and the shadow register window at BAR0 + 0x8fc, 40 registers), drivers/soc/qcom/qmi_encdec.c (how a counted array,
+a string inside a structure and a string of its own are encoded), drivers/bus/mhi/common.h and drivers/bus/mhi/host (the register,
+context and ring-element layouts and the doorbell order), net/qrtr (the version 1 header and the control messages). Not read and not
+used: any Qualcomm binary.
+
+Specifications only for level 6 (behaviour and wire facts; no code, comment or table copied), the same Ubuntu kernel and commit,
+read for what the chip and the firmware expect and in which order; every fact landed in WifiHw.h, and the writers, parsers and
+the step machine on top of them (WifiCe.h, WifiHtc.h, WifiWmi.h, WifiLink.h) are this repository's own:
+  ath12k/htc.c and htc.h: the transport's 8-byte header and its fields, the four control messages (ready, connect a service,
+    its answer, set-up complete) with each word's layout, the connection flags (the receive allocation, "no credit flow
+    control"), the connect statuses, the trailer's records and the credit report's shape, that only a message interface keeps
+    credit flow control, and that a message costs ceil(length / credit size) credits.
+  ath12k/wmi.c and wmi.h: the command and event identifiers level 6 uses, the 4-byte command header, the TLV form (length in
+    the low half, tag in the high half, the value padded to a word) and the four array tags; the field order of the
+    service-ready, ready, scan and management-frame events; the initialisation command's three TLVs and the field order of the
+    resource configuration's 72 words with the two flag words its host always sends; the start-scan structure's 39 words, the
+    scan flags and the dwell times its host uses, the five TLVs that follow it and that the address array carries the broadcast
+    address; the stop-scan and virtual-device commands; the scan event types and reasons.
+  ath12k/wifi7/wmi.c and hw.h: the resource-configuration values of this chip's own entry (four virtual devices, sixteen peers,
+    thirty-two traffic identifiers, the receive timeouts, native-Wi-Fi decapsulation, the message-descriptor count, peer-map
+    version 1, "use a radio identifier") and the target constants behind them.
+  ath12k/ce.c, ce.h, hal.c, wifi7/hal.c, wifi7/hal.h, wifi7/hal_wcn7850.c, wifi7/hal_qcc2072.c, wifi7/hal_desc.h: that a pipe is
+    a source ring, a destination ring and a destination-status ring; that both the source and the destination ring are producer
+    rings of the host's while the status ring is the chip's; the three descriptor layouts and their fields (the address's high
+    bits, the length, the identifier that comes back in the status entry, the ring identifier); the register block of a ring
+    (base low and high with the size in words, the identifier with the descriptor's size, the pointer-address pair, the
+    interrupt set-up, the enable bit in the misc register), the R2 block at +0x400 with the host's pointer, the
+    destination-status ring's own block at +0x58 and its pointer at +0x408, the largest-buffer register of a destination ring,
+    the units at 0x01b80000 and 0x2000 apart, the ring identifiers (64, 81 and 100 plus the pipe), **that both pointers count
+    32-bit words**, and that the chip writes its own pointer into a host-memory block the ring names.
+  ath12k/wifi7/pci.c and wifi7/hw.c: that 0x110e is this chip, its hardware entry (the board size, the auxiliary microcode, the
+    internal sleep clock, nine copy engines, fourteen service entries, shadow registers supported) and the window register
+    0x3278 it shares with the QCC2072.
+  ath12k/core.c: the order the whole start-up runs in (the transport up, its ready awaited, the services connected, set-up
+    complete, the service-ready event, the initialisation, the ready event) and that the host memory chunks are always none.
+  ath12k/mac.c: what a scan needs (a created virtual device, which this chip does not have to start), the scan identifier, and
+    that a passive scan asks for no network by name.
+Not read and not used: any Qualcomm binary.
+
+Specifications only for level 4's fixes of 2026-11-12 (docs/drivers/wifi.md section 10.21; behaviour and register facts, no code,
+comment or table copied), the same Ubuntu kernel and commit:
+  drivers/bus/mhi/host/boot.c and pm.c: that the host writes 0 to BHI's status before the image's address (high, then low), size
+    and doorbell; that bits 31:30 at 3 are an error, with the error code and the three error debug words read then; that the
+    receive vector registers' power-on values are undefined; that the boot loader gets exactly the first 512 KiB; that the vector
+    for BHI is 0 and is written again after a reset. WifiMhi.h's startSbl/readErrors and the stale-value rule are this
+    repository's own.
+  drivers/interconnect/qcom/sm8750.c and drivers/pci/controller/dwc/pcie-qcom.c: that PCIe0's DMA path is MASTER_PCIE_0 ->
+    qns_pcie_mem_noc (8 bytes wide), whose bus clock manager is SN4 and not keep-alive; that pcie-qcom votes that path before the
+    controller's clocks and at width x the lane rate once the link is up; drivers/interconnect/qcom/bcm-voter.c and icc-rpmh.c:
+    the BCM command's bits and how a bandwidth becomes a vote (the aux data's unit and width, the scale of 1000, a small vote
+    never rounded to 0). WifiHw.h's bcmVote/bcmCommand and WifiSurvey.h's cmdDbEntry/cmdDbBcm are this repository's own.
+  drivers/net/wireless/ath/ath12k/pci.c and pci.h: the chip-side reset of every power-up (the PCIe interrupt clear, the warm-boot
+    entry word, the reset cause, the SoC global reset at BAR0 + 0x3008 and its 10 ms, MHICTRL's reset), for
+    piano-wifi-socreset=1 (then PianoWifi.cpp chipSocReset; from the fourth round the whole recipe, WifiPbl.h, below).
+  UniXNU-sheng package/WifiProbe.cpp (BSD-2-Clause-Patent, read, nothing copied): that its hardware-verified ladder votes the PCIe
+    NoC's bus clock manager (SN7 on SM8550) when the link comes up, before the chip's first DMA.
+
+Specifications only for level 4's fourth round of 2026-11-12 (docs/drivers/wifi.md section 10.23; behaviour and register facts,
+no code, comment or table copied), the same Ubuntu kernel and commit:
+  drivers/net/wireless/ath/ath12k/pci.c, pci.h, mhi.c, mhi.h, wifi7/pci.c, wifi7/hal.c, wifi7/hal_qcc2072.c: the whole power-on
+    sw_reset and its order (the chip's PARF LTSSM word 0x1e081b0 := 0x111 retried five times, the GCC hot-reset bit 0x10 of the
+    QCC2072 register set's 0x1e65304 that WCN7860 uses, the interrupt clear, the QFPROM power control 0x1f8031c with VDD4BLOW bit
+    2 cleared, the BHIe vector doorbell/status words at BAR0 0x360/0x368/0x394/0x39c, the Q6 cookie, the warm entry, the reset
+    cause, the global reset, MHICTRL's reset and its 10 ms); that the host disables ASPM and enables MSI before MHI starts; that
+    the MHI controller of this chip is configured with a 512 KiB boot loader, 512 KiB segments, full-boot-chain download and a
+    crash dump size. WifiPbl.h's chipPowerOnReset and msiEnable are this repository's own.
+  drivers/bus/mhi/host/init.c, pm.c, boot.c: that before the boot the host zeroes the BHIe receive vector block and writes only
+    BHI's vector; that the MHI context registers are written once the device is READY (mhi_init_mmio from the ready transition);
+    that the full boot chain loads the first 512 KiB over BHI and, when an ELF header follows at 512 KiB, only the rest over
+    BHIe. WifiMhi.h's mhiClearRxVectors is this repository's own.
+  drivers/pci/controller/dwc/pcie-designware-debugfs.c, pcie-designware.c and include/linux/pcie-dwc.h: the RAS DES capability
+    (a vendor-specific extended capability, ID 2 revision 4 on Qualcomm's controllers), its counter control and data offsets and
+    fields, and the group/event numbers of the TLP and error counters in WifiHw.h kRasEvents. WifiPbl.h's rasDes* are this
+    repository's own.
+  drivers/pci/setup-bus.c: how the enumeration closes a bridge's unused I/O and prefetchable windows (the values and the order),
+    which WifiBringup.h step 307 now does.
+  xiaomipad-8pro-mainline firmware/piano-wlan.json: the stock amss.bin's size and SHA-256 (WifiHw.h kAmssStockSha256); the
+    boot loader part's SHA-256 (kAmssStockSblSha256) was computed from that same pinned file, which this repository never holds.
+This repository: package/PianoAudio/AudioSha256.c (sha256 d3a1a322ee462493b0eeaf4cb312f534a4ea80f926e65138561da7994f686cee,
+  BSD-2-Clause-Patent) ->
+  WifiSha256.h: the FIPS 180-4 compression and padding re-expressed in this namespace as a header, with a whole-block update path
+  added; PianoAudio is not modified.
+  UniXNU-sheng package/WifiProbe.cpp and ShengUfs NativeUfs.cpp (BSD-2-Clause-Patent, read, nothing copied): that sheng's own
+    chip power-up ran the same ath12k recipe including the QFPROM bit and enabled MSI into a sink page before its boot loader,
+    and that its working window for this chip family's stream mapped IOVA 0x10000000 upward (the IOVA range is not the cause).
+
+Specifications only for the fifth round of 2026-11-12 (docs/drivers/wifi.md section 10.24: the crash after mission mode; behaviour,
+register and layout facts as these hosts are publicly known to behave, no code, comment or table copied), the same Ubuntu kernel:
+  drivers/bus/mhi/host/boot.c, init.c, pm.c, main.c, internal.h and drivers/bus/mhi/common.h: that a controller with a crash dump
+    size gets a BHIe receive vector table over segments of that size before the power-up, right after the receive block is zeroed,
+    written address high, low, size, then the session in the doorbell's 29:0; that on the crash dump environment the host only
+    waits for the receive status (31:30 = 2 complete, 3 an error); the receive block's offsets (+0x60 .. +0x78); that the context
+    initialisation writes every configured channel's state (disabled), burst mode, type and event ring before the power-up and the
+    ring with the enabled state only when the channel is prepared, right before its start command; that every ring's base is a
+    multiple of its length; that the mission-mode transition asserts the device wake doorbell (channel 127) before the devices
+    are created, that an M0 in mission mode rings every event ring, the command ring with work and every channel again, and that
+    an M1 is answered with M2 (and a wake toggle when the host still needs the device). WifiMhi.h's mhiDevWake / mhiSetState /
+    mhiHealth and the layout, WifiChannels.h's ipcrPrepare / ipcrStart / ipcrRingAll and WifiRddm.h are this repository's own.
+  drivers/net/wireless/ath/ath12k/mhi.c, coredump.c, qmi.c: this chip's crash dump size (0x420000 bytes) and 512 KiB segments,
+    that the host collects the dump on the crash dump callback, the order of the first three WLFW requests once the service
+    arrives (the radio's capability, the indication registration, the host capability with the internal sleep clock bit).
+  net/qrtr/ns.c: that the host's name service answers a remote's hello (with its own hello and its servers) rather than speaking
+    first on a new link; level 5 now waits 500 ms for the chip's hello before saying its own.
+  (2026-11-12 seventh round) drivers/net/wireless/ath/ath12k/qmi.c and core.c of the same tree: the file download's fields (the
+    remaining size in total_size, the end flag on the last segment, the file identifier = the target capability's board or 0xff
+    without one, the board file's kind from its ELF magic, the 256 KiB cap), that the radio capability's board identifier is only
+    logged, that with no board-2.bin the API-1 board file and regdb.bin are used, and the order target capability -> regulatory
+    database -> board file -> PHY microcode -> auxiliary microcode (no TME-L request); wifi7/hw.c's WCN7860 entry (the auxiliary
+    microcode downloaded, the feature list PERST_NO_PULL | AUX_UC); xiaomipad-8pro-mainline firmware/piano-wlan.json (the stock
+    files Ubuntu ships, their sizes, no TME-L file). Project-SunUEFI 0003-input-wireless.patch (GPL-2.0, facts only): another
+    SM8750 + peach tree's TME-L request (0x005b) and its stock refusal 83, which this driver does not send.
+  The vendor MHI host (msm kernels, GPL-2.0), for the crash dump's header layout only: a version and the header's size, then one
+  64-byte entry per file (device address, physical address, size, a 20-byte description, a 20-byte file name), the files back to
+  back after the header across the segments, and the failure reason in the file whose name says SFR. WifiRddm.h's decode accepts
+  either order of the first two words, since only the layout was taken, not the code.
+Not read and not used: any Qualcomm binary; no dump is kept, committed or printed beyond the decode's short lines.
+
+Specifications only for level 7, the join (2026-11-13; docs/drivers/wifi.md section 13.3; behaviour, identifiers, field
+places and bit positions, no code, comment or table copied), the same Ubuntu kernel (unixnu-research/ubuntu-ref):
+  drivers/net/wireless/ath/ath12k/wifi7/hw.c: the WCN7860 entry (vdev_start_delay, rx_mac_buf_ring, reoq_lut_support off, the
+    QCC2072 operations); wifi7/hal.c: WCN7860 takes QCC2072's HAL and registers and WCN7850's transmit-ring map and parameters
+    (receive buffers return to software ring 1).
+  mac.c, peer.c, dp.c: the order of a station's join on a chip with vdev_start_delay (the peer, its HTT peer map, the default
+    routing value hash | ring << 1, one reorder queue per traffic identifier 0-16 with a window of 1, then the delayed start,
+    the peer's association and the station up after the association); the station's parameters after a virtual device (the
+    transmit encapsulation and receive decapsulation, the stream count, the three power-save parameters and their values, power
+    save off); the peer's association fields of a legacy peer (the rate form 500 kb/s | bit 7 for CCK, the four-way-handshake
+    flag clearing the authorisation); a station's start (passive with "no initiating radiation", the beacon interval and DTIM).
+  dp_rx.c, wifi7/dp_rx.c, wifi7/hal_rx.c, wifi7/hal_desc.h, hal.h: the reorder queue descriptor (its 32 words, the header's owner,
+    kind and debug pattern, the queue number, info0's valid / counter / access category / retry / window / PN / ignore-A-MPDU
+    bits, the start sequence number, the three extension descriptors of a QoS identifier, the 128-byte alignment), the
+    identifier-to-access-category rule, WMI_PEER_REORDER_QUEUE_SETUP's fields.
+  wmi.h, wmi.c: the command and event identifiers (counted out of their enumerations) and tags of the station power-save
+    parameter, the reorder queue set-up, the roam event; the device parameter numbers of the encapsulation, decapsulation and
+    stream count; the peer parameter "default routing"; the frame modes (raw 0, native Wi-Fi 1, Ethernet 2); the management
+    frame command's fields and its 64-byte inline copy; the roam event's reason values.
+  dp_htt.c, dp_htt.h: the HTT peer map messages (types 3, 0x1e, 0x2b; unmap 4, 0x1f) and their fields.
+The 802.11 frames of the join (WifiDot11.h: the authentication, the association request and its elements' order, the RSN element
+and its suites, the answers, the status and reason codes) are written from IEEE Std 802.11 itself; no driver's code was read
+for them.
+
+Specifications only (no code, comment or table copied): mainline Linux drivers/clk/qcom/gcc-sm8750.c and tcsrcc-sm8750.c,
+include/dt-bindings/clock/qcom,sm8750-gcc.h, drivers/pci/controller/dwc/pcie-qcom.c and pcie-designware.h,
+drivers/phy/qualcomm/phy-qcom-qmp-pcie.c and phy-qcom-qmp-pcs-v7.h, drivers/pinctrl/qcom/pinctrl-sm8750.c (register offsets, bit
+positions, the DesignWare LTSSM L0 value); Project-SunUEFI (unixnu-research/Project-SunUEFI) patches/linux/7.3/0001-platform.patch,
+a GPL-2.0 kernel patch read for facts only (the WCN7861 supply voltage ranges in WifiHw.h's comment); the piano boot DT
+(out/inputs/piano-boot.dtb), which is where every rail, voltage range, pin, window and stream of levels 2 to 4 comes from; ARM IHI
+0062 (SMMUv2: SMR, S2CR, IDR0/IDR1); the MHI specification's register and state names as mainline drivers/bus/mhi and the vendor
+MHI host use them (behaviour only, no code, comment or table). Not read and not used for anything: any Qualcomm binary (no reverse
+engineering of vendor firmware or drivers). The firmware itself is never part of this repository: level 4 reads
+image/peach/amss20.bin out of the tablet's own modem_a partition at run time (LicenseRef-Proprietary-Firmware, no
+redistribution).
+
+PianoWifiEthernet.cpp (the macOS side of level 6) is new code for this repository, with the same shape as this repository's
+package/PianoNullEthernet/PianoNullEthernet.cpp (whose own provenance is that package's UPSTREAM): an IOEthernetController with
+no device behind it — the medium published, the interface attached and marked built in, every frame dropped, the BSD wait
+disabled — re-expressed here with its link left **down**, the scan list of level 6 copied onto it, and an address of this
+driver's own. PianoNullEthernet is not modified, and no kext from outside this repository is linked (the native kext rule,
+tooling/k27/check-native-kexts.py).
+
+WifiApple80211.h and PianoWifi80211.h (the apple80211 front end, docs/drivers/wifi-menu.md section 5) are new code for this
+repository after UniXNU-sheng's package/WifiNet.cpp (main 00ba90984e831e4c6ce30ec3d8a56e6434e9f1af, sha256
+a4738ae766ded21d5a89a891c26f9a5604da37f8162ff24acc4d035776221cae; BSD-2-Clause-Patent, our own organisation's, LICENSE as above):
+  Taken, re-expressed in this repository's structures and checked against the macOS 27.3 host facts (wifi-menu.md section 5.2,
+  section 5.4 marks each): the request's 40-byte layout and the two ioctl numbers; the request numbers it shares with 27.3; the
+  answers' layouts of POWER, STATE, OP_MODE, PHY_MODE, RSSI/NOISE, the channel and the channel list, COUNTRY_CODE, the scan
+  record's head (to its elements at 0x8c) and the SCAN_REQ fields read; the card capability bits it sets; the event codes, the
+  kernel event's form (vendor Apple, class 6, subclass 1, the interface's name then the payload) posted through the private
+  kev_post_msg symbol, and its link-event payload; the scan's completion posted a short while after an answer from the cache;
+  EIO after the last scan record. Not taken: its own ifnet and registry stand-ins (piano uses IONetworkingFamily's interface and
+  an interface filter), its association, keys and data path.
+  The wm4 binding bits (docs/drivers/wifi-menu.md section 9, piano-wifi-sheng; read at the 2026-11-15 clone e578007, the study
+  private/host-checks/20261115-unixnu-sheng): the SIOCGIFMEDIA answer words (IFM_IEEE80211|IFM_AUTO, IFM_AVALID, count 1), their
+  if_ioctl form re-expressed in this repository's interface filter; card capability bit 46 and what it makes the framework's scan
+  wait for; the scan request's type field at 0x34 (3: the held results); SSID_CHANGED and BSSID_CHANGED beside every
+  LINK_CHANGED; and, from package/ShengEthernet.cpp (same licence, same clone), NativeSandboxGrantProcess on the interface — here
+  the single name "airportd", because this kernel's native_sandbox_grant compares the whole property. Their macOS-27.3 finding
+  that a user-client request's byte replies must be memcpy'd, not copyout'd, is the shape of the kext's fallback (shengKernelBuffer),
+  with this repository's own bounds logic; their comma-separated grant list cannot match this kernel and is not used.
+OpenIntelWireless (itlwm / AirportItlwm, GPL) was not read for this code; its facts reached the design only through the W0
+report's notes (private/host-checks/20261114-io80211), and none of its text is here.
+
+Shared FAT refresh (2026-11-17): UniXNU-piano commit 8f4ce8914c0b,
+  package/PianoPower/FatVolume.{c,h}, BSD-2-Clause-Patent. The optional bounded
+  prefix API is used by Bluetooth only; default strict mounts are unchanged.
+  Local copies retain the existing byte-for-byte owner integrity checks.

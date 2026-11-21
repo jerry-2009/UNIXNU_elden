@@ -1,7 +1,18 @@
 # 从新克隆构建 GUI / 蓝牙分支
 
-入口是 `tools/build_clean.py`。它不需要旧 v99 构建目录、Patch 工作台、旧内核、
-旧对象或旧驱动归档。`--variant gui` 对应8GiB交互v109；`--variant bluetooth`
+入口是 `tools/build_clean.py`。它不需要旧v99构建目录、Patch工作台、旧内核、旧对象或旧驱动归档。
+
+充电断链恢复有独立选项 `--charge-link-recovery`，完整前置选项与验收范围见
+[构建说明](../profiles/charge-link-recovery/README.md)。已完成两件原生对象与完整内核构建；
+这条新选项的空输出完整boot构建和实机验收尚未执行。
+
+2026-11-18空输出复测发现蓝牙基线误从当前仓读取已更新的WcnPower.c，导致原指纹拒绝。
+现在该基线只读仓内固定源码快照，字节来自89b31f6599068d63792c3b124f775fcac0f6c2da，
+仍保持原feb9fefa…指纹；当前共享电源实现不改动。来源见
+[固定输入证据](../profiles/current-build/frozen/source-proof.json)。修正后完整2GiB命令已从
+新空输出目录完成37阶段并通过签名boot审核，见[整链证据](evidence/data-capacity-clean-build-20261118.json)。
+
+`--variant gui` 对应8GiB交互v109；`--variant bluetooth`
 对应v121蓝牙诊断分支（6GiB），具有真实HCI初始化和退出/stderr观察，蓝牙用户态
 尚未连接成功。两者保持独立，不把它们冒称为已实机合并的配置。
 
@@ -57,7 +68,11 @@ FAT16由仓库自己的写入器产生，已用独立fsck.fat核验，不依赖m
 
 ## 命令
 
-当前充电旁路退出修订的完整选项链见
+[2GiB稀疏Data](../profiles/data-capacity-2g-key/README.md#clean-build)提供当前空间修复的完整命令，
+`--data-capacity-2g`同时重编实际KeyStore适配器并启用PackedRAMDisk；不加选项仍生成512MiB。
+新组合空输出整链已通过；新整链镜像未刷入，现有实机证据仍以该profile标注的分包为准。
+
+充电旁路退出修订的完整选项链见
 [charge-window-handoff](../profiles/charge-window-handoff/README.md#build)。
 恢复系统亮度服务时再加 `--backlight-service`，见[该配置的实机记录](../profiles/backlight-service/README.md)。
 PD确认后进行功耗试验使用 `--pd-power-trial`，见[独立试验配置](../profiles/pd-power-trial/README.md)；它不是普通GUI日用配置。

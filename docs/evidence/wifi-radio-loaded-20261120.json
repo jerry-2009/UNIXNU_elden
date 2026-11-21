@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "fix": "Replace actual libEldenBluetooth WcnPowerNative.o; reject missing or wrong loaded PMIC/WCN members.",
+  "previous_candidate_withdrawn": "136b6d82d2531968f752ea2c5114e94ea01b39c3f74355108b0de4d7ace33d49",
+  "loaded_archives": {
+    "pmic": {
+      "path": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-radio-admission-20261120/battery2/pmic/libEldenPmicClient.a",
+      "sha256": "0809568698675ac4475a44fa8bab41739ad9497ac85850ba0ca6f97c61dd3040",
+      "member": "PmicClient.o",
+      "member_sha256": "6041ff93ee4731980e853a82d4582412805540027aa6f78852b1576ac9fa8084"
+    },
+    "wcn": {
+      "path": "/Users/ciscohe/Desktop/UniXNU_elden/lab/wifi-radio-admission-20261120/kernel2/bluetooth/libEldenBluetooth.a",
+      "sha256": "245fa657e22ec51a6d22d31c756bc8f23de07d036d3b5692cefe578491e72da8",
+      "member": "WcnPowerNative.o",
+      "member_sha256": "8d67658deae92747cc1c61000dcef88df994190fb1e6eb05bf58962de0418859",
+      "retained_members": {
+        "Wcn7861Peripheral.o": "89a1cf3159493a0953a34f18c023e14bea7302c62ebfe32db69adebf85356bf2",
+        "Wcn7861Startup.o": "e4db6cf7643d49c41bdaa2a2e48099bfdb426a9be148e0fd98009f951b967aa0",
+        "Wcn7861Hci.o": "8a23220c0e18fddbf9c7c32074d641e27cee869cb9304a92fbd7f6fb7392339d",
+        "UartPlatform.o": "ed2aa7fb3c54d21083289f4653d44d43b05293f671a030f0001a9c12e44f83c6",
+        "WcnPower.o": "64c5c8b9dcf50c8ae3f79a2c2022fb393e117eef3feefcf7c46e8d2163a0eb65",
+        "BtH4.o": "23ed4b6cd26388811db83123c9b00bf66ee0f71e0f0a7ea69c188036e9a3eece",
+        "BtGeni.o": "1759dd6d9e5e60a031ab250022235a6e3dd2dc58f86095f39d983b45c87599b4",
+        "BtTlv.o": "82d9b38c7940b4a471945df169a980906d11333ed2b34a236f668edae22b19cd",
+        "BtIbs.o": "231eb0bd67221fbd0ce8cc26314edb1d2de37bd7798290ff91f19a90d5e885a5",
+        "BtPmic.o": "fd017571c36ed95ea0a2286ba73210f8db1a5f0c30a5b50a54abef065e75af3d",
+        "Sm8750Rpmh.o": "a86a9250ee6a911ae373e94cff5d0eb016ce95b1982066efa4279438b307ddad",
+        "Sm8750AossQmp.o": "3177ef7379f1605f3d22fea4cad50616cab393b9371c0f1993c77300e2092240",
+        "BtBridge.o": "7c038fb430da54b6015770082eb9d2a1138a292af25424d850ac57c7f9ead86e",
+        "BtStandIn.o": "d20e16bc0ea44308303ced0151538dd3d615be91649a1cecd8f4ef5e643bf81f",
+        "EldenWcnFirmware.o": "c7a1a4cbb41eae5cacb6f05812b38eb3a565fd78f363f4c17207acc9e45f2b27",
+        "WcnPowerNative.o": "86cd7057eab3842f83ffcc21a5698354ec654ed7b97b42d6207689d5f62c5cdf",
+        "NativeHost.o": "13a636791002cc31a686e4f2dfc90b16f3cc19d23214c503a0e88159b8d26796",
+        "UartBackend.o": "8784af5bee1e28ccdd316308052b119773f9a546fdc2df340418e8601ce14b6d",
+        "EldenBluetoothInspect.o": "a5c52d9fba4a79b3ddfbc054ad710a550c42432c8c41b18a94bf6b1fa0bcb86a",
+        "BootstrapStatus.o": "6ec91a6626f68d9281690fc5827d79362d243d2bb1e338b1e2535210d9e7845e"
+      },
+      "members": {
+        "Wcn7861Peripheral.o": "89a1cf3159493a0953a34f18c023e14bea7302c62ebfe32db69adebf85356bf2",
+        "Wcn7861Startup.o": "e4db6cf7643d49c41bdaa2a2e48099bfdb426a9be148e0fd98009f951b967aa0",
+        "Wcn7861Hci.o": "8a23220c0e18fddbf9c7c32074d641e27cee869cb9304a92fbd7f6fb7392339d",
+        "UartPlatform.o": "ed2aa7fb3c54d21083289f4653d44d43b05293f671a030f0001a9c12e44f83c6",
+        "WcnPower.o": "64c5c8b9dcf50c8ae3f79a2c2022fb393e117eef3feefcf7c46e8d2163a0eb65",
+        "BtH4.o": "23ed4b6cd26388811db83123c9b00bf66ee0f71e0f0a7ea69c188036e9a3eece",
+        "BtGeni.o": "1759dd6d9e5e60a031ab250022235a6e3dd2dc58f86095f39d983b45c87599b4",
+        "BtTlv.o": "82d9b38c7940b4a471945df169a980906d11333ed2b34a236f668edae22b19cd",
+        "BtIbs.o": "231eb0bd67221fbd0ce8cc26314edb1d2de37bd7798290ff91f19a90d5e885a5",
+        "BtPmic.o": "fd017571c36ed95ea0a2286ba73210f8db1a5f0c30a5b50a54abef065e75af3d",
+        "Sm8750Rpmh.o": "a86a9250ee6a911ae373e94cff5d0eb016ce95b1982066efa4279438b307ddad",
+        "Sm8750AossQmp.o": "3177ef7379f1605f3d22fea4cad50616cab393b9371c0f1993c77300e2092240",
+        "BtBridge.o": "7c038fb430da54b6015770082eb9d2a1138a292af25424d850ac57c7f9ead86e",
+        "BtStandIn.o": "d20e16bc0ea44308303ced0151538dd3d615be91649a1cecd8f4ef5e643bf81f",
+        "EldenWcnFirmware.o": "c7a1a4cbb41eae5cacb6f05812b38eb3a565fd78f363f4c17207acc9e45f2b27",
+        "WcnPowerNative.o": "8d67658deae92747cc1c61000dcef88df994190fb1e6eb05bf58962de0418859",
+        "NativeHost.o": "13a636791002cc31a686e4f2dfc90b16f3cc19d23214c503a0e88159b8d26796",
+        "UartBackend.o": "8784af5bee1e28ccdd316308052b119773f9a546fdc2df340418e8601ce14b6d",
+        "EldenBluetoothInspect.o": "a5c52d9fba4a79b3ddfbc054ad710a550c42432c8c41b18a94bf6b1fa0bcb86a",
+        "BootstrapStatus.o": "6ec91a6626f68d9281690fc5827d79362d243d2bb1e338b1e2535210d9e7845e"
+      }
+    }
+  },
+  "kernel": {
+    "kernel_sha256": "772c05212fbe8f0ce0d20d51af720d4e7da724dba20a50c62a7f0ddb8042b6f0",
+    "native_sha256": "32e342dc524bbcbf4e24a4a09571b761002c71927d4043b668b2a9a90f0d9e1e",
+    "entry_delta": 7124,
+    "apple_regions": 30
+  },
+  "qualification": {
+    "passed": true,
+    "mutation_cases": 57,
+    "menu_dispatch": true,
+    "countdown_and_fallback_preserved": true,
+    "actual_component_report_qualified": true,
+    "hardware_tested": false
+  },
+  "package": {
+    "image_sha256": "4513068b6d2e4ffb11d07b4d1c640bcb4c866e34b8d694b68d16eb77cb537631",
+    "session": "4df02d420655a9e7",
+    "floor": [
+      1738713600,
+      0,
+      3
+    ]
+  },
+  "source_inputs": {
+    "tools/build_wifi_net17_kernel.py": "e5523800138fa45a4d652d6133d336e7206d96d9958c3249b4ff25aee93bcff5",
+    "tools/wifi_network17_boot.py": "2ef27dfc02879e0d038b23ce8d7f27f587fb9a76b4ee383fb67c6213975f6dda",
+    "tools/test_wifi_net17_qualification.py": "d86ddcce5edc8c4308394a6f5cb781ff1d61e32c1295790b424e44c53c94e68f"
+  },
+  "next": "Single corrected live PCI write/MHI-state trial, full stock recovery.",
+  "goal": "active and incomplete"
+}

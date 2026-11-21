@@ -1,106 +1,38 @@
-# Wi-Fi：协议服务已离线构建，硬件链未验收
+# Wi-Fi当前主线 · 2026-11-21
 
-当前Wi-Fi仍未打通：没有已验证的en0、扫描、关联或联网；真实WLAN供电、PCIe/DMA/MHI
-与网络接口的集成仍待完成。125对象编译和用户态服务准备不等于Wi-Fi可用。
-当前正常电源/亮度候选是v142，用户已授权无人值守测试；本轮没有启动Wi-Fi射频。
-蓝牙已通过原生初始化和BLE广播报告接收，但设备列表、配对及稳定重连尚未验收。
-下方各构建记录保留其当时版本与范围。
+最新实机确认 PMK 就绪、PEER_ASSOC 21ms、收到并提交各 1 个 EAPOL。TCL 快照 HP=TP=8 words，WBM HP=TP=0，密钥与受控端口仍为零。原厂 Android、root、green、原充电与无线设置已恢复。[本轮实录](evidence/wifi-station-tx-priority-hardware-20261121.json)
 
-## 已完成的前置项
+本轮关联采用 legacy PHY，实际描述符 TID 为 0。WMM 模式下才会采用候选的 EAPOL TID 7 分支。固定成功供体的 10f-c 在 legacy 模式完成 WPA2，两个 EAPOL 完成项由固件返回，随后 10g 验证 DHCP 与网关。当前沿该成功组合核查本机 OEM 发送分类与固件完成返回路径。[小米 Pad 8 Pro 实录](https://github.com/lenzhang/UniXNU-xiaomipad8pro/blob/2438556c77c90c22c7b76e57eb8b40c44b35f1af/docs/drivers/wifi.md#88-the-batched-tablet-test-list)
 
-原modem_a七件主要Peach固件的只读文件访问已有实现，尺寸/SHA按原厂备份固定。
-路径与板级资源在`drivers/EldenWifi`、`EldenWifiResources.h`及工作台
-`lab/records/wifi-elden-20261108/inputs.json`，不是PCIe/MHI已启动的证据。
+成功参考是[小米Pad8Pro lenzhang](https://github.com/lenzhang/UniXNU-xiaomipad8pro)，
+固定2438556c，其记录有WPA2／DHCP／公网、睡眠及固件崩溃恢复实证。
+[官方11机型／23仓审核](SM8750-WIFI-REUSE-AUDIT-20261120.md)列出未成功、404及API403边界。
+只导入portable协议，保留本机原厂固件／板级接线、IRQ/DMA owner和Sheng iPadOS17桥。
+macOS27系统ABI与Y700固件不整包覆盖。
 
-官方Ath12kWifi已克隆到Windows和Mac各自Y700项目的`research/Ath12kWifi`。
-正式参考清单现为43仓，包括后续所需的固定Linux7.0.14源。组件采用固定提交
-`5f7f5a8a9f02f7ab45ed10a2f226e348c519a838`，不自动替换已有候选输入。
-其README记录的实机范围是sheng/24A446上的开关、扫描、WPA2、DHCP及流量，
-不能转记为本机或21H461已通过。
-
-该版本默认用户态构建目标为arm64e/iOS27；新工具
-`tools/build_elden_wifi_userspace.py`在独立输出目录取固定Git快照，改为arm64/iOS17。
-只下载并验证4.25MB的wpa_supplicant2.12原版归档，未为用户态构建重复下载Linux/FreeBSD。
-保留原sheng控制协议、原SME/WPA认证代码和已审核的注册/通知改动；另核899个原版文件逐字不变。
-参考克隆未修改。重复输出拒绝覆盖，旧文件不删除。
-
-已构建并本地签名的`unixnu-wpa_supplicant`：
-
-- SHA256：`f54eb63475c7f3b3cb0d1d1ed78728a941fb8c07e363f88cf8c5095a69adecb7`
-- CDHash：`b02572b5f0fd9e79790645ad33df708b24530295`
-- 实际Mach-O为thin arm64、最低iOS17.0；仅链接libSystem.B.dylib，编译无警告/错误。
-- 控制端点`org.unixnu.wifi.control`，原version1／40B头；尚未验证本机内核端点。
-
-工作台材料`edl_work/wifi-userland-20261112`；Mac为项目内
-`lab/wifi-userspace-20261112/build`。已生成原sheng形式的job和空网络配置模板，
-**没有安装、没有合并launchd缓存或更新trustcache，也没有运行服务或提供网络密码。**
-静态目标和签名检查不等于iPadOS加载、控制通道或认证实机通过。
-完整来源见[服务记录](evidence/wifi-userland-20261112.json)。
-
-## Peach必须使用本机Linux配置
-
-ArmadaOS的TB322FC原始DTS明确固定到h0cheung提交
-`6f97250ead155fc3b980856323e99a4623dae73d`。该源码的`ath12k/wifi7`有独立
-PEACH0x110e条目，不需要将整个QCC2072配置当作猜测起点。
-
-| 项目 | 本机Linux Peach | QCC2072条目 |
+| 验收 | 结果 | 实录 |
 | --- | --- | --- |
-| 硬件版本 | Peach HW2.0；拒绝未知SoC major | QCC2072 HW1.0 |
-| internal_sleep_clock | false | true |
-| download_tme_lite | true | 未设置 |
-| board_api1_only | true | 未设置 |
-| QMI能力位 | WLAN_EN、AUX_UC | QDSS_CFG_MISS、PCIE_PERST_NO_PULL、AUX_UC |
+| PCIe／DMA／原厂FW／QMI | 已实际进入Mission Mode与FW_INIT_DONE | [v166](evidence/wifi-control-v166-20261116.json) |
+| portable扫描 | 两轮，32保留BSS（上限32）、113管理帧、HTT6环、CE24/24/drop0 | [scan](evidence/wifi-portable-scan-hardware-20261120.json) |
+| station与iOS桥 | VDEV/auth/assoc，stage714；iOS桥start0；helper精确签名准入 | [station](evidence/wifi-portable-station-hardware-20261121.json) |
+| 本机OEM命令格式 | station peer确认21ms；helper生成4次message2 | [wire](evidence/wifi-station-wire-hardware-20261121.json) |
+| EAPOL发送完成／密钥 | 当前 TCL 消费 1，WBM 完成 0，keys0／port0 | [本轮](evidence/wifi-station-tx-priority-hardware-20261121.json) · [早期独立轮次](evidence/wifi-station-tx-hardware-20261121.json) |
+| WPA2／DHCP／流量／重连／睡眠 | 未完成 | 下一次综合窗口 |
+| 回程 | 独立BM-off/idle/MSI4/PERST-low、真实fastboot与完整stock恢复通过 | station协议drain超时仍保留 |
 
-数据通路使用QCC2072 ops/描述符/寄存器，CE/MHI等复用WCN7850，**这些复用不等于整份硬件配置可互换**。
-Pagani的`peach.py`明确标有未验证推测，README最近实机仍停在S7I读取失败，未完成网络初始化。
-可借鉴拆分方法，不能直接复制其七rail、低地址DMA池、跳过读回或整片QCC2072映射。
-后续应逐项移植本机独立Peach配置及其QMI/固件依赖，再验证实际PCI身份、供电、DMA/MSI和启动。
-来源与字段对照见[Peach记录](evidence/wifi-peach-profile-20261112.json)。
+当前候选 `9c9fc5d3`，源码 `c62a26e`，session `80ad897d6443755d`，floor 1738713600／0／3。CiscoMac 的 ARM64 对象、整核、20 项拒绝用例及签名包静态审查通过。增量入口为 `tools/build_wifi_station_tx_priority.py`，沿用原 PMK 就绪 runtime2。四份旧构建输入逐字恢复了冻结的 CRLF，Git 保留原字节。
 
-进一步追到原Y700补丁：QMI收到目标能力后，先应用固件OL-CPR电压请求，成功才可继续TME-Lite。
-新[OL-CPR适配](../drivers/EldenWifi/OLCPR.md)已统一复用原WcnPower算法/DTS映射，去除上一轮重复计算。
-20,128组Linux数值对照、4,096组新旧兼容及原12电源场景通过，两个ARM64对象绑定到同一提供者。
-原C层发送器已有，仍受BT Ready/epoch/失败隔离限制；Wi-Fi的QMI→原生WLAN owner路由尚未接通。
-适配器只产生计划，本轮没有调压。
-不能把缺少的回调改成成功来绕过这个前置条件。
+下一轮候选 `3f8f74e1` 已在 CiscoMac 构建并签名，源码 `6a573e6`，session `2471600257fe1d70`。静态审查通过，回滚索引为 1738713600／0／3，21 项错误组合均被拒绝。平板已离线，等待实机验收。[OEM HTT/TCL 适配](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md)
 
-[Peach回移](../drivers/EldenWifi/peach/README.md)现已准备9个驱动文件和电源接口头，
-6个变化C单元在ARM64/iOS17编译通过；171份实际输入核对通过，尚非整套125对象或内核链接。
-加载顺序/失败传播的实际函数体测试通过。更正：原TME处理对特定0x53限制状态有非致命例外，
-保留限制日志，不称为TME加载成功；其它错误及OL-CPR前置失败仍停止，现场行为尚待验证。
-完整警告和范围见回移说明；真实WLAN电源提供者仍未接通。
+实际OEM模块排除隐式RBM：相关helper为ret，TCL0→WBM0/RBM5与donor一致。
+单设备vdev-ID检查和物理MAC选择有差异，尚未证明是TX原因；没有因此猜写bank。
+命令格式的新增字段与尾部数组来自已加载模块的尺寸/指令，原donor blob保持。
+本轮受控退出仍协议drain超时，晚期UMAC refusal和真实物理fence通过分开记录。
 
-后续[完整C运行时](../drivers/EldenWifi/RUNTIME.md)已按官方准备流程编译125对象，
-456份实际编译输入和符号重命名检查通过；对当前内核缺失的外部符号为真实WLAN电源接口。
-官方生命周期host测试通过（先修正其两处模拟回调缺少radio_idx参数的UBSan失败）。
-板级PCIe/DMA/网络回调仍需接入，9334条编译警告保留并待完整审核，未链接新内核或进行联网实测。
+复现源码及准确依赖：[portable scan](../drivers/EldenWifi/portable/README.md)、
+[完整station](../drivers/EldenWifi/portable/station/README.md)。基础从零build已单独验收；
+这些Wi-Fi增量命令有明确前置对象路径，尚未集成到新克隆一条命令，不能宣称已从零重验当前Wi-Fi。
+网络凭据只保留在私有构建输入，SSIDs/BSSIDs/keys不进入Git与日志。
 
-警告审核已定位并修复[MHI下载状态读取](../drivers/EldenWifi/peach/MHI-STATUS-READ.md)：
-原BHI在先读到pending、后读失败时会误报成功；现在独立保留并返回读取错误。
-实际函数故障注入、完整125对象重建和比较通过；功能代码只改mhi_boot.o，其他编译输入455项保持。
-两条tx_status警告消除后仍有9332条，后续审核继续。未在平板上复现该故障，也未据此宣称无线可用。
-
-官方栈锁定Linux7.0.14，而上述Y700源码是7.2.8；独立Peach条目还涉及9个ath12k文件和电源序列接口。
-新`research/linux-ath12k-7.0.14`固定在458c6079…供逐项回移，未更换官方栈的锁定版本。
-Windows该克隆有8个netfilter头文件因大小写冲突显示修改，原样保留；消费源码应从Git对象核对，
-不reset、不将这些路径的工作树视图冒称逐字原版。它们不是本次OL-CPR组件的输入。
-
-## 复现与下一步
-
-在macOS、Python3.12/Xcode环境运行，所有输出用新目录：
-
-```sh
-python3 tools/build_elden_wifi_userspace.py \
-  --component-repository /path/to/research/Ath12kWifi \
-  --supplicant-archive /path/to/wpa_supplicant-2.12.tar.gz \
-  --output /path/to/new-wifi-userspace
-python3 tools/analysis/audit_peach_profile.py \
-  --repository /path/to/research/tb322fc-linux-kernel --output /path/to/new-evidence
-```
-
-归档URL/校验值取固定组件`tools/source-lock.json`。构建工具只修改隔离快照的目标/依赖准入和输出保护；
-认证源由原组件准备器生成，未引入自制认证或假成功响应。还需原生网络/Apple80211的21H461精确ABI、
-内核控制端点、用户态job/trust与固件载入的完整整合；持久凭据、Wi-Fi/蓝牙共用供电与睡眠也未完成。
-
-充电主线仍保留双口仲裁与完整保护周期缺口；本轮参考同步无相关新提交，
-ArmadaOS仍明列双口充电待完善。完整外围Goal未完成，GPU最后、扬声器先讨论保护。
+过去反复的WMI／CE3／wake／OEM wire诊断见[原样历史](archive/20261121/WIFI-STATUS.md)。
+原源码／结果SHA不重写；当时失败不能被新的扫描通过倒写成成功。

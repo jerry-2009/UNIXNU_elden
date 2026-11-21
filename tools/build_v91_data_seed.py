@@ -2,7 +2,8 @@
 """Create the initial v91 APFS Data fixture from the verified original OS image.
 
 Only newly created regular image files are modified. The volume UUID adjustment
-is limited to checksummed, unencrypted APFS volume superblocks in a 512MiB copy.
+is limited to checksummed, unencrypted APFS volume superblocks. The default stays
+512MiB; the explicit 2048MiB variant requires separately qualified native guards.
 """
 from pathlib import Path
 import argparse,hashlib,json,os,plistlib,shutil,stat,struct,subprocess,uuid
@@ -23,8 +24,8 @@ def fletcher(block):
     a=b=0;mod=0xffffffff
     for value in struct.unpack('<1022I',block[8:]):a=(a+value)%mod;b=(b+a)%mod
     x=mod-(a+b)%mod;y=mod-(a+x)%mod;return (y<<32)|x
-def retag_copy(source,dest,old_uuid,new_uuid):
-    if source.stat().st_size!=536870912 or dest.exists() or not source.is_file():raise RuntimeError('Only a fresh 512MiB test image copy is permitted')
+def retag_copy(source,dest,old_uuid,new_uuid,*,expected_bytes=536870912):
+    if expected_bytes not in (536870912,2147483648) or source.stat().st_size!=expected_bytes or dest.exists() or not source.is_file():raise RuntimeError('Only a fresh explicitly sized seed image copy is permitted')
     old=uuid.UUID(old_uuid).bytes;new=uuid.UUID(new_uuid).bytes;changed=[]
     with source.open('rb') as src,dest.open('xb') as target:
         offset=0
@@ -84,7 +85,9 @@ def verify_filesystem(raw,out):
     if check.returncode:raise RuntimeError('Read-only APFS filesystem verification failed')
     return {'fsck_returncode':0,'apfs_feature_flags_match_baseline':True}
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--os-image',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--os-image',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--size-mib',type=int,choices=(512,2048),default=512,help='Explicit seed capacity;2048 requires a new kernel/boot qualification')
+    a=p.parse_args();expected_bytes=a.size_mib*1024*1024
     profile=json.loads(PROFILE.read_text());source=a.os_image.resolve(strict=True);out=a.output.resolve()
     if out.exists() or str(source).startswith('/dev/'):raise RuntimeError('Use an original OS image and a new output directory')
     if os.geteuid() not in (0,501):raise RuntimeError('Run as the fixture owner UID501 or as root, only inside owned disk images')
@@ -94,7 +97,7 @@ def main():
     image=out/'formatted.cdr';osdev=datadev=None
     try:
         osdev=attach(source,om)
-        subprocess.run(['hdiutil','create','-size','512m','-layout','NONE','-fs','APFS','-volname','EldenData','-type','UDTO',str(image)],check=True,stdout=subprocess.DEVNULL)
+        subprocess.run(['hdiutil','create','-size',str(a.size_mib)+'m','-layout','NONE','-fs','APFS','-volname','EldenData','-type','UDTO',str(image)],check=True,stdout=subprocess.DEVNULL)
         datadev=attach(image,dm);info=plistlib.loads(subprocess.check_output(['diskutil','info','-plist',str(dm)]));old_uuid=info['VolumeUUID']
         for name,item in sorted(profile['entries'].items(),key=lambda p:(len(Path(p[0]).parts),p[0])):
             target=dm/name
@@ -119,7 +122,7 @@ def main():
     finally:
         for dev in (datadev,osdev):
             if dev:detach(dev)
-    raw=out/'data.raw';changed=retag_copy(image,raw,old_uuid,profile['volume_uuid']);dev=None
+    raw=out/'data.raw';changed=retag_copy(image,raw,old_uuid,profile['volume_uuid'],expected_bytes=expected_bytes);dev=None
     try:
         dev=attach(raw,vm);info=plistlib.loads(subprocess.check_output(['diskutil','info','-plist',str(vm)]))
         if info['VolumeUUID'].upper()!=profile['volume_uuid']:raise RuntimeError('APFS volume identity did not survive retag')
@@ -127,10 +130,12 @@ def main():
         live_inodes={name:(vm/name).lstat().st_ino for name in profile['entries']}
         live_inodes['.']=vm.lstat().st_ino
         raw_owners=audit_image(raw,live_inodes,profile)
+        space=os.statvfs(vm);host_available_bytes=space.f_bavail*space.f_frsize
     finally:
         if dev:detach(dev)
     packed=out/'data.packed';extents=pack(raw,packed)
-    report={'logical_manifest_sha256':digest(PROFILE),'logical_entries_verified':count,'volume_uuid':profile['volume_uuid'],'raw_sha256':digest(raw),'packed_sha256':digest(packed),'packed_bytes':packed.stat().st_size,'expanded_bytes':raw.stat().st_size,'extent_count':extents,'retagged_superblocks':changed,'only_new_image_files_modified':True,'host_journal_contents_not_copied':True,'hardware_tested':False,'tablet_operation':False}
+    report={'logical_manifest_sha256':digest(PROFILE),'logical_entries_verified':count,'volume_uuid':profile['volume_uuid'],'raw_sha256':digest(raw),'packed_sha256':digest(packed),'packed_bytes':packed.stat().st_size,'expanded_bytes':raw.stat().st_size,'extent_count':extents,'retagged_superblocks':changed,'only_new_image_files_modified':True,'host_journal_contents_not_copied':True,'hardware_tested':False,'tablet_operation':False,
+        'requested_size_mib':a.size_mib,'host_available_bytes_after_seed':host_available_bytes,'requires_expanded_native_qualification':a.size_mib!=512}
     report.update(verify_filesystem(raw,out))
     report.update(raw_owners_verified=raw_owners,live_inodes=live_inodes,raw_ownership=profile['raw_ownership'])
     (out/'result.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({k:v for k,v in report.items() if k!='live_inodes'},indent=2))

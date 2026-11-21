@@ -1,0 +1,90 @@
+{
+  "profile": "wifi-service-scan",
+  "hardware_tested": true,
+  "image_sha256": "634bff5e45c4f9fd9f7590b095cb2a37494fe8a08c1ae315b9a1f8d8dab8c30c",
+  "session": "1eaf78095c2e49fd",
+  "kernel_sha256": "b6b0d1b8daa2e19f69b3e3a909a6654ba148289da79b180cd25ee49d3cb873b4",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "firmware_stage": 4,
+  "first_info_status": 3,
+  "later_info_status": 9,
+  "diagnostic_scan_issued": false,
+  "scanning_accepted": false,
+  "bss": 0,
+  "control_connections": 31,
+  "control_disconnects": 31,
+  "wmi_command": 16387,
+  "wmi_name": "WMI_PDEV_SET_PARAM",
+  "wmi_timeout_count": 30,
+  "mac_start_error": -11,
+  "observed_wmi_credits": 0,
+  "driver_messages": [
+    "ELDEN_ATH12K level=4 wmi command 16387 timeout",
+    "ELDEN_ATH12K level=4 failed to send WMI_PDEV_SET_PARAM cmd",
+    "ELDEN_ATH12K level=3 fail to start mac operations in pdev idx 0 ret -11",
+    "ELDEN_ATH12K level=3 stuck: ce1 buf sw 2 write 0 hp 0 cached-tp 4 tp 4 needed 0",
+    "ELDEN_ATH12K level=3 stuck: ce1 status sw 0 tp 8 cached-hp 8 hp 8",
+    "ELDEN_ATH12K level=3 stuck: ce2 buf sw 16 write 14 hp 28 cached-tp 32 tp 32 needed 0",
+    "ELDEN_ATH12K level=3 stuck: ce2 status sw 0 tp 64 cached-hp 64 hp 64",
+    "ELDEN_ATH12K level=3 stuck: ce3 src sw 2 write 4 hp 16 reap 4 cached-tp 8 tp 8",
+    "ELDEN_ATH12K level=3 stuck: ce4 src sw 1 write 9 hp 36 reap 0 cached-tp 24 tp 36",
+    "ELDEN_ATH12K level=3 stuck: wmi credits 0, mhi ee 2 state 2"
+  ],
+  "comparison": [
+    {
+      "capture": "live-service-owner-v175-20261116",
+      "sha256": "a016a513158e6e0c9f7ba6013d1d7e3bccfaf0f1d7de78cf3c76cccf948479ea",
+      "wmi_16387_timeouts": 30,
+      "last_runtime_live": [
+        "ELDEN_WIFI_RUNTIME live stage=4 error=0 rounds=132 irq=80 vectors=7f bss=0 repeats=32"
+      ]
+    },
+    {
+      "capture": "live-service-trace-v176-20261116",
+      "sha256": "90d46ed25c25133049a636d3141ab5a1751bd1f7ff3bdd254b15f2cb4651c9c0",
+      "wmi_16387_timeouts": 0,
+      "last_runtime_live": [
+        "ELDEN_WIFI_RUNTIME live stage=4 error=0 rounds=4409 irq=105 vectors=7f bss=0 repeats=36"
+      ]
+    },
+    {
+      "capture": "live-service-scan-v177-20261116",
+      "sha256": "4ae980b0372bcdf41ce0f7e9c7e85f69e35acaafa3a0c3101a44d4b9a9175e6b",
+      "wmi_16387_timeouts": 30,
+      "last_runtime_live": [
+        "ELDEN_WIFI_RUNTIME live stage=4 error=0 rounds=131 irq=80 vectors=7f bss=0 repeats=32"
+      ]
+    }
+  ],
+  "root_cause_proven": false,
+  "next": "Observe actual native MSI latch/mask/pending/error and CE completion processing at first WMI timeout; do not guess hardware settings or fabricate credit/completion success.",
+  "limitations": "Stage4/error0 is not interface-open acceptance. Diagnostic DDR differences are not proof of RAM corruption. No successful INFO gate or real scan exercised in this run.",
+  "capture": {
+    "bytes": 285382,
+    "sha256": "4ae980b0372bcdf41ce0f7e9c7e85f69e35acaafa3a0c3101a44d4b9a9175e6b",
+    "reported_drop_max": 8,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false
+  },
+  "physical_fence_and_wcn_stop": true,
+  "typed_return_and_physical_fastboot": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_restored": true,
+  "charging_settings_restored": true,
+  "radio_settings_restored": true,
+  "scan_preferences_restored": true,
+  "sleep_requested": true,
+  "host_scenarios": 7,
+  "actual_scan_predicate_and_block_tested": true,
+  "real_control_queue_tested": true,
+  "native_warnings": 1,
+  "source_inputs": 207,
+  "apple_executable_regions": 30,
+  "all_jobs_terminal": true,
+  "full_goal_complete": false
+}

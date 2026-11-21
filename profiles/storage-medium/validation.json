@@ -1,0 +1,27 @@
+{
+  "native": {
+    "profile": "storage-medium",
+    "kernel_sha256": "2e946a0344f9c7703df83e58b427b3c5db1eeba40393094591a6ea757d803466",
+    "native_sha256": "ef3870ab608288139c1f0666405da217acc0444bd9543c1b1704cad73e41ba15",
+    "changed_core_objects": 0,
+    "changed_native_objects": 2,
+    "scalar": true,
+    "original_apple_executables_hashed": 30
+  },
+  "host": {
+    "passed": true,
+    "result": "PASS 10 medium publication/ownership cases",
+    "actual_helper": true,
+    "asan_ubsan": true,
+    "helper_sha256": "8b28ba5ba5b020567450ac69bfc061ed005270a34398112441fee4e39992d05a",
+    "hardware": false,
+    "limits": "Fake object ownership and allocation; real IOKit/ioctl requires hardware verification."
+  },
+  "warnings": {
+    "same_warning_diagnostics": true,
+    "count": 26,
+    "normalization": "line/column only; warning text and file retained",
+    "ram_warnings": 0
+  },
+  "new_full_clean_command_rerun": false
+}

@@ -16,6 +16,7 @@ def main():
     if sys.flags.optimize:raise ValueError('Validation requires Python assertions enabled')
     p=argparse.ArgumentParser(description=__doc__)
     for n in ('component-repository','board-repository','linux-archive','supplicant-archive','backport','llvm','kernel-reference','output'):p.add_argument('--'+n,type=Path,required=True)
+    p.add_argument('--native-lifecycle',action='store_true',help='Require real native consumer/BM callbacks')
     a=p.parse_args();out=a.output.resolve()
     if out.exists():raise ValueError('New output directory required')
     linux=json.loads((ROOT/'drivers/EldenWifi/peach/runtime-linux-input.json').read_text());raw=gzip.decompress(a.linux_archive.read_bytes())
@@ -69,6 +70,20 @@ def main():
     write(out/'mhi-status-read-fix.json',{'original_sha256':hashlib.sha256(before).hexdigest(),
         'derived_sha256':hashlib.sha256(after).hexdigest(),
         'patch_source_sha256':sha(ROOT/'drivers/EldenWifi/peach/MhiReadPatch.py'),
+        'hardware_operations':False})
+    from PciMsiPatch import patch as patch_pci_msi
+    if a.native_lifecycle:
+        from PciLifecyclePatch import patch as patch_pci_msi
+    pci=module/'src/nw_pci.c';before=pci.read_bytes();after=patch_pci_msi(before)
+    original_pci=pci.with_name('nw_pci.before-msi-fix')
+    if original_pci.exists():raise ValueError('PCI original source already exists')
+    pci.rename(original_pci);pci.write_bytes(after)
+    write(out/'pci-msi-fix.json',{'original_sha256':hashlib.sha256(before).hexdigest(),
+        'derived_sha256':hashlib.sha256(after).hexdigest(),
+        'patch_source_sha256':sha(ROOT/'drivers/EldenWifi/peach/PciMsiPatch.py'),
+        'implementation_sha256':sha(ROOT/'drivers/EldenWifi/peach/PciMsi.inc'),
+        'native_lifecycle':a.native_lifecycle,
+        'lifecycle_source_sha256':sha(ROOT/'drivers/EldenWifi/peach/PciLifecyclePatch.py') if a.native_lifecycle else None,
         'hardware_operations':False})
     # The original prepare flow reads the already-qualified Linux+Peach layer;
     # its output may contain additional upstream OS/runtime transformations.

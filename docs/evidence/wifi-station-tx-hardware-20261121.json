@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-21",
+  "hardware_tested": true,
+  "source_commit": "c20e37c",
+  "image_sha256": "1a7a713397cff3a35bfdfbb9d2c9e2ba4f3f2674277f9f1cd36cced1e6049c86",
+  "session": "43cd42ead32ff3bd",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "raw": {
+    "path": "edl_work/live-station-tx-20261121-r2/usb/20261120-220116.bin",
+    "bytes": 305959,
+    "sha256": "63b4b15ac4dbf769fbe135004a9f9b41a1abadc6fb2923c68194258c82c0ac7a",
+    "drop_max": 4,
+    "status_samples": 74,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "observations": {
+    "MODE_REPLY": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 MODE_REPLY pdev/status/configured/mappings 00000000 00000000 00000001 00000000",
+    "TX_STATE": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 TX_STATE submitted/completed/acked TCL-own/device WBM-own/device ready peer/hw/m 00000003 00000000 00000000 00000003 00000018 00000000 00000000 00000001 00000002 0000000c 00000001 0000000c 0000000c 00000001",
+    "TCL_CONFIG": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 TCL_CONFIG base/msb/id/misc/tp-lo/tp-hi/HP/TP 11d77800 00020000 00000008 000000c2 11d77000 00000000 00000018 00000018",
+    "WBM_CONFIG": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 WBM_CONFIG base/msb/id/misc/hp-lo/hp-hi/HP/TP 11d78000 00020000 00008008 000000c0 11d77004 00000000 00000000 00000000",
+    "TX_CONTRACT": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 TX_CONTRACT bank-config/id/frequency/up/RSN/HTTmajor/minor/wake/MHIcontrol/statu 00004a04 00000000 00001464 00000001 00000001 00000003 0000008a 00000001 00000200 00000201",
+    "TX_DESC": "ELDEN_ATH12K level=4 ELDEN_PORTABLE step=805 TX_DESC metadata-only words2..7 00000000 00010000 00000087 00000001 00c0000c 00000000"
+  },
+  "mode": {
+    "pdev": 0,
+    "status": 0,
+    "configured_mode": 1,
+    "mappings": 0
+  },
+  "transmit": {
+    "submitted": 3,
+    "completed": 0,
+    "acked": 0,
+    "tcl_host_slots": 3,
+    "tcl_device_words": 24,
+    "tcl_hp_words": 24,
+    "tcl_tp_words": 24,
+    "wbm_host_slots": 0,
+    "wbm_device_words": 0,
+    "wbm_hp_words": 0,
+    "wbm_tp_words": 0,
+    "ready": 1,
+    "peer": 2,
+    "hardware_peer": 12,
+    "mapped": 1,
+    "search": 12,
+    "hash": 12,
+    "metadata": 1,
+    "bank_config": 18948,
+    "bank": 0,
+    "frequency": 5220,
+    "vdev_up": 1,
+    "rsn": 1,
+    "htt_version": [
+      3,
+      138
+    ],
+    "wake": 1,
+    "mhi_control": 512,
+    "mhi_status": 513,
+    "descriptor_metadata_words_2_to_7": [
+      0,
+      65536,
+      135,
+      1,
+      12582924,
+      0
+    ]
+  },
+  "final_state": "ELDEN_ATH12K level=4 ELDEN_STATION stage=714 error=0 failed=0 start=1 auth=1 assoc=1 port=0 keys=0 RX=3 TX=3 EAPOL=3/3 done=0 ack=0",
+  "physical_fence": "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+  "tcl_descriptor_consumption_accepted": true,
+  "tx_completion_accepted": false,
+  "rf_transmission_or_ack_accepted": false,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "protocol_stop_accepted": false,
+  "warm_mhi_reset_accepted": false,
+  "full_stock_root_green_original_settings_restored": true,
+  "all_device_jobs_terminal": true,
+  "superseded_prewrite_attempt": "edl_work/live-station-tx-20261121 rejected mismatched audit before any flash; retained unchanged",
+  "next": "Audit OEM and successful donor TCL-to-TQM-to-WBM buffer return routing, bank and descriptor contract. Do not repeat credit/BAR/wake-only probes.",
+  "goal": "active and incomplete"
+}

@@ -1,5 +1,11 @@
 # Full Peach Wi-Fi C runtime — compiled offline
 
+Current QMI follow-up (2026-11-15): [QMI-POWER.md](QMI-POWER.md) supplies the real
+external power callback and consumer binding API. A separate128-object
+relocatable link resolves it against the unchanged125-object runtime and
+native/shared WCN providers. The historical report below remains unchanged;
+the native PCIe/MHI caller, whole kernel and hardware are still unverified.
+
 All125 production C objects now build from the pinned Ath12kWifi5f7f5a8 sources
 plus the explicit TB322FC Peach backport. The complete official preparation flow
 is applied: Linux/mac80211/cfg80211 sources, MHI hooks, completion/workqueue

@@ -50,7 +50,10 @@ def open_verified_edl_port(timeout=20,enumerate_ports=None,open_fn=None,now=None
     enumerate_ports=enumerate_ports or list_ports.comports;open_fn=open_fn or fh.open_port
     now=now or time.monotonic;pause=pause or time.sleep;deadline=now()+timeout;attempts=0
     def matches():
-        return len([q for q in enumerate_ports() if q.device=='COM7' and (q.vid,q.pid,q.location)==(0x05c6,0x9008,'1-5')])==1
+        # pyserial adds :x.<interface> when Windows exposes USBMI. The observed
+        # QDLoader has interface3 on the same physical1-5 path; admit only that
+        # proven spelling alongside the legacy spelling, never arbitrary suffixes.
+        return len([q for q in enumerate_ports() if q.device=='COM7' and (q.vid,q.pid)==(0x05c6,0x9008) and q.location in ('1-5','1-5:x.3')])==1
     while now()<deadline:
         if matches():
             attempts+=1
@@ -121,7 +124,8 @@ def main():
     out=a.output.resolve()
     if not out.is_relative_to(ROOT/'edl_work') or out.exists():p.error('output must be a new directory under this project edl_work')
     out.mkdir(parents=True)
-    report=dict(summary,started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),success=False)
+    report=dict(summary,started_utc=datetime.datetime.now(datetime.timezone.utc).isoformat(),success=False,
+                edl_opened=False,programmer_uploaded=False,nand_write_started=False)
     port=None
     try:
         assert sha(image)==checked.sha256 and sha(reference)==reference_sha
@@ -143,10 +147,12 @@ def main():
         port,report['edl_open_attempts']=open_verified_edl_port()
         report['edl_opened']=True
         if not fh.sahara_upload(port,fh.MELF):raise RuntimeError('programmer upload failed')
+        report['programmer_uploaded']=True
         time.sleep(1);fh.configure(port)
         fh.read_part(port,4,0,6,out/'lun4-main-before.bin')
         check_gpt((out/'lun4-main-before.bin').read_bytes())
         assert sha(image)==checked.sha256 and sha(reference)==reference_sha
+        report['nand_write_started']=True # conservative from the first possible write
         if not fh.program_delta(port,4,113318,24576,image,reference,'verified-boot_a'):
             raise RuntimeError('write did not complete')
         digest=fh.target_sha256(port,4,113318,24576)

@@ -1,0 +1,16 @@
+{
+  "evidence": "../../docs/evidence/wifi-ce3-flow-component-20261118.json",
+  "host_passed": true,
+  "runtime_compiled": true,
+  "kernel_package_passed": true,
+  "hardware_tested": true,
+  "network_accepted": false,
+  "hardware_evidence": "../../docs/evidence/wifi-mode-v190-hardware-20261119.json",
+  "candidate_sha256": "d5926009d31893fd5d2d7db146f3af42b3fd7de51c28dd345a6b4a92d5684452",
+  "bounded_flow_records_complete": true,
+  "native_physical_shutdown_qualified": true,
+  "full_stock_original_settings_restored": true,
+  "mode_metadata_variant": true,
+  "native_identity_generated": true,
+  "mode_response_status_unparsed": true
+}

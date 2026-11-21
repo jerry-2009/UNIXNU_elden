@@ -20,18 +20,30 @@ def main():
     for name in ('image','entry-kernel','stock-boot','parent-vbmeta','output'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--baseline-kernel',type=Path,help='Optional original hardware baseline; otherwise use its checked-in entry-body fingerprint')
     p.add_argument('--data-report',type=Path)
+    p.add_argument('--expanded-data',action='store_true')
+    p.add_argument('--keep-packed-data',action='store_true')
+    p.add_argument('--data-ui-replay',action='store_true')
     p.add_argument('--fbwc-report',type=Path)
     p.add_argument('--entry-report',type=Path)
     p.add_argument('--battery-ui',action='store_true')
     p.add_argument('--wcn-report',type=Path)
     p.add_argument('--bt-runtime',type=Path)
     p.add_argument('--pd-gui',action='store_true')
+    p.add_argument('--early-stall',action='store_true',help='Controlled pre-UFS interrupt-masked watchdog qualification')
     p.add_argument('--hid-report',type=Path)
     p.add_argument('--wait-sample',action='store_true')
     a=p.parse_args();checked=check_image(a.image,'boot_a');stock=check_image(a.stock_boot,'boot_a');check_image(a.parent_vbmeta,'vbmeta')
     if bool(a.wcn_report)!=bool(a.bt_runtime) or (a.wcn_report and (a.fbwc_report or a.battery_ui or a.hid_report)) or (a.hid_report and (a.fbwc_report or a.battery_ui)):raise ValueError('Ambiguous runtime audit')
     bt=bt_runtime_boot.qualify(a.wcn_report,a.entry_report,a.bt_runtime) if a.wcn_report else None
+    if a.expanded_data!=bool(bt and bt.get('expanded_data')):raise ValueError('Data capacity and native profile must match')
+    if a.keep_packed_data:
+        from data_capacity_boot import keep_packed
+        bt=keep_packed(bt)
+    if a.data_ui_replay:
+        from data_capacity_boot import enable_ui_replay
+        bt=enable_ui_replay(bt)
     if a.pd_gui:bt=bt_runtime_boot.pd_gui(bt)
+    if a.early_stall:bt=bt_runtime_boot.early_stall(bt)
     hid=hid_delivery_boot.qualify(a.hid_report,a.entry_report) if a.hid_report else None
     ACCEPTED_STOCK={'8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890','4e4c9c72707c7cb91c29a2ccece15ca919a3fa2098cea795e28ed22dfdcd86fc'}
     if stock.sha256 not in ACCEPTED_STOCK:raise RuntimeError('Unknown stock contract')
@@ -86,12 +98,14 @@ def main():
     for name,h in expected.items():
         content=fat.read(prefix+name)
         if name=='EldenPayloadLoader.efi':verify_loader(content)
-        elif name=='Payloads/data.packed' and sha(content)!=h:
+        elif name=='Payloads/data.packed' and (a.expanded_data or sha(content)!=h):
             if not a.data_report:raise RuntimeError('Rebuilt Data seed verification is missing')
-            verify_packed_seed(content,a.data_report)
+            seed=verify_packed_seed(content,a.data_report,expected_bytes=2147483648 if a.expanded_data else 536870912)
+            if a.expanded_data and seed['packed_sha256']!=bt['data_packed_sha256']:raise ValueError('Data seed differs from qualified native profile')
             rebuilt_seed=True
         elif sha(content)!=h:raise RuntimeError('Frozen payload changed: '+name)
     tree=adt_walk(fat.read(prefix+'Payloads/kernel.macho.adt'))
+    if tree['keep_packed']!=a.keep_packed_data:raise ValueError('Packed Data handoff differs from requested mode')
     expected_window=hid.get('memory_window_bytes',0x180000000) if hid else 0x180000000
     if tree['window']!=expected_window or tree['gpuaddon'] is not None:raise RuntimeError('Memory/GPU configuration changed')
     if a.fbwc_report and not a.entry_report:raise RuntimeError('Framebuffer audit requires the entry transformation report')

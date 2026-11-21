@@ -1,0 +1,94 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": true,
+  "image_sha256": "d2ec5dd0bb37fc81fc7158ccccff011976c97ed940c11ae24978777e6a5954d7",
+  "session": "b2c6456bd8019b67",
+  "raw": {
+    "path": "edl_work\\live-board-state-20261120\\usb\\20261120-080001.bin",
+    "bytes": 264251,
+    "sha256": "2daa80778d6a57f1857632473f53c16822fcc3a7eb5bbdb00ae81a75b8abf95a",
+    "drop_max": 29,
+    "status_samples": 59,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "board_samples": {
+    "12": {
+      "summary": "ELDEN_BOARD_STATE stage=12 rc=0 epoch=1 pins=12 rails=6 parent=600000000/300000000; existing-reads-only non-atomic",
+      "pins": [
+        "ELDEN_BOARD_PIN stage=12 gpio=16 ctl=3c3 io=3 irq=702",
+        "ELDEN_BOARD_PIN stage=12 gpio=18 ctl=5 io=1 irq=742",
+        "ELDEN_BOARD_PIN stage=12 gpio=19 ctl=5 io=1 irq=742",
+        "ELDEN_BOARD_PIN stage=12 gpio=202 ctl=1a41 io=0 irq=742"
+      ],
+      "rails": [
+        "ELDEN_BOARD_RAIL stage=12 rail=0 mv=876 mode=7 en=80 status=8f target=876",
+        "ELDEN_BOARD_RAIL stage=12 rail=1 mv=1800 mode=7 en=80 status=87 target=1800",
+        "ELDEN_BOARD_RAIL stage=12 rail=2 mv=1200 mode=7 en=80 status=87 target=1200",
+        "ELDEN_BOARD_RAIL stage=12 rail=3 mv=876 mode=7 en=80 status=8f target=876",
+        "ELDEN_BOARD_RAIL stage=12 rail=4 mv=1312 mode=7 en=80 status=87 target=1312",
+        "ELDEN_BOARD_RAIL stage=12 rail=5 mv=1860 mode=7 en=80 status=8f target=1860"
+      ]
+    },
+    "9": {
+      "summary": "ELDEN_BOARD_STATE stage=9 rc=0 epoch=1 pins=12 rails=6 parent=600000000/300000000; existing-reads-only non-atomic",
+      "pins": [
+        "ELDEN_BOARD_PIN stage=9 gpio=16 ctl=3c3 io=3 irq=702",
+        "ELDEN_BOARD_PIN stage=9 gpio=18 ctl=5 io=1 irq=742",
+        "ELDEN_BOARD_PIN stage=9 gpio=19 ctl=5 io=1 irq=742",
+        "ELDEN_BOARD_PIN stage=9 gpio=202 ctl=1a41 io=0 irq=742"
+      ],
+      "rails": [
+        "ELDEN_BOARD_RAIL stage=9 rail=0 mv=876 mode=7 en=80 status=8f target=876",
+        "ELDEN_BOARD_RAIL stage=9 rail=1 mv=1800 mode=7 en=80 status=87 target=1800",
+        "ELDEN_BOARD_RAIL stage=9 rail=2 mv=1200 mode=7 en=80 status=87 target=1200",
+        "ELDEN_BOARD_RAIL stage=9 rail=3 mv=876 mode=7 en=80 status=8f target=876",
+        "ELDEN_BOARD_RAIL stage=9 rail=4 mv=1312 mode=7 en=80 status=87 target=1312",
+        "ELDEN_BOARD_RAIL stage=9 rail=5 mv=1860 mode=7 en=80 status=8f target=1860"
+      ]
+    },
+    "90": {
+      "summary": "ELDEN_BOARD_STATE stage=90 rc=0 epoch=1 pins=12 rails=6 parent=600000000/300000000; existing-reads-only non-atomic",
+      "pins": [
+        "ELDEN_BOARD_PIN stage=90 gpio=16 ctl=3c3 io=3 irq=702",
+        "ELDEN_BOARD_PIN stage=90 gpio=18 ctl=5 io=1 irq=742",
+        "ELDEN_BOARD_PIN stage=90 gpio=19 ctl=5 io=1 irq=742",
+        "ELDEN_BOARD_PIN stage=90 gpio=202 ctl=1a41 io=0 irq=742"
+      ],
+      "rails": [
+        "ELDEN_BOARD_RAIL stage=90 rail=0 mv=876 mode=7 en=80 status=8f target=876",
+        "ELDEN_BOARD_RAIL stage=90 rail=1 mv=1800 mode=7 en=80 status=87 target=1800",
+        "ELDEN_BOARD_RAIL stage=90 rail=2 mv=1200 mode=7 en=80 status=87 target=1200",
+        "ELDEN_BOARD_RAIL stage=90 rail=3 mv=876 mode=7 en=80 status=8f target=876",
+        "ELDEN_BOARD_RAIL stage=90 rail=4 mv=1312 mode=7 en=80 status=7 target=1312",
+        "ELDEN_BOARD_RAIL stage=90 rail=5 mv=1860 mode=7 en=80 status=8f target=1860"
+      ]
+    }
+  },
+  "external_pin_state_unchanged_at_loss": true,
+  "six_regulator_mode_enable_voltage_good_at_first_pmf": true,
+  "pll_parents": [
+    600000000,
+    300000000
+  ],
+  "s7i_status_at_first_timeout": 7,
+  "s7i_first_pmf_status": 135,
+  "s7i_drop_not_proven_causal": true,
+  "ce3_still_lost_before_first_pmf": true,
+  "bss": 0,
+  "scan_accepted": false,
+  "association": false,
+  "dhcp": false,
+  "traffic": false,
+  "wmi_timeouts": 27,
+  "graceful_fence_proven": false,
+  "net_drained": false,
+  "umac_put": false,
+  "physical_fastboot": true,
+  "full_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "stock_root_green_original_settings_restored": true,
+  "all_device_jobs_terminal": true,
+  "next": "Do not adjust external voltage or pins from these stable readings. Complete exact firmware-side host capabilities/wake notification comparison.",
+  "goal": "active and incomplete"
+}

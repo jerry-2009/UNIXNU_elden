@@ -1,0 +1,38 @@
+{
+  "candidate": {
+    "profile": "wifi-pci-window-trace",
+    "image_sha256": "c4aa5d1f4a1fc7567735097b0b02436471c589179c883925acaf6f862a2784d0",
+    "session": "80bb66d9dc9166fd",
+    "kernel_sha256": "59e71badedcf261605bbd3753351cf7b42b14e43307d5e71174200d6146c6b02",
+    "accepted_static": true,
+    "hardware_tested": false,
+    "packaging_source_sha256": "9af975f293a89b772bf7b4f9a0cf021fcf5fe1e93474aeeb6e52372c2c5039cb"
+  },
+  "actual_read_function_host_test": {
+    "passed": true,
+    "actual_read_functions": true,
+    "old_return_and_access_order_preserved": true,
+    "reversible_source": true,
+    "hardware_and_window_configuration_modeled": true,
+    "observer_sha256": "e2e41ced9e01722e3728a8f14adc635c776712f386b534595c993eddfecd54e7",
+    "summary": "PASS 30 actual original/patched PCI read scenarios, offsets/wake/window/counters; max line=137",
+    "hardware_tested": false
+  },
+  "runtime_binding_sha256": "3193bcf0dc6fe27542eaa99e6b720f4ab2f62c2b1b0cfc4deb91967844a32e4c",
+  "runtime_changed_retained": [
+    6,
+    119
+  ],
+  "native_warnings": 1,
+  "original_apple_execution_ranges": 30,
+  "entry_delta": 7124,
+  "full_asset_source_closure": true,
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "qualification_tests": 5,
+  "hardware_tested": false,
+  "workbench_records": "edl_work/wifi-pci-window-v188-20261118"
+}

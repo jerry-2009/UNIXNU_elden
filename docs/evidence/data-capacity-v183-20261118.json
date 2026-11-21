@@ -1,0 +1,99 @@
+{
+  "scope": "2GiB volatile sparse Data with actual software KeyStore; full peripheral Goal incomplete",
+  "candidate": {
+    "profile": "data-capacity-2g-key",
+    "image_sha256": "14bf65ff5fcd9b54b30f7d1fd2b8ba268b27a4d597f91fbeb0844a7ad88538a5",
+    "session": "da3ea46ff92d12c2",
+    "kernel_sha256": "5c69537323159a2e9797dfa9a17599426356cb5723951e39563fdd28918735ac",
+    "data_packed_sha256": "139c013b76e73c0d83327d369fffca62450362307c031905c8b9629e6d35834a",
+    "expected_data_bytes": 2147483648,
+    "accepted_static": true,
+    "keystore_capacity_updated": true,
+    "keep_packed_data": true,
+    "tablet_accessed": false,
+    "hardware_tested": false
+  },
+  "native_predicates": {
+    "kern_exec": 3,
+    "ShengUfs": 5,
+    "EldenKeyEventsGlue": 2
+  },
+  "warnings": {
+    "kern_exec": 90,
+    "ShengUfs": 26,
+    "EldenKeyEventsGlue": 0
+  },
+  "source_inputs": {
+    "drivers/EldenDataCapacity/GuardSource.py": "c3316f0e7f85baf39c1510e68c9cdeb7ad3458419fd837891c745e42402fe14b",
+    "profiles/data-capacity-2g/source-files.json": "716162e25dab29e594b1422107a7bd74f8de1b5970579983bba73f4cd66d860b",
+    "profiles/data-capacity-2g/seed-contract.json": "d27b1c90aef2597a6059c3416fecc3d8038da1615d4d4a38f9cc4ac446eefd7c",
+    "profiles/data-capacity-2g/seed-layout-contract.json": "2096551ad3c3d8af98eb4384cc878d298f5b227ffd189823e6aba6af99105642",
+    "profiles/data-capacity-2g/native-contract.json": "ad3e627aaaf9620fdf017578418adf863577d9258c900e578008bb30c13dc4f1",
+    "profiles/data-capacity-2g-key/native-contract.json": "a9b9b49d78a02bb2ab389fc01f5ebba5da7d83d6180438894a92d3257327e68f",
+    "profiles/ufs-idle-trial/native-contract.json": "b785d52df2f8122bc62c32e9ec49316b1eba7f5438fd32f6bf672f84b2231739",
+    "profiles/v91/boot-build/data-seed.json": "48f55583046418c089d09381a85d7f0ce72c1bb8b57fa3770d91e2fbad550f8a",
+    "profiles/v91/firmware-build/plan.json": "1acec9efcc0d7fb6bae0d14ae1164af31cab57c716008d7fffd05f0ca57a08b0",
+    "profiles/v91/image-build/plan.json": "84dcd495ac130a36a5cc53cb9a7bd61c01e1615b933a0f9efa1321db78cff24c",
+    "profiles/v91/native-build/plan.json": "2242750f53ea98118388131f2811c7921dd2d07183cc28bab8a08716822edbbf",
+    "tools/build_data_capacity_kernel.py": "a110d6a1b3500928a400935aebd1197584d21e5180e769aaba37ceb6169cf6e7",
+    "tools/build_data_capacity_boot.py": "8bd3bc3be9373095ec4a12f5de80d857f2f05bdad93c6c0107bcade8159bd760",
+    "tools/data_capacity_boot.py": "3d54539bf7741a3f0041767b9e0c0e5d4903841f1d70e7782f7e19cac0597b6f",
+    "tools/build_clean.py": "e4a97c9eec456938d9f094450afa4874a4ea419c5713168948e324d8169b5746",
+    "tools/build_v91_data_seed.py": "2203f5954041351d05895ace4231ac758bf9d631b2f1e130c33b5f755d4032ad",
+    "tools/verify_v91_assets.py": "dd8d83650f1317d577ea3180b2b9cb6e8e8f57919362ac146b971c168c9cef79",
+    "tools/seed_ownership.py": "a806de2ff918e96d4f1287d782ad28b3b9d2fb42bd0bcce01134c4d7627a3ba5",
+    "tools/build_v91_boot.py": "a98c5e03e816b8816580d9173c3ab3d8f81149447c81c368e637be73b74b95a9",
+    "tools/audit_v91_boot.py": "c3a52f2ec6b0b5951e6a77d5d0d178cf6977ca5d060b02556e58fe06b944d07e",
+    "tools/bt_runtime_boot.py": "2c2508885445a192e56094d8a3411f9fa74b6ae011b96f064f55f599f12f147f",
+    "tools/charge_verification_boot.py": "18c9e3cf9f581fe6d91b06cafe15f77b546cdb34dd96d998e13e87037ba92690",
+    "tools/prepare_v91_entry.py": "ddd73224482aaaff301ab53efe310b1cfa725f33a459d12e03f5b8a7b29ae188",
+    "tools/audit_entry_relocation.py": "7736aa93baba8c194a96ecb89c7153a8fcb96866ceeefd6eada5a89b5d74b24a",
+    "tools/replay_xnu_objects.py": "b66d6a260d3818666321899231cb41ddff045d2fbd65245b958b5a2fbf309bca",
+    "tools/link_v91_kernel.py": "505b390d9dc7de308354bf738524e4f88fd87f7c74f6ff2567ae161b25b14489",
+    "tools/test_data_capacity_boot.py": "db4b1c27bfe251a5978838160c1369706213e374276f1c58017bc320c58bfa3b",
+    "tools/test_data_key_gate.py": "ef4ec0185086e8b068ba7a22d5694c657aec7ba40120571e7f0dcf604939c72b",
+    "tools/test_expanded_data_seed.py": "f06b603266229d15ccaa4a91d2c8116fd6164e0dc93718392fa5cfdae8b6638a",
+    "tools/test_packed_data_handoff.py": "be6289d271da000ad50b8b6d1d12323027ffa30c9086903583557037f98c39a4"
+  },
+  "inherited_report_roles": [
+    "clean",
+    "core",
+    "keystore",
+    "parent",
+    "seed"
+  ],
+  "seed": {
+    "expanded_bytes": 2147483648,
+    "packed_bytes": 1138816,
+    "packed_sha256": "139c013b76e73c0d83327d369fffca62450362307c031905c8b9629e6d35834a",
+    "raw_sha256": "7c279f0d67654035bf60beaf07d057f761d39fdb0f492af2385bf498ed31430a",
+    "logical_manifest_sha256": "48f55583046418c089d09381a85d7f0ce72c1bb8b57fa3770d91e2fbad550f8a",
+    "logical_entries_verified": 232,
+    "raw_owners_verified": 233,
+    "fsck_returncode": 0,
+    "host_available_bytes_after_seed": 2138226688
+  },
+  "host_validation": {
+    "qualification_cases": 11,
+    "actual_sparse_helpers": "PASS actual sparse import/end-range/cross-page/zero-read/allocation-failure; logical=2147483648 resident=1146880 pointer-table=4194304",
+    "actual_keystore_functions": "PASS 384 actual KeyStore gate equivalence cases; only admitted capacity changes",
+    "pinned_firmware_parser": {
+      "passed": true,
+      "firmware_commit": "d099354d0eab34df5088ca1ba89c9c88bc3260bb",
+      "source_sha256": "db189a520fb7af3decb80f6ad65e2b7ab2aa9e3e6c5ab6e2286a23df6108d8f2",
+      "only_adt_name_changed": true,
+      "packed_bytes": 1138816,
+      "logical_bytes": 2147483648,
+      "actual_parser_and_allocation_expression": true,
+      "sanitizers": [
+        "ASan",
+        "UBSan"
+      ],
+      "hardware_tested": false
+    }
+  },
+  "historical_v182_audit_unchanged": true,
+  "complete_clean_command_validated": false,
+  "hardware_tested": false,
+  "workbench_records": "edl_work/data-capacity-v183-20261118"
+}

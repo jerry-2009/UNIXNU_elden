@@ -1,0 +1,122 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "profile": "wifi-network-17",
+  "question": "Apply the exact OEM GPIO202 AP eGPIO ownership transition to the observed cold state; verify GPIO18/19 mux and CE3 preservation before first WMI.",
+  "previous_trial": {
+    "image_sha256": "562e846c3db874f36d44073c63c78786f7748146d3eec7cfbc598d9045f42ad3",
+    "record": "edl_work/live-sideband-20261120/supervisor.json",
+    "pin_before": {
+      "18": [
+        "0x1",
+        "0",
+        "0x742"
+      ],
+      "19": [
+        "0x1",
+        "0",
+        "0x742"
+      ],
+      "202": [
+        "0x801",
+        "0",
+        "0x742"
+      ]
+    },
+    "helper_rc": -19,
+    "writes": 0,
+    "radio_started": false,
+    "full_stock_root_green_settings_restored": true
+  },
+  "source_evidence": {
+    "repository": "h0cheung/tb322fc-linux-kernel",
+    "revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+    "board": "arch/arm64/boot/dts/qcom/sm8750-lenovo-elden.dts",
+    "pinctrl": "drivers/pinctrl/qcom/pinctrl-msm.c:msm_pinmux_set_mux",
+    "soc": "drivers/pinctrl/qcom/pinctrl-sm8750.c",
+    "egpio_present_bit": 11,
+    "ap_ownership_bit": 12,
+    "armada_reference": "packages/kernel/dts/sm8750-lenovo-elden.dts"
+  },
+  "contract": {
+    "pins": [
+      18,
+      19,
+      202
+    ],
+    "gpio202_only_remote_state": [
+      2049,
+      0,
+      1858
+    ],
+    "gpio202_expected_ctl": 6721,
+    "gpio202_output_low_before_output_enable": true,
+    "gpio18_19_mux": 1,
+    "gpio18_19_input": true,
+    "all_initial_reads_before_writes": true,
+    "unknown_state_and_irq_refused": true,
+    "partial_failure_held_until_reset": true,
+    "ce_wmi_firmware_credit_timeout_unchanged": true,
+    "charger_permissions_unchanged": true
+  },
+  "host": {
+    "passed": true,
+    "actual_helper": true,
+    "asan_ubsan": true,
+    "mmio_modeled": true,
+    "hardware_tested": false,
+    "summary": "PASS 27 actual sideband cases; three board pins only, all guards before writes, unknown partial state held",
+    "source_inputs": {
+      "tools/test_wifi_sideband_pins.py": "a1317367f85b659cd8222821e54b5a691e250f6cde43b0a2654368588b6eb770",
+      "drivers/EldenWifi/SidebandSource.py": "31bea018c5febe568571c25519da12de231ec5c010c9ef377936dc78c3ba1aeb",
+      "drivers/EldenWifi/SidebandPins.h": "e51ef90ea36e43c9d783b06691aa3dbce6e21bcf79d6c33cbec4e56c885d0c77"
+    }
+  },
+  "qualification": {
+    "passed": true,
+    "mutation_cases": 61,
+    "menu_dispatch": true,
+    "countdown_and_fallback_preserved": true,
+    "actual_component_report_qualified": true,
+    "hardware_tested": false
+  },
+  "consumers": {
+    "PmicClient": {
+      "source_sha256": "cf3994a4a90d06781c8368f5757ecd321d072c56872ff404c718d7cd32ff090f",
+      "object_sha256": "6041ff93ee4731980e853a82d4582412805540027aa6f78852b1576ac9fa8084",
+      "warnings": 0
+    },
+    "WcnPowerNative": {
+      "source_sha256": "310335007de3d57b57503c9e1e594371ce94230b770a7a5030a07a8934a78a72",
+      "object_sha256": "567ea63fde16c5d7b74bc23abdb15c187e6afe2da0d8337a288ff9f6b7ae23b1",
+      "warnings": 1
+    }
+  },
+  "kernel": {
+    "kernel_sha256": "673194d0c0bf5d3a2443972704519c05c39afb849875da6260caaac5565332e0",
+    "native_sha256": "f785e87d15b14cd93d1445c1c34e56ef56db6c1301d61692224b5c39ab560dd6"
+  },
+  "package": {
+    "image_sha256": "2447dfd258f87c6962a24ba4d4293270e3d15b911fe44eb9ecf62175a403729d",
+    "session": "a600174c63405fec",
+    "rollback_index": 1738713600,
+    "footer_location": 0,
+    "parent_boot_chain_location": 3,
+    "accepted_static": true,
+    "full_asset_source_closure": true,
+    "entry_branch_target_qualified": true
+  },
+  "source_inputs": {
+    "tools/build_wifi_battery_admission.py": "102074af536802233f8339a5717c2bd1c7e472b3e9fb67a74f93fbc53e92f4e6",
+    "tools/test_wifi_battery_admission.py": "ad807b0b6f70754b6dc0934b91e2e73b114c234cc206a6f489f71c732d06572e",
+    "drivers/EldenWifi/BatteryAdmissionSource.py": "49c3016d721890626f4d4dc65e7248df59b50f5023247372d8bdb3f6ab4ecb0e",
+    "drivers/EldenWifi/BatteryAdmission.h": "ed76a4fa23b48f023e7f0928a920d1659b0cc0031068b2776265d14382467ab0",
+    "drivers/EldenWifi/BatteryAdmission.inc": "a839090772b5bfc1c08f762d00b7820263c96edf1be49a4f653c49af46bd4fc9",
+    "tools/test_wifi_sideband_pins.py": "a1317367f85b659cd8222821e54b5a691e250f6cde43b0a2654368588b6eb770",
+    "drivers/EldenWifi/SidebandSource.py": "31bea018c5febe568571c25519da12de231ec5c010c9ef377936dc78c3ba1aeb",
+    "drivers/EldenWifi/SidebandPins.h": "e51ef90ea36e43c9d783b06691aa3dbce6e21bcf79d6c33cbec4e56c885d0c77"
+  },
+  "build_records": "edl_work/wifi-sideband-20261120/{host2,battery2,kernel2,entry2,package2}",
+  "next": "One session-bound sideband/CE3/WMI/scan capture with physical return and stock restoration. Acceptance requires real BSS, association, DHCP and bidirectional traffic.",
+  "goal": "active and incomplete"
+}

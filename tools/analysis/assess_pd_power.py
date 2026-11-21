@@ -14,7 +14,7 @@ def assess(run):
     if not flash['success'] or flash['full_readback_sha256']!=digest or build['image_sha256']!=digest or audit['image_sha256']!=digest or not audit['accepted_static']:
         raise ValueError('Image/readback/audit mismatch')
     profile=build['bluetooth_runtime']['profile']
-    if build['session']!=session or audit['session']!=session or profile not in ('pd-power-trial','pd-gui','cpu-power-observation'):raise ValueError('Wrong candidate')
+    if build['session']!=session or audit['session']!=session or profile not in ('pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):raise ValueError('Wrong candidate')
     if profile=='pd-gui' and (not build['bluetooth_runtime'].get('menu_only_gui') or build['bluetooth_runtime'].get('native_profile')!='pd-power-trial' or audit['bluetooth_runtime']['profile']!='pd-gui'):raise ValueError('Wrong GUI qualification')
     text=data.decode('utf-8',errors='replace').replace('\r','');lines=text.splitlines()
     if set(re.findall(r'ELDEN STATUS v1 session=([0-9a-f]{16})',text))!={session}:raise ValueError('Mixed session')

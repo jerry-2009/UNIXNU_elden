@@ -3,6 +3,7 @@
  * Physical primitives and the shared resource/epoch ledger remain board-owned.
  */
 #include "WcnPower.h"
+#include "WcnSharedPower.h"
 #include <string.h>
 const EldenWcnRailSpec elden_wcn_rail_specs[EldenWcnRailCount]={
     {"smpf5",0x5a7,876,1000},{"ldof3",0x5c3,1800,1800},
@@ -39,6 +40,18 @@ static int rails(EldenWcnPower *p){
     }
     return parents(p);
 }
+static int read_targets(EldenWcnPower *p){
+    for(unsigned i=0;i<EldenWcnRailCount;i++){
+        const EldenWcnRailSpec *r=&elden_wcn_rail_specs[i];
+        int rc=p->io.rail_read(p->io.context,(EldenWcnRail)i,&p->before[i]);
+        if(rc)return rc;
+        const EldenWcnRailState *s=&p->before[i];
+        if(s->mv>r->maximum||s->mode==0xee||((s->enable&0x80)&&!(s->status&0x80)))
+            return EldenWcnPowerIdentity;
+        p->target[i]=s->mv>r->minimum?s->mv:r->minimum;
+    }
+    return 0;
+}
 int elden_wcn_power_acquire(EldenWcnPower *p,uint64_t epoch){
     if(!p||!epoch||!p->io.preflight||!p->io.rail_read||!p->io.rail_vote||!p->io.qmp||
        !p->io.bt_set||!p->io.bt_get||!p->io.wlan_get||!p->io.parents||
@@ -49,14 +62,7 @@ int elden_wcn_power_acquire(EldenWcnPower *p,uint64_t epoch){
     int rc=p->io.preflight(p->io.context);if(rc)return rc;
     if((rc=parents(p)))return rc;
     /* Every voltage range is qualified before the first PDC/control write. */
-    for(unsigned i=0;i<EldenWcnRailCount;i++){
-        const EldenWcnRailSpec *r=&elden_wcn_rail_specs[i];
-        if((rc=p->io.rail_read(p->io.context,(EldenWcnRail)i,&p->before[i])))return rc;
-        const EldenWcnRailState *s=&p->before[i];
-        if(s->mv>r->maximum||s->mode==0xee||((s->enable&0x80)&&!(s->status&0x80)))
-            return EldenWcnPowerIdentity;
-        p->target[i]=s->mv>r->minimum?s->mv:r->minimum;
-    }
+    if((rc=read_targets(p)))return rc;
     bool wlan=false,bt=false;
     if((rc=p->io.wlan_get(p->io.context,&wlan))||(rc=p->io.bt_get(p->io.context,&bt)))return rc;
     p->epoch=epoch;p->state=EldenWcnPowerPreparing;p->control_started=true;
@@ -178,9 +184,8 @@ static int message(char out[64],unsigned rail,bool wake,uint32_t value){
     while(count)out[n++]=digits[--count];
     out[n++]='}';out[n]=0;return 0;
 }
-int elden_wcn_power_cpr(EldenWcnPower *p,uint64_t epoch,const EldenWcnPmuParam *params,size_t count){
-    if(elden_wcn_power_check(p,epoch,2))return EldenWcnPowerAgain;
-    EldenWcnPdcVote votes[4];int rc=elden_wcn_cpr_plan(params,count,votes);if(rc)return rc;
+static int cpr_send_votes(EldenWcnPower *p,const EldenWcnPdcVote votes[4]){
+    int rc;
     char commands[8][64];unsigned commands_count=0;
     for(unsigned i=0;i<4;i++){
         if(votes[i].wake_valid&&votes[i].wake){
@@ -198,3 +203,15 @@ int elden_wcn_power_cpr(EldenWcnPower *p,uint64_t epoch,const EldenWcnPmuParam *
     }
     return 0;
 }
+static int cpr_apply(EldenWcnPower *p,const EldenWcnPmuParam *params,size_t count){
+    EldenWcnPdcVote votes[4];int rc=elden_wcn_cpr_plan(params,count,votes);if(rc)return rc;
+    return cpr_send_votes(p,votes);
+}
+int elden_wcn_power_cpr(EldenWcnPower *p,uint64_t epoch,const EldenWcnPmuParam *params,size_t count){
+    if(elden_wcn_power_check(p,epoch,2))return EldenWcnPowerAgain;
+    return cpr_apply(p,params,count);
+}
+
+/* Separate consumer leases share the exact tables, arithmetic and executor
+ * above. The old BT ABI/layout remain available to frozen build profiles. */
+#include "WcnSharedPower.inc"

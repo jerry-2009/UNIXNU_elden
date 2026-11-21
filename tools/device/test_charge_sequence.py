@@ -7,7 +7,7 @@ def status(generation=10,mode=2,available=True):
 
 class ChargeSequenceTests(unittest.TestCase):
     def start(self,modes=None):
-        s=ChargeSequence(modes or ['stock'],0,5)
+        s=ChargeSequence(modes or ['stock'],0,5,max_status_gap=5)
         self.assertEqual(s.update(status(),0),s.modes[0])
         return s
 
@@ -49,6 +49,31 @@ class ChargeSequenceTests(unittest.TestCase):
                 s.update(status(11,1),6);self.assertFalse(s.done)
                 s.update(status(11,1),11);self.assertTrue(s.done);self.assertTrue(s.restored)
 
+    def test_silent_gap_restarts_hold(self):
+        s=self.start()
+        s.update(status(11,1),1)
+        s.update(status(11,1),7)
+        self.assertFalse(s.restored)
+        self.assertEqual([e['event'] for e in s.events],['sent','applied','confirmation-lost','applied'])
+        s.update(status(11,1),12)
+        self.assertTrue(s.restored)
+
+    def test_same_mode_new_generation_restarts_hold(self):
+        s=self.start()
+        s.update(status(11,1),1)
+        s.update(status(12,1),6)
+        self.assertFalse(s.restored)
+        self.assertEqual(s.applied_at,6)
+        s.update(status(12,1),11)
+        self.assertTrue(s.restored)
+
+    def test_silent_gap_after_confirmation_deadline_reverts_to_stock(self):
+        s=self.start(['bypass','stock'])
+        s.update(status(11,2),44)
+        self.assertEqual(s.update(status(11,2),50),'stock')
+        self.assertTrue(s.errors)
+        self.assertFalse(s.restored)
+
     def test_unconfirmed_command_has_one_stock_recovery(self):
         s=self.start(['bypass','stock'])
         self.assertEqual(s.update(status(10,2),45),'stock')
@@ -75,16 +100,16 @@ class ChargeSequenceTests(unittest.TestCase):
         self.assertEqual([e['mode'] for e in s.events if e['event']=='sent'],['80','stock'])
 
     def test_u32_limit_and_no_wrap_request(self):
-        s=ChargeSequence(['stock'],0,5)
+        s=ChargeSequence(['stock'],0,5,max_status_gap=5)
         self.assertIsNone(s.update(status(0xffffffff),0));self.assertTrue(s.done)
         self.assertTrue(s.errors);self.assertFalse(s.restored);self.assertFalse(s.events)
-        s=ChargeSequence(['stock'],0,5)
+        s=ChargeSequence(['stock'],0,5,max_status_gap=5)
         self.assertEqual(s.update(status(0xfffffffe),0),'stock')
         s.update(status(0xffffffff,1),1);s.update(status(0xffffffff,1),6)
         self.assertTrue(s.restored)
 
     def test_valid_five_mode_sequence(self):
-        s=ChargeSequence(['bypass','80','bypass','40-60','stock'],0,5)
+        s=ChargeSequence(['bypass','80','bypass','40-60','stock'],0,5,max_status_gap=5)
         self.assertEqual(s.update(status(0,0),0),'bypass')
         for generation,mode in enumerate((2,3,2,4,1),1):
             start=(generation-1)*6+1;s.update(status(generation,mode),start)

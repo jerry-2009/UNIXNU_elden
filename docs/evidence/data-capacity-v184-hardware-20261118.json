@@ -1,0 +1,75 @@
+{
+  "candidate_sha256": "ea3b1393c6cbe7b29b6b91db594f32d2416a4d90c54cc634ab3d8853c4dddf03",
+  "session": "5a36ec4091564a51",
+  "data_bytes": 2147483648,
+  "data_mount_return": 0,
+  "actual_keystore_registration": true,
+  "ram_window_bytes": 6442450944,
+  "capture": {
+    "path": "edl_work/live-data-capacity-v184-rerun-20261118/usb/20261118-040102.bin",
+    "bytes": 1460099,
+    "sha256": "a11723f7f223aaa475ece4814d09a8f0cc9ab9da7c40f374ccc23a2aaa9b293d",
+    "drop_max": 127,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false
+  },
+  "observed_enospc": 0,
+  "observed_panic": 0,
+  "control_events": [
+    {
+      "id": "data-v184-swipe-up",
+      "command": "swipe-up",
+      "utc": "2026-11-18T04:02:38.305120+00:00",
+      "state": "send-attempt"
+    },
+    {
+      "line": "ELDEN ERR swipe-up unavailable or already attempted",
+      "elapsed": 95.1569999998901,
+      "utc": "2026-11-18T04:02:38.457870+00:00"
+    },
+    {
+      "id": "data-v184-finish",
+      "command": "fastboot",
+      "utc": "2026-11-18T04:07:40.923357+00:00",
+      "state": "send-attempt"
+    }
+  ],
+  "ui_replay_parameter_removed_by_bt_menu": true,
+  "settings_interaction_accepted": false,
+  "frames": [
+    {
+      "id": 1,
+      "source_frame": 7,
+      "session": "5a36ec4091564a51",
+      "width": 238,
+      "height": 380,
+      "raw_sha256": "baedd590fce8bf03f84df92b6b31b16ae1cb69e78255d5b189d33b10442aa6a4",
+      "crc32": "4150a25a",
+      "all_rows_verified": true,
+      "image": "D:\\Desktop\\Git\\Patch\\Y700-Elden\\lab\\records\\data-capacity-publication-20261118\\v184-frames\\frame-1.png",
+      "description": "Read-only 1:8 sampled framebuffer; UI content still requires visual assessment"
+    },
+    {
+      "id": 2,
+      "source_frame": 8,
+      "session": "5a36ec4091564a51",
+      "width": 238,
+      "height": 380,
+      "raw_sha256": "21ce693144ae0e9c425f54d48d6ca138dd11523576eab340cc5516c8e215e4d5",
+      "crc32": "de890b56",
+      "all_rows_verified": true,
+      "image": "D:\\Desktop\\Git\\Patch\\Y700-Elden\\lab\\records\\data-capacity-publication-20261118\\v184-frames\\frame-2.png",
+      "description": "Read-only 1:8 sampled framebuffer; UI content still requires visual assessment"
+    }
+  ],
+  "frames_visually_verified": "lockscreen clock and bottom gesture bar; not Settings/desktop",
+  "typed_return_and_physical_fastboot": true,
+  "full_stock_sha_verified": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_original_settings_restored": true,
+  "all_device_jobs_terminal": true,
+  "persistent_data_complete": false,
+  "charging_complete": false,
+  "full_goal_complete": false
+}

@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "device": "TB322FC",
+  "soc": "SM8750",
+  "stock_fdt_sha256": "b060f1001c4907895656c967fe3b2e5f6fb4d350be65cd79e4e3f4cdff1a8a45",
+  "node": "/soc/pcie@1c00000",
+  "stock_address_cells": 3,
+  "stock_parent_address_cells": 1,
+  "stock_size_cells": 2,
+  "stock_ranges_cells": [16777216, 0, 1075838976, 1075838976, 0, 1048576, 33554432, 0, 1076887552, 1076887552, 0, 63963136],
+  "memory_base": 1076887552,
+  "stock_memory_end_exclusive": 1140850688,
+  "linux_memory_end_exclusive": 1677721600,
+  "bar_expectations_from_stock_resource_cache": {
+    "0": 2097152,
+    "2": 32768
+  },
+  "bar_sizes_require_real_discovery": true,
+  "peach_window_register": 12920,
+  "chip_version_register": 28311552,
+  "required_major": 2
+}

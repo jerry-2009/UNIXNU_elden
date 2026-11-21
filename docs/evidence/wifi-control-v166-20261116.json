@@ -1,0 +1,63 @@
+{
+  "stage": "hardware-tested-restored-stock",
+  "image_sha256": "8d4917a338cbfc087c817cfdb5ba13882174917d2afba63aa8acb18adb9a261c",
+  "session": "401a0d3a1b943912",
+  "audit_sha256": "8925108696db95e1ad5322e0d8f7ec476ac424cee5128c63fb05032a7cd20aea",
+  "rollback": 1738713600,
+  "footer": 0,
+  "parent_location": 3,
+  "kernel_sha256": "f847af90b826f2fc57f74ea3569b2cb6f597587177b3da99662ca0cc8d925f3b",
+  "source_inputs": 178,
+  "direct_call_checks": 21,
+  "hardware_tested": true,
+  "capture": {
+    "file": "edl_work\\live-control-v166-20261116\\usb\\20261116-020535.bin",
+    "bytes": 251027,
+    "sha256": "7b174e6c86ee409ed73d51ecb9453cc3fb9db9c025a6a8c305645c72d3096cb0",
+    "drop_max": 22,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false
+  },
+  "init_calls": [
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:1 nw_mainline_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:1 register_pernet_device rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:2 wiphy_sysfs_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:3 register_netdevice_notifier rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:4 nl80211_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:5 regulatory_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:6 workqueue rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:2 lx_init_cfg80211_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:3 lx_init_ieee80211_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:4 mhi_init_hook rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:5 nw_qrtr_mhi_register rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:6 ath12k_wifi7_pci_init rc=0"
+  ],
+  "key_lines": [
+    "ELDEN_WIFI_CONTROL start=0",
+    "ELDEN_WIFI_RUNTIME start=0 linux-stage=2 master=1 command=6",
+    "ELDEN_ATH12K level=6 chip_id 0x2 chip_family 0x4 board_id 0xff soc_id 0x40210200",
+    "ELDEN_ATH12K level=6 fw_version 0x100effff fw_build_timestamp 2025-05-29 06:58 fw_build_id QC_IMAGE_VERSION_STRING=WLAN.GNG.1.0-03869-QCAGNGSWPL_V1.0_V2.0_SILICONZ-1.108007.3.112099.4",
+    "ELDEN_ATH12K level=4 qmi TME-L power-on hardware-restricted (stock-compatible, continuing)",
+    "ELDEN_ATH12K level=6 qmi AUX_UC request succeeded",
+    "ELDEN_ATH12K level=3 failed to load exact Peach QDSS config: -2",
+    "ELDEN_WIFI_RUNTIME stop=0 stage=6 reset=1/1 ctl=0 status=101 command=2 transactions=10 consumer=0"
+  ],
+  "msi_irq_max": 45,
+  "native_control_registered": true,
+  "native_client_session_tested": false,
+  "mhi_mission_mode": true,
+  "qmi_actual_exchange": true,
+  "stop_hardware_reset_observed": true,
+  "stock_android_root_green_restored": true,
+  "original_charge_and_radio_settings_restored": true,
+  "networks_scanned": false,
+  "network_interface_or_traffic_accepted": false,
+  "qdss_missing": {
+    "linux_name": "qdss_trace_config.bin",
+    "oem_path": "image/peach/qdss_trace_config_v2.cfg",
+    "bytes": 6237,
+    "sha256": "94251904525f36f69092db8abde1f5198bd32c8c5fa482448e7076e0e3bc0eab"
+  },
+  "jobs_terminal": true
+}

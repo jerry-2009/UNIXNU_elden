@@ -1,10 +1,14 @@
-# Load-aware SCMI governor component (v147, not installed)
+# Load-aware SCMI governor component
 
-The demand policy and transaction controller are implemented and compiled for
-arm64/iPadOS17. They have **not** been linked into a complete kernel, packaged or
-run on Y700. The last device restoration remains the v146 stock Android result.
-No power saving, physical frequency change, thermal behavior or charging success
-is inferred from these component tests.
+The original v147 component was validated offline; [v148](../../profiles/cpu-governor/README.md)
+has since completed a bounded native/hardware trial. It did not establish a
+power saving. The generated policy header is now scoped as EldenCpuFreqPolicy.h
+to avoid the existing power-header name; original v147 reproduction uses e6dd6cd.
+
+The demand policy and transaction controller target arm64/iPadOS17. This page
+documents their design and original component tests; the v148 profile records
+the later real transitions and Android restoration. Component tests alone do
+not establish power savings, thermal behavior or charging success.
 
 ## Reused policy
 

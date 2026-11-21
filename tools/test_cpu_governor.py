@@ -6,7 +6,7 @@ sys.path.insert(0,str(ROOT/'drivers/EldenCpuPower'))
 from GovernorSource import policy
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--cxx',required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-    body=policy();(out/'Policy.h').write_bytes(body)
+    body=policy();(out/'EldenCpuFreqPolicy.h').write_bytes(body)
     command=[a.cxx,'-std=c++17','-O1','-g','-Wall','-Wextra','-fsanitize=address,undefined','-fno-omit-frame-pointer','-I',str(out),'-I',str(ROOT/'drivers/EldenCpuPower'),'-I',str(ROOT/'profiles/v91/sources/power'),str(ROOT/'drivers/EldenCpuPower/TestGovernor.cpp'),'-o',str(out/'test')]
     for name,cmd in [('compile',command),('run',[str(out/'test')])]:
         result=subprocess.run(cmd,capture_output=True);(out/(name+'.log')).write_bytes(result.stdout+result.stderr);result.check_returncode()

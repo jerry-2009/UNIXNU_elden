@@ -1,0 +1,152 @@
+{
+  "date": "2026-11-19",
+  "kind": "read-only delivery and repository maintenance review",
+  "mainline_reviewed_commit": "c656700adc5f69976e0bc683387b3df76213e694",
+  "peripheral_commit": "4528eac989e7dca5ef1aca56bfd26f8a92a5348a",
+  "gpu_commit": "71b537909ca538830aaa79b939d0767168ee0360",
+  "remote_branch_heads_match": true,
+  "document_sha256": {
+    "docs/peripherals/STATUS.md": "5df565c7ad7c0a0f27a8de5b1a9e787e87e1146301208344d13d68104802d24f",
+    "docs/peripherals/PEN-NATIVE.md": "3e4416fc468aa960530aa42bb779494190258afea85e4b1ea49082190a3ca0c1",
+    "docs/peripherals/RTC-WAKE.md": "726aced7a4cfa97e331794eb161c50179bf400e76adda4efd29d082f6512662d",
+    "docs/peripherals/HAPTICS-BROKER.md": "3e6891aac6b2c4a945461353fe116a9afdc26e9488246f5c61539b75dd5857f0",
+    "docs/peripherals/WAKE-PROTOCOL.md": "2e527733b0f088c448fbb57e447e40a4386dbd6618a1d576f2b13c80090bcae4",
+    "docs/peripherals/MOTION-CORE.md": "2221731d84280b3df0d2b2302d24588be0982c54b04817e6172307ac7109b0b6",
+    "docs/peripherals/CAMERA-CORE.md": "71aff1990decf487323f3f3667b74bfe8da2c446d3adface3406512fe14987fa",
+    "drivers/EldenPen/protocol-validation.json": "1977837ba550e3d7783127330701a21d049bf2ba20becd230bd82c95fdee56d3",
+    "drivers/EldenRtc/validation.json": "6881861274566f3ea959d81ed1efa7f41cfa27730baf2048aad309e7b7f11370",
+    "drivers/EldenWake/validation.json": "9463ec3f31b8b0b4d3097840e3a32d4b488d2d74d88d2c2dd0b5839c03f45c16",
+    "drivers/EldenHaptics/broker-validation.json": "fc5f232a609dea640d4447ecf709a46412f82203fdeda2def26986357536967f",
+    "drivers/EldenMotion/validation.json": "60ae0842ff5a749ecdb81b0a09913bfe2a58f23e9b44ca0a02ffee17309521db",
+    "drivers/EldenCamera/validation.json": "8ba24c675cb8a11e720f6b482e021c6a828876845c10727a8c35228c5cc2880e"
+  },
+  "gpu_document_sha256": {
+    "docs/GPU-GOAL-STATUS.md": "a5cde87deb4a4aa4e66b9d52bd2a0ac9df308af97ee12376d9183167ce2e6487",
+    "docs/GPU-MERGE.md": "43a488aebf7ba10efe0786982d1673e6a38f6daafb039bd195adcd91de17d513",
+    "docs/evidence/gpu-complete-20261116.json": "7681b5f1b1cca986b9f925a9bd7303d71bd1010df39503e29cf37c4e4cbb4e0c",
+    "docs/evidence/gpu-delivery-20261116.json": "b8f1265f3ba0b2321b76ec68ae8165a73fc6c6fb463aba7e32153f51a5b28aee"
+  },
+  "archives": [
+    {
+      "directory": "edl_work/offline-peripherals-20261119",
+      "archive_name": "offline-peripherals.tar.gz",
+      "bytes": 24340607,
+      "sha256": "8ea11374b2f1c3e0dcb421b40f02a59e5382133cbdbf20104d1b3e5f46e9b1aa",
+      "regular_members": 264,
+      "hash_verified_members": 264,
+      "metadata_members": 0,
+      "paths_valid": true,
+      "member_hashes_match": true,
+      "hardware_acceptance_inferred": false
+    },
+    {
+      "directory": "edl_work/haptics-native-20261119",
+      "archive_name": "haptics-native.tar.gz",
+      "bytes": 22492147,
+      "sha256": "8f5edc573e62b8207c73fb582a6195da76deb447b5e072f91375cbe7377a830a",
+      "regular_members": 180,
+      "hash_verified_members": 180,
+      "metadata_members": 0,
+      "paths_valid": true,
+      "member_hashes_match": true,
+      "hardware_acceptance_inferred": false
+    },
+    {
+      "directory": "edl_work/haptics-broker-20261119",
+      "archive_name": "broker-offline.tar.gz",
+      "bytes": 25996657,
+      "sha256": "5c704b1fca62a33ee817dc0e71f3acce36a8e0ed94c90f43e18998f8209e784c",
+      "regular_members": 523,
+      "hash_verified_members": 523,
+      "metadata_members": 0,
+      "paths_valid": true,
+      "member_hashes_match": true,
+      "hardware_acceptance_inferred": false
+    },
+    {
+      "directory": "edl_work/gpu-complete-20261116",
+      "archive_name": "elden-a830-offline.tar.gz",
+      "bytes": 87270508,
+      "sha256": "cef8999016da9aeb3ff69c0ca73043ad839814b58a3dfcaa352374e8069da1f1",
+      "regular_members": 38,
+      "hash_verified_members": 37,
+      "metadata_members": 1,
+      "paths_valid": true,
+      "member_hashes_match": true,
+      "hardware_acceptance_inferred": false
+    }
+  ],
+  "archive_hashes_and_report_relationships_verified": true,
+  "source_worktrees_unchanged": true,
+  "component_states": {
+    "pen": {
+      "offline_native_link_verified": true,
+      "hardware": false,
+      "current_mainline_integrated": false,
+      "kernel_sha256": "2240372e7e84f247820310b482757d934cb8723b87b45c0266e6e355782b24af",
+      "remaining": [
+        "raw XNU SPI/integrity and scan assumptions",
+        "UIKit polar pressure/units and mounting",
+        "Notes/PencilKit/palm/release/sleep",
+        "current mainline integration and hardware trial"
+      ]
+    },
+    "rtc": {
+      "offline_link_verified": true,
+      "hardware": false,
+      "current_mainline_integrated": false,
+      "persistent_offset_verified": false,
+      "wake_alarm_verified": false,
+      "remaining": [
+        "actual PMIC epoch and persistent offset location",
+        "mainline initializer/clock/recovery integration",
+        "hardware retention and suspend/wake"
+      ]
+    },
+    "haptics": {
+      "offline_native_link_verified": true,
+      "default_catalog_count": 0,
+      "measured_bank_available": false,
+      "output_qualified": false,
+      "system_actuator_connected": false,
+      "hardware": false,
+      "current_mainline_integrated": false,
+      "kernel_sha256": "d64231c6f491161fab05163c2a00d6a0532ab50a95d99057683ed4a31b6ea097",
+      "remaining": [
+        "measured per-motor waveform/gain/thermal and bus qualification",
+        "actual iOS17 Actuator and capability/preset service route",
+        "current-mainline and hardware acceptance",
+        "suspend/resume"
+      ]
+    },
+    "wake": {
+      "protocol_offline_only": true,
+      "gpio_pdc_native_connected": false,
+      "hardware": false
+    },
+    "motion": {
+      "core_offline_only": true,
+      "native_provider_connected": false,
+      "hardware": false
+    },
+    "cameras": {
+      "core_offline_only": true,
+      "native_pipeline_connected": false,
+      "hardware": false
+    },
+    "gpu": {
+      "complete_offline_delivery_verified": true,
+      "current_mainline_integrated": false,
+      "boot_packaged": false,
+      "hardware": false,
+      "integration_order": "last"
+    }
+  },
+  "no_tablet_access": true,
+  "no_build_or_flash": true,
+  "no_branch_merge": true,
+  "goal_state_changed": false,
+  "tests_not_rerun": true,
+  "compiled_reports_revalidated_as_saved_evidence_only": true,
+  "full_peripheral_goal_complete": false
+}

@@ -1,0 +1,58 @@
+{
+  "root_trial_passed": true,
+  "pcie_gen": 3,
+  "lanes": 2,
+  "root_id": "0x11c17cb",
+  "endpoint_id": "0x110e17cb",
+  "endpoint_command": "0x0",
+  "phy_writes": 127,
+  "controller_writes": 430,
+  "gcc_released": true,
+  "quiesce_and_sync_return": true,
+  "stock_full_sha_restored": true,
+  "arc_requests": {
+    "mx_index": 9,
+    "mx_level": 448,
+    "cx_index": 10,
+    "cx_level": 480
+  },
+  "sn4_requested": 16383,
+  "sn4_calculated_minimum": 3773,
+  "ldo_readback_mv": [
+    880,
+    1200
+  ],
+  "capture_bytes": 145944,
+  "capture_sha256": "27b922beb313e76e62c219b48df6c03dc1f5543af73b4b88da8993fa23b93059",
+  "reported_drop_max": 0,
+  "discontinuities": 0,
+  "reconnections": 0,
+  "storage_not_ready_messages_only_after_reset_marker": true,
+  "pd_bootstrap_interrupted_by_return": true,
+  "session": "0b8c9da91e696299",
+  "image_sha256": "f717f7a56323f709724d57aa062fd76ff83afcba5b849508b1fb6c9a0bd98eaa",
+  "boot_nonce": "f6c3a13b010d7f48",
+  "scope": "PCIe root/PHY/config only; no BAR allocation, DMA, MSI, MHI, firmware, network or daily-power acceptance",
+  "gate_scope": "Reported drop counters and critical lines complete; no final post-disconnect counter is available",
+  "negative_capture_tests": {
+    "passed": true,
+    "baseline_sha256": "27b922beb313e76e62c219b48df6c03dc1f5543af73b4b88da8993fa23b93059",
+    "rehash_mutations": true,
+    "rejected": [
+      "wrong-root",
+      "bus-master",
+      "missing-stage",
+      "missing-quiesce",
+      "missing-reset",
+      "early-storage-error",
+      "early-ufs-stop",
+      "bad-stock-sha",
+      "wrong-session",
+      "discontinuity",
+      "failed-restore",
+      "charge-not-restored",
+      "scan-not-restored",
+      "wrong-floor"
+    ]
+  }
+}

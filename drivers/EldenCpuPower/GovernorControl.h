@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: BSD-2-Clause-Patent */
 #pragma once
-#include "Policy.h"
+#include "EldenCpuFreqPolicy.h"
 #include "CpuPerfAccess.h"
 
 /* Single-writer controller. The caller owns the CPUCP channel and supplies

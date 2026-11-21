@@ -1,0 +1,27 @@
+{
+  "host": {
+    "passed": true,
+    "result": "PASS 11 early arm/adoption/stall cases",
+    "actual_transformed_paths": true,
+    "actual_wdt_core": true,
+    "asm_and_kernel_modeled": true,
+    "asan_ubsan": true,
+    "source_sha256": "7aa3f2f4ede7dd2721d87540553bbaa54f820b8152b78bae0955eb579e2379bb",
+    "recovery_sha256": "8aa4767465772ed47dd14ae791be972bef4882778179ad1121bae251e5b01cec",
+    "hardware": false
+  },
+  "native": {
+    "profile": "early-storage-guard",
+    "kernel_sha256": "c380eec270844e0afdc62ce3a783e05a645e7f817c220f7bae3185b17046a929",
+    "native_sha256": "1784bafd8a592149f29d543e51b244478fd97386d22b105b12730b372f88ce25",
+    "changed_core_objects": 0,
+    "changed_native_objects": 1,
+    "scalar": true,
+    "original_apple_executables_hashed": 30
+  },
+  "intent": {
+    "missing_stall_intent_rejected": true,
+    "reason": "Menu or session policy differs"
+  },
+  "full_clean_combined_command_repeated": false
+}

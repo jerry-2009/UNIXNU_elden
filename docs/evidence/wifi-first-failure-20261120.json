@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "purpose": "Compare complete state after pdev creation and at first real failed UMAC handshake, before forced RDDM.",
+  "scope": {
+    "stages": [
+      12,
+      90
+    ],
+    "raw_bar_words": 21,
+    "physical_owned_map_words": 47,
+    "no_new_control_writes": true,
+    "no_new_wake": true,
+    "no_new_maps": true,
+    "readclear_reset_cause_excluded": true,
+    "reads_nonatomic": true
+  },
+  "build": {
+    "pci": {
+      "source_sha256": "d1262a8a9785decd5a05a2a6ae0576e29574c4baf94404e040abde2b74aec537",
+      "object_sha256": "80eff18ab019cdbf094b951f1fa2d008569cff97eef49f0cfb5c60d229c910cc",
+      "warnings": 120
+    },
+    "core": {
+      "source_sha256": "267a592a39b5583fb39cf07dc8dad93662473d41c5c186fbc6972eda3cea1074",
+      "object_sha256": "e49410ed0421281e46d63e7a214d393bda453ac048de88f7bd28a3b2c0c287a4",
+      "warnings": 157
+    },
+    "worker_sha256": "21008eb165348de871d39a3a4743e98984f9aab6951cab460cbcb1379b9a0aa4",
+    "worker_warnings": 1,
+    "binding_sha256": "bcd771e7de73b66581d9a7d3187db222eaa0a3b24a51308a806b807cb8558c73",
+    "kernel_sha256": "cdbe461c49e8411e773e49a46556600e92584fe84b0ec95e8ca75b54a10e1f64",
+    "native_sha256": "f48793813d45b05495be2a94f6538c7ced1fbb2b78ec1806f61283dc2e98b4d5"
+  },
+  "verification": {
+    "actual_physical_host_scenarios": 13,
+    "asan_ubsan": true,
+    "mmio_owner_modeled": true,
+    "qualification_mutations": 119,
+    "original_apple_executables": 30,
+    "entry_branch_delta": 7124,
+    "package_audit": true,
+    "first_composition_refusal_retained": "worker base_object hash reported immediate instead of original service parent; corrected worker2/runtime2",
+    "clean_build_rerun": false
+  },
+  "image_sha256": "ddd1352ec03eeb3eb78841aa26abfb0b8811e7dddab3d081a9710488edcadf67",
+  "session": "72daf70592c1ce2a",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "workbench_build": "edl_work/wifi-first-failure-20261120",
+  "next": "One combined WMI/first-failure/scan trial and full stock restoration, then act on the actual matched state difference.",
+  "wifi_network_accepted": false,
+  "goal": "active and incomplete"
+}

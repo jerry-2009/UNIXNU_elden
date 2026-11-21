@@ -1,8 +1,16 @@
 # CPU load and firmware-level observation
 
+Current result: [v148 bounded governor](../../profiles/cpu-governor/README.md)
+confirmed191 transitions and restoration on hardware. It did not establish net
+charging or a power saving; the next focus is storage. Earlier component/draft
+boundaries below remain as historical links.
+
 The subsequent [load-aware governor component](GOVERNOR.md) is implemented and
 host/native compiled, but not linked into a boot candidate or tested on hardware.
 The observer and its v146 image below remain unchanged.
+
+The [mode3 runtime and recovery draft](RUNTIME.md) now has host validation; native
+integration awaits the ongoing macOS maintenance. No governor boot is available yet.
 
 This extends the frozen `CpuPerfSurvey.cpp` through a SHA-bound transform. Mode1
 keeps the original survey. Opt-in `elden-cpu-survey=2` (or `ecp=2`, with the long

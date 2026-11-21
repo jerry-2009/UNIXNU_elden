@@ -1,0 +1,102 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "ce3_timeline_trial": true,
+  "hardware_tested": true,
+  "image_sha256": "8de0c7d2303814f8fb426033da16e680ff92b32a23a21e06bae270d8e414b563",
+  "session": "5da802cc8c1de368",
+  "raw": {
+    "path": "edl_work\\live-ce3-timeline-20261120\\usb\\20261119-231542.bin",
+    "bytes": 285820,
+    "sha256": "19c044fcee2b17a2d0692baf77ffbddbac4d4d6285419d206b6845864c660705",
+    "status_samples": 65,
+    "drop_max": 0,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "key_lines": [
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=1 rc=0 base=10001bc0 size=8000 id=4 misc=c2 hw=0/0 win=40000037 sw=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=2 rc=0 base=10001bc0 size=8000 id=4 misc=c2 hw=0/0 win=40000037 sw=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_UMAC_WAKE get=0 held=1 before=2 after=2 checks=1",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=3 rc=0 base=10001bc0 size=8000 id=4 misc=c2 hw=0/0 win=40000037 sw=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=4 rc=0 base=10001bc0 size=8000 id=4 misc=c2 hw=0/0 win=40000037 sw=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=5 rc=0 base=10001bc0 size=8000 id=4 misc=c2 hw=0/0 win=40000037 sw=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=6 rc=0 base=10001bc0 size=8000 id=4 misc=c2 hw=4/4 win=40000037 sw=4/4",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=7 rc=0 base=10001bc0 size=8000 id=4 misc=42 hw=8/8 win=40000037 sw=8/8",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=8 rc=0 base=10001bc0 size=8000 id=4 misc=c2 hw=8/8 win=40000037 sw=8/8",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=9 rc=0 base=ffffffff size=ffffffff id=ffffffff misc=ffffffff hw=ffffffff/ffffffff win=40000000 sw=8/8",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_INSPECT command=4003 sw=2 write=4 hp=16 dma=8/8 flags=20000",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=0/4/8 val=ffffffff/ffffffff/ffffffff",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=c/10/1c val=ffffffff/ffffffff/ffffffff",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=20/30/34 val=ffffffff/ffffffff/ffffffff",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=38/3c/40 val=ffffffff/ffffffff/ffffffff",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=44/48/50 val=ffffffff/ffffffff/ffffffff",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_REG off=400/404/4c val=ffffffff/ffffffff/ffffffff",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_MAP slot=2 rc=0 bus=128c0820 pa=8ee2c0820 want=8ee2c0820 par=44000008ee2c0b00/44000008ee2c0b00 live=3568 fault=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_MAP slot=3 rc=0 bus=128c0920 pa=8ee2c0920 want=8ee2c0920 par=44000008ee2c0b00/44000008ee2c0b00 live=3568 fault=0/0",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=9 rc=0 base=ffffffff size=ffffffff id=ffffffff misc=ffffffff hw=ffffffff/ffffffff win=40000000 sw=16/8",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=9 rc=0 base=ffffffff size=ffffffff id=ffffffff misc=ffffffff hw=ffffffff/ffffffff win=40000000 sw=16/8",
+    "ELDEN_ATH12K level=4 ELDEN_CE3_TIME stage=9 rc=0 base=ffffffff size=ffffffff id=ffffffff misc=ffffffff hw=ffffffff/ffffffff win=40000000 sw=16/8",
+    "ELDEN_ATH12K level=4 ELDEN_UMAC_WAKE put=1 held=0",
+    "ELDEN_WIFI_FENCE result=0 stage=6 master-off=1 transactions-sampled=1 idle=1 command=2 device-status=10 msi=4 perst=pending consumer=0",
+    "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+    "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+  ],
+  "stage1_to8_config_nonzero": true,
+  "ce3_config_before_pdev": {
+    "base": "0x10001bc0",
+    "size": "0x8000",
+    "entry": "4",
+    "misc": "0xc2",
+    "hw": "8/8",
+    "window": "0x40000037"
+  },
+  "stage9_before_first_pdev": {
+    "registers": "0xffffffff",
+    "window": "0x40000000",
+    "software": "8/8"
+  },
+  "window_changed_after_stage8": true,
+  "actual_cause_of_window_change_proven": false,
+  "prior_zero_ce3_config_as_real_reset_proven": false,
+  "first_wmi_failure": 16387,
+  "buffer_cpu_and_backing_checks_passed": true,
+  "device_read_or_hardware_smmu_proven": false,
+  "scan_accepted": false,
+  "bss": 0,
+  "association": false,
+  "dhcp": false,
+  "traffic": false,
+  "physical_fence_return_proven": true,
+  "umac_put_proven": true,
+  "stock_restore_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "android_root_green_original_settings_restored": true,
+  "radio_restoration": {
+    "complete": true,
+    "attempts": 4,
+    "errors": [
+      {
+        "attempt": 1,
+        "type": "RuntimeError",
+        "message": ""
+      },
+      {
+        "attempt": 2,
+        "type": "RuntimeError",
+        "message": ""
+      }
+    ],
+    "actual_radios": [
+      "1",
+      "1"
+    ],
+    "actual_scans": [
+      "1",
+      "1"
+    ]
+  },
+  "device_jobs_terminal": true,
+  "next": "Apply exact OEM no-local-cache selector only for Peach, retain lock/value/readback and passive timeline; old cached37 can disagree with actual0.",
+  "goal": "active and incomplete"
+}

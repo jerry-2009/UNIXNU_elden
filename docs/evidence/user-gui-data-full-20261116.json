@@ -1,0 +1,36 @@
+{
+  "user_report": {
+    "received_utc": "2026-11-16T12:32:49Z",
+    "candidate": "v156",
+    "session": "410a995d2346b0d3",
+    "user_observations": [
+      "SpringBoard crashed/reloaded",
+      "Animations resemble a slideshow",
+      "Settings > General > About: Capacity1GB, Available9.9MB"
+    ],
+    "ram_window_bytes": 6442450944,
+    "capacity_labels_are_storage_not_ram": true,
+    "root_cause_not_yet_proven": true,
+    "raw_sha256": "22edd740364eb4b604b49a7b37182c8aca2c88471d911478120ad3cf12d5d4b5",
+    "raw_bytes": 1775274
+  },
+  "enospc_lines": 461,
+  "springboard_enospc_lines": 38,
+  "ram_bytes": 6442450944,
+  "data_seed_bytes": 536870912,
+  "smp_online_masks": [
+    "ff"
+  ],
+  "early_display_copy_ms": {
+    "samples": 32,
+    "median": 138.28591145833332,
+    "min": 122.718125,
+    "max": 140.25078125,
+    "not_continuous_fps": true
+  },
+  "reported_capture_drop_max": 975,
+  "raw_sha256": "22edd740364eb4b604b49a7b37182c8aca2c88471d911478120ad3cf12d5d4b5",
+  "restoration_complete": true,
+  "springboard_exit_reason_not_captured": true,
+  "priority": "Prepare expanded sparse Data with strict ownership/native/recovery/packer guards; persistent Data still unfinished."
+}

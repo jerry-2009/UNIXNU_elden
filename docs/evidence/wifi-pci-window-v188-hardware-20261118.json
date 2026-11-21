@@ -1,0 +1,82 @@
+{
+  "candidate_sha256": "c4aa5d1f4a1fc7567735097b0b02436471c589179c883925acaf6f862a2784d0",
+  "session": "80bb66d9dc9166fd",
+  "pci_reads": [
+    "ELDEN_PCI_READ req=1b86400 off=86400 static=0 win=80000 reg=3278 cached=37 hw=40000037 read=1 wake=0 val=0 ce=1b80000 dp=a00000",
+    "ELDEN_PCI_READ req=1b86404 off=86404 static=0 win=80000 reg=3278 cached=37 hw=40000037 read=1 wake=0 val=0 ce=1b80000 dp=a00000"
+  ],
+  "srng": [
+    "ELDEN_SRNG CFG ce=3 id=67 flags=20000 shadow=1 idx=34 off=984 target=1b86400 direct=1b86400 maps=36",
+    "ELDEN_SRNG HP sw=16 last=16 enter=4 exit=4 timer=0 lastoff=984 hw=0/0 dma-tp=8"
+  ],
+  "access": {
+    "static_window": false,
+    "dynamic_window": 55,
+    "window_register": 12920,
+    "cached": 55,
+    "hardware_readback": 1073741879,
+    "wake_result": 0,
+    "hp_request": 28861440,
+    "hp_bar_offset": 549888,
+    "hif_hp": 0,
+    "hif_tp": 0,
+    "coherent_dma_tp": 8
+  },
+  "board_reference": {
+    "commit": "6f97250ead155fc3b980856323e99a4623dae73d",
+    "path": "drivers/net/wireless/ath/ath12k/wifi7/pci.c",
+    "sha256": "db0a577f79e6a9095441059217e5e0991aa3abdba563725a742ece229b999826",
+    "peach_uses_dynamic_qcc2072_window": true
+  },
+  "interpretation": "Observed dynamic window/readback/wake agree with original board routing. Direct CSR0/0 remains different from coherent DMA8; verify ring CSR/shadow read semantics before firmware/credit claims.",
+  "physical_shutdown": {
+    "fence": [
+      "ELDEN_WIFI_FENCE result=0 stage=6 master-off=1 transactions-sampled=1 idle=1 command=2 device-status=10 msi=4 perst=pending consumer=0"
+    ],
+    "transport": [
+      "ELDEN_WIFI_TRANSPORT rc=0 stage=4 cfg=70/50 msi=3 BM=0 MHI=0",
+      "ELDEN_WIFI_TRANSPORT stop=0 msi=4 irq-active=0 master-attempted=1"
+    ],
+    "perst": [
+      "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified"
+    ],
+    "wcn": [
+      "ELDEN_WCN RPC stop=1; radio/UART stopped, boot-shared votes retained"
+    ]
+  },
+  "native_dma_msi_perst_wcn_stop_proven": true,
+  "warm_mhi_reset_proven": false,
+  "capture": {
+    "path": "edl_work/live-pci-window-v188-20261118/usb/20261118-114009.bin",
+    "bytes": 280679,
+    "sha256": "18a74fc9041febd37e065b0a4cc823ca45cefe58cb5c2c823077162779edf42f",
+    "drop_max": 0,
+    "reconnections": 0,
+    "discontinuities": 0,
+    "post_disconnect_counter_available": false
+  },
+  "android_restoration": {
+    "complete": true,
+    "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+    "root": true,
+    "green": true,
+    "original_radios_equal": true,
+    "original_scans_equal": true,
+    "original_charging_equal": true,
+    "sleep_requested": true,
+    "initial_radio_restore_failure_retained": true,
+    "all_jobs_terminal": true
+  },
+  "all_jobs_terminal": true,
+  "network_acceptance": false,
+  "full_goal_complete": false,
+  "version": "v188",
+  "date": "2026-11-18",
+  "kernel_sha256": "59e71badedcf261605bbd3753351cf7b42b14e43307d5e71174200d6146c6b02",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "daily_candidate_promoted": false
+}

@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "station_stride_variant": true,
+  "image_sha256": "c9c33f92c52043dad55714f93475b90bb83d51bc5ff6cef4c69907102d349754",
+  "session": "5e076ea0aa1dd9cf",
+  "raw": {
+    "path": "edl_work/live-station-stride-20261120/usb/20261119-165541.bin",
+    "sha256": "c6a86d6af2b25762ce1d8693e70ef13f747c8a1a1d18b316d5edd836967b7dd6",
+    "bytes": 285911,
+    "status_samples": 64,
+    "reported_drop_max": 14,
+    "reconnections": [],
+    "discontinuities": [],
+    "post_disconnect_counter_available": false
+  },
+  "observed": [
+    "ELDEN_WIFI_NET start=0 station-stage=4",
+    "ELDEN_WIFI_NET drain=0",
+    "ELDEN_WIFI_PLATFORM shutdown=0 config-error=0",
+    "ELDEN_WIFI_FENCE result=0 stage=6 master-off=1 transactions-sampled=1 idle=1 command=2 device-status=10 msi=4 perst=pending consumer=0",
+    "ELDEN_PCIE_PLATFORM physical-reset=1 perst-low=1 master-off=1 transactions-idle=1 msi=4 warm-reset=unverified",
+    "ELDEN_RPC RESET_AFTER_SYNC route=sdam-v7"
+  ],
+  "network_published_only_after_station4": true,
+  "actual_station_mac_matches_factory": true,
+  "wmi_timeout_count": 30,
+  "scan_requests_accepted": 0,
+  "bss": 0,
+  "association": false,
+  "dhcp": false,
+  "traffic": false,
+  "upstream_stride_fix_hardware_run": true,
+  "upstream_stride_fault_as_wmi_root_cause_proven": false,
+  "source_memory_safety_fix_retained": true,
+  "real_platform_fence_stop_passed": true,
+  "warm_mhi_reset_proven": false,
+  "stock_restore_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "stock_android_root_green_and_original_charge_radio_scan_settings_restored": true,
+  "restoration_attempts": 4,
+  "restoration_initial_errors": [
+    {
+      "attempt": 1,
+      "type": "RuntimeError",
+      "message": ""
+    },
+    {
+      "attempt": 2,
+      "type": "RuntimeError",
+      "message": ""
+    }
+  ],
+  "device_jobs_terminal": true,
+  "goal": "active and incomplete",
+  "next": "Focus on unreaped WMI command completion; no repeat of interface/start-order/firmware-hash probes."
+}

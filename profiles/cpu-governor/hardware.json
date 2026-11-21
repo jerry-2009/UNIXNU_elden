@@ -1,0 +1,764 @@
+{
+  "pd": {
+    "profile": "cpu-governor",
+    "session": "a32b069d6e2a7573",
+    "boot_nonce": "b3da16780956f30f",
+    "image_sha256": "c0c821a0408345517ae2d80a4a9b799566b0b458b733b5c25291fd6b348aac9c",
+    "raw_sha256": "34f6377dd5f584f595127e81761a07e180dc5ee62ad8a303557fd47fb30da5e2",
+    "bytes": 3736742,
+    "phases": [
+      {
+        "line": 371,
+        "phase": 1,
+        "error": 0,
+        "pulse": 0,
+        "high": 0,
+        "cycle": 0,
+        "deadline": 880,
+        "suspend": 0,
+        "restored": 0
+      },
+      {
+        "line": 1552,
+        "phase": 2,
+        "error": 0,
+        "pulse": 2,
+        "high": 0,
+        "cycle": 9,
+        "deadline": 862,
+        "suspend": 0,
+        "restored": 0
+      },
+      {
+        "line": 1674,
+        "phase": 3,
+        "error": 0,
+        "pulse": 4,
+        "high": 0,
+        "cycle": 11,
+        "deadline": 859,
+        "suspend": 0,
+        "restored": 0
+      },
+      {
+        "line": 1909,
+        "phase": 4,
+        "error": 0,
+        "pulse": 4,
+        "high": 1,
+        "cycle": 16,
+        "deadline": 856,
+        "suspend": 1,
+        "restored": 0
+      },
+      {
+        "line": 2660,
+        "phase": 5,
+        "error": 0,
+        "pulse": 4,
+        "high": 1,
+        "cycle": 23,
+        "deadline": 836,
+        "suspend": 0,
+        "restored": 0
+      },
+      {
+        "line": 2686,
+        "phase": 6,
+        "error": 0,
+        "pulse": 4,
+        "high": 1,
+        "cycle": 24,
+        "deadline": 836,
+        "suspend": 0,
+        "restored": 1
+      }
+    ],
+    "zero_cycles": [
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "zero_readback_interrupted": false,
+    "pulse_attempted": true,
+    "pulse": [
+      [
+        "0",
+        "101021",
+        "0"
+      ]
+    ],
+    "pulse_restored_or_unneeded": true,
+    "controller_completed": true,
+    "pd_contracts": [
+      "ELDEN_PD_CONTRACT port=2 result=0 position=1 type=0 range-mv=5000/5000 exact-v=1 requested-mv=5000 requested-ma=3000 requested-mw=15000; contract-only, not metering",
+      "ELDEN_PD_CONTRACT port=2 result=0 position=2 type=0 range-mv=9000/9000 exact-v=1 requested-mv=9000 requested-ma=2220 requested-mw=19980; contract-only, not metering"
+    ],
+    "pd_ready_observed": true,
+    "ready_before_measurement": null,
+    "observation_loss_during_measurement": null,
+    "backlight_trial_finished": null,
+    "observations": [
+      {
+        "line": 369,
+        "state": 1,
+        "phase": 1,
+        "error": 0,
+        "epoch": 0,
+        "cycle": 0
+      },
+      {
+        "line": 2684,
+        "state": 2,
+        "phase": 6,
+        "error": 0,
+        "epoch": 1,
+        "cycle": 24
+      },
+      {
+        "line": 15194,
+        "state": 3,
+        "phase": 6,
+        "error": 0,
+        "epoch": 1,
+        "cycle": 101
+      }
+    ],
+    "stopped_cleanly": true,
+    "reset_after_sync": true,
+    "dropped": 55,
+    "discontinuities": [],
+    "reconnections": [],
+    "limits": "Critical received markers and readbacks, not proof of every instant or individual-port watts. Character drops remain reported. Net charging is assessed separately from complete battery samples."
+  },
+  "governor_lifecycle_passed": true,
+  "cleanup_passed": true,
+  "rows": [
+    {
+      "line": 5290,
+      "phase": "active",
+      "elapsed_ms": 0,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 0,
+      "sets": 0,
+      "confirmed": 0,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 5393,
+      "phase": "running",
+      "elapsed_ms": 5003,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 216,
+      "sets": 21,
+      "confirmed": 21,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 5491,
+      "phase": "running",
+      "elapsed_ms": 10024,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 435,
+      "sets": 39,
+      "confirmed": 39,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 3,
+      "level1": 0,
+      "khz0": 960000,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 6379,
+      "phase": "running",
+      "elapsed_ms": 15041,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 663,
+      "sets": 50,
+      "confirmed": 50,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 8147,
+      "phase": "running",
+      "elapsed_ms": 20052,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 892,
+      "sets": 60,
+      "confirmed": 60,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 6,
+      "level1": 0,
+      "khz0": 1555200,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 10725,
+      "phase": "running",
+      "elapsed_ms": 25068,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 1122,
+      "sets": 69,
+      "confirmed": 69,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 10826,
+      "phase": "running",
+      "elapsed_ms": 30078,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 1359,
+      "sets": 71,
+      "confirmed": 71,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 10950,
+      "phase": "running",
+      "elapsed_ms": 35079,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 1586,
+      "sets": 82,
+      "confirmed": 82,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 3,
+      "level1": 0,
+      "khz0": 960000,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 11112,
+      "phase": "running",
+      "elapsed_ms": 40097,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 1807,
+      "sets": 99,
+      "confirmed": 99,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 11226,
+      "phase": "running",
+      "elapsed_ms": 45114,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 2035,
+      "sets": 110,
+      "confirmed": 110,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 6,
+      "level1": 0,
+      "khz0": 1555200,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 11428,
+      "phase": "running",
+      "elapsed_ms": 50116,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 2252,
+      "sets": 130,
+      "confirmed": 130,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 11554,
+      "phase": "running",
+      "elapsed_ms": 55131,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 2492,
+      "sets": 130,
+      "confirmed": 130,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 11704,
+      "phase": "running",
+      "elapsed_ms": 60151,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 2727,
+      "sets": 135,
+      "confirmed": 135,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 11866,
+      "phase": "running",
+      "elapsed_ms": 65170,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 2961,
+      "sets": 141,
+      "confirmed": 141,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 11940,
+      "phase": "running",
+      "elapsed_ms": 70185,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 3201,
+      "sets": 141,
+      "confirmed": 141,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 12118,
+      "phase": "running",
+      "elapsed_ms": 75202,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 3436,
+      "sets": 145,
+      "confirmed": 145,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 12238,
+      "phase": "running",
+      "elapsed_ms": 80219,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 3658,
+      "sets": 161,
+      "confirmed": 161,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 12363,
+      "phase": "running",
+      "elapsed_ms": 85228,
+      "state": 1,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 3882,
+      "sets": 175,
+      "confirmed": 175,
+      "restored": 0,
+      "restore_sets": 0,
+      "level0": 4,
+      "level1": 0,
+      "khz0": 1152000,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    },
+    {
+      "line": 12480,
+      "phase": "end",
+      "elapsed_ms": 90033,
+      "state": 4,
+      "error": 0,
+      "scmi_error": 0,
+      "scmi_status": 0,
+      "windows": 4092,
+      "sets": 192,
+      "confirmed": 191,
+      "restored": 1,
+      "restore_sets": 1,
+      "level0": 8,
+      "level1": 0,
+      "khz0": 1996800,
+      "khz1": 1017600,
+      "cap0": 8,
+      "cap1": 0
+    }
+  ],
+  "release": [
+    {
+      "clean": 1,
+      "held": 0,
+      "transfers": 423
+    }
+  ],
+  "active_tail": {
+    "count": 10,
+    "median_published_ma": -191.5,
+    "cycles": [
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64
+    ],
+    "percent": [
+      99,
+      99,
+      99,
+      99,
+      99,
+      99,
+      99,
+      99,
+      99,
+      99
+    ]
+  },
+  "after_restore_first": {
+    "count": 10,
+    "median_published_ma": -127.5,
+    "cycles": [
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74
+    ],
+    "percent": [
+      99,
+      99,
+      99,
+      99,
+      99,
+      99,
+      99,
+      99,
+      99,
+      99
+    ]
+  },
+  "display_copy": {
+    "before": {
+      "count": 8,
+      "bytes": [
+        23152640
+      ],
+      "median_ms": 136.48546875,
+      "min_ms": 133.4353125,
+      "max_ms": 138.90109375
+    },
+    "active": {
+      "count": 24,
+      "bytes": [
+        23152640
+      ],
+      "median_ms": 133.82473958333333,
+      "min_ms": 120.06395833333333,
+      "max_ms": 140.10625
+    },
+    "after": {
+      "count": 0,
+      "bytes": [],
+      "median_ms": null,
+      "min_ms": null,
+      "max_ms": null
+    }
+  },
+  "limits": "Sparse reported levels are confirmed controller states, not instantaneous measured clocks. Publisher power/copy windows may differ in GUI/workload and are not a causal A/B benchmark. Copy time is not end-to-end frame latency. Drops remain recorded; no full-cycle/peak-PD acceptance.",
+  "supervisor": {
+    "events": [
+      {
+        "event": "stock-android-admitted",
+        "utc": "2026-11-15T06:22:16.925458+00:00",
+        "soc": 99,
+        "mv": 4452.0,
+        "temperature_c": 30.5
+      },
+      {
+        "event": "listeners-started",
+        "utc": "2026-11-15T06:22:28.340697+00:00",
+        "pid": 192532
+      },
+      {
+        "event": "watcher-started",
+        "utc": "2026-11-15T06:22:28.346098+00:00",
+        "pid": 67824
+      },
+      {
+        "event": "flash-verified",
+        "utc": "2026-11-15T06:22:33.176821+00:00",
+        "sha256": "c0c821a0408345517ae2d80a4a9b799566b0b458b733b5c25291fd6b348aac9c"
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:22:33.201145+00:00",
+        "seconds": 0,
+        "bytes": 0,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:23:03.597082+00:00",
+        "seconds": 30,
+        "bytes": 14563,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:23:33.989600+00:00",
+        "seconds": 61,
+        "bytes": 90489,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:24:04.357632+00:00",
+        "seconds": 91,
+        "bytes": 157566,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:24:34.807922+00:00",
+        "seconds": 122,
+        "bytes": 1132238,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:25:05.178326+00:00",
+        "seconds": 152,
+        "bytes": 3515612,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:25:33.510668+00:00",
+        "seconds": 180,
+        "bytes": 3554543,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:26:03.886463+00:00",
+        "seconds": 211,
+        "bytes": 3593036,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:26:34.277138+00:00",
+        "seconds": 241,
+        "bytes": 3625501,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:27:04.649628+00:00",
+        "seconds": 271,
+        "bytes": 3670748,
+        "logger_exit": null
+      },
+      {
+        "event": "capture-progress",
+        "utc": "2026-11-15T06:27:35.035206+00:00",
+        "seconds": 302,
+        "bytes": 3712655,
+        "logger_exit": null
+      },
+      {
+        "event": "physical-fastboot-observed",
+        "utc": "2026-11-15T06:27:57.321868+00:00"
+      },
+      {
+        "event": "restore-verified",
+        "utc": "2026-11-15T06:28:02.051552+00:00",
+        "sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890"
+      },
+      {
+        "event": "android-restored",
+        "utc": "2026-11-15T06:28:17.672977+00:00",
+        "settings_equal": true,
+        "root": true,
+        "green": true,
+        "sleep_requested": true
+      },
+      {
+        "event": "supervisor-terminal",
+        "utc": "2026-11-15T06:28:17.672977+00:00",
+        "candidate_written": false,
+        "complete": true
+      }
+    ],
+    "android_before": [
+      "1",
+      "095100",
+      "095100"
+    ],
+    "android_after": [
+      "1",
+      "095100",
+      "095100"
+    ],
+    "complete": true
+  },
+  "visual_review": {
+    "frame": 6,
+    "sha256": "9eb2a8cddbc2da44d2f9e7948ad354a9a6746cc6dfa7df5ee3aba282377d0b46",
+    "springboard_visible": true,
+    "white_placeholders_remain": true,
+    "physical_touch_tested": false,
+    "active_rpc_stop_tested": false
+  },
+  "previous_v146_copy": {
+    "raw_sha256": "48ab403575edb4a89bc4390a1bff25c098a45937dd7130052962a8a97dc3fbb6",
+    "count": 32,
+    "median_ms": 134.08380208333335,
+    "strict_benchmark": false
+  }
+}

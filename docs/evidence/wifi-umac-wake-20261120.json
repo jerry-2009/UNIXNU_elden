@@ -1,0 +1,88 @@
+{
+  "date": "2026-11-20",
+  "profile": "wifi-network-17",
+  "umac_hold_trial": true,
+  "hardware_tested": false,
+  "problem": "First CE3 completion stops after initial WMI commands. Genuine MHI-only hold did not fix it.",
+  "vendor": {
+    "commit": "d50b305f7da9e14715a25120a4ac7b1a4b8b97c3",
+    "module_sha256": "33869cd650843656e216b092809b9cd7327865abb1b6b9dfcd55399abd600d76",
+    "module_bytes": 20170464,
+    "module_path": "/vendor_dlkm/lib/modules/qca_cld3_peach_v2.ko",
+    "actual_loaded_module": "qca_cld3_peach_v2",
+    "actual_binary_contains_umac_handshake": true,
+    "hif_request_text_offset": "0x452738",
+    "hif_request_size": 1300,
+    "request": 12292,
+    "status": 31473728,
+    "ready": 2,
+    "original_binary_private": true
+  },
+  "host": {
+    "summary": "PASS 37 actual UMAC wake scenarios; MHI/MMIO modeled; 50ms polling bound and exact cleanup",
+    "actual_helper": true,
+    "hardware_and_mhi_modeled": true,
+    "sanitizers": [
+      "ASan",
+      "UBSan"
+    ],
+    "normal_and_mhi_workers_byte_identical": true
+  },
+  "runtime": {
+    "binding_sha256": "2e42401ef30ac09dbad6f0b329f387b2a3fcae74333dfc1f5c687b10126142c4",
+    "pci_sha256": "18361bd0300e0bd160d98f0090016920cd6c45211cd93f4106d738ee149814ab",
+    "retained_units": 124,
+    "changed_units": [
+      "ath12k_wmi.o",
+      "ath12k_pci.o"
+    ],
+    "inherited_stride": true,
+    "warning_count": 120,
+    "new_external": "_elden_wifi_umac_hold_requested",
+    "no_ce_wmi_firmware_irq_or_timeout_change": true
+  },
+  "native": {
+    "object_sha256": "95bcafa706b13d7c84aec976c88e6640f9ab562456924c26b8c26d8606ff9056",
+    "warnings": 1,
+    "imports_missing": [],
+    "physical_fence_preserved": true
+  },
+  "kernel": {
+    "native_sha256": "ec6a9d0790e198ee7d3cee755899616816baa687c122ceec31cfa6af02d7b165",
+    "kernel_sha256": "542a05735c76b455f1432a78cef700cc21e6ad06896bd7be1596e9fbe827d21e",
+    "apple_regions": 30,
+    "entry_delta": 7124,
+    "core_unchanged": true
+  },
+  "qualification": {
+    "passed": true,
+    "mutation_cases": 17,
+    "menu_dispatch": true,
+    "countdown_and_fallback_preserved": true,
+    "actual_component_report_qualified": true,
+    "hardware_tested": false
+  },
+  "package": {
+    "image_sha256": "21b9231b3ca96156b9bf7b787f64481d932717048c1ebd745f658453692db930",
+    "session": "b86eb5d73f05fd7b",
+    "rollback": 1738713600,
+    "footer": 0,
+    "parent": 3,
+    "accepted_static": true,
+    "boot_argument_bytes": 1023
+  },
+  "source_inputs": {
+    "drivers/EldenWifi/UmacWake.inc": "eef5c433dc92571cc277e7fdd06217059c52c9ad754f3f2212d61937ae6e9ee2",
+    "drivers/EldenWifi/peach/UmacWakePatch.py": "b1577baed5e9b2a9defa42504348ed973a4951a9dc4e76faf2260e6e6d7fe606",
+    "drivers/EldenWifi/net/Net17NativeSource.py": "72cfa77bc4b6225f619039ea3fb8b5a3f21b685080d7ae0549997bdeacfaa063",
+    "tools/test_wifi_umac_wake.py": "6bfe52f3efc6b7d37adc9bf1100979d41397a39bd4f86234e0ef51a6b7245b0f",
+    "tools/build_wifi_umac_wake.py": "d9f99233622a857ec2d95667bea76b50c1d8053c69c9a115798d78492f1e6778",
+    "tools/build_wifi_net17_native.py": "beb751a389c4428104c5ccfa279f91f3eea70d131a472ffbc2e33270a076d6ed",
+    "tools/build_wifi_net17_kernel.py": "a27f67469b8912986209cc58548fc81cba5ce1cfba8f8dee1ba9e0a96c9febcb",
+    "tools/wifi_network17_boot.py": "6017aaf0cac1fbc3d7d1377c77324de9d5424811748bd60da2dd85e4ee8bf9d2",
+    "tools/test_wifi_net17_qualification.py": "ee464592ca1b08a1c79248004a8cbd2ef09d7c0609d146de11f4925919c171e7"
+  },
+  "initial_runtime1_rejection": "Checker omitted actual lx_delay_us dependency; runtime2 checks it explicitly.",
+  "next": "One bounded OEM handshake/CE3/scan contrast, then full physical stop and stock restoration. No Wi-Fi success yet.",
+  "goal": "active and incomplete"
+}

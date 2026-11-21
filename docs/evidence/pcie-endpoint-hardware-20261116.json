@@ -1,0 +1,166 @@
+{
+  "hardware": {
+    "root_trial_passed": true,
+    "pcie_gen": 3,
+    "lanes": 2,
+    "root_id": "0x11c17cb",
+    "endpoint_id": "0x110e17cb",
+    "endpoint_command": "0x0",
+    "phy_writes": 127,
+    "controller_writes": 430,
+    "gcc_released": true,
+    "quiesce_and_sync_return": true,
+    "stock_full_sha_restored": true,
+    "arc_requests": {
+      "mx_index": 9,
+      "mx_level": 448,
+      "cx_index": 10,
+      "cx_level": 480
+    },
+    "sn4_requested": 16383,
+    "sn4_calculated_minimum": 3773,
+    "ldo_readback_mv": [
+      880,
+      1200
+    ],
+    "capture_bytes": 164526,
+    "capture_sha256": "55d541503512ea2b4df412870516d5316185c45c1d5d626c2d45ac1c779ece83",
+    "reported_drop_max": 21,
+    "discontinuities": 0,
+    "reconnections": 0,
+    "storage_not_ready_messages_only_after_reset_marker": true,
+    "pd_bootstrap_interrupted_by_return": true,
+    "session": "a6f4850f8a2715a7",
+    "image_sha256": "1990cca48d1300e16d95c1ad87012e9b371274b61f2d083762db9afd4e208d22",
+    "boot_nonce": "dd122fa2264f0ce8",
+    "scope": "Root/BAR/Peach-major/confirmed power epoch only; no DMA/MSI/MHI/firmware/network or daily-power acceptance",
+    "gate_scope": "Required lines present; whole stream incomplete due to reported drops; no final post-disconnect counter available",
+    "endpoint_trial_passed": true,
+    "chip_version": "0x40210200",
+    "chip_major": 2,
+    "chip_minor": 0,
+    "endpoint_command_after_mapping": "0x2",
+    "bar0": 1077936128,
+    "bar0_bytes": 2097152,
+    "bar2": 1080033280,
+    "bar2_bytes": 32768,
+    "endpoint_writes": 28,
+    "wlan_identity_confirmed": true
+  },
+  "host": {
+    "passed": true,
+    "result": "20 native root scenarios / 1822 checks passed\n30 native root+endpoint scenarios / 5519 checks passed",
+    "asan_ubsan": true,
+    "actual_native_worker_root_endpoint_phy": true,
+    "physical_services_modeled": true,
+    "hardware": false,
+    "generated_sha256": {
+      "Native.cpp": "c85585e52e3989805573a73cc6d827070479383dd8d911b1def77e8401116795",
+      "NativeRuntime.inc": "bfacebf646c7ce17e9f5b5502aae0ed11ae392a4eb77e48c88542e9e05146692",
+      "NativeExports.inc": "1d2db37efc66b004ed1500432ed070f2c27f3cb4928734135deb371c1b5a4847"
+    }
+  },
+  "native": {
+    "object_sha256": "62cbbdf5bc1aab1778c1d2f987035b6e42eb110fec0f2358262b1e4d24a3a1bf",
+    "binding_sha256": "8bfe038992c84e44fa6ec34d2a62b49bb149166112e5ce4ab0fc2b2e766ee207",
+    "warnings": 0,
+    "scalar": true,
+    "endpoint_worker_bound": true,
+    "generated_sources": {
+      "Native.cpp": "c85585e52e3989805573a73cc6d827070479383dd8d911b1def77e8401116795",
+      "NativeRuntime.inc": "bfacebf646c7ce17e9f5b5502aae0ed11ae392a4eb77e48c88542e9e05146692",
+      "NativeExports.inc": "1d2db37efc66b004ed1500432ed070f2c27f3cb4928734135deb371c1b5a4847"
+    }
+  },
+  "kernel": {
+    "profile": "pcie-endpoint-trial",
+    "kernel_sha256": "1278eb40263041c1dde4167c937ae9e22c4b7e9c67c32350596eedf3493a13e1",
+    "native_sha256": "e7d79791d193e84ad3a30e95d1badb6645e721f6643ec46f139853d76c3a7ab3",
+    "changed_native_objects": 3,
+    "added_native_objects": 5,
+    "changed_core_objects": 0,
+    "core_filelist_unchanged": true,
+    "original_apple_executables_hashed": 30,
+    "ufs_diagnostic_removed": true,
+    "ufs_ah8_retained": true
+  },
+  "hooks": {
+    "_elden_pcie_native_start": {
+      "address": "0xfffffff007ba1304",
+      "calls": [
+        "0xfffffff007b9a358"
+      ],
+      "caller": "_elden_wcn_power_start",
+      "prelink_preserved": true
+    },
+    "_elden_pcie_native_stop_begin": {
+      "address": "0xfffffff007ba1bf4",
+      "calls": [
+        "0xfffffff007b9af98"
+      ],
+      "caller": "_elden_wcn_request_stop",
+      "prelink_preserved": true
+    },
+    "_elden_pcie_root_start": {
+      "address": "0xfffffff007ba30b8",
+      "calls": [
+        "0xfffffff007ba19a4"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_wlan_root_power": {
+      "address": "0xfffffff007b9bdbc",
+      "calls": [
+        "0xfffffff007ba20a8"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_pcie_endpoint_identify": {
+      "address": "0xfffffff007ba5478",
+      "calls": [
+        "0xfffffff007ba2434"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    },
+    "_elden_wlan_power_confirm_endpoint": {
+      "address": "0xfffffff007b9b7f4",
+      "calls": [
+        "0xfffffff007ba24c0"
+      ],
+      "caller": null,
+      "prelink_preserved": true
+    }
+  },
+  "capture_tests": {
+    "passed": true,
+    "baseline_sha256": "55d541503512ea2b4df412870516d5316185c45c1d5d626c2d45ac1c779ece83",
+    "rehash_mutations": true,
+    "rejected": [
+      "wrong-root",
+      "bus-master",
+      "missing-stage",
+      "missing-quiesce",
+      "missing-reset",
+      "early-storage-error",
+      "early-ufs-stop",
+      "bad-stock-sha",
+      "wrong-session",
+      "discontinuity",
+      "failed-restore",
+      "charge-not-restored",
+      "scan-not-restored",
+      "wrong-floor",
+      "wrong-chip-major",
+      "allff-chip",
+      "unconfirmed-power",
+      "endpoint-dma-enabled",
+      "missing-chip-stage",
+      "wrong-bar-size",
+      "window-not-restored"
+    ]
+  },
+  "goal_complete": false
+}

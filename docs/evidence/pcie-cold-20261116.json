@@ -1,0 +1,376 @@
+{
+  "date": "2026-11-16",
+  "stock": {
+    "identity": [
+      "HA2A1PT2",
+      "TB322FC",
+      "1",
+      "green"
+    ],
+    "mode": "read-only stock sysfs/FDT",
+    "files": {
+      "endpoint-config.bin": {
+        "bytes": 256,
+        "sha256": "3d6876a0146de8576eb2395a858de1213d1b92c65b779df3a331cfd5a4584546"
+      },
+      "running.dtb": {
+        "bytes": 885898,
+        "sha256": "b060f1001c4907895656c967fe3b2e5f6fb4d350be65cd79e4e3f4cdff1a8a45"
+      },
+      "stock-pcie.txt": {
+        "bytes": 3124,
+        "sha256": "6342d39965f4c6ad9758f919ddc5adb9aaed7be79b6c479b75860f58b3470ffe"
+      }
+    },
+    "endpoint_config_qualified": false,
+    "reason": "suspended endpoint; config is256 bytes of FF; cached sysfs identity only",
+    "battery": {
+      "percent": 100,
+      "mv": 4451,
+      "current_ma": 0,
+      "temperature_c": 25.9,
+      "state": "Full"
+    },
+    "controls_changed": false
+  },
+  "facts": {
+    "path": "drivers/EldenPcie/board-facts.json",
+    "sha256": "b6de310e9f5ad01da92ad1c9998ba8e4b030da5f607d3b3780e48cfe01509d54",
+    "device": "TB322FC",
+    "soc": "SM8750",
+    "sequence_count": 127
+  },
+  "phy_generation": {
+    "revision": "6f97250ead155fc3b980856323e99a4623dae73d",
+    "source_inputs": {
+      "drivers/phy/qualcomm/phy-qcom-qmp-pcie.c": "ddc1d81fe302fd100e0102c5b1acbf552fd3e13c80f46e8228e5c98731a3a0fc",
+      "drivers/phy/qualcomm/phy-qcom-qmp-qserdes-com-v7.h": "d1540bbc719d263b0efdd2b5823dd7640ecc60f890a3314ed74df41ee3dd169a",
+      "drivers/phy/qualcomm/phy-qcom-qmp-qserdes-txrx-v7.h": "7a1d156f5d057d10eaa76b2de414ea68444c5d59793cd783d07978289d4fef03",
+      "drivers/phy/qualcomm/phy-qcom-qmp-pcs-v7.h": "4a843b15c3e3d243d0ef5594b6a68b300e4bf01bb9c290ea4693a9d80904e2c3",
+      "drivers/phy/qualcomm/phy-qcom-qmp-pcs-pcie-v6.h": "94c874146205004a18bf01ccc99796b412b73f67e33b438a68630ed4e2915e0b"
+    },
+    "facts_sha256": "b6de310e9f5ad01da92ad1c9998ba8e4b030da5f607d3b3780e48cfe01509d54",
+    "stock_fdt_sha256": "b060f1001c4907895656c967fe3b2e5f6fb4d350be65cd79e4e3f4cdff1a8a45",
+    "stock_fdt_checked": true,
+    "sequence_count": 127,
+    "output_sha256": "15a669913b5aef092eb1cf556561caac7a6cb9fdc5c52cecf2e1ac04f11fcc24",
+    "linux_register_count": 123,
+    "linux_value_differences": [
+      {
+        "offset": "0x1380",
+        "register": "QSERDES_V7_RX_RX_MODE_01_HIGH4",
+        "linux": 156,
+        "stock": 143
+      },
+      {
+        "offset": "0x1394",
+        "register": "QSERDES_V7_RX_RX_MODE_10_HIGH4",
+        "linux": 156,
+        "stock": 143
+      },
+      {
+        "offset": "0x1b80",
+        "register": "QSERDES_V7_RX_RX_MODE_01_HIGH4",
+        "linux": 156,
+        "stock": 143
+      },
+      {
+        "offset": "0x1b94",
+        "register": "QSERDES_V7_RX_RX_MODE_10_HIGH4",
+        "linux": 156,
+        "stock": 143
+      }
+    ],
+    "linux_only": [
+      {
+        "offset": "0x5e0",
+        "register": "QPHY_V7_PCS_EQ_CONFIG2",
+        "linux": 15
+      }
+    ],
+    "stock_only": [
+      {
+        "offset": "0x5e4",
+        "stock": 15
+      },
+      {
+        "offset": "0x1800",
+        "stock": 0
+      }
+    ],
+    "hardware_operations": false
+  },
+  "regenerated_without_private_fdt": true,
+  "pagani_comparison": {
+    "revision": "c888efd3ce1b817d13f28783a77cf689cb2255c9",
+    "path": "drivers/PaganiWifi/PaganiWifiTables.h",
+    "sha256": "001f808ba5dd4356b1e31efcfd9631c0a1064d71201c29f73cf55f3efb859516",
+    "count": 128,
+    "extra_write": [
+      2296,
+      31,
+      0
+    ],
+    "rest_equals_stock": true
+  },
+  "phy_host": {
+    "passed": true,
+    "result": "281 PHY transaction scenarios / 83426 checks passed",
+    "asan_ubsan": true,
+    "mmio_and_clock_and_admission_modeled": true,
+    "hardware": false,
+    "source_sha256": {
+      "Phy.c": "a18afd15e9f1385bf2d07723d8ceea94cf2eafc9d89cb2d9d9490f1c63fee428",
+      "Phy.h": "a2dcfd5068fab775a2706b0e290eb1fcb368e777ab34b84ec262b18b2c9898fa",
+      "PhySequence.inc": "15a669913b5aef092eb1cf556561caac7a6cb9fdc5c52cecf2e1ac04f11fcc24",
+      "TestPhy.c": "0d77d34e85993dc80fdacb96a1c7a722d95e1cddc5944443266515333a0f6373"
+    }
+  },
+  "phy_native": {
+    "compiled": true,
+    "object_sha256": "b35bfcc847768af23b43c669b284bacd98dc01b6a79fb444125f1178333fb2d0",
+    "command": [
+      "xcrun",
+      "--sdk",
+      "iphoneos",
+      "clang",
+      "-target",
+      "arm64-apple-ios17.0",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-ffreestanding",
+      "-fno-builtin",
+      "-fno-stack-protector",
+      "-mgeneral-regs-only",
+      "-c",
+      "/Users/ciscohe/Desktop/UniXNU_elden/lab/pcie-phy-20261115/source/drivers/EldenPcie/Phy.c",
+      "-o",
+      "/Users/ciscohe/Desktop/UniXNU_elden/lab/pcie-phy-20261115/native1/Phy.o"
+    ],
+    "warnings": 0,
+    "exports": [
+      "_elden_pcie_phy_start"
+    ],
+    "imports": [],
+    "scalar": true,
+    "kernel_linked": false,
+    "hardware_tested": false,
+    "source_sha256": {
+      "Phy.c": "a18afd15e9f1385bf2d07723d8ceea94cf2eafc9d89cb2d9d9490f1c63fee428",
+      "Phy.h": "a2dcfd5068fab775a2706b0e290eb1fcb368e777ab34b84ec262b18b2c9898fa",
+      "PhySequence.inc": "15a669913b5aef092eb1cf556561caac7a6cb9fdc5c52cecf2e1ac04f11fcc24"
+    }
+  },
+  "cold_host": {
+    "passed": true,
+    "result": "47 native/WLAN GPIO/QMI scenarios, 450 checks passed",
+    "asan_ubsan": true,
+    "real_qmi_native_core_chain": true,
+    "physical_io_modeled": true,
+    "hardware": false,
+    "exact_linux_header_sha256": "09d5313e43cdcc0a57426d5aea26e25aea8a124411440c4cf3dd29a675319a1a",
+    "source_sha256": {
+      "drivers/EldenBluetooth/WcnPower.c": "8028445481b7012df33ce6ce13739171a17dfeb89fba4f84d30ca4af85fe16ab",
+      "drivers/EldenBluetooth/WcnPower.h": "2047193ec2337bf0ef83f4308c0a83d879fdd6738e80f422a6c1907111a6fff3",
+      "drivers/EldenBluetooth/WcnSharedPower.h": "9f7c484035ffaaec76946ececf52bda9227cd8139ffeca8684a659821f201266",
+      "drivers/EldenBluetooth/WcnSharedPower.inc": "4e2f63533c45003bd9ece5a9c8f16d7bae95c28444a20af818bfdd1e7a8d6190",
+      "drivers/EldenWifi/WlanPower.h": "adea0f3f42a196a8412e6cc1d63224d9db5cbbeff15a79661d5e1bcf87ee7a68",
+      "drivers/EldenWifi/WlanGpio.h": "db9e4f66fc32f0bd5cb6571fb6667175633e281e9c5407b10222f9f756f4b571",
+      "drivers/EldenWifi/WlanPowerNative.inc": "41e5adc3092c54d44ba36de79ce6ce642130744b226969a3bc56df5df51d6a89",
+      "drivers/EldenWifi/WlanPowerExports.inc": "7e7ae94cb8aeac5321c88f820a8ff9381d2cac51af247a782ee647c49128680c",
+      "drivers/EldenWifi/TestWlanNative.cpp": "59c8fa023b65fe5fdb78de1eae801cbb5fb3e43aaa0819f1820fbf2187290d24",
+      "drivers/EldenWifi/TestQmiPower.inc": "cb4b8d9418244c05b5b86b44b16a6652b60e3feb6d7a82b84e688bc769d99880",
+      "drivers/EldenWifi/QmiPower.c": "cfdb089a03395bcd73e9057ecb154efae3484b1980e26beeaa1e333da98de1ed",
+      "drivers/EldenWifi/QmiPowerBinding.h": "1fc656dbfe3766ad10405f8ebb3e036ce1e8f46836552fa1de59eb58a185bbdf"
+    }
+  },
+  "cold_native": {
+    "compiled": true,
+    "source_sha256": "ae470ad3fffcbcc2078d2c71d8416fce9abaa830576a46838c4f72765310da09",
+    "object_sha256": "32cfdd70b48f83f1a2b14082e48f154cc2338b5b31a035af70a8bab13d133431",
+    "exports": [
+      "_elden_wcn_power_lease_check",
+      "_elden_wcn_power_parent_hz",
+      "_elden_wcn_power_start",
+      "_elden_wcn_request_stop",
+      "_elden_wcn_stop_requested",
+      "_elden_wlan_power_acquire",
+      "_elden_wlan_power_check",
+      "_elden_wlan_power_confirm_endpoint",
+      "_elden_wlan_power_cpr",
+      "_elden_wlan_power_ready",
+      "_elden_wlan_power_stop",
+      "_sm8750_aoss_qmp_owner"
+    ],
+    "imports": [
+      "_IODelay",
+      "_IOFree",
+      "_IOMalloc_internal",
+      "_IOSleep",
+      "_KHEAP_DEFAULT",
+      "_PE_parse_boot_argn",
+      "_Sm8750AossQmpInit",
+      "_Sm8750AossQmpSend",
+      "_Sm8750CmdDbCopy",
+      "_Sm8750CmdDbVrm",
+      "_Sm8750RpmhWriteActive",
+      "__ZN14IODeviceMemory9withRangeEyy",
+      "__ZN15IORegistryEntry8fromPathEPKcPK15IORegistryPlanePcPiPS_",
+      "__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass",
+      "__ZN6OSData9metaClassE",
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_bzero",
+      "_current_thread",
+      "_elden_bt_bootstrap_publish",
+      "_elden_bt_host_publish",
+      "_elden_bt_host_run",
+      "_elden_bt_runtime_ready",
+      "_elden_init_exec_accepted",
+      "_elden_recovery_armed",
+      "_elden_spmi_transaction_acquire",
+      "_elden_spmi_transaction_release",
+      "_elden_usb_log_putc",
+      "_elden_wcn_bt_nvm",
+      "_elden_wcn_bt_patch",
+      "_elden_wcn_hci_firmware_prepare",
+      "_elden_wcn_hci_prepare",
+      "_elden_wcn_hci_run",
+      "_elden_wcn_nvm",
+      "_elden_wcn_parent_decode",
+      "_elden_wcn_patch",
+      "_elden_wcn_peripheral_prepare",
+      "_elden_wcn_rail_specs",
+      "_elden_wcn_shared_acquire",
+      "_elden_wcn_shared_check",
+      "_elden_wcn_shared_cpr",
+      "_elden_wcn_shared_snapshot",
+      "_elden_wcn_shared_stop",
+      "_elden_wcn_startup_prepare",
+      "_elden_wcn_startup_run",
+      "_elden_wcn_tmel",
+      "_elden_wcn_uart_backend_close",
+      "_elden_wcn_uart_backend_open",
+      "_gIODTPlane",
+      "_kernel_thread_start",
+      "_memcmp",
+      "_native_owner_data_status",
+      "_pb_bdaddr_from_seed",
+      "_pb_bdaddr_written",
+      "_pb_spmi_find",
+      "_pb_spmi_read8",
+      "_snprintf",
+      "_thread_deallocate",
+      "_thread_terminate",
+      "_vsnprintf"
+    ],
+    "bindings": [
+      "/Users/ciscohe/Desktop/UniXNU_elden/lab/reset-v116-20261114/build/source/WcnPowerNative.cpp"
+    ],
+    "warning_count": 1,
+    "scalar": true,
+    "legacy_power_entrypoints_removed": true,
+    "kernel_linked": false,
+    "hardware_tested": false,
+    "full_report_sha256": "605e63a8c9102b7964d889fb42f9071dbf1401d6ae43b6c56619c5c565f5f23c"
+  },
+  "cold_qmi": {
+    "compiled": true,
+    "gateway_source_sha256": "cfdb089a03395bcd73e9057ecb154efae3484b1980e26beeaa1e333da98de1ed",
+    "gateway_object_sha256": "5ea37619e9088233c506fd1373d8c36b0a508dc4a7a46cdd1b823dea2b09251b",
+    "exact_header_sha256": "09d5313e43cdcc0a57426d5aea26e25aea8a124411440c4cf3dd29a675319a1a",
+    "warnings": 14,
+    "wifi_runtime_report_sha256": "b5a7115dad78f9ed75485eb062bb979ef43ff1a0ffe585c928b4b8284d484adb",
+    "wifi_objects_unchanged": 125,
+    "relocatable_link_sha256": "aecc9488f81849861d9fd9aa3e38cd7dc11a08c62bbfff482d3a4eadbdbff006",
+    "relocatable_link_succeeded": true,
+    "linux_qmi_symbol_bound": true,
+    "duplicate_definitions": {},
+    "remaining_imports": [
+      "_IODelay",
+      "_IOFree",
+      "_IOMalloc_internal",
+      "_IOSleep",
+      "_KHEAP_DEFAULT",
+      "_PE_parse_boot_argn",
+      "_Sm8750AossQmpInit",
+      "_Sm8750AossQmpSend",
+      "_Sm8750CmdDbCopy",
+      "_Sm8750CmdDbVrm",
+      "_Sm8750RpmhWriteActive",
+      "__ZN14IODeviceMemory9withRangeEyy",
+      "__ZN15IORegistryEntry8fromPathEPKcPK15IORegistryPlanePcPiPS_",
+      "__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass",
+      "__ZN6OSData9metaClassE",
+      "___stack_chk_fail",
+      "___stack_chk_guard",
+      "_bzero",
+      "_current_thread",
+      "_elden_bt_bootstrap_publish",
+      "_elden_bt_host_publish",
+      "_elden_bt_host_run",
+      "_elden_bt_runtime_ready",
+      "_elden_init_exec_accepted",
+      "_elden_recovery_armed",
+      "_elden_spmi_transaction_acquire",
+      "_elden_spmi_transaction_release",
+      "_elden_usb_log_putc",
+      "_elden_wcn_bt_nvm",
+      "_elden_wcn_bt_patch",
+      "_elden_wcn_hci_firmware_prepare",
+      "_elden_wcn_hci_prepare",
+      "_elden_wcn_hci_run",
+      "_elden_wcn_nvm",
+      "_elden_wcn_patch",
+      "_elden_wcn_peripheral_prepare",
+      "_elden_wcn_startup_prepare",
+      "_elden_wcn_startup_run",
+      "_elden_wcn_tmel",
+      "_elden_wcn_uart_backend_close",
+      "_elden_wcn_uart_backend_open",
+      "_gIODTPlane",
+      "_kernel_thread_start",
+      "_memcmp",
+      "_memcpy",
+      "_memmove",
+      "_memset",
+      "_native_owner_data_status",
+      "_pb_bdaddr_from_seed",
+      "_pb_bdaddr_written",
+      "_pb_spmi_find",
+      "_pb_spmi_read8",
+      "_snprintf",
+      "_sscanf",
+      "_strchr",
+      "_strcmp",
+      "_strlen",
+      "_strncpy",
+      "_strtoul",
+      "_thread_deallocate",
+      "_thread_terminate",
+      "_vsnprintf"
+    ],
+    "scalar": true,
+    "native_board_caller_added": false,
+    "kernel_linked": false,
+    "boot_created": false,
+    "hardware_tested": false,
+    "full_report_sha256": "5ea7ad4472b452488e63a2ca7091bf8a46e09bc8b007665aa2345fe20cd7c23e"
+  },
+  "scope": {
+    "stock_read_only": true,
+    "phy_native_root_admission_implemented": false,
+    "root_controller_implemented": false,
+    "kernel_linked": false,
+    "boot_created": false,
+    "hardware_function_tested": false
+  },
+  "next": "Root-complex clocks/GDSC/PARF/PERST/LTSSM then fresh endpoint/config/DMA/MSI/MHI; do not use cached PCI identity for confirmation",
+  "goal_complete": false,
+  "gpu_worktree_accessed": false,
+  "all_jobs_terminal": true,
+  "facts_eol_normalized_to_git_lf": true
+}

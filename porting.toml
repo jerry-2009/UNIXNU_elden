@@ -5,7 +5,7 @@ schema_version = 1
 name = "elden"
 soc = "SM8750P"
 os_profile = "ipados-17.7.11-21H461"
-summary = "v106 physical Settings/General works; v108 restores original IONetworkStack. About latency validation, memory expansion and basic peripherals remain incomplete. Device restored stock."
+summary = "v156 adds verified UFS automatic idle/wake and restoration to the v15532-slot direct-DMA path. Charging cycles/net power, wireless, persistence, memory and remaining peripherals are incomplete; GPU is separate offline work."
 
 [[area]]
 id = "configuration"
@@ -67,15 +67,15 @@ evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Re
 id = "storage"
 status = "implemented"
 components = ["ShengUfs"]
-paths = ["drivers/**", "patches/xnu/**", "scripts/**", "soc/sm8750/dts/**", "dts/**", "configs/**", "package/**", "docs/PHASE3-STORAGE.md", "docs/UFS-STAGE2-20261106.md"]
-inputs = ["SM8750 UFS host at 0x1d84000 (+0x3000) and QMP PHY at 0x1d80000 (+0x2000), both described by the same-device Linux tree sm8750-lenovo-elden.dts and sm8750.dtsi pinned at bf96c3d4048973298ede78487177c6f1b4f6bc0f.", "Controller resources: GIC_SPI 265 level-high, 8 GCC/RPMh clocks, GCC_UFS_PHY_BCR, GCC_UFS_PHY_GDSC, apps_smmu stream 0x60, lanes-per-direction 2, ICE crypto@1d88000.", "PHY resources: RPMH_CXO_CLK, GCC_UFS_PHY_PHY_AUX_CLK, TCSR_UFS_CLKREF_EN, GCC_UFS_MEM_PHY_GDSC.", "Board supplies and reset: PHY vreg_l1j_0p91 and vreg_l3g_1p2, host vreg_l17b_2p5 (1.3 A) and vreg_l1d_1p2 (1.2 A), reset GPIO tlmm 215 active-low.", "4 KiB logical-sector partition geometry and a root-volume UUID, both owner-supplied and read-only."]
+paths = ["drivers/**", "patches/xnu/**", "scripts/**", "soc/sm8750/dts/**", "dts/**", "configs/**", "package/**", "docs/PHASE3-STORAGE.md", "docs/UFS-STAGE2-20261106.md", "drivers/EldenStorageMedium/**", "profiles/storage-medium/**", "tools/storage_medium_build.py", "tools/test_storage_medium.py", "tools/analysis/assess_storage_medium.py", "tools/analysis/audit_storage_medium.py", "drivers/EldenUfsWait/**", "profiles/ufs-wait-trial/**", "tools/build_ufs_wait_objects.py", "tools/analysis/assess_ufs_wait.py", "drivers/EldenUfsQueue/**", "profiles/ufs-queue-trial/**", "tools/analysis/assess_ufs_queue.py", "tools/test_ufs_native.py"]
+inputs = ["SM8750 UFS host at 0x1d84000 (+0x3000) and QMP PHY at 0x1d80000 (+0x2000), both described by the same-device Linux tree sm8750-lenovo-elden.dts and sm8750.dtsi pinned at bf96c3d4048973298ede78487177c6f1b4f6bc0f.", "Controller resources: GIC_SPI 265 level-high, 8 GCC/RPMh clocks, GCC_UFS_PHY_BCR, GCC_UFS_PHY_GDSC, apps_smmu stream 0x60, lanes-per-direction 2, ICE crypto@1d88000.", "PHY resources: RPMH_CXO_CLK, GCC_UFS_PHY_PHY_AUX_CLK, TCSR_UFS_CLKREF_EN, GCC_UFS_MEM_PHY_GDSC.", "Board supplies and reset: PHY vreg_l1j_0p91 and vreg_l3g_1p2, host vreg_l17b_2p5 (1.3 A) and vreg_l1d_1p2 (1.2 A), reset GPIO tlmm 215 active-low.", "4 KiB logical-sector partition geometry and a root-volume UUID, both owner-supplied and read-only.", "v152 IRQ binding uses ArmadaOS TB322FC -> h0cheung6f97250ead155fc3b980856323e99a4623dae73d sm8750.dtsi SPI265/INTID297; inherited transport/DMA ownership is unchanged."]
 completion = ["Controller and PHY initialize.", "Read-only capacity, GPT and known-block checks match the device.", "The configured OS volume mounts and launchd starts."]
 configuration = ["Frozen v91 inputs and explicit experimental v92 separation; see docs/REPRODUCIBILITY.md."]
 procedure = ["Follow docs/PLAN.md and retain identity, fresh power, floor and full SHA admission."]
-findings = ["UFS-backed iPadOS root, RAM Data, launchd and Settings have run."]
-limits = ["Persistent Data and UFS performance are not fully qualified."]
-next_action = ["Compare measured I/O with the pinned sheng success path; qualify persistence separately."]
-evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "UFS-backed iPadOS root, RAM Data, launchd and Settings have run. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }]
+findings = ["UFS-backed iPadOS root, RAM Data, launchd and Settings have run.", "v149 declares the existing UFS windows and RAM Data nonrotating. The actual iPadOS17 ioctl path reports isssd=1 for all three BSD units; transport remains single-slot polling and RAM remains volatile.", "v152 keeps the single slot but enables completion IRQ and bounded scheduler-aware waiting. Both whole-image pins and64 paired hashes/128 samples passed, with128 sample IRQs/5 IRQ wakes. Entire session2114 sleeps/wakes and no wait timeouts; root and stock Android restored. Warm QD1 latency did not show a consistent speedup. The current block-hash tables already reside entirely in protected RAM.", "v155 enables32 slots, a qualified independent NC request list and prepared driver-owned direct DMA. Both whole-image pins and48 batches/1536 commands/16 matched datasets passed; actual outstanding doorbells peaked27. Fixed-order QD32 128KiB reads recorded2430-2837MiB/s; cache/order bias prevents a causal speedup or GUI claim. Stock restoration passed."]
+limits = ["Persistent Data and UFS performance are not fully qualified.", "v155 has not qualified sustained pressure, BUSY/TASK_SET_FULL retry policy, CPU utilization or UI latency. Diagnostic batch reads should not recur in unrelated candidates."]
+next_action = ["Retain the verified queue/DMA path and remove diagnostic batch calls in the next feature build; continue Wi-Fi hardware integration. Qualify stress, CPU/UI latency and persistence separately rather than repeating the completed QD trial."]
+evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "UFS-backed iPadOS root, RAM Data, launchd and Settings have run. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }, { kind = "device", reference = "profiles/storage-medium/hardware.json", command = "Run the v149 signed storage-medium candidate, retain existing spec_open SSD outcomes and property readbacks, then perform session-bound sync/reset and full-SHA stock Android restore.", revision = "8af7569707e0401fc24b2999e5edbbe37ab26609", result = "Three property readbacks and six ioctl outcomes passed; root and Android restoration passed. No throughput or energy-saving benchmark; drop132 and unconfirmed human touch source retained." }, { kind = "device", reference = "profiles/ufs-wait-trial/hardware.json", command = "Run v152 paired pinned-block trial, retain complete rows and IRQ/stop counters, then session-bound sync/reset and full-SHA stock Android restoration.", revision = "1629b24a472f7b19d74cf5d5fb5aa8059c5ff0cf", result = "128 rows/64 paired hashes; actual IRQ wakes and recovery passed.3129911B/drop26/no reconnect; no sustained throughput, CPU utilization or user-visible speedup claim." }, { kind = "device", reference = "profiles/ufs-queue-trial/hardware.json", command = "Run the complete v155 QD1/8/32 candidate with retained snapshot DMA, full image pins and read-hash matching; then verify sync/reset and full-SHA stock Android restoration.", revision = "7c6553abb4e8f3de21b63a00c17004e9a8d9ebb0", result = "32-slot NC mapping/1536 direct reads and root/SMP/return passed.3185070B/drop155/no reconnect; fixed order/cache and high-SOC current limitations retained. v154 refusal and recovery archived separately." }]
 
 [[area]]
 id = "display"
@@ -151,15 +151,15 @@ evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Re
 id = "power"
 status = "implemented"
 components = []
-paths = ["soc/sm8750/**", "package/**", "drivers/EldenPmicGlink/**", "scripts/driver-patches/EldenPowerInspect.cpp", "scripts/driver-patches/EldenPowerStartup.inc", "scripts/driver-patches/EldenModemReader.inc", "docs/ADSP-PMIC-RUNTIME-20261108.md", "docs/UCSI-DUALPORT-20261108.md", "docs/BATTERY-TELEMETRY-20261108.md"]
+paths = ["soc/sm8750/**", "package/**", "drivers/EldenPmicGlink/**", "scripts/driver-patches/EldenPowerInspect.cpp", "scripts/driver-patches/EldenPowerStartup.inc", "scripts/driver-patches/EldenModemReader.inc", "docs/ADSP-PMIC-RUNTIME-20261108.md", "docs/UCSI-DUALPORT-20261108.md", "docs/BATTERY-TELEMETRY-20261108.md", "drivers/EldenUfsIdle/**", "profiles/ufs-idle-trial/**", "tools/test_ufs_idle.py", "tools/analysis/assess_ufs_idle.py"]
 inputs = ["PM8550-class PMIC, RPMh resources and device power domains.", "Volume and power key behavior."]
 completion = ["Declared power controls match readings.", "Sleep/resume or shutdown transitions restore dependent peripherals."]
 configuration = ["Frozen v91 inputs and explicit experimental v92 separation; see docs/REPRODUCIBILITY.md."]
 procedure = ["Follow docs/PLAN.md and retain identity, fresh power, floor and full SHA admission."]
-findings = ["Battery/backlight, OEM ADSP/GLINK, UCSI notifications and controlled PD procedures have hardware evidence."]
-limits = ["Shared 500mA, complete fast charging, bypass, charge windows and all dual-port failure cases remain open."]
+findings = ["Battery/backlight, OEM ADSP/GLINK, UCSI notifications and controlled PD procedures have hardware evidence.", "v156 enables the stock-observed5000us UFS auto-Hibern8 timer with owned clock-request bits and error handling.32 hardware enter/exit cycles and authenticated reads passed; controller restoration, sync/reset and stock Android recovery passed."]
+limits = ["Shared 500mA, complete fast charging, bypass, charge windows and all dual-port failure cases remain open.", "UFS low-power entry is not whole-system sleep or measured tablet energy savings. Read-after-idle latency was0.8-1.0ms; high-SOC current and log loss do not establish net charging."]
 next_action = ["Use decision-changing functional tests; do not repeat the rejected GLINK write path."]
-evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "Battery/backlight, OEM ADSP/GLINK, UCSI notifications and controlled PD procedures have hardware evidence. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }]
+evidence = [{ kind = "host", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "Battery/backlight, OEM ADSP/GLINK, UCSI notifications and controlled PD procedures have hardware evidence. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }, { kind = "device", reference = "profiles/ufs-idle-trial/hardware.json", command = "Run v156 auto-Hibern8 idle/read proof, verify32 hardware enter/exit counters and block hashes, then controller restore, sync/reset and full stock recovery.", revision = "9c9a739148b175c4df362d91467ae39a7fadb9c2", result = "AHIT5f4/CFG183c/IE61 admitted;32 wake reads verified; stop0 phaseRestored and original Android UFS/charging settings restored. Drop1172; critical records complete, no net-energy claim." }]
 
 [[area]]
 id = "packaging"
@@ -179,52 +179,68 @@ evidence = [{ kind = "device", reference = "docs/CURRENT-STATUS.md", command = "
 id = "diagnostics"
 status = "device-verified"
 components = []
-paths = ["scripts/check-*", "scripts/verify_*", "scripts/phase2_1_audit.py", "docs/**", "out/build.json", "assets/**"]
+paths = ["scripts/check-*", "scripts/verify_*", "scripts/phase2_1_audit.py", "docs/**", "out/build.json", "assets/**", "drivers/EldenCpuActivation/EarlyStorageSource.py", "profiles/early-storage-guard/**", "tools/test_early_storage_guard.py", "tools/analysis/assess_early_storage_guard.py"]
 inputs = ["RAM-only owner-operated boot procedure.", "Build and artifact SHA-256 values.", "UEFI screen output and recovery path."]
 completion = ["Every claimed checkpoint has a reproducible command, image hash and visible result.", "Failures reach a diagnosable screen or log instead of a silent hang."]
 configuration = ["Frozen v91 inputs and explicit experimental v92 separation; see docs/REPRODUCIBILITY.md."]
 procedure = ["Follow docs/PLAN.md and retain identity, fresh power, floor and full SHA admission."]
-findings = ["USB kernel logs, frame readback, session-bound RPC and directed fastboot recovery work."]
+findings = ["USB kernel logs, frame readback, session-bound RPC and directed fastboot recovery work.", "v150 moves the existing Gunyah arming before kernel UFS work and adopts it at unchanged SMP readiness. Normal startup and an interrupt-masked pre-UFS stall both returned to fastboot and restored Android; firmware/earlier-kernel coverage is not claimed."]
 limits = ["v91 whole capture dropped 24 bytes; counted raster records and Settings frame CRC were retained."]
 next_action = ["Preserve the recovery path and measure rather than infer CPU/UFS stalls."]
-evidence = [{ kind = "device", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "USB kernel logs, frame readback, session-bound RPC and directed fastboot recovery work. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }]
+evidence = [{ kind = "device", reference = "docs/CURRENT-STATUS.md", command = "Read frozen source/hardware manifests; no new device operation during maintenance", revision = "c7fae2baaaad4be7406de3691a4e79cc5cc48664", result = "USB kernel logs, frame readback, session-bound RPC and directed fastboot recovery work. Imported source is a local snapshot based on this revision; see profiles/v91/manifest.json for exact hashes." }, { kind = "device", reference = "profiles/early-storage-guard/hardware.json", command = "Run v150 normal mode and the same-kernel --early-stall candidate with passive PC capture; verify the exact stall marker, response before the120s fallback and full stock Android restoration.", revision = "e7bfb105e0af80eafe6c372da2d99857a89e372d", result = "EARLY_ARM/SMP_ADOPT and eight-core admission passed. Masked-stall marker to responsive fastboot46.583s includes bootloader/USB time; no software fallback or PC reset observed. Normal drop59; stall drop0 with final transport-timeout boundary." }]
 
 [[area]]
 id = "network-initialization"
 status = "device-verified"
-components = ["XnuPrelink", "com.apple.iokit.IONetworkingFamily"]
+components = ["XnuPrelink", "IONetworkingFamily"]
 paths = ["profiles/v107-iokit-busy", "profiles/v108-network-family", "tools/build_network_family.py", "docs/NETWORK-INITIALIZATION.md"]
+inputs = ["Original iPadOS17 21H461 kernelcache and its IONetworkingFamily3.4; the frozen v107/v108 profiles."]
+configuration = ["v108 adds the original network family to prelink roots and retains its IOResources/IOBSD personality; it does not create a network interface."]
+procedure = ["Follow profiles/v108-network-family/README.md, audit the original family extent, then inspect the six IOKit snapshots and full stock-restoration record."]
+completion = ["The real IONetworkStack registers without a dummy MAC/interface; Wi-Fi scan, association and traffic are separate unfinished requirements."]
 findings = ["v107: six complete busy0/AES-only snapshots. v108: exact original21H461 family added; six snapshots show real IONetworkStack and AES, busy0."]
 limits = ["No WLAN/Ethernet interface; About latency not measured in v108. Capture dropped36 bytes."]
 next_action = ["Measure userland initialization when useful and continue qualified RAM expansion; no fake network readiness."]
-evidence = [{kind="device", reference="profiles/v108-network-family/hardware-result.json", result="Signed candidate, sync return and complete stock restoration verified."}]
+evidence = [{command="Run the recorded v108 candidate, inspect six busy/provider snapshots, request session-bound reset-after-sync and verify the full stock boot hash and Android recovery.", revision="1bb142e0375ed47a38b7b7166cc4cc442d3e792a", kind="device", reference="profiles/v108-network-family/hardware-result.json", result="Signed candidate, sync return and complete stock restoration verified."}]
 
 [[area]]
 id = "memory-window8"
 status = "device-verified"
 components = ["DarwinBoot", "ArmDTPlatform"]
 paths = ["profiles/v109-memory8", "tools/memory_window_patch.py", "docs/MEMORY-EXPANSION.md"]
+inputs = ["TB322FC EFI memory map, the v108 parent and three coherent bootstrap objects recorded in profiles/v109-memory8."]
+configuration = ["The separate v109 GUI profile manages8GiB with24 page-table-pool pages; current Bluetooth/PD profiles still use6GiB."]
+procedure = ["Follow profiles/v109-memory8/README.md and inspect its window, entry, original-Apple-region and captured GUI/stock-restoration checks."]
+completion = ["The requested EFI allocation and kernel window agree, root/GUI and recovery work; this does not qualify16GiB or every page under stress."]
 findings = ["Real EFI allocation and XNU8GiB window; three coherent bootstrap objects,24page pool and31 original Apple text extents audited. Software Settings/General frame CRCb92cfd0a validated."]
 limits = ["Not16GiB, full-page stress, About-latency or physical-finger acceptance. Home transition artifacts remain. Final capture drop10; damaged frame12 rejected."]
 next_action = ["Keep8GiB baseline and evaluate KVA/EFI reservations before larger windows or outside-page adoption."]
-evidence = [{kind="device", reference="profiles/v109-memory8/ui-hardware-result.json", result="Three trials completed sync return and full stock restoration; Android/root/green restored."}]
+evidence = [{command="Run the v109 GUI window trial, verify captured Settings/General frames and the recorded full-SHA stock Android restoration.", revision="63c7f9994776f9e1d9b990fdf5c59c06c8356a66", kind="device", reference="profiles/v109-memory8/ui-hardware-result.json", result="Three trials completed sync return and full stock restoration; Android/root/green restored."}]
 
 [[area]]
 id = "spmi-adc-bt-serialization"
 status = "host-verified"
 components = ["EldenPmicGlink", "EldenBluetooth"]
 paths = ["drivers/EldenSpmi", "profiles/v110-bt-fifo"]
+inputs = ["Frozen v110 ADC and Bluetooth readers, the same-board Linux transaction-serialization contract and the EldenSpmi transaction gate."]
+configuration = ["One shared provider serializes complete ADC and Bluetooth SPMI transactions; this area records the historical component stage."]
+procedure = ["Run tools/test_spmi_transaction_gate.py and build the ADC/WCN consumer components as documented in drivers/EldenSpmi; inspect host-result.json."]
+completion = ["The real readers use one gate, collisions and errors release it correctly; full-kernel and device qualification are recorded separately by v111."]
 findings = ["Both v110 runs stop before UART with completed SPMI status9 and ADC errors. Same-board Linux serializes entire bus transactions; Elden lacked a common gate. Actual-reader host collision/error tests and four ARM64 gate components pass."]
 limits = ["No full gate kernel or hardware test. FIFO hardware not reached. Status9 causality is not proved. Charging/net-current/cycles and Bluetooth remain incomplete."]
 next_action = ["Integrate one gate provider plus actual ADC and BT consumers, audit and then test thermal/WCN together."]
-evidence = [{kind="host", reference="drivers/EldenSpmi/host-result.json", result="Injected concurrency/error model; not hardware proof."}]
+evidence = [{command="Run the actual-reader transaction-gate fault/concurrency host tests recorded in drivers/EldenSpmi/host-result.json.", revision="b86a5f368ca97ebdd2c2a31f58437b1cd61ed917", kind="host", reference="drivers/EldenSpmi/host-result.json", result="Injected concurrency/error model; not hardware proof."}]
 
 [[area]]
 id = "spmi-hci-v114"
 status = "implemented"
 components = ["EldenPmicGlink", "EldenBluetooth"]
 paths = ["profiles/v111-spmi-gate", "profiles/v113-uart-gic", "profiles/v114-hci-length"]
+inputs = ["Qualified v111 shared SPMI consumers, v113 UART/peripheral evidence and the12-byte HCI identity response format in v114."]
+configuration = ["v114 keeps the v113 board/firmware path and adjusts the validated response-length gate; v112 remains withdrawn."]
+procedure = ["Follow the v111, v113 and v114 profile READMEs; inspect the frozen hardware records and preserve errors/stock recovery."]
+completion = ["The expected response is reached and accepted on hardware with clean recovery; a source fix alone is insufficient for native HCI readiness or pairing."]
 findings = ["v111 shared-bus consumers verified,54 ADC readings/thermal/WCN pass. v113 peripheral complete and real EDL response captured. v114 length12 validation fixes proven old-source rejection."]
 limits = ["v112 withdrawn for GIC address typo. Initial IBS wake remains variable. v114 did not reach its new check on hardware. No native HCI-ready/pairing or charge-policy completion."]
 next_action = ["Inspect cold-start UART synchronization and same-board Linux port-reopen sequence before further device runs."]
-evidence = [{kind="device", reference="profiles/v114-hci-length/hardware-result.json", result="Typed sync/reset and stock restore; stage2 timeout retained."}]
+evidence = [{command="Run the recorded v114 candidate and preserve its failed preparation-stage trace plus the verified stock restoration; the new length gate was not reached.", revision="79ecf38be39bcade9bb6f90ec95af60a9f57c36a", kind="device", reference="profiles/v114-hci-length/hardware-result.json", result="Typed sync/reset and stock restore; stage2 timeout retained."}]

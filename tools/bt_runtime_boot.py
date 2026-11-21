@@ -11,7 +11,19 @@ def qualify(report_path,entry_path,runtime):
     if not report_path or not entry_path or not runtime:raise ValueError('Complete v99 build, entry and runtime inputs required')
     report=json.loads(Path(report_path).read_text());entry=json.loads(Path(entry_path).read_text());runtime=Path(runtime)
     name=report.get('profile')
-    if name in ('charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation'):
+    if name=='wifi-network-17':
+        from wifi_network17_boot import qualify as network_qualify
+        return network_qualify(report_path,entry_path,runtime)
+    if name in ('data-capacity-2g','data-capacity-2g-key'):
+        from data_capacity_boot import qualify as capacity_qualify
+        return capacity_qualify(report_path,entry_path,runtime)
+    if name in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace','wifi-ce3-flow-trace']:
+        from wifi_service_boot import qualify as service_qualify
+        return service_qualify(report_path,entry_path,runtime)
+    if name in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
+        from pcie_root_boot import qualify as qualify_pcie
+        return qualify_pcie(report_path,entry_path,runtime)
+    if name in ('charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
         from charge_verification_boot import qualify as qualify_charge
         return qualify_charge(report_path,entry_path,runtime)
     if name=='bt-address17':
@@ -105,7 +117,23 @@ def pd_gui(qualification):
         raise ValueError('PD GUI requires the qualified PD integration kernel')
     return dict(qualification,profile='pd-gui',native_profile='pd-power-trial',menu_only_gui=True)
 
+def early_stall(qualification):
+    if not qualification or qualification.get('profile')!='early-storage-guard':raise ValueError('Stall requires qualified early-guard kernel')
+    return dict(qualification,profile='early-storage-stall',native_profile='early-storage-guard',controlled_stall=True)
+
 def menu(qualification=None):
+    if qualification and qualification.get('profile')=='wifi-network-17':
+        from wifi_network17_boot import menu as network_menu
+        return network_menu(qualification)
+    if qualification and qualification.get('profile') in ('data-capacity-2g','data-capacity-2g-key'):
+        from data_capacity_boot import menu as capacity_menu
+        return capacity_menu(qualification)
+    if qualification and qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace','wifi-ce3-flow-trace']:
+        from wifi_service_boot import menu as service_menu
+        return service_menu(qualification)
+    if qualification and qualification.get('profile') in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
+        from pcie_root_boot import menu as pcie_menu
+        return pcie_menu(qualification)
     before=battery_template(framebuffer_template(True));config=tomllib.loads(before)
     first=config['entry'][0];original=first['args'];tokens=original.split()
     # This trial uses real input and Bluetooth logs, not the one-shot software
@@ -115,16 +143,16 @@ def menu(qualification=None):
     expected=arguments(original)
     for key in removed:expected.pop(key)
     expected['elden-wcn-power']='4'
-    if qualification and qualification.get('profile') in ('elden-software-keystore','bluetool-owner-launch','bt-transport-trace','bt-syscall-trace','bluetool-lifecycle','bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation'):
+    if qualification and qualification.get('profile') in ('elden-software-keystore','bluetool-owner-launch','bt-transport-trace','bt-syscall-trace','bluetool-lifecycle','bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
         slots=[i for i,t in enumerate(result) if t.partition('=')[0]=='elden-key-state']
         if len(slots)!=1 or expected.get('elden-key-state')!='1':raise ValueError('Expected old state mode1')
         result[slots[0]]='elden-key-state=2'
         expected['elden-key-state']='2'
-    if qualification and qualification.get('profile') in ('backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation'):
+    if qualification and qualification.get('profile') in ('backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
         if 'elden-backlight' in expected or 'ebl' in expected:raise ValueError('Backlight already selected')
         mode='5' if qualification['profile'] in ('backlight-power-trial','pd-power-trial') else '6'
         result.append('ebl='+mode);expected['ebl']=mode
-    if qualification and qualification.get('profile') in ('pd-power-trial','pd-gui','cpu-power-observation'):
+    if qualification and qualification.get('profile') in ('pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
         for key,old_value,new_value in [('elden-thermal','2','3'),('smp-hold','240','600')]:
             if expected.get(key)!=old_value:raise ValueError('Unexpected PD trial baseline '+key)
             slots=[i for i,t in enumerate(result) if t.partition('=')[0]==key]
@@ -135,7 +163,7 @@ def menu(qualification=None):
             result[result.index(key+'=1')]=key
         if 'epd' in expected or 'elden-pd-bootstrap' in expected:raise ValueError('PD already selected')
         result.append('epd=2');expected['epd']='2'
-    if qualification and qualification.get('profile')=='cpu-power-observation':
+    if qualification and qualification.get('profile') in ('cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
         # PE_parse_boot_argn treats bare numeric-one flags as 1, and 334=0x14e.
         # Preserve every option and its numeric value within the 1024-byte ABI.
         for key in ('security-mode-change-enable','amfi_get_out_of_my_way'):
@@ -143,15 +171,32 @@ def menu(qualification=None):
             result[result.index(key+'=1')]=key
         if result.count('debug=0x14e')!=1:raise ValueError('Unexpected debug mask')
         result[result.index('debug=0x14e')]='debug=334';expected['debug']='334'
-        result.append('ecp=2');expected['ecp']='2'
+        mode='3' if qualification['profile']=='cpu-governor' else '2'
+        result.append('ecp='+mode);expected['ecp']=mode
+    if qualification and qualification.get('profile') in ('early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
+        if result.count('vdog=2')!=1:raise ValueError('Unexpected watchdog baseline')
+        mode='4' if qualification['profile']=='early-storage-stall' else '3'
+        result[result.index('vdog=2')]='vdog='+mode;expected['vdog']=mode
     text=before.replace('args = "'+original+'"','args = "'+' '.join(result)+'"',1)
-    text=text.replace('title = "'+first['title']+'"','title = "Bluetooth runtime + battery - TEST"',1)
+    title='UFS idle power + wake - TEST' if qualification and qualification.get('profile')=='ufs-idle-trial' else 'UFS queue + DMA trial - TEST' if qualification and qualification.get('profile')=='ufs-queue-trial' else 'UFS completion read trial - TEST' if qualification and qualification.get('profile')=='ufs-wait-trial' else 'Bluetooth runtime + battery - TEST'
+    text=text.replace('title = "'+first['title']+'"','title = "'+title+'"',1)
     new=tomllib.loads(text)
     if arguments(new['entry'][0]['args'])!=expected or len(new['entry'][0]['args'].replace('@SESSION@','0'*16).encode())>1023:
         raise ValueError('Bluetooth option contract or length differs')
     if new['entry'][1:]!=config['entry'][1:] or new['boot']!=config['boot']:raise ValueError('Fallback/menu behavior changed')
     return text
 def adt(base,qualification=None):
+    if qualification and qualification.get('profile')=='wifi-network-17':
+        qualification=dict(qualification,profile='ufs-idle-trial')
+    if qualification and qualification.get('profile') in ('data-capacity-2g','data-capacity-2g-key'):
+        if qualification.get('keep_packed_data'):
+            from data_capacity_boot import packed_adt
+            return packed_adt(base,qualification)
+        qualification=dict(qualification,profile='ufs-idle-trial')
+    if qualification and qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace','wifi-ce3-flow-trace']:
+        qualification=dict(qualification,profile='ufs-idle-trial')
+    if qualification and qualification.get('profile') in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
+        qualification=dict(qualification,profile='ufs-idle-trial') # unchanged v156 ADT/runtime only
     result=copy.deepcopy(base);found=[]
     def visit(n):
         for p in n['properties']:
@@ -162,17 +207,27 @@ def adt(base,qualification=None):
     old=bytes.fromhex(found[0]['hex'])
     if not old.endswith(b'\0') or b'bluetoothd,' in old:raise ValueError('Prior Bluetooth fixup is not allowed')
     updated=old+FIXUP
-    if qualification and qualification['profile'] in ('v118-native17','v119-bt-exit','v120-bt-xpc','v121-bt-stderr','current-source','bt-exit-stack','elden-software-keystore','bluetool-owner-launch','bt-transport-trace','bt-syscall-trace','bluetool-lifecycle','bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation'):
+    if qualification and qualification['profile'] in ('v118-native17','v119-bt-exit','v120-bt-xpc','v121-bt-stderr','current-source','bt-exit-stack','elden-software-keystore','bluetool-owner-launch','bt-transport-trace','bt-syscall-trace','bluetool-lifecycle','bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
         updated=bytes.fromhex(qualification['text_fixups_hex'])
-        expected_count=59 if qualification['profile'] in ('bt-address17','charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation') else 55 if qualification['profile']=='bt-discovery17' else 40 if qualification['profile'] in ('bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation') else 38 if qualification['profile']=='bt-scan17' else 32 if qualification['profile']=='bt-complete17' else 25 if qualification['profile']=='bt-optional17' else 31 if qualification['profile']=='v120-bt-xpc' else 22
+        expected_count=59 if qualification['profile'] in ('bt-address17','charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial') else 55 if qualification['profile']=='bt-discovery17' else 40 if qualification['profile'] in ('bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial') else 38 if qualification['profile']=='bt-scan17' else 32 if qualification['profile']=='bt-complete17' else 25 if qualification['profile']=='bt-optional17' else 31 if qualification['profile']=='v120-bt-xpc' else 22
         if not updated.startswith(old+FIXUP) or len([x for x in updated.split(b'\0') if x])!=expected_count:raise ValueError('Native17 table contract differs')
     found[0]['hex']=updated.hex();result.pop('sha256',None)
-    if qualification and qualification['profile'] in ('bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation'):
+    if qualification and qualification['profile'] in ('bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
         from bt_registry_adt import apply as registry_adt
         result=registry_adt(result)
     return result
 def augment_trust(original,qualification):
-    if qualification.get('profile') not in ('bluetool-lifecycle','bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation'):return original
+    if qualification.get('profile')=='wifi-network-17':
+        from wifi_service_boot import augment_trust as service_trust
+        return service_trust(original,qualification)
+    if qualification.get('profile') in ('data-capacity-2g','data-capacity-2g-key'):
+        qualification=dict(qualification,profile='ufs-idle-trial')
+    if qualification.get('profile') in ['wifi-service','wifi-service-owner','wifi-service-control-trace','wifi-service-scan','wifi-wmi-snapshot','wifi-credit-trace','wifi-srng-trace','wifi-pci-window-trace','wifi-ce3-flow-trace']:
+        from wifi_service_boot import augment_trust as service_trust
+        return service_trust(original,qualification)
+    if qualification.get('profile') in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
+        qualification=dict(qualification,profile='ufs-idle-trial') # identical qualified cache/trust assets
+    if qualification.get('profile') not in ('bluetool-lifecycle','bt-registry','bt-helper-trace','bt-process-lifetime','bt-optional17','bt-complete17','bt-scan17','bt-scan-ready17','bt-scan-observe17','bt-scan-roles17','bt-discovery17','bt-address17','charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','pd-gui','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):return original
     if hashlib.sha256(original).hexdigest()!=qualification['cache_input_trust_sha256']:raise ValueError('Unexpected trust before cache')
     sys.path.insert(0,str(ROOT/'tools/legacy-workbench'))
     from icon_cpu_trust import parts

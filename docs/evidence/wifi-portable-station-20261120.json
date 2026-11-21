@@ -1,0 +1,148 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "purpose": "Complete the successful SM8750 donor station, WPA2/key/data and iOS17 bridge before one consolidated hardware trial.",
+  "donor": {
+    "schema": 1,
+    "repository": "https://github.com/lenzhang/UniXNU-xiaomipad8pro",
+    "commit": "2438556c77c90c22c7b76e57eb8b40c44b35f1af",
+    "license": "BSD-2-Clause-Patent",
+    "files": [
+      {
+        "path": "WifiSta.h",
+        "upstream_path": "package/PianoWifi/WifiSta.h",
+        "sha256": "ddd7780b195c3584cb023df121c6e3177154c078a469c0a84826431ea4bf629e",
+        "bytes": 56234
+      },
+      {
+        "path": "WifiDp.h",
+        "upstream_path": "package/PianoWifi/WifiDp.h",
+        "sha256": "e34fd826570c827b3c20790a895296a963066450790196df55b8d2d4a3afa5ef",
+        "bytes": 30362
+      },
+      {
+        "path": "WifiHtVht.h",
+        "upstream_path": "package/PianoWifi/WifiHtVht.h",
+        "sha256": "4994f45688e634d27b107f0fb31c5520d7e6d3e121bcbdb6625efe2463a536b2",
+        "bytes": 8744
+      },
+      {
+        "path": "WifiDot11.h",
+        "upstream_path": "package/PianoWifi/WifiDot11.h",
+        "sha256": "2a79048e74da29c66a896581cd2884c882beda65fd7a094b9714a16612e9b884",
+        "bytes": 15180
+      },
+      {
+        "path": "WifiNet.h",
+        "upstream_path": "package/PianoWifi/WifiNet.h",
+        "sha256": "23dc79e63c2d3fa33ffa44591c0865d35e8a918827e32b522a72982f61846182",
+        "bytes": 15517
+      },
+      {
+        "path": "WifiProfile.h",
+        "upstream_path": "package/PianoWifi/WifiProfile.h",
+        "sha256": "895719a21b200f8c6bcdfac375c907484fe24c83d879253a3225f40b2bbaa075",
+        "bytes": 9398
+      },
+      {
+        "path": "PianoWifiNet.h",
+        "upstream_path": "package/PianoWifi/PianoWifiNet.h",
+        "sha256": "6e4d9f7ff03a25106e192f6a8c4f9a5afe3545e45b3e645b1cbccbff9609ae8f",
+        "bytes": 12738
+      },
+      {
+        "path": "LICENSE",
+        "upstream_path": "package/PianoWifi/LICENSE",
+        "sha256": "c3b5bc2960852a3a6e3c7cae1f52486e21fd6115e925a3353e10214792ce88fb",
+        "bytes": 2663
+      },
+      {
+        "path": "tests/assoc_host.cpp",
+        "upstream_path": "package/PianoWifi/tests/assoc_host.cpp",
+        "sha256": "9149cbe03f6a019c728dc412740884582097f191487539dc59d0205e9845e3b7",
+        "bytes": 27576
+      },
+      {
+        "path": "tests/sta_host.cpp",
+        "upstream_path": "package/PianoWifi/tests/sta_host.cpp",
+        "sha256": "17c8668120c4d1ad864d18ca48ea6b5bfe8440b64c8dd0f41eaaa1b2f7b61512",
+        "bytes": 56817
+      },
+      {
+        "path": "tests/dp_host.cpp",
+        "upstream_path": "package/PianoWifi/tests/dp_host.cpp",
+        "sha256": "5b48ba556d1e7330da6a6f38cf36baf0b787d1066668c558249c61d9e0b09b38",
+        "bytes": 23684
+      },
+      {
+        "path": "tests/net_host.cpp",
+        "upstream_path": "package/PianoWifi/tests/net_host.cpp",
+        "sha256": "684a3dd1db7a14ec16f79d97c2d5a35151b8ac4adb3bb260f9ed8c4b117db913",
+        "bytes": 12501
+      },
+      {
+        "path": "piano-wifi-supplicant.c",
+        "upstream_path": "tooling/native/piano-wifi-supplicant/piano-wifi-supplicant.c",
+        "sha256": "d9913e519c003c0d937be8b166e947f107170f36ed40182a66a886674bcb0951",
+        "bytes": 35302
+      },
+      {
+        "path": "WifiUserControl.h",
+        "upstream_path": "package/PianoWifi/WifiUserControl.h",
+        "sha256": "802ed00ff27f512fca240dadcf4b29676fd894d4c4209ce66c01ee70b8639cdf",
+        "bytes": 3041
+      }
+    ],
+    "scan_lock": "../../upstream/source.json",
+    "macos_abi_not_imported": true,
+    "firmware_board_power_not_imported": true
+  },
+  "build": {
+    "runtime_sha256": "06f447d5a79009b37ff5d96cd4a02ff99457141da22f9b46e26998ed88bb6474",
+    "station_sha256": "9ab02117f6b53b6c20e8b4f3705e7e284627dfbfaaffa45538075280375ce74e",
+    "worker_sha256": "2741881a36bc7dfde621ea64e4ea3da0da8a37397bc191162b668ffc5f91f899",
+    "core_sha256": "06310a66f499cae76e6a98b2be73775edb3cfecc4e126511022bdd0b8011ac5c",
+    "kernel_sha256": "a8cbea04ac1cf6aff2d3d4f7849de27b55e0c164b6fb0f22798bd623014cd2dc",
+    "helper_sha256": "bc478cac5143a6f36b1bebcd05364b5dbd531d54cdfe8b3f362a14bf1f33b214",
+    "helper_cdhash": "8425a7787deb13bb4d3b81a94966637484cd4786",
+    "runtime_count": 126,
+    "retained_objects": 121,
+    "warnings": {
+      "c": {
+        "core.c": 157,
+        "qmi.c": 152,
+        "nw_wifi.c": 83,
+        "nw_mainline.c": 67
+      },
+      "worker": 1,
+      "core": 91
+    }
+  },
+  "verification": {
+    "original_donor_assoc_sta_dp_net_tests": true,
+    "crypto_handshake_replay_group_rekey_selftest": true,
+    "actual_adapter_owner_profile_generation_refusals": true,
+    "asan_ubsan": true,
+    "hardware_and_firmware_models": true,
+    "composition_mutations": 12,
+    "original_apple_executables": 30,
+    "entry_delta": 7124,
+    "signed_package_audit": true,
+    "clean_build_rerun": false
+  },
+  "image_sha256": "87d1c43cce7d15a45794a8388948e59094209d95c924a746cfcb4410aeb4b915",
+  "session": "2661d591ea5855d4",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "private_input": "Owner current Android WPA2 profile; payload/credentials excluded from Git and logs.",
+  "scan_parent_hardware_accepted": true,
+  "station_association_accepted": false,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "next": "One combined full station/WPA2/data/DHCP/traffic and physical return trial, then owner-requested Mac Trash/document maintenance.",
+  "goal": "active and incomplete"
+}

@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-20",
+  "hardware_tested": false,
+  "profile": "wifi-network-17",
+  "question": "Complete board pinctrl SW_CTRL18/19 and HOST_SOL202 before radio supply/enable; retain state observer.",
+  "contract": {
+    "pins": [
+      18,
+      19,
+      202
+    ],
+    "mux": [
+      1,
+      1,
+      0
+    ],
+    "host_sol_low": true,
+    "target_signals_not_driven": true,
+    "unknown_egpio_irq_refused": true,
+    "all_initial_reads_before_writes": true,
+    "partial_failure_held": true,
+    "other_clocks_fw_mode_ring_unchanged": true
+  },
+  "source_evidence": {
+    "stock_pins_record": "lab/records/wifi-board-pins-20261120",
+    "armada_revision": "d4c3b13a96c5fca9899368e141da2620e9b42e98",
+    "board_source": "6f97250ead155fc3b980856323e99a4623dae73d sm8750-lenovo-elden.dts/pinctrl-sm8750.c"
+  },
+  "host": {
+    "passed": true,
+    "actual_helper": true,
+    "asan_ubsan": true,
+    "mmio_modeled": true,
+    "hardware_tested": false,
+    "summary": "PASS 23 actual sideband cases; three board pins only, all guards before writes, unknown partial state held",
+    "source_inputs": {
+      "tools/test_wifi_sideband_pins.py": "c149914ecb847de7a0e35bc28a7f861a1ac84abf595229b8c1a646599c4a30ce",
+      "drivers/EldenWifi/SidebandSource.py": "31bea018c5febe568571c25519da12de231ec5c010c9ef377936dc78c3ba1aeb",
+      "drivers/EldenWifi/SidebandPins.h": "01bbf0883b1a86acaedcc987264af072313b4bbe7506de7b58d39dc866048017"
+    }
+  },
+  "consumers": {
+    "PmicClient": {
+      "source_sha256": "cf3994a4a90d06781c8368f5757ecd321d072c56872ff404c718d7cd32ff090f",
+      "object_sha256": "6041ff93ee4731980e853a82d4582412805540027aa6f78852b1576ac9fa8084",
+      "warnings": 0
+    },
+    "WcnPowerNative": {
+      "source_sha256": "310335007de3d57b57503c9e1e594371ce94230b770a7a5030a07a8934a78a72",
+      "object_sha256": "3396e37210e1dd7b0330097ab6457abc78839b82afddf44592dae36dce23d293",
+      "warnings": 1
+    }
+  },
+  "qualification": {
+    "passed": true,
+    "mutation_cases": 61,
+    "menu_dispatch": true,
+    "countdown_and_fallback_preserved": true,
+    "actual_component_report_qualified": true,
+    "hardware_tested": false
+  },
+  "kernel": {
+    "kernel_sha256": "d61e5eb0b70958859bfb12d375db9190f7735f104f37bc7998bb2d8a75a2a486",
+    "native_sha256": "5117005edde9bc84dfe1af8ab3dfaf226b71c6a1cddd80fd553d83a0805985c6",
+    "apple_regions": 30,
+    "entry_delta": 7124
+  },
+  "package": {
+    "image_sha256": "562e846c3db874f36d44073c63c78786f7748146d3eec7cfbc598d9045f42ad3",
+    "session": "f7d71c6050ef6775",
+    "floor": [
+      1738713600,
+      0,
+      3
+    ]
+  },
+  "source_inputs": {
+    "tools/build_wifi_battery_admission.py": "102074af536802233f8339a5717c2bd1c7e472b3e9fb67a74f93fbc53e92f4e6",
+    "tools/test_wifi_battery_admission.py": "ad807b0b6f70754b6dc0934b91e2e73b114c234cc206a6f489f71c732d06572e",
+    "drivers/EldenWifi/BatteryAdmissionSource.py": "49c3016d721890626f4d4dc65e7248df59b50f5023247372d8bdb3f6ab4ecb0e",
+    "drivers/EldenWifi/BatteryAdmission.h": "ed76a4fa23b48f023e7f0928a920d1659b0cc0031068b2776265d14382467ab0",
+    "drivers/EldenWifi/BatteryAdmission.inc": "a839090772b5bfc1c08f762d00b7820263c96edf1be49a4f653c49af46bd4fc9",
+    "tools/test_wifi_sideband_pins.py": "c149914ecb847de7a0e35bc28a7f861a1ac84abf595229b8c1a646599c4a30ce",
+    "drivers/EldenWifi/SidebandSource.py": "31bea018c5febe568571c25519da12de231ec5c010c9ef377936dc78c3ba1aeb",
+    "drivers/EldenWifi/SidebandPins.h": "01bbf0883b1a86acaedcc987264af072313b4bbe7506de7b58d39dc866048017"
+  },
+  "next": "One exact sideband/config/scanning trial, then full physical return.",
+  "goal": "active and incomplete"
+}

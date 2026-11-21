@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-16",
+  "profile": "wifi-init-trace",
+  "image_sha256": "4ae415a0d7e0d627a54e98a71b77585ad4c287c99f887df6183321bece1a2e12",
+  "session": "080a6e18406e8a9e",
+  "capture": {
+    "bytes": 168563,
+    "sha256": "041a2fe619304441a737aa26acb7fc62c1a2be083c70e70cbe4dc75e96f237e2",
+    "reported_drop_max": 0,
+    "discontinuities": 0,
+    "reconnections": 0,
+    "post_disconnect_counter_available": false
+  },
+  "trace": [
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:1 nw_mainline_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:1 register_pernet_device rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:2 wiphy_sysfs_init rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:3 register_netdevice_notifier rc=0",
+    "ELDEN_ATH12K level=3 ELDEN_INIT cfg80211_core.c:4 nl80211_init rc=-16",
+    "ELDEN_ATH12K level=3 ELDEN_INIT nw_wifi.c:2 lx_init_cfg80211_init rc=-16",
+    "ELDEN_WIFI_RUNTIME start=-16 linux-stage=0 master=0 command=2",
+    "ELDEN_WIFI_RUNTIME stop=0 stage=6 reset=0/0 ctl=0 status=0 command=2 transactions=0 consumer=0"
+  ],
+  "supervisor_sha256": "ed004e6b0aaf26da87abfba18bceeb470cb4bd232f9f906569388e8801213796",
+  "stock_restored": true,
+  "stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "root_cause": {
+    "linked_implementation": "Ath12kWifi/src/nw_cfg80211_control.c:nl80211_init",
+    "failed_call": "nw_wifi_control_bind",
+    "reason": "Native caller never installed nw_wifi_control_transport_set, so bind returns NW_CONTROL_NOT_READY=3, mapped to -EBUSY=-16.",
+    "unchanged_unused_source": "out/cfg80211/nl80211.c is not this linked implementation",
+    "reference": "UniXNU-sheng e8937177309d88c93b305a57bad147fd5fac8a86 WifiProbe.cpp controlStart before nw_wifi_start"
+  },
+  "device_dma": false,
+  "firmware_upload": false,
+  "scan_or_network": false,
+  "charging_complete": false
+}

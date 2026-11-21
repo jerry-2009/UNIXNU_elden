@@ -1,0 +1,125 @@
+"""Link one service core and one native worker over the verified v173 kernel."""
+import argparse,hashlib,io,json,os,shutil,subprocess,sys,tarfile
+from pathlib import Path
+from replay_xnu_objects import global_symbols
+from link_v91_kernel import verify_original_executables,native_identity
+from audit_entry_relocation import entry
+ROOT=Path(__file__).resolve().parents[1]
+def read(p):return json.loads(p.read_text())
+def write(p,v):p.write_text(json.dumps(v,indent=2)+'\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def defs(p):return {n for n,v in global_symbols(p).items() if v[0]&0x0e}
+
+def runtime_observer_exports(snapshot):
+    additions={'_elden_wifi_assets_ready'}|({'_elden_wifi_irq_snapshot'} if snapshot else set())
+    if snapshot and snapshot.get('credit_trace'):additions.add('_elden_wifi_credit_trace')
+    if snapshot and snapshot.get('srng_trace'):additions.add('_elden_wifi_srng_first_wmi')
+    if snapshot and snapshot.get('pci_window_trace'):additions.add('_elden_wifi_pci_diag_read')
+    if snapshot and snapshot.get('ce3_flow_trace'):
+        if snapshot.get('ce3_flow_trace') is not True or not snapshot.get('pci_window_trace'):
+            raise ValueError('CE3 flow exports require the explicit window profile')
+        additions|={'_elden_wifi_ce3_flow_note','_elden_wifi_ce3_flow_dump'}
+    return additions
+
+def relocated_baseline_plan(raw,expected_sha):
+    """Prove the sole maintained-plan change is byte-identical WcnPower lookup."""
+    digest='feb9fefa74ee07e39b7f5694c5921329d0017163a6391bdd82bf64a2ae9208c0'
+    record=json.loads(raw)['providers'][digest]
+    if record!={'kind':'snapshot','path':'frozen/WcnPower-feb9fefa74ee.c','sha256':digest,'bytes':10257}:raise ValueError('Unexpected baseline provider relocation')
+    old=dict(record,kind='repository',path='drivers/EldenBluetooth/WcnPower.c')
+    current=json.dumps(record,separators=(',',':')).encode();prior=json.dumps(old,separators=(',',':')).encode()
+    if raw.count(current)!=1:raise ValueError('Ambiguous provider relocation')
+    restored=raw.replace(current,prior,1)
+    if hashlib.sha256(restored).hexdigest()!=expected_sha:raise ValueError('Baseline plan has other changes')
+    return digest
+def main():
+    if sys.flags.optimize:raise ValueError('Assertions required')
+    p=argparse.ArgumentParser(description=__doc__)
+    for n in ['parent-build','service-core','service-native','service-assets','clean-build','original-kernelcache','output']:
+        p.add_argument('--'+n,type=Path,required=True)
+    p.add_argument('--irq-snapshot-build',type=Path)
+    a=p.parse_args();parent=a.parent_build.resolve();out=a.output.resolve();prior=read(parent/'result.json')
+    assert prior['profile']=='wifi-platform-fence' and prior['platform_physical_fence']
+    for name in ['native','kernel']:assert sha(parent/(name+'.macho'))==prior[name+'_sha256']
+    core=read(a.service_core/'result.json');native=read(a.service_native/'result.json');assets=read(a.service_assets/'result.json')
+    assert sha(a.service_core/'kern_exec.o')==core['object_sha256'] and sha(a.service_native/'Native.o')==native['object_sha256']
+    assert assets==core['assets'] and native['platform_physical_fence_preserved'] and native['service_admission']
+    snapshot=read(a.irq_snapshot_build/'result.json') if a.irq_snapshot_build else None
+    assert bool(snapshot)==bool(native.get('wmi_snapshot'))
+    if snapshot:
+        assert snapshot['append_only_observer'] and snapshot['base_binding_sha256']==prior['component_objects']['WifiRuntimeMsiBinding.o']['sha256']
+        assert sha(a.irq_snapshot_build/'WifiRuntimeMsiBinding.o')==snapshot['binding_sha256']==native['irq_snapshot_binding']
+    inputs={**prior['source_inputs'],**core['source_inputs'],**native['source_inputs']}
+    policy_names=['tools/build_wifi_service_kernel.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py']
+    parent_policy_inputs={name:inputs[name] for name in policy_names if name in inputs}
+    for name in policy_names:inputs[name]=sha(ROOT/name)
+    plan_name='profiles/current-build/plan.json';provider_relocation=None
+    if plan_name in inputs and sha(ROOT/plan_name)!=inputs[plan_name]:
+        old_plan_sha=inputs[plan_name];provider_sha=relocated_baseline_plan((ROOT/plan_name).read_bytes(),old_plan_sha)
+        provider=ROOT/'profiles/current-build/frozen/WcnPower-feb9fefa74ee.c'
+        assert sha(provider)==provider_sha
+        provider_relocation={'old_plan_sha256':old_plan_sha,'new_plan_sha256':sha(ROOT/plan_name),'source_sha256':provider_sha,'only_provider_location_changed':True}
+        inputs[plan_name]=sha(ROOT/plan_name);inputs[str(provider.relative_to(ROOT))]=provider_sha
+    for name,h in inputs.items():assert sha(ROOT/name)==h,name
+    out.mkdir(parents=True,exist_ok=False);folder=out/'pcie';folder.mkdir()
+    cmd=read(parent/'link-command.json');archives=[x.split(',')[-1] for x in cmd if x.endswith('/libEldenPcie.a')];assert len(archives)==1
+    oldar=Path(archives[0]);names=[n for n in subprocess.check_output(['ar','t',oldar],text=True).splitlines() if not n.startswith('__.SYMDEF')]
+    assert len(names)==len(set(names)) and names.count('Native.o')==1
+    members={};original_members={}
+    for name in names:
+        old=subprocess.check_output(['ar','p',oldar,name]);original_members[name]=hashlib.sha256(old).hexdigest()
+        data=(a.service_native/'Native.o').read_bytes() if name=='Native.o' else old
+        if snapshot and name=='WifiRuntimeMsiBinding.o':data=(a.irq_snapshot_build/name).read_bytes()
+        if name=='Native.o':assert sha(Path(prior['component_objects'][name]['path']))==native['base_object_sha256']
+        (folder/name).write_bytes(data);members[name]=hashlib.sha256(data).hexdigest()
+    archive=folder/'libEldenPcie.a';subprocess.run(['ar','rcs',str(archive),*names],cwd=folder,env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
+    for name in names:
+        actual=subprocess.check_output(['ar','p',archive,name]);expected=(folder/name).read_bytes()
+        assert actual==expected or actual==expected+b'\n'*((-len(expected))%8),name
+    lines=(parent/'link.filelist').read_text().splitlines();cores=[n for n in lines if Path(n).name=='kern_exec.o'];assert len(cores)==1
+    assert sha(Path(cores[0]))==core['base_object_sha256']
+    inherited={n:sha(Path(n)) for n in lines}
+    for arg in cmd:
+        name=arg.split(',')[-1]
+        if name.endswith(('.o','.a')) and Path(name).is_file():inherited[name]=sha(Path(name))
+    filelist=out/'link.filelist';filelist.write_text('\n'.join(str(a.service_core/'kern_exec.o') if n==cores[0] else n for n in lines)+'\n')
+    oldlists=[x.split(',')[-1] for x in cmd if x.endswith('link.filelist')];assert len(oldlists)==1
+    cmd=[x.replace(str(parent/'native.macho'),str(out/'native.macho')).replace(str(oldar),str(archive)).replace(oldlists[0],str(filelist)) for x in cmd]
+    write(out/'link-command.json',cmd);env=dict(os.environ,CCC_OVERRIDE_OPTIONS='+-Wno-unknown-warning-option');env.pop('SDKROOT',None)
+    with (out/'link.log').open('x') as f:subprocess.run(cmd,cwd=out,env=env,stdout=f,stderr=subprocess.STDOUT,check=True)
+    additions=runtime_observer_exports(snapshot)
+    assert defs(out/'native.macho')==defs(parent/'native.macho')|additions
+    for name,h in inherited.items():assert sha(Path(name))==h,name
+    pre=read(ROOT/'profiles/v91/image-build/plan.json')['prelink'];assert sha(a.original_kernelcache)==pre['original_kernelcache_sha256']
+    kit=out/'prelink-tool';kit.mkdir()
+    with tarfile.open(fileobj=io.BytesIO(subprocess.check_output(['git','-C',str(a.clean_build/'dependencies/XnuPrelink'),'archive',pre['commit']]))) as t:t.extractall(kit,filter='data')
+    cmd=[sys.executable,str(kit/'emit_prelink.py'),'--kernel',str(out/'native.macho'),'--prelinked',str(a.original_kernelcache.resolve()),'--slide='+pre['slide'],'--output',str(out/'kernel.macho')]
+    for n in pre['roots']:cmd+=['--root',n]
+    for n in pre['early_security_initializers']:cmd+=['--early-security-init',n]
+    with (out/'prelink.log').open('x') as f:subprocess.run(cmd,cwd=out,stdout=f,stderr=subprocess.STDOUT,check=True)
+    assert verify_original_executables(out/'kernel.macho',read(out/'kernel.json'),pre['original_executable_sha256'])==30
+    before=entry((parent/'kernel.macho').read_bytes());after=entry((out/'kernel.macho').read_bytes())
+    assert before[2]==after[2] and before[1]-before[0]==after[1]-after[0]==7124
+    runtime=out/'runtime';shutil.copytree(parent/'runtime',runtime)
+    for name in ['runtime.trustcache','launchd.plist','launchd.plist.sig','EldenBtLaunchCache.h']:shutil.copyfile(runtime/name,runtime/('base-'+name))
+    for name in ['runtime.trustcache','launchd.plist','launchd.plist.sig','EldenWifiServiceAssets.h','unixnu-wpa_supplicant','wpa_supplicant.conf','org.unixnu.wifi.supplicant.plist']:
+        shutil.copyfile(a.service_assets/name,runtime/name)
+    write(runtime/'wifi-service-assets.json',assets)
+    for name in ['tools/build_wifi_service_kernel.py','tools/wifi_service_boot.py','tools/charge_verification_boot.py','tools/bt_runtime_boot.py']:
+        inputs[name]=sha(ROOT/name)
+    if native.get('control_trace') and not core.get('owner_launch_required'):raise ValueError('Control trace requires the qualified owner rule')
+    loaded_sections,loaded_commands,loaded_symbols=native_identity(out/'native.macho')
+    write(out/'native-contract.json',dict(sections=loaded_sections,commands=loaded_commands,symbols=loaded_symbols))
+    result=dict(prior);result.update(profile='wifi-ce3-flow-trace' if snapshot and snapshot.get('ce3_flow_trace') else 'wifi-pci-window-trace' if snapshot and snapshot.get('pci_window_trace') else 'wifi-srng-trace' if snapshot and snapshot.get('srng_trace') else 'wifi-credit-trace' if snapshot and snapshot.get('credit_trace') else 'wifi-wmi-snapshot' if snapshot else 'wifi-service-scan' if native.get('service_scan') else 'wifi-service-control-trace' if native.get('control_trace') else 'wifi-service-owner' if core.get('owner_launch_required') else 'wifi-service',kernel_sha256=sha(out/'kernel.macho'),native_sha256=sha(out/'native.macho'),
+        source_inputs=inputs,changed_core_objects=1,changed_native_objects=2 if snapshot else 1,added_native_objects=0,core_filelist_unchanged=False,
+        core=core,service_native=native,service_assets=assets,base_report=prior,
+        service_archive_members=members,base_archive_members=original_members,inherited_inputs=inherited,
+        parent_kernel_sha256=prior['kernel_sha256'],entry_return_target=hex(after[1]),
+        endpoint_generated_sources=native['generated_sources'],runtime_snapshot=snapshot,boot_packaged=False,hardware_tested=False)
+    result['parent_policy_inputs']=parent_policy_inputs
+    result['baseline_provider_relocation']=provider_relocation
+    result['native_identity_contract']=dict(path='native-contract.json',sha256=sha(out/'native-contract.json'),native_sha256=result['native_sha256'])
+    result['component_objects']=dict(prior['component_objects']);result['component_objects']['Native.o']={'path':str(a.service_native/'Native.o'),'sha256':native['object_sha256']}
+    if snapshot:result['component_objects']['WifiRuntimeMsiBinding.o']={'path':str(a.irq_snapshot_build/'WifiRuntimeMsiBinding.o'),'sha256':snapshot['binding_sha256']}
+    write(out/'result.json',result);print(json.dumps({k:result[k] for k in ['profile','kernel_sha256','original_apple_executables_hashed']}))
+if __name__=='__main__':main()
