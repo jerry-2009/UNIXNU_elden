@@ -93,3 +93,9 @@ lengths and disabled non-MLO tails. The real peer-association confirmation
 now returns in21ms; helper message2 is generated, but TX/WBM completion0
 and WPA2/DHCP/traffic remain unaccepted. Old donor blobs and
 older candidate/result hashes remain unchanged.
+
+The next [profile preparation](PROFILE-READY.md) change makes the helper
+prepare its real PMK before association and reply for the current socket
+session/generation. Source/ASan/UBSan/full build verification passes; its
+full hardware connection trial remains pending. It leaves data rings and
+the real key/authorization rules unchanged and samples the VDEV MAC metadata.

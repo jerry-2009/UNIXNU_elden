@@ -10,6 +10,8 @@ def defs(p):return {n for n,v in global_symbols(Path(p)).items() if v[0]&0x0e}
 def refs(p):return {n for n,v in global_symbols(Path(p)).items() if not v[0]&0x0e}
 
 def qualify_runtime(r):
+    if r.get('station_ready'):
+        return qualify_ready(r)
     if r.get('station_wire'):
         return qualify_wire(r)
     if r.get('station_diagnostic'):
@@ -41,6 +43,25 @@ def qualify_runtime(r):
     for name,digest in r['source_inputs'].items():
         if sha(ROOT/name)!=digest:raise ValueError('Station source pin differs: '+name)
     return True
+
+def qualify_ready(r):
+    if any(r.get(k) is not True for k in ['compiled','station_ready','current_session_generation_ready','queued_profile_not_ready','no_board_ring_bank_clock_timeout_change','no_payload_logging']):
+        raise ValueError('Unqualified profile-ready runtime')
+    qualify_runtime(r['base'])
+    from ProfileReadySource import station,STATION_SHA
+    if sha(r['parent_source'])!=STATION_SHA or station(Path(r['parent_source']).read_bytes())!=Path(r['source']).read_bytes():
+        raise ValueError('Readiness actual parent/source differs')
+    if sha(r['source'])!=r['source_sha256'] or sha(r['object'])!=r['object_sha256'] or len(r['retained_objects'])!=125:
+        raise ValueError('Readiness source/object boundary differs')
+    if r['command'].count('-ivfsoverlay')!=1 or r['command'][r['command'].index('-ivfsoverlay')+1]!=r['base']['overlay']:
+        raise ValueError('Readiness OEM codec overlay differs')
+    for path,digest in {**r['retained_objects'],**r['consumed_inputs']}.items():
+        if sha(path)!=digest:raise ValueError('Readiness consumed input differs')
+    if sha(r['link'][r['link'].index('-o')+1])!=r['binding_sha256']:raise ValueError('Readiness full binding differs')
+    for path,digest in r['source_inputs'].items():
+        if sha(ROOT/path)!=digest:raise ValueError('Readiness source pin differs')
+    return True
+
 
 def qualify_wire(r):
     if any(r.get(k) is not True for k in ['compiled','station_wire','mandatory_nonmlo_wire','no_board_ring_bank_clock_timeout_change','no_payload_logging']):
@@ -122,8 +143,20 @@ def qualify_native(r,folder):
 def qualify_assets(report,runtime,native,base_trust_sha):
     from wifi_service_boot import trust_append
     runtime=Path(runtime);a=read(runtime/'wifi-service-assets.json')
-    if a!=report['service_assets'] or a!=report['core']['assets'] or not a.get('station_assets') or not a.get('crypto_source_unchanged') or not a.get('crypto_self_test'):
+    if a!=report['service_assets'] or a!=report['core']['assets'] or not a.get('station_assets') or not a.get('crypto_self_test'):
         raise ValueError('Station authentication/assets differ')
+    if a.get('helper_profile_ready'):
+        if a.get('crypto_source_unchanged') is not False or a.get('crypto_algorithms_unchanged') is not True or a.get('ready_generation_status_only') is not True:
+            raise ValueError('Helper readiness scope differs')
+        from build_wifi_station_assets import source as helper_base
+        from ProfileReadySource import helper
+        expected_helper=helper(helper_base())
+    else:
+        if a.get('crypto_source_unchanged') is not True:raise ValueError('Unexpected helper source change')
+        from build_wifi_station_assets import source as helper_base
+        expected_helper=helper_base()
+    if sha(runtime/'elden-wifi-supplicant.c')!=a['helper_source_sha256'] or (runtime/'elden-wifi-supplicant.c').read_bytes()!=expected_helper:
+        raise ValueError('Actual signed helper source differs')
     if a['input_trust_sha256']!=base_trust_sha or a['credentials_included'] or (a['old_jobs_unchanged'],a['jobs'],a['new_trust_entries'])!=(561,562,2):
         raise ValueError('Station cache/trust parent differs')
     for name,key in [('launchd.plist','cache_sha256'),('launchd.plist.sig','signature_sha256'),('EldenWifiServiceAssets.h','header_sha256'),
@@ -150,10 +183,12 @@ def qualify_components(report):
     qualify_native(report['station_worker'],folder)
     if parent['kernel_sha256']!=report['station_parent_kernel_sha256'] or report['profile']!='wifi-network-17':raise ValueError('Station parent differs')
     original=report['station_runtime']
-    while original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire'):original=original['base']
+    while original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire') or original.get('station_ready'):original=original['base']
     if original['scan_parent']!=parent['portable_scan_runtime']:raise ValueError('Station scan chain differs')
     if report['network_bridge']!=parent['network_bridge'] or report['optional_runtime']!=parent['optional_runtime']:
         raise ValueError('Station OS bridge/rules changed')
+    if bool(report['station_runtime'].get('station_ready'))!=bool(report['service_assets'].get('helper_profile_ready')):
+        raise ValueError('Readiness kernel/helper pairing differs')
     if report['entry_delta']!=7124 or report['original_apple_executables_hashed']!=30 or not report['original_physical_return_preserved']:
         raise ValueError('Station entry/return changed')
     for name,digest in report['source_inputs'].items():

@@ -9,7 +9,8 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for n in ['parent-kernel','assets','clean-build','llvm','output']:p.add_argument('--'+n,type=Path,required=True)
     a=p.parse_args();prior=json.loads((a.parent_kernel/'result.json').read_text());row=prior['core'];assets=json.loads((a.assets/'result.json').read_text())
-    if not assets.get('station_assets') or not assets['crypto_source_unchanged'] or assets['credentials_included']:raise ValueError('Invalid station assets')
+    qualified_crypto=assets.get('crypto_source_unchanged') or assets.get('helper_profile_ready') and assets.get('crypto_algorithms_unchanged')
+    if not assets.get('station_assets') or not qualified_crypto or assets['credentials_included']:raise ValueError('Invalid station assets')
     out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);cmd=list(row['command']);ov=json.loads(Path(cmd[cmd.index('-ivfsoverlay')+1]).read_text())
     replacements={};inherited={};changes=[]
     for item in ov['roots']:

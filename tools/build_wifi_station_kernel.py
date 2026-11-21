@@ -18,7 +18,7 @@ def main():
     from wifi_station import qualify_runtime,qualify_native
     qualify_runtime(runtime);qualify_native(worker,a.native_build)
     original=runtime
-    while original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire'):original=original['base']
+    while original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire') or original.get('station_ready'):original=original['base']
     if original['scan_parent']!=prior['portable_scan_runtime'] or core['base']!=prior['core'] or worker['base']!=prior['network_worker'] or core['assets']!=assets:
         raise ValueError('Station actual component parents differ')
     for name in ['native','kernel']:
@@ -56,7 +56,7 @@ def main():
     s,c,h=native_identity(out/'native.macho');write(out/'native-contract.json',dict(sections=s,commands=c,symbols=h))
     from shutil import copytree,copyfile
     copytree(parent/'runtime',out/'runtime')
-    for name in ['launchd.plist','launchd.plist.sig','EldenWifiServiceAssets.h','unixnu-wpa_supplicant','wpa_supplicant.conf','runtime.trustcache','org.unixnu.wifi.supplicant.plist']:
+    for name in ['launchd.plist','launchd.plist.sig','EldenWifiServiceAssets.h','unixnu-wpa_supplicant','wpa_supplicant.conf','runtime.trustcache','org.unixnu.wifi.supplicant.plist','elden-wifi-supplicant.c']:
         copyfile(a.assets/name,out/'runtime'/name)
     write(out/'runtime/wifi-service-assets.json',assets)
     policy=['tools/build_wifi_station_kernel.py','tools/wifi_station.py','tools/wifi_network17_boot.py','tools/charge_verification_boot.py']
@@ -66,7 +66,7 @@ def main():
     # Require all effective native/runtime pins to win; verify separately that
     # the signed helper/source has not changed in the asset qualifier.
     def live_inputs(value):
-        inherited=live_inputs(value['base']) if value.get('station_hif') or value.get('station_diagnostic') or value.get('station_wire') else {}
+        inherited=live_inputs(value['base']) if value.get('station_hif') or value.get('station_diagnostic') or value.get('station_wire') or value.get('station_ready') else {}
         inherited.update(value['source_inputs']);return inherited
     inputs.update(live_inputs(runtime));inputs.update(worker['source_inputs'])
     for n,h in inputs.items():
