@@ -1,10 +1,6 @@
 # Elden 当前状态 · 2026-11-21
 
-最新OEM命令格式修补实机收到PEER_ASSOC确认（21ms），VDEV/auth/assoc与helper message2通过；
-仍4个EAPOL RX／4TX提交、完成0／ACK0／keys0／port0。该轮快照TCL HP32/TP8、WBM0/0。
-[最新实录](evidence/wifi-station-wire-hardware-20261121.json)。前一轮TCL消费全部3描述符的
-[独立实录](evidence/wifi-station-tx-hardware-20261121.json)保持；不能混作本轮终态。
-下一步核本机OEM数据TX路由／bank与VDEV响应物理MAC字段，不重复wire/wake/credit/BAR单项试验。
+最新候选 `9c9fc5d3` 已实机确认 PMK 就绪、PEER_ASSOC 21ms、EAPOL RX/TX 各 1。TCL 快照 HP=TP=8 words，WBM 仍为零。实机走 legacy PHY，EAPOL 描述符采用 TID 0。[最新实录](evidence/wifi-station-tx-priority-hardware-20261121.json)
 Mac本周整理已完成，137项旧产物及18项临时内容仅入Trash，未清空。
 
 Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚未完成WPA2／DHCP／可用流量。
@@ -23,16 +19,12 @@ Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚�
 | 蓝牙 | 原厂HCI／用户态与扫描链已有阶段性记录，Settings选项可见 | 配对、双向数据、持续使用／睡眠 |
 | 其他外设 | offline-peripheral-fixes独立成果，GPU独立工作树 | 主线评审／集成／实机；马达和喇叭未经校准保持禁用 |
 
-最新Wi-Fi源提交 `0573b38`，候选SHA
-`61f9066fa6cb26c102528454ce5426072635acef3f4e8ceecd06d40f9e134a53`，
-session `fa7b794966c5f32c`。EAPOL4RX／4TX提交，无message3／密钥／端口授权；提交不等于RF发送或ACK。
-[当前实机证据](evidence/wifi-station-wire-hardware-20261121.json)／[实现](../drivers/EldenWifi/portable/station/OEM-WIRE.md)。
+实机源提交 `c62a26e`，session `80ad897d6443755d`。当前仍缺 message 3、密钥和端口授权。按成功供体的 legacy 模式与固件 EAPOL 完成路径继续核对。[Wi-Fi 状态](WIFI-STATUS.md)
 扫描通过来自前一份[8ecacf44实录](evidence/wifi-portable-scan-hardware-20261120.json)，不是host模型。
 
 平板已完整恢复stock Android、root、green、原充电／无线／扫描设置并请求熄屏。所有设备任务已结束。
 协议teardown超时，独立BM-off／transaction idle／MSI4／PERST-low和物理fastboot通过；
-不把这些混称为暖MHI复位成功。最新日志354403B/drop最大2、无重连；USB断开后计数未知。
-受控退出时另有UMAC timeout；它不能反推为首个TX失败原因。
+暖 MHI 复位待验证。最新日志 441810 B，观测掉字计数最高 87，无重连。设备已由用户带走，进入离线阶段。
 
 源码唯一入口是本仓main。新克隆在工作台research，研究笔记在lab/reference-reviews。
 完整Goal active，当前重点为数据发送完成→WPA2→DHCP／流量；之后回到电源剩余验收。

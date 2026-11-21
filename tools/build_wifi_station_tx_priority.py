@@ -1,4 +1,4 @@
-"""Rebuild the profile-ready station object with EAPOL WMM priority."""
+"""Rebuild the profile-ready station object with a selected TX adaptation."""
 
 import argparse
 import json
@@ -10,19 +10,28 @@ from pathlib import Path
 from build_wifi_station_ready import ROOT, STA, defs, refs, sha
 from replay_xnu_objects import sections
 from wifi_station import qualify_runtime
-from StationTxPriority import station
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('parent-build', 'llvm', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--oem-metadata', action='store_true',
+                        help='Pair the stock HTT version request with OEM TCL metadata')
     args = parser.parse_args()
+    if args.oem_metadata:
+        from StationOemMetadata import station
+        source_recipe = 'StationOemMetadata.py'
+        flag = 'oem_tcl_v1'
+    else:
+        from StationTxPriority import station
+        source_recipe = 'StationTxPriority.py'
+        flag = 'eapol_voice'
     parent = args.parent_build.resolve()
     output = args.output.resolve()
     prior = json.loads((parent / 'result.json').read_text())
     qualify_runtime(prior)
-    if not prior.get('station_ready') or prior.get('eapol_voice'):
+    if not prior.get('station_ready') or prior.get('eapol_voice') or prior.get('oem_tcl_v1'):
         raise ValueError('Expected the original profile-ready station build')
 
     generated = station(Path(prior['source']).read_bytes())
@@ -63,11 +72,12 @@ def main():
         raise ValueError('TX priority changed the combined runtime interface')
 
     pins = dict(prior['source_inputs'])
-    for path in (Path(__file__).resolve(), STA / 'StationTxPriority.py'):
+    for path in (Path(__file__).resolve(), STA / source_recipe):
         pins[path.relative_to(ROOT).as_posix()] = sha(path)
-    result = dict(prior, eapol_voice=True, source=str(source), source_sha256=sha(source),
+    result = dict(prior, source=str(source), source_sha256=sha(source),
                   object=str(obj), object_sha256=sha(obj), command=cmd, consumed_inputs=consumed,
                   link=link, binding_sha256=sha(binding), source_inputs=pins, hardware_tested=False)
+    result[flag] = True
     qualify_runtime(result)
     (output / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'compiled': True, 'binding_sha256': result['binding_sha256']}))

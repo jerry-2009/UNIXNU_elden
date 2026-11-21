@@ -51,9 +51,14 @@ def qualify_ready(r):
     from ProfileReadySource import station,STATION_SHA
     parent_source=Path(r['parent_source']).read_bytes()
     expected_source=station(parent_source)
+    if r.get('eapol_voice') is True and r.get('oem_tcl_v1') is True:
+        raise ValueError('Conflicting station transmit formats')
     if r.get('eapol_voice') is True:
         from StationTxPriority import station as with_tx_priority
         expected_source=with_tx_priority(expected_source)
+    if r.get('oem_tcl_v1') is True:
+        from StationOemMetadata import station as with_oem_metadata
+        expected_source=with_oem_metadata(expected_source)
     if sha(r['parent_source'])!=STATION_SHA or expected_source!=Path(r['source']).read_bytes():
         raise ValueError('Readiness actual parent/source differs')
     if sha(r['source'])!=r['source_sha256'] or sha(r['object'])!=r['object_sha256'] or len(r['retained_objects'])!=125:

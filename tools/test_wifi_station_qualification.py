@@ -53,6 +53,12 @@ def main():
             try:qualify_components(changed)
             except (ValueError,KeyError):count+=1
             else:raise AssertionError('Malformed profile readiness accepted: '+name)
+    if r['station_runtime'].get('oem_tcl_v1'):
+        changed=copy.deepcopy(r)
+        changed['station_runtime']['oem_tcl_v1']=False
+        try:qualify_components(changed)
+        except (ValueError,KeyError):count+=1
+        else:raise AssertionError('OEM metadata derivation accepted without its format declaration')
     q=dict(r,**assets,network_bridge=True,mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,segmented_memory=True,
       unique_memory=True,prefault_memory=True,mhi_runtime=True,control_transport_bound=True,firmware_qdss_config=True,runtime_owned_cleanup=True,
       runtime_platform_shutdown=True,runtime_platform_budget=True,platform_physical_fence=True)
