@@ -19,6 +19,7 @@ def main():
     for n in ('clean-build','parent-build','original-kernelcache','llvm','output'):p.add_argument('--'+n,type=Path,required=True)
     p.add_argument('--window-handoff',action='store_true',help='Release explicit bypass when returning to firmware-managed windows')
     p.add_argument('--link-recovery',action='store_true',help='Retain possible manual charge inhibit across transport loss; recompile both consumers')
+    p.add_argument('--pd-parent',action='store_true',help='Apply link recovery over the qualified PD/backlight parent')
     p.add_argument('--translation-survey',action='store_true',help='Window variant plus one SPMI page translation survey; no FIFO access')
     p.add_argument('--backlight-service',action='store_true',help='Rebuild the backlight boot alias over the qualified window parent')
     p.add_argument('--backlight-power-trial',action='store_true',help='Use the existing dim/restore path with bounded observation timing')
@@ -31,6 +32,7 @@ def main():
     p.add_argument('--ufs-queue-trial',action='store_true',help='Owned DMA, multi-slot queue and QD1/8/32 trial over the verified IRQ parent')
     p.add_argument('--ufs-idle-trial',action='store_true',help='Stock5000us automatic Hibern8 with idle/read/restore validation')
     a=p.parse_args();base=a.clean_build.resolve();parent=a.parent_build.resolve();out=a.output.resolve()
+    if a.pd_parent and not a.link_recovery:raise ValueError('--pd-parent requires --link-recovery')
     if a.link_recovery:
         if any((a.translation_survey,a.backlight_service,a.backlight_power_trial,a.pd_power_trial,
                 a.cpu_power_observation,a.cpu_governor,a.storage_medium,a.early_storage_guard,
@@ -56,12 +58,16 @@ def main():
     if a.link_recovery:
         from LinkSource import policy as link_policy,client as link_client,header as link_header
         policy_derive=link_policy;client_derive=link_client;generated_policy_header=link_header()
+        if a.pd_parent:
+            from PdStartupSource import recovery_client
+            client_derive=recovery_client
     if a.translation_survey:
         if not a.window_handoff:raise ValueError('Translation survey requires --window-handoff')
         from TranslationSource import client as translation_client
         client_derive=translation_client
     if out.exists():raise ValueError('Fresh output required')
     contract='profiles/backlight-power-trial/native-contract.json' if a.pd_power_trial else 'profiles/charge-window-handoff/native-contract.json' if a.backlight_service else 'profiles/bt-address17/native-contract.json'
+    if a.pd_parent:contract='profiles/pd-power-trial/native-contract.json'
     if a.cpu_power_observation:contract='profiles/pd-power-trial/native-contract.json'
     if a.cpu_governor:contract='profiles/cpu-power-observation/native-contract.json'
     if a.storage_medium:contract='profiles/cpu-power-observation/native-contract.json'
@@ -72,6 +78,10 @@ def main():
     c=read(ROOT/contract)
     assert native_identity(parent/'native.macho')==(c['sections'],c['commands'],c['symbols'])
     parent_report=read(parent/'result.json');assert sha(parent/'kernel.macho')==parent_report['kernel_sha256']
+    if a.pd_parent:
+        from PdStartupSource import client as pd_client
+        assert parent_report['profile']=='pd-power-trial'
+        assert hashlib.sha256(pd_client()).hexdigest()==parent_report['native_objects']['PmicClient']['source_sha256']
     rows=read(base/'native/build/results.json');capture=read(base/'native/capture.json')
     virtual_root=read(ROOT/'profiles/v91/native-build/plan.json')['virtual_root'].rstrip('/')
     out.mkdir(parents=True);(out/'source').mkdir();records={};objects={};object_archives={};inherited={}
@@ -121,7 +131,7 @@ def main():
                 assert sha(f)==expected;item['external-contents']=str(source);bindings.append(item['name'])
                 if unit=='PmicClient':extra.append({'type':'file','name':str(Path(item['name']).parent/'ChargeVerification.h'),'external-contents':str(ROOT/'drivers/EldenPmicGlink/ChargeVerification.h')})
                 if unit=='PmicClient' and a.translation_survey:extra.append({'type':'file','name':str(Path(item['name']).parent/'TranslationSurvey.h'),'external-contents':str(ROOT/'drivers/EldenUsbThermal/TranslationSurvey.h')})
-                if a.pd_power_trial:
+                if a.pd_power_trial or (a.pd_parent and unit=='PmicClient'):
                     headers=['PdObservation.h','PdCompletion.h'] if unit=='PmicClient' else ['PdObservation.h']
                     for header in headers:extra.append({'type':'file','name':str(Path(item['name']).parent/header),'external-contents':str(ROOT/'drivers/EldenPmicGlink'/header)})
                 if a.cpu_power_observation or a.cpu_governor:
@@ -145,7 +155,7 @@ def main():
         result=subprocess.run(cmd,cwd=cwd,capture_output=True);(out/(unit+'.log')).write_bytes(result.stdout+result.stderr);result.check_returncode()
         if expected_objcopy:
             late=out/(unit+'.late.o');subprocess.run([str(a.llvm/'llvm-objcopy'),*expected_objcopy,str(obj),str(late)],check=True);obj=late
-        added={'_elden_pd_power_observation'} if a.pd_power_trial and unit=='PmicClient' else set()
+        added={'_elden_pd_power_observation'} if (a.pd_power_trial or a.pd_parent) and unit=='PmicClient' else set()
         if a.cpu_governor:added={'_elden_cpu_governor_request_stop'}
         assert exports(obj)==exports(old)|added and not any(k.endswith('/__mod_init_func') for k in sections(obj))
         if a.cpu_governor:
@@ -224,6 +234,7 @@ def main():
     if a.backlight_service:files += [ROOT/'drivers/EldenBacklight/BootSource.py',ROOT/'drivers/EldenBacklight/BacklightRuntime.cpp']
     if a.backlight_power_trial:files.append(ROOT/'drivers/EldenBacklight/PowerTrialSource.py')
     if a.pd_power_trial:files += [ROOT/'drivers/EldenPmicGlink'/n for n in ('PdObservation.h','PdCompletion.h','PdStartupSource.py')]+[ROOT/'drivers/EldenBacklight/PdPowerSource.py']
+    if a.pd_parent:files += [ROOT/'drivers/EldenPmicGlink'/n for n in ('PdObservation.h','PdCompletion.h','PdStartupSource.py')]
     if a.cpu_power_observation:files += [ROOT/'drivers/EldenCpuPower'/n for n in ('SurveySource.py','Survey.inc','CpuLoad.h')]+[ROOT/'drivers/EldenPmicGlink/PdObservation.h',ROOT/'profiles/v91/sources/power/CpuPerfSurvey.cpp']
     if a.cpu_governor:files += [ROOT/'drivers/EldenCpuPower'/n for n in ('RuntimeSource.py','Runtime.inc','SurveySource.py','Survey.inc','CpuLoad.h','GovernorControl.h','GovernorSource.py','upstream/CpuFreqGovernor.h','upstream/source.json','upstream/LICENSE')]+[ROOT/'drivers/EldenPmicGlink/PdObservation.h',ROOT/'profiles/v91/sources/power/CpuPerfSurvey.cpp',ROOT/'profiles/v91/sources/power/EldenScmiPerf.h',ROOT/'profiles/v91/sources/power/CpuPerfAccess.h',ROOT/'profiles/current-build/plan.json',ROOT/'profiles/v97-wcn/EldenSdamRecovery.inc',ROOT/'tools/cpu_governor_build.py']
     if a.storage_medium or a.early_storage_guard:
@@ -244,6 +255,7 @@ def main():
     if a.window_handoff:report['profile']='charge-window-handoff'
     if a.link_recovery:
         report['profile']='charge-link-recovery';report['manual_inhibit_survives_transport_loss']=True
+        if a.pd_parent:report['profile']='charge-link-pd'
         report['generated_policy_header_sha256']=sha(out/'source/ChargePolicy.h')
         loaded_sections,loaded_commands,loaded_symbols=native_identity(out/'native.macho')
         write(out/'native-contract.json',dict(sections=loaded_sections,commands=loaded_commands,symbols=loaded_symbols))

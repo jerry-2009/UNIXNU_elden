@@ -91,11 +91,11 @@ def main():
     if a.charge_link_recovery:
         if a.variant!='bluetooth' or not a.bt_address17:
             raise ValueError('--charge-link-recovery requires the qualified Bluetooth/address17 chain')
-        if any((a.spmi_translation_survey,a.backlight_service,a.backlight_power_trial,
-                a.pd_power_trial,a.pd_gui,a.cpu_power_observation,a.cpu_governor,
+        if any((a.spmi_translation_survey,(a.backlight_service and not a.pd_gui),
+                a.cpu_power_observation,a.cpu_governor,
                 a.storage_medium,a.early_storage_guard,a.ufs_wait_trial,
                 a.ufs_queue_trial,a.ufs_idle_trial,a.data_capacity_2g)):
-            raise ValueError('--charge-link-recovery requires its separate charge/address17 chain')
+            raise ValueError('--charge-link-recovery requires the address17 or --pd-gui charge chain')
         a.charge_window_handoff=True
     if a.charge_window_handoff:a.charge_verification=True
     if a.charge_verification and not a.bt_address17:raise ValueError('--charge-verification currently requires the qualified --bt-address17 baseline')
@@ -257,8 +257,9 @@ def main():
         stage('bt-address17',script('build_bt_address17.py','--clean-build',out,'--process-build',out/'bt-process-lifetime','--scan-runtime',out/'bt-address-runtime/runtime','--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'bt-address17'),'bt-address17/result.json')
         kernel_folder=out/'bt-address17';runtime_folder=kernel_folder/'runtime'
     if a.charge_verification:
-        charge_name='charge-link-recovery' if a.charge_link_recovery else 'charge-window-handoff' if a.charge_window_handoff else 'charge-verification'
-        charge_args=['--link-recovery'] if a.charge_link_recovery else ['--window-handoff'] if a.charge_window_handoff else []
+        early_link_recovery=a.charge_link_recovery and not a.pd_gui
+        charge_name='charge-link-recovery' if early_link_recovery else 'charge-window-handoff' if a.charge_window_handoff else 'charge-verification'
+        charge_args=['--link-recovery'] if early_link_recovery else ['--window-handoff'] if a.charge_window_handoff else []
         if a.spmi_translation_survey:charge_name='spmi-translation-survey';charge_args+=['--translation-survey']
         stage(charge_name,script('build_charge_verification.py','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/charge_name,*charge_args),charge_name+'/result.json')
         kernel_folder=out/charge_name;runtime_folder=kernel_folder/'runtime'
@@ -270,6 +271,9 @@ def main():
     if a.pd_power_trial:
         stage('pd-power-trial',script('build_charge_verification.py','--pd-power-trial','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'pd-power-trial'),'pd-power-trial/result.json')
         kernel_folder=out/'pd-power-trial';runtime_folder=kernel_folder/'runtime'
+    if a.charge_link_recovery and a.pd_gui:
+        stage('charge-link-pd',script('build_charge_verification.py','--link-recovery','--pd-parent','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'charge-link-pd'),'charge-link-pd/result.json')
+        kernel_folder=out/'charge-link-pd';runtime_folder=kernel_folder/'runtime'
     if a.cpu_power_observation:
         stage('cpu-power-observation',script('build_charge_verification.py','--cpu-power-observation','--clean-build',out,'--parent-build',kernel_folder,'--original-kernelcache',inputs['original_kernelcache'],'--llvm',inputs['llvm'],'--output',out/'cpu-power-observation'),'cpu-power-observation/result.json')
         kernel_folder=out/'cpu-power-observation';runtime_folder=kernel_folder/'runtime'

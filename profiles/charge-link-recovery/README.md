@@ -103,6 +103,19 @@ For an existing **source-built** address17 parent:
   --llvm /path/to/llvm/bin --output out/charge-link
 ```
 
+For one functional window covering PD and normal GUI brightness, add
+`--pd-gui` to the full clean-build command above. The build first produces
+the v144 PD kernel, then applies link recovery to that parent. An incremental
+build can use `--link-recovery --pd-parent` against a qualified
+`pd-power-trial` parent, then pass `--pd-gui` to both the packer and auditor.
+The combined PMIC client retains PD observation and defers battery policy
+changes while the PD startup handoff is active.
+
+CiscoMac built this combined variant incrementally over v144 and reused the
+backlight archive. The signed image `f6352810`, session `bd8811563167f017`,
+passed static audit. The combined empty-output build and hardware acceptance
+remain pending. [Combined build evidence](../../docs/evidence/charge-link-pd-20261122.json)
+
 Host validation:
 
 ```sh

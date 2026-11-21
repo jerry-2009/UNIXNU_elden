@@ -2,7 +2,21 @@
 from VerificationSource import client as verified_client,replace
 
 def client():
-    text=verified_client().decode('utf-8')
+    return with_pd_observation(verified_client())
+
+def recovery_client():
+    from LinkSource import client as link_client
+    text=with_pd_observation(link_client()).decode('utf-8')
+    return replace(text, 'const bool allowed=stable&&poll.committed.value[EldenChargePresent]',
+        '''/* The startup handoff temporarily owns the input limit. Wait
+                 * until its transition ends before changing battery policy. */
+                const bool pdSettled=bootMode!=2||
+                    ((bootstrap.phase==EldenPdBootDone||bootstrap.phase==EldenPdBootFailed)&&
+                     !icl.suspend_requested&&!icl.quarantined);
+                const bool allowed=stable&&pdSettled&&poll.committed.value[EldenChargePresent]''').encode('utf-8')
+
+def with_pd_observation(source):
+    text=source.decode('utf-8')
     text=replace(text,'#include "PdBootstrap.h"','#include "PdBootstrap.h"\n#include "PdCompletion.h"')
     text=replace(text,'static unsigned usbIclSends;','static unsigned usbIclSends;\nstatic volatile uint64_t pdObservation;\nstatic unsigned pdObservationSeen=EldenPdUnavailable;')
     text=replace(text,'PE_parse_boot_argn("elden-pd-bootstrap",&bootMode,sizeof(bootMode));',

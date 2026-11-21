@@ -14,7 +14,7 @@ def load_native_contract(folder,report,profile,*,wifi_service=False):
     declared=report.get('native_identity_contract')
     if declared is None:
         return json.loads((ROOT/'profiles'/profile/'native-contract.json').read_text())
-    if not (wifi_service or profile=='charge-link-recovery') or set(declared)!={'path','sha256','native_sha256'} or declared['path']!='native-contract.json':
+    if not (wifi_service or profile in ('charge-link-recovery','charge-link-pd')) or set(declared)!={'path','sha256','native_sha256'} or declared['path']!='native-contract.json':
         raise ValueError('Invalid generated native identity declaration')
     artifact=Path(folder)/'native.macho';contract=Path(folder)/'native-contract.json'
     if declared['native_sha256']!=report['native_sha256'] or sha(artifact)!=declared['native_sha256'] or sha(contract)!=declared['sha256']:
@@ -26,6 +26,8 @@ def qualify_charge_link_pair(folder,report):
     """Check both compiled consumers, including every state-header alias."""
     sys.path.insert(0,str(ROOT/'drivers/EldenPmicGlink'))
     from LinkSource import policy,client,header
+    if report.get('profile')=='charge-link-pd':
+        from PdStartupSource import recovery_client as client
     folder=Path(folder)
     expected_header=header();wanted_header=hashlib.sha256(expected_header).hexdigest()
     header_path=(folder/'source/ChargePolicy.h').resolve()
@@ -61,8 +63,8 @@ def qualify(report_path,entry_path,runtime):
     if profile=='ufs-wait-trial':units={'ArmCpu','ShengUfs'}
     if profile=='ufs-queue-trial':units={'ShengUfs'}
     if profile=='ufs-idle-trial':units={'ShengUfs'}
-    if profile not in ('charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
-    if profile=='charge-link-recovery':
+    if profile not in ('charge-verification','charge-window-handoff','charge-link-recovery','charge-link-pd','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial') or r['changed_core_objects']!=0 or r['changed_native_objects']!=len(units) or set(r['native_objects'])!=units or not r['core_filelist_unchanged'] or not r['scalar']:raise ValueError('Wrong diagnostic build')
+    if profile in ('charge-link-recovery','charge-link-pd'):
         qualify_charge_link_pair(folder,r)
     if profile in ('ufs-queue-trial','ufs-idle-trial'):
         sys.path.insert(0,str(ROOT/'drivers/EldenUfsQueue'));import NativeSource as q

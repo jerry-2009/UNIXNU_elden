@@ -23,7 +23,7 @@ def qualify(report_path,entry_path,runtime):
     if name in ('wifi-platform-fence','wifi-platform-budget','wifi-platform-shutdown','wifi-qmi-wire-trace','wifi-stop-trace','wifi-drain-lifetime','wifi-qdss-config','wifi-control-transport','wifi-init-trace','wifi-mhi-runtime','pcie-root-trial','pcie-endpoint-trial','smmu-domain-trial','smmu-memory-detail','smmu-segmented-memory','smmu-unique-memory','smmu-prefault-memory'):
         from pcie_root_boot import qualify as qualify_pcie
         return qualify_pcie(report_path,entry_path,runtime)
-    if name in ('charge-verification','charge-window-handoff','charge-link-recovery','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
+    if name in ('charge-verification','charge-window-handoff','charge-link-recovery','charge-link-pd','spmi-translation-survey','backlight-service','backlight-power-trial','pd-power-trial','cpu-power-observation','cpu-governor','storage-medium','early-storage-guard','early-storage-stall','ufs-wait-trial','ufs-queue-trial','ufs-idle-trial'):
         from charge_verification_boot import qualify as qualify_charge
         return qualify_charge(report_path,entry_path,runtime)
     if name=='bt-address17':
@@ -113,15 +113,17 @@ def qualify(report_path,entry_path,runtime):
     return result
 def pd_gui(qualification):
     """Select the existing GUI brightness branch after full PD-kernel qualification."""
-    if not qualification or qualification.get('profile')!='pd-power-trial' or qualification.get('table_count')!=59 or qualification.get('key_state')!=2:
+    if not qualification or qualification.get('profile') not in ('pd-power-trial','charge-link-pd') or qualification.get('table_count')!=59 or qualification.get('key_state')!=2:
         raise ValueError('PD GUI requires the qualified PD integration kernel')
-    return dict(qualification,profile='pd-gui',native_profile='pd-power-trial',menu_only_gui=True)
+    return dict(qualification,profile='pd-gui',native_profile=qualification['profile'],menu_only_gui=True)
 
 def early_stall(qualification):
     if not qualification or qualification.get('profile')!='early-storage-guard':raise ValueError('Stall requires qualified early-guard kernel')
     return dict(qualification,profile='early-storage-stall',native_profile='early-storage-guard',controlled_stall=True)
 
 def menu(qualification=None):
+    if qualification and qualification.get('profile')=='charge-link-pd':
+        raise ValueError('Charge link recovery over PD requires --pd-gui')
     if qualification and qualification.get('profile')=='wifi-network-17':
         from wifi_network17_boot import menu as network_menu
         return network_menu(qualification)

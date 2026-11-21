@@ -14,6 +14,7 @@ from unittest import mock
 
 import build_charge_verification
 import build_clean
+import bt_runtime_boot
 from charge_verification_boot import qualify_charge_link_pair, load_native_contract
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -25,15 +26,17 @@ def sha(data):return hashlib.sha256(data).hexdigest()
 
 
 class ChargeLinkQualification(unittest.TestCase):
-    def fixture(self):
+    def fixture(self, combined=False):
         temporary=tempfile.TemporaryDirectory(prefix='y700-charge-qualify-')
         self.addCleanup(temporary.cleanup)
         folder=Path(temporary.name);(folder/'source').mkdir()
         generated_header=header();header_path=folder/'source/ChargePolicy.h'
         header_path.write_bytes(generated_header)
-        report=dict(profile='charge-link-recovery',manual_inhibit_survives_transport_loss=True,
+        report=dict(profile='charge-link-pd' if combined else 'charge-link-recovery',manual_inhibit_survives_transport_loss=True,
                     generated_policy_header_sha256=sha(generated_header),native_objects={})
-        for unit,name,data in [('ChargePolicy','ChargePolicy.c',policy()),('PmicClient','PmicClient.cpp',client())]:
+        from PdStartupSource import recovery_client
+        pmic_source=recovery_client() if combined else client()
+        for unit,name,data in [('ChargePolicy','ChargePolicy.c',policy()),('PmicClient','PmicClient.cpp',pmic_source)]:
             (folder/'source'/name).write_bytes(data)
             obj=(unit+' modeled object').encode();(folder/(unit+'.o')).write_bytes(obj)
             aliases=['/frozen/ChargePolicy.h','/build/project/ChargePolicy.h']
@@ -45,6 +48,16 @@ class ChargeLinkQualification(unittest.TestCase):
 
     def test_compiled_pair_accepts_derived_aliases(self):
         folder,report=self.fixture();qualify_charge_link_pair(folder,report)
+
+    def test_combined_requires_matching_pmic_source_and_gui_packaging(self):
+        folder,report=self.fixture(combined=True);qualify_charge_link_pair(folder,report)
+        report['profile']='charge-link-recovery'
+        with self.assertRaisesRegex(ValueError,'source/header pairing'):qualify_charge_link_pair(folder,report)
+        qualification=dict(profile='charge-link-pd',table_count=59,key_state=2)
+        with self.assertRaisesRegex(ValueError,'requires --pd-gui'):bt_runtime_boot.menu(qualification)
+        gui=bt_runtime_boot.pd_gui(qualification)
+        self.assertEqual(gui['native_profile'],'charge-link-pd')
+        self.assertIn('ebl=6',bt_runtime_boot.menu(gui))
 
     def test_missing_or_mismatched_consumer_rejected(self):
         for unit in ('ChargePolicy','PmicClient'):
@@ -100,13 +113,14 @@ class ChargeLinkQualification(unittest.TestCase):
                 '--bt-address17','--charge-link-recovery']
 
     def test_clean_chain_reaches_native_platform_guard(self):
-        with mock.patch.object(sys,'argv',self.clean_arguments()),mock.patch.object(sys,'platform','win32'):
-            with self.assertRaisesRegex(SystemExit,'Native build requires macOS'):build_clean.main()
+        for options in ([],['--pd-gui']):
+            with mock.patch.object(sys,'argv',self.clean_arguments()+options),mock.patch.object(sys,'platform','win32'):
+                with self.assertRaisesRegex(SystemExit,'Native build requires macOS'):build_clean.main()
 
     def test_clean_chain_rejects_missing_prerequisite_and_mixed_options(self):
         base=self.clean_arguments()
         for option in ('--spmi-translation-survey','--backlight-service','--backlight-power-trial',
-                       '--pd-power-trial','--pd-gui','--cpu-power-observation','--cpu-governor',
+                       '--pd-power-trial','--cpu-power-observation','--cpu-governor',
                        '--storage-medium','--early-storage-guard','--ufs-wait-trial',
                        '--ufs-queue-trial','--ufs-idle-trial','--data-capacity-2g'):
             with self.subTest(option=option),mock.patch.object(sys,'argv',base+[option]):

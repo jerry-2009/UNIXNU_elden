@@ -1,5 +1,10 @@
 # 充电当前状态 · 2026-11-22
 
+合并候选 `f6352810` 已签名并通过独立审查。该镜像在 v144 的 PD 内核上重编 PMIC
+客户端和充电策略，复用 v145 实测使用的背光对象，菜单走正常 GUI 亮度。PD 启动交接期间
+暂缓充电策略切换。整像已转存 Windows 工作台，回滚仍为 1738713600／0／3。尚未刷入。
+[合并候选](evidence/charge-link-pd-20261122.json)
+
 最新原厂快照为 100%／Full，电池净电流 0 mA。两个 UCSI 连接器均在线，第二口报告
 5 V／3 A，原厂 USB 电源驱动仍报告 SDP、输入限额 500 mA，观测电流 47 mA。
 四代参考的 UCSI `current_now` 在 PD 模式取自 RDO。验收时用同期表计与双 FG 判定
@@ -23,8 +28,7 @@ PMIC GLINK 断链后，旧候选可能重放已选旁路。主线现在取消旧
 遥测后恢复原厂窗口及可能残留的手动停充状态。这条路径可独立于主机恢复命令运行。34 项
 主机断链场景及 CiscoMac ARM64 整核链接通过。签名候选 `f68f681d` 已通过独立静态审查，
 session `f642cda0d1e652d5`，回滚索引 1738713600／0／3。Windows 工作台的副本已核对整像摘要。
-此候选用于验证 GLINK 恢复，沿用 address17 电源基线。v145 的 PD 初始化与 GUI 背光属于
-独立 profile，仍须在对应构建验收。[构建证据](evidence/charge-link-auto-stock-20261122.json)
+该独立候选沿用 address17 电源基线。[构建证据](evidence/charge-link-auto-stock-20261122.json)
 
 此前空目录 clean build 候选 SHA `89d37ae3c38a1053805a0ecb3c0b90423ace65dddde632204474f6cf6b9a426a`，session `7825ecbd7e13597e`；更早的独立签名候选是 `ed063e4b`，session `916665e1c3e24274`。两者回滚索引均为 1738713600／0／3，均通过静态审查，尚未刷入。
 断链后的原厂放行、双口净充、物理旁路及保护周期仍待实机验收。[复现与候选](../profiles/charge-link-recovery/README.md)

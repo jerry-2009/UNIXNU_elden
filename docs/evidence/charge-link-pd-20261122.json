@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-22",
+  "native_profile": "charge-link-pd",
+  "boot_profile": "pd-gui",
+  "scope": "incremental ARM64 rebuild over v144 with the v145 GUI brightness menu",
+  "parent_kernel_sha256": "84ac5a9376c9140ccf6249e5f2b493ad9e4eb73b20cf9baf6b90f27407351097",
+  "retained_backlight_archive_sha256": "24531302e2a7999fe9af7154dd5cf0662eea0ae14b2d16acf31bdd8c417563ee",
+  "native_sha256": "66d75bdcda7105b71ad5bfa5b310ffcf34d7d12f1c6d6d5be336d44b4bf23578",
+  "prelinked_kernel_sha256": "37e28431de6590e5406b410ec6cfa2dcd3242cab8cb561ac32fb79ba9a88c447",
+  "entry_kernel_sha256": "b9f57eae0dfce3f3c4688b3c9ff22fbf8996ab6ceb21163350b43aa884137bde",
+  "rebuilt_objects": ["PmicClient", "ChargePolicy"],
+  "changed_core_objects": 0,
+  "original_apple_executables_verified": 30,
+  "host_qualification_tests": 9,
+  "boot": {
+    "accepted_static": true,
+    "image_sha256": "f63528100f47649bed8eb01943e4df88d6cd279f0b582716641e3deefa9474fa",
+    "session": "bd8811563167f017",
+    "rollback": [1738713600, 0, 3],
+    "workbench_directory": "edl_work/charge-link-pd-20261122",
+    "windows_copy_sha256_verified": true
+  },
+  "combined_empty_output_build": false,
+  "hardware_tested": false,
+  "device_written": false
+}
