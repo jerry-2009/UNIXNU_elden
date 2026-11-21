@@ -50,9 +50,11 @@ class ConsoleLines:
 class ChargeSequence:
     MODES={'stock':1,'bypass':2,'80':3,'40-60':4}
     MAX_GENERATION=0xffffffff
-    def __init__(self,modes,delay,hold):
+    def __init__(self,modes,delay,hold,*,max_status_gap):
         self.modes=modes;self.delay=delay;self.hold=hold;self.index=0;self.pending=None
         self.sent_at=None;self.applied_at=None;self.before=None;self.done=not modes
+        self.max_status_gap=max_status_gap
+        self.confirmed_sample=None
         self.recovering=False;self.recovery_deadline=None;self.restored=False;self.errors=[];self.events=[]
     def update(self,status,elapsed):
         if self.done:return None
@@ -65,15 +67,21 @@ class ChargeSequence:
             # The kernel retains the last applied mode/generation after its
             # telemetry becomes unavailable. Those historical values cannot
             # confirm a new command or finish the observed hold interval.
-            in_time=self.applied_at is not None or elapsed-self.sent_at<45
-            confirmed=in_time and available and generation is not None and generation>self.before and mode==str(self.MODES[self.pending])
-            if not confirmed and self.applied_at is not None:
-                self.events.append(dict(event='confirmation-lost',mode=self.pending,elapsed=elapsed))
-                self.applied_at=None
+            matches=available and generation is not None and generation>self.before and mode==str(self.MODES[self.pending])
+            if self.confirmed_sample is not None:
+                last_generation,last_seen=self.confirmed_sample
+                if not matches or generation!=last_generation or elapsed-last_seen>self.max_status_gap:
+                    self.events.append(dict(event='confirmation-lost',mode=self.pending,elapsed=elapsed))
+                    self.applied_at=None
+                    self.confirmed_sample=None
+            confirmed=matches and (self.applied_at is not None or elapsed-self.sent_at<45)
+            if confirmed:
+                self.confirmed_sample=(generation,elapsed)
             if confirmed and self.applied_at is None:
                 self.applied_at=elapsed;self.events.append(dict(event='applied',mode=self.pending,generation=generation,elapsed=elapsed))
             if self.applied_at is not None and elapsed-self.applied_at>=self.hold:
                 self.index+=1;self.pending=None;self.applied_at=None
+                self.confirmed_sample=None
                 if self.index==len(self.modes):self.done=True;self.restored=True;return None
             elif self.applied_at is None and elapsed-self.sent_at>=45:
                 self.errors.append('Unconfirmed charge command: '+self.pending)
@@ -223,7 +231,8 @@ def main():
     tracker=Milestone(a.expect_session);lines=ConsoleLines();next_status=started+.5;report['statuses']=[]
     reboot_sent=False;home_sent=False;home_release_ok=False;swipe_release_ok=False;homes_sent=0;last_home_sent=0;hid_ready=False;gui_at=None;received_hash=hashlib.sha256()
     controls_seen=set();last_status=None;report['control_events']=[];report['milestones']=[];milestones_seen=set()
-    charge=ChargeSequence(charge_modes,a.charge_delay,a.charge_hold)
+    charge=ChargeSequence(charge_modes,a.charge_delay,a.charge_hold,
+                          max_status_gap=2*max(a.status_interval,.5))
     continuity=BootContinuity(a.expect_session,required=bool(a.reconnect_seconds))
     returning=False;report['discontinuities']=[];report['reconnections']=[]
     print('Connected '+selected.device+'; DTR asserted. Saving raw bytes to '+str(raw),flush=True)

@@ -30,6 +30,8 @@ generation greater than the pre-command value, and the requested mode. Historica
 mode/generation values retained during telemetry loss cannot finish the sequence.
 If availability, mode or generation ceases to qualify during the observed hold,
 the hold restarts after a qualifying sample; the original command is not replayed.
+Each hold uses the same generation. A gap over two status query intervals
+invalidates the hold and restarts the observation when a qualifying sample arrives.
 The first confirmation must arrive before45 seconds; an in-time confirmation can
 finish its hold afterwards. One bounded stock recovery remains. Recovery errors
 stay in the report even if stock later succeeds. Counter
