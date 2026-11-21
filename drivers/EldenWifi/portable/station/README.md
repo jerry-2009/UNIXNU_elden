@@ -82,3 +82,13 @@ Protocol drain timed out; actual BM-off/transaction-idle/MSI4/PERST-low,
 typed physical fastboot/full stock/root/green/original-setting restoration
 passed independently. See [hardware evidence](../../../../docs/evidence/wifi-portable-station-hardware-20261121.json).
 Next compare the successful donor's TCL/WBM/peer setup before more hardware.
+
+## Current OEM command adaptation
+
+The consolidated TX trial proves TCL consumption3, WBM completion0 and
+status0/configured1 from the real mode response. HIF lifetime is already
+accepted. The loaded OEM has newer VDEV_START/UP and PEER_ASSOC envelopes;
+the prepared [OEM wire adaptation](OEM-WIRE.md) adds only their proven
+lengths and disabled non-MLO tails. Its codec and full build checks pass;
+hardware WPA2/DHCP/traffic acceptance is still pending. Old donor blobs and
+older candidate/result hashes remain unchanged.

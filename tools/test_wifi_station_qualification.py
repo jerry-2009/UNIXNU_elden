@@ -11,7 +11,7 @@ def main():
     for name in ['station','donor','object','native','owner','firmware','return','profile','entry','helper','trust','private']:
         changed=copy.deepcopy(r)
         runtime=changed['station_runtime']
-        while runtime.get('station_hif') or runtime.get('station_diagnostic'):runtime=runtime['base']
+        while runtime.get('station_hif') or runtime.get('station_diagnostic') or runtime.get('station_wire'):runtime=runtime['base']
         if name=='station':changed['station_trial']=False
         elif name=='donor':runtime['station_donor']['commit']='0'*40
         elif name=='object':changed['station_runtime']['binding_sha256']='0'*64
@@ -29,6 +29,17 @@ def main():
             qualify_assets(changed,a.report.parent/'runtime',(a.report.parent/'native.macho').read_bytes(),r['service_assets']['input_trust_sha256'])
         except (ValueError,KeyError):count+=1
         else:raise AssertionError('Malformed station declaration accepted: '+name)
+    if r['station_runtime'].get('station_wire'):
+        for name in ['wire-disabled','wrong-oem','overlay-digest','unexpected-control-delta']:
+            changed=copy.deepcopy(r)
+            value=changed['station_runtime']
+            if name=='wire-disabled':value['mandatory_nonmlo_wire']=False
+            elif name=='wrong-oem':value['vendor_module_sha256']='0'*64
+            elif name=='overlay-digest':value['overlay_sha256']='0'*64
+            else:value['no_board_ring_bank_clock_timeout_change']=False
+            try:qualify_components(changed)
+            except (ValueError,KeyError):count+=1
+            else:raise AssertionError('Malformed station wire accepted: '+name)
     q=dict(r,**assets,network_bridge=True,mode=0,root_trial=True,endpoint_trial=True,smmu_domain=True,memory_detail=True,segmented_memory=True,
       unique_memory=True,prefault_memory=True,mhi_runtime=True,control_transport_bound=True,firmware_qdss_config=True,runtime_owned_cleanup=True,
       runtime_platform_shutdown=True,runtime_platform_budget=True,platform_physical_fence=True)

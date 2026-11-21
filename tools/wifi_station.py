@@ -10,6 +10,8 @@ def defs(p):return {n for n,v in global_symbols(Path(p)).items() if v[0]&0x0e}
 def refs(p):return {n for n,v in global_symbols(Path(p)).items() if not v[0]&0x0e}
 
 def qualify_runtime(r):
+    if r.get('station_wire'):
+        return qualify_wire(r)
     if r.get('station_diagnostic'):
         return qualify_diagnostic(r)
     if r.get('station_hif'):
@@ -39,6 +41,29 @@ def qualify_runtime(r):
     for name,digest in r['source_inputs'].items():
         if sha(ROOT/name)!=digest:raise ValueError('Station source pin differs: '+name)
     return True
+
+def qualify_wire(r):
+    if any(r.get(k) is not True for k in ['compiled','station_wire','mandatory_nonmlo_wire','no_board_ring_bank_clock_timeout_change','no_payload_logging']):
+        raise ValueError('Unqualified OEM station wire')
+    qualify_runtime(r['base'])
+    from StationWireSource import association,station,ASSOC_SHA,STATION_SHA
+    if r['vendor_module_sha256']!='33869cd650843656e216b092809b9cd7327865abb1b6b9dfcd55399abd600d76' or r['vendor_commit']!='d50b305f7da9e14715a25120a4ac7b1a4b8b97c3':
+        raise ValueError('Wrong station OEM evidence')
+    if sha(r['parent_source'])!=STATION_SHA or sha(r['parent_codec'])!=ASSOC_SHA or station(Path(r['parent_source']).read_bytes())!=Path(r['source']).read_bytes() or association(Path(r['parent_codec']).read_bytes())!=Path(r['codec']).read_bytes():
+        raise ValueError('Station wire source/codec differs')
+    for name,key in [('source','source_sha256'),('codec','codec_sha256'),('object','object_sha256'),('overlay','overlay_sha256')]:
+        if sha(r[name])!=r[key]:raise ValueError('Station wire actual '+name+' differs')
+    expected={'version':0,'roots':[{'type':'file','name':r['parent_codec'],'external-contents':r['codec']}]}
+    if read(r['overlay'])!=expected or r['command'].count('-ivfsoverlay')!=1 or r['command'][r['command'].index('-ivfsoverlay')+1]!=r['overlay']:
+        raise ValueError('Station codec overlay differs')
+    if len(r['retained_objects'])!=125:raise ValueError('Station wire retained runtime differs')
+    for path,digest in {**r['retained_objects'],**r['consumed_inputs']}.items():
+        if sha(path)!=digest:raise ValueError('Station wire consumed input differs')
+    if sha(r['link'][r['link'].index('-o')+1])!=r['binding_sha256']:raise ValueError('Station wire binding differs')
+    for name,digest in r['source_inputs'].items():
+        if sha(ROOT/name)!=digest:raise ValueError('Station wire source pin differs')
+    return True
+
 
 def qualify_diagnostic(r):
     if any(r.get(k) is not True for k in ['compiled','station_diagnostic','readonly_registers','no_payload_logging','one_first_tx_sample']):raise ValueError('Wrong consolidated TX diagnostic')
@@ -125,7 +150,7 @@ def qualify_components(report):
     qualify_native(report['station_worker'],folder)
     if parent['kernel_sha256']!=report['station_parent_kernel_sha256'] or report['profile']!='wifi-network-17':raise ValueError('Station parent differs')
     original=report['station_runtime']
-    while original.get('station_hif') or original.get('station_diagnostic'):original=original['base']
+    while original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire'):original=original['base']
     if original['scan_parent']!=parent['portable_scan_runtime']:raise ValueError('Station scan chain differs')
     if report['network_bridge']!=parent['network_bridge'] or report['optional_runtime']!=parent['optional_runtime']:
         raise ValueError('Station OS bridge/rules changed')
