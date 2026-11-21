@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+from pathlib import PurePosixPath
 from firmware_contract import verify_firmware
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,6 +19,48 @@ PROFILE = ROOT / 'profiles/v91/firmware-build'
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def stage_crypto_package(source, destination, expected):
+    """Copy the pinned external inputs under an EDK II package search root."""
+    source = source.resolve(strict=True)
+    destination = destination.resolve()
+    if destination.exists():
+        raise ValueError('Staged CryptoBin destination already exists')
+    destination.mkdir(parents=True)
+    expected_names = set(expected)
+    for relative, digest in expected.items():
+        name = PurePosixPath(relative)
+        if name.is_absolute() or '..' in name.parts or '\\' in relative or ':' in relative:
+            raise ValueError('Unsafe CryptoBin manifest path: ' + relative)
+        original = source.joinpath(*name.parts)
+        if (original.is_symlink() or not original.is_file() or
+                not original.resolve(strict=True).is_relative_to(source)):
+            raise ValueError('CryptoBin source path is not a regular package member: ' + relative)
+        if sha(original) != digest:
+            raise ValueError('CryptoBin input mismatch: ' + relative)
+        staged = destination.joinpath(*name.parts)
+        staged.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(original, staged)
+        if sha(staged) != digest:
+            raise ValueError('Staged CryptoBin input mismatch: ' + relative)
+    actual_names = {
+        path.relative_to(destination).as_posix()
+        for path in destination.rglob('*')
+        if path.is_file()
+    }
+    if actual_names != expected_names:
+        raise ValueError('Staged CryptoBin package has unexpected files')
+    return dict(
+        destination=destination.relative_to(destination.parents[1]).as_posix(),
+        files=len(expected_names),
+        files_sha256=sha256_json(expected),
+        verified=True,
+    )
+
+
+def sha256_json(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
 
 def git(repository, *args):
@@ -96,6 +139,13 @@ def main():
                  plan['darwin_commit'] + '^{commit}').decode().strip()
     if darwin != plan['darwin_commit']:
         raise ValueError('DarwinBoot input mismatch')
+    # GenFds resolves DSC includes through PACKAGES_PATH. A CryptoBin path
+    # outside those roots is shortened as a workspace-relative include by
+    # BaseTools. Stage only the hash-locked manifest into this disposable
+    # source workspace, then pass its short in-workspace package path.
+    staged_crypto = mu / 'Platforms' / 'EldenBaseCrypto'
+    crypto_stage = stage_crypto_package(args.crypto_path, staged_crypto,
+                                       plan['crypto_files'])
     for relative in plan['repository_files']:
         source = ROOT / relative
         destination = project / relative
@@ -148,10 +198,16 @@ def main():
         ['make', '-C', str(mu / 'MU_BASECORE/BaseTools'), '-j' + str(args.jobs)],
         [sys.executable, str(project / 'scripts/build_phase2_firmware.py'),
          '--target', 'DEBUG', '--toolchain', str(wrappers),
-         '--crypto-path', str(crypto), '--jobs', str(args.jobs), '--keep-build-tree'],
+         '--crypto-path', str(staged_crypto), '--jobs', str(args.jobs), '--keep-build-tree'],
     ]
     (out / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
     (out / 'source-export.json').write_text(json.dumps(records, indent=2) + '\n')
+    (out / 'crypto-package.json').write_text(json.dumps({
+        'source_release_sha256': sha256_json(plan['crypto_files']),
+        'staged': crypto_stage,
+        'external_crypto_path': str(crypto),
+        'build_uses_staged_package': str(staged_crypto),
+    }, indent=2) + '\n')
     report = {'device_operation': False, 'copied_old_build_objects': False,
               'profile_sha256': sha(PROFILE / 'plan.json'), 'returncode': None}
     with (out / 'build.log').open('x') as log:

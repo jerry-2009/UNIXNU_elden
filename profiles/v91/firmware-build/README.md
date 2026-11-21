@@ -40,6 +40,12 @@ Only explicitly parsed CodeView GUID fields and their enclosing compressed
 representation may vary. Matching a module GUID list alone is insufficient.
 The raw FD hash need not equal the historical image.
 
+The builder copies only the manifest-hashed CryptoBin package into the temporary
+Mu PACKAGES_PATH before invoking BaseTools. The caller's external extraction
+is verified but never modified. This keeps the EDK II include inside its normal
+package lookup roots and records the staged package manifest beside the build
+commands.
+
 Original Qualcomm and Crypto binary dependencies remain pinned external inputs;
 this does not claim that proprietary firmware has become open source. Do not
 publish additional original firmware or signing material. A successful offline
