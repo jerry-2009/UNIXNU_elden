@@ -32,10 +32,19 @@ def station(data):
     return derive(data, READY_SOURCE_SHA, [(send, replacement)])
 
 
-def dp_header(data):
+def dp_header(data, *, single_pdev_bank=False):
     if sha(data) != DP_SOURCE_SHA:
         raise ValueError('OEM EAPOL critical patch requires the fixed donor Dp header')
     text = data.decode()
+    if single_pdev_bank:
+        # The installed TB322FC module clears vdev_id_check_en on attach.
+        # Keep the existing station search mode and the descriptor's VDEV ID.
+        text = replace_once(
+            text,
+            '  write(dp, io, kDpTclBankConfig + 4 * dp.bank, kDpBankStation);',
+            '  write(dp, io, kDpTclBankConfig + 4 * dp.bank, kDpBankStation & ~kDpBankVdevCheck);',
+            'single-PDEV station bank',
+        )
     text = replace_once(
         text,
         'inline bool dpSend(Dp &dp, const ChipIo &io, const uint8_t *frame, uint32_t length)\n{\n  using namespace dpdetail;',

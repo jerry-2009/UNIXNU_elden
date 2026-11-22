@@ -49,10 +49,13 @@ def qualify_runtime(r):
 
 def qualify_oem_eapol_critical(r):
     fields = ['compiled', 'oem_eapol_critical', 'station_tx_critical',
-              'oem_flow_override', 'oem_high_priority_notify', 'no_board_ring_bank_clock_timeout_change',
+              'oem_flow_override', 'oem_high_priority_notify',
               'no_payload_logging']
     if any(r.get(k) is not True for k in fields):
         raise ValueError('Unqualified OEM EAPOL critical TX path')
+    single_pdev_bank=r.get('oem_single_pdev_bank',False)
+    if type(single_pdev_bank) is not bool or r.get('no_board_ring_bank_clock_timeout_change') is not (not single_pdev_bank):
+        raise ValueError('OEM station bank choice differs')
     if r.get('hardware_tested') is not False:
         raise ValueError('An offline descriptor build cannot claim hardware acceptance')
     if len(r.get('retained_objects', {})) != 125:
@@ -69,7 +72,7 @@ def qualify_oem_eapol_critical(r):
             expected_source != Path(r['source']).read_bytes()):
         raise ValueError('OEM EAPOL station source derivation differs')
     original_dp = STA / 'upstream/WifiDp.h'
-    generated_dp = dp_header(original_dp.read_bytes())
+    generated_dp = dp_header(original_dp.read_bytes(),single_pdev_bank=single_pdev_bank)
     if (sha(original_dp) != DP_SOURCE_SHA or generated_dp != Path(r['dp_header']).read_bytes() or
             sha(r['dp_header']) != r['dp_header_sha256']):
         raise ValueError('OEM TCL critical field derivation differs')

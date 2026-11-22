@@ -11,7 +11,11 @@ static std::recursive_mutex mutex;
 static unsigned sends;static bool synchronous;
 static int send_error;
 static void take(void *){mutex.lock();}static void give(void *){mutex.unlock();}
-static uint32_t read_reg(void *,uint32_t){return 0;}static void write_reg(void *,uint32_t,uint32_t){}
+static uint32_t bank_config;
+static uint32_t read_reg(void *,uint32_t){return 0;}
+static void write_reg(void *,uint32_t reg,uint32_t value){
+    if(reg==kDpTclBankConfig)bank_config=value;
+}
 static uint8_t ready[16]={21,0,16,0,1,0,0,0};
 static int message(void *,uint64_t session,const void *data,uint32_t){
     sends++;
@@ -61,6 +65,11 @@ static void test_oem_critical(const EldenPortableIo &io){
     uint8_t version[8]={};
     assert(httBuildVersionReq(version,sizeof version)==8);
     dpTxSetup(dp,{io.owner,io.read,io.write},0,kDpPdevSingle,0,0);
+#if ELDEN_TEST_SINGLE_PDEV_BANK
+    assert(bank_config==0x0a04);
+#else
+    assert(bank_config==0x4a04);
+#endif
     uint8_t eapol[14]={};
     eapol[12]=0x88;eapol[13]=0x8e;
     assert(netQueuePut(tx_queue,eapol,sizeof eapol,true));

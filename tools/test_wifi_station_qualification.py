@@ -44,12 +44,15 @@ def main():
             except (ValueError,KeyError):count+=1
             else:raise AssertionError('Malformed station wire accepted: '+name)
     if r['station_runtime'].get('oem_eapol_critical'):
-        for name in ('critical-declaration','flow-override','high-priority-notify'):
+        for name in ('critical-declaration','flow-override','high-priority-notify','station-bank'):
             changed=copy.deepcopy(r)
             value=changed['station_runtime']
             if name=='critical-declaration':value['station_tx_critical']=False
             elif name=='flow-override':value['oem_flow_override']=False
-            else:value['oem_high_priority_notify']=False
+            elif name=='high-priority-notify':value['oem_high_priority_notify']=False
+            else:
+                value['oem_single_pdev_bank']=not value.get('oem_single_pdev_bank',False)
+                value['no_board_ring_bank_clock_timeout_change']=not value['oem_single_pdev_bank']
             try:qualify_components(changed)
             except (ValueError,KeyError):count+=1
             else:raise AssertionError('Malformed OEM critical TX declaration accepted: '+name)

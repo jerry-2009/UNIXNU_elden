@@ -20,9 +20,13 @@ def main():
                         help='Pair the stock HTT version request with OEM TCL metadata')
     parser.add_argument('--oem-eapol-critical', action='store_true',
                         help='Add OEM EAPOL critical flow-override and TX-notify fields')
+    parser.add_argument('--single-pdev-bank', action='store_true',
+                        help='Match the TB322FC station bank VDEV check setting')
     args = parser.parse_args()
     if args.oem_metadata and args.oem_eapol_critical:
         parser.error('Choose one TX adaptation')
+    if args.single_pdev_bank and not args.oem_eapol_critical:
+        parser.error('--single-pdev-bank requires --oem-eapol-critical')
     if args.oem_eapol_critical:
         from StationOemEapolCritical import station, dp_header
         source_recipe = 'StationOemEapolCritical.py'
@@ -58,7 +62,7 @@ def main():
         if len(dp_paths) != 1 or sha(dp_paths[0]) != sha(dp_source):
             raise ValueError('Profile-ready runtime did not consume the pinned DP header')
         dp_virtual_path = dp_paths[0]
-        dp_bytes = dp_header(dp_source.read_bytes())
+        dp_bytes = dp_header(dp_source.read_bytes(), single_pdev_bank=args.single_pdev_bank)
         dp_header_path = output / 'WifiDp.h'
         dp_header_path.write_bytes(dp_bytes)
         roots.append({'type': 'file', 'name': dp_virtual_path,
@@ -118,7 +122,7 @@ def main():
             base=prior,
             parent_source=prior['source'],
             parent_source_sha256=prior['source_sha256'],
-            no_board_ring_bank_clock_timeout_change=True,
+            no_board_ring_bank_clock_timeout_change=not args.single_pdev_bank,
             no_payload_logging=True,
             oem_flow_override=True,
             oem_high_priority_notify=True,
@@ -128,6 +132,8 @@ def main():
             dp_header=str(output / 'WifiDp.h'),
             dp_header_sha256=sha(output / 'WifiDp.h'),
         )
+        if args.single_pdev_bank:
+            result['oem_single_pdev_bank'] = True
     qualify_runtime(result)
     (output / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'compiled': True, 'binding_sha256': result['binding_sha256']}))

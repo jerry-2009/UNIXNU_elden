@@ -22,3 +22,14 @@ python tools/build_wifi_station_tx_priority.py --oem-metadata \
 单字 HTT 候选实测在第二轮扫描前退回。新的发送候选使用八字节 HTT 和原 TCL 元数据，在已有 EAPOL 控制端口发送路径提交 critical flow override 与 semi-hard notify。Legacy 保持 TID 0，WMM 仍用 TID 7。分类来自当前站点发送队列，范围为 EAPOL，原厂通用 critical 分类仍由其上层决定。
 
 用 `--oem-eapol-critical` 从同一 profile-ready 父构建，再按 station 路径合成和审查。测试执行真实队列到 TCL 发送函数，核对 legacy、WMM 和后续普通数据，并确认 HTT 长度及 TX 元数据保持。该测试用宿主 MMIO/DMA。签名实测候选为 `60ca685d`，会话 `e29fe911571aa175`。
+
+单 PDEV bank 对照在 `--oem-eapol-critical` 上加 `--single-pdev-bank`。原厂模块
+`dp_vdev_attach_be` 在 `0x3e7c8c` 清除 vdev 偏移 `0xa3c9` 的布尔值；
+`dp_tx_get_bank_profile` 在 `0x3ef10c` 读取同一偏移，随后在 `0x3ef158`
+至 `0x3ef15c` 把它编码到 bit 14。ArmadaOS 四代内核的 HAL 对该位定义相同。
+此对照把实测的 `0x4a04` 改为 `0x0a04`，保留八字节 HTT、VDEV 关联与描述符 ID、
+既有索引／地址查找设置及 EAPOL 描述符。原厂 index-search 分支另有组播策略，
+该分支的适用条件与当前 VDEV 状态仍待确认。
+
+CiscoMac 的实际发送路径测试验证了 bank 写值和普通帧行为。完整 ARM64 链接及
+20 项拒绝用例通过，签名候选 `c9427d2f` 的会话是 `6f87a81d1e1da868`。
