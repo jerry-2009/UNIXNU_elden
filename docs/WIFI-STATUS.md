@@ -1,4 +1,16 @@
-# Wi-Fi当前主线 · 2026-11-22
+# Wi-Fi 当前主线 · 2026-11-23
+
+`dc553008` 的实机记录确认 56 字节配置再次跑完第二轮扫描（32 BSS、104 管理帧）并关联。
+TCL 消费三个 EAPOL message 2，WBM 指针、完成、ACK、密钥和受控端口均为 0。
+随后 stage 90 的 UMAC 访问返回 `-110`，读取 TCL、WBM 和 bank 均返回全一值，
+因此本轮未确认 `0x40204` 的硬件读回。设备完成实际 fastboot 回程和原厂恢复。
+[index-bank 实录](evidence/wifi-station-index-bank-hardware-20261122.json)
+
+`91b34e5f` 两次写入均通过整像回读，均未捕获候选 CDC 会话。该镜像报告为
+`shared_wcn_owner=true`、`station_trial=false`，未包含上述 station 路径，
+两次启动均无 Wi-Fi／蓝牙功能结论。第二次恢复后已确认 Android boot complete、
+`green/locked` 和 KernelSU root。下一次联合候选以 56 字节 station 为起点并接入共享 WCN。
+用 `build_v91_boot.py --require-wifi-station` 给连接验收的打包显式指定 station。
 
 原厂 56 字节 HTT 环配置候选 `b0d308f0` 已跑完第二轮扫描和关联，保留 32 个 BSS、
 收到 136 个管理帧，CE 提交与完成均为 59。这是一次实机通过，尚需确认重复启动稳定性。

@@ -51,6 +51,10 @@ python tools/build_wifi_station_kernel.py --parent-build TESTED_SCAN_KERNEL --ru
 python tools/test_wifi_station_qualification.py --report NEW_KERNEL/result.json --output NEW_QUALIFICATION.json
 ```
 
+Pass `--require-wifi-station` to `tools/build_v91_boot.py` when packaging a
+connectivity test. It rejects a bridge-only build even when shared WCN mode
+is enabled.
+
 The donor's original assoc/sta/dp/net tests and helper crypto/replay/group-rekey
 self-test pass ASan/UBSan. `TestStation.cpp` executes our real owner/profile/
 generation/port/queue refusal code; modeled memory is not hardware success.

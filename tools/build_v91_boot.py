@@ -42,6 +42,7 @@ def main():
     p.add_argument('--battery-ui',action='store_true',help='Restore qualified battery UI; compact existing numeric-one flags without dropping options')
     p.add_argument('--wcn-report',type=Path)
     p.add_argument('--bt-runtime',type=Path)
+    p.add_argument('--require-wifi-station',action='store_true',help='Require a qualified Wi-Fi station profile when packaging a connectivity test')
     p.add_argument('--pd-gui',action='store_true',help='Use the existing GUI brightness branch of a qualified PD integration kernel')
     p.add_argument('--early-stall',action='store_true',help='Controlled pre-UFS interrupt-masked watchdog qualification')
     p.add_argument('--bootshim',type=Path,help='Reuse the exact source-pinned 128-byte BootShim binary')
@@ -67,6 +68,8 @@ def main():
     entry=json.loads(a.entry_report.read_text())
     if bool(a.wcn_report)!=bool(a.bt_runtime) or (a.wcn_report and (a.fbwc_report or a.battery_ui or a.hid_report)) or (a.hid_report and (a.fbwc_report or a.battery_ui)):raise ValueError('Select one qualified kernel profile')
     bt=bt_runtime_boot.qualify(a.wcn_report,a.entry_report,a.bt_runtime) if a.wcn_report else None
+    if a.require_wifi_station and not (bt and bt.get('profile')=='wifi-network-17' and bt.get('station_trial') is True):
+        p.error('--require-wifi-station needs a qualified wifi-network-17 station build')
     if a.expanded_data!=bool(bt and bt.get('expanded_data')):raise ValueError('Data capacity and native profile must match')
     if a.expanded_data and data_contract['packed_sha256']!=bt['data_packed_sha256']:raise ValueError('Native profile expects a different Data seed')
     if a.keep_packed_data:
