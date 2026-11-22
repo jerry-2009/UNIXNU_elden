@@ -3,6 +3,7 @@ import argparse,copy,json,sys
 from pathlib import Path
 from wifi_network17_boot import qualify_components,menu
 from bt_runtime_boot import menu as route_menu
+from battery_boot import arguments
 
 
 def main():
@@ -308,7 +309,7 @@ def main():
     if 'elden-wcn-power=4' in config['entry'][0]['args'].split():raise AssertionError('Unqualified candidate enabled Bluetooth')
     if len(config['entry'][0]['args'].replace('@SESSION@','0'*16).encode())>1023:raise AssertionError('Boot argument ABI exceeded')
     shared=tomllib.loads(menu(dict(q,shared_wcn_owner=True,station_trial=True)))
-    if 'elden-wcn-power=4' not in shared['entry'][0]['args'].split():raise AssertionError('Shared WCN menu did not enable Bluetooth')
+    if arguments(shared['entry'][0]['args']).get('ewt')!='1' or 'elden-wcn-power' in arguments(shared['entry'][0]['args']):raise AssertionError('Shared WCN menu did not use the qualified shared owner flag')
     if 'Bluetooth' not in shared['entry'][0]['title']:raise AssertionError('Shared WCN menu title lost Bluetooth')
     result=dict(passed=True,mutation_cases=cases,menu_dispatch=True,countdown_and_fallback_preserved=True,
         actual_component_report_qualified=True,shared_wcn_menu=True,hardware_tested=False)

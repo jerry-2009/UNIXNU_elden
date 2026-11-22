@@ -152,7 +152,7 @@ def qualify_components(report):
     stride=report.get('mac_phy_stride_runtime')
     battery=report.get('battery_admission')
     if bool(report.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission report mismatch')
-    if battery and battery.get('shared_owner') is not True:raise ValueError('Radio-only admission must use the shared WCN owner')
+    if battery and (battery.get('shared_owner') is not True or battery.get('shared_owner_alias')!='ewt' or battery.get('shared_owner_mode')!=4):raise ValueError('Radio-only admission must use the qualified shared WCN owner alias')
     if bool(report.get('sideband_pins_trial'))!=bool(battery and battery.get('sideband_pins_trial')):raise ValueError('Sideband report mismatch')
     if report.get('ce_wmi_firmware_objects_unchanged') is not (not bool(stride)) or report.get('core_filelist_unchanged') is not True or (report['changed_core_objects'],report['changed_native_objects'],report['added_native_objects'])!=(0,(2 if stride else 1)+int(bool(battery)),1):
         raise ValueError('Wrong network-only composition')
@@ -379,10 +379,8 @@ def menu(qualification):
         config=tomllib.loads(text);args=config['entry'][0]['args']
         if arguments(args).get('elden-wcn-power') is not None:
             raise ValueError('Shared WCN menu already contains a Bluetooth mode')
-        value=args+' elden-wcn-power=4'
-        if len(value.replace('@SESSION@','0'*16).encode())>1023:
-            raise ValueError('Shared WCN menu exceeds parser contract')
-        text=text.replace('args = "'+args+'"','args = "'+value+'"',1)
+        if arguments(args).get('ewt')!='1':
+            raise ValueError('Shared WCN owner requires the qualified Wi-Fi runtime flag')
         text=text.replace('Wi-Fi SM8750 WPA2 and data + USB - TEST',
                           'Wi-Fi SM8750 WPA2 + Bluetooth and data + USB - TEST',1)
     return text

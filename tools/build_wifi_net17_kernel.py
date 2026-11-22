@@ -36,7 +36,7 @@ def main():
     battery=read(args.battery_admission_build/'result.json') if args.battery_admission_build else None
     if bool(worker.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Battery admission worker pair mismatch')
     if battery:
-        if not battery.get('compiled') or not battery.get('radio_only_no_charger_set') or not battery.get('chemistry_two_gauges_epoch_age_checked') or not battery.get('controls_and_charger_permission_unchanged'):
+        if not battery.get('compiled') or not battery.get('shared_owner') or battery.get('shared_owner_alias')!='ewt' or battery.get('shared_owner_mode')!=4 or not battery.get('radio_only_no_charger_set') or not battery.get('chemistry_two_gauges_epoch_age_checked') or not battery.get('controls_and_charger_permission_unchanged'):
             raise ValueError('Unqualified radio-only battery admission')
         for name,digest in battery['source_inputs'].items():
             if sha(ROOT/name)!=digest:raise ValueError('Radio-only battery source changed')

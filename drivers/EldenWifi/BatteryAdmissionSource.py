@@ -49,6 +49,9 @@ def wcn():
         'temperature>3800||(expected&&expected!=e)||!elden_wifi_battery_ready(e))return false;')
     declaration='int elden_recovery_armed(void);'
     text=replace(text,declaration,declaration+'\nint elden_wifi_battery_available(void);')
+    old='unsigned mode=0;PE_parse_boot_argn("elden-wcn-power",&mode,sizeof(mode));'
+    new='unsigned mode=0;if(!PE_parse_boot_argn("elden-wcn-power",&mode,sizeof(mode))){unsigned shared=0;PE_parse_boot_argn("ewt",&shared,sizeof(shared));if(shared==1)mode=4;}'
+    text=replace(text,old,new)
     old='if(!elden_recovery_armed()||native_owner_data_status||!elden_init_exec_accepted)return -11;'
     text=replace(text,old,'if(!elden_recovery_armed()||native_owner_data_status||!elden_init_exec_accepted||!elden_wifi_battery_available())return -11;')
     return text.encode()

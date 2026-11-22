@@ -88,7 +88,8 @@ def main():
          'soc/sm8750/include/EldenWifiResources.h']
     if a.sideband_pins:own+=['tools/test_wifi_sideband_pins.py','drivers/EldenWifi/SidebandSource.py','drivers/EldenWifi/SidebandPins.h']
     if a.board_state:own+=['drivers/EldenWifi/BoardState.inc','tools/test_wifi_board_state.py']
-    proof=dict(compiled=True,wifi_battery_runtime_trial=True,shared_owner=True,radio_only_no_charger_set=True,chemistry_two_gauges_epoch_age_checked=True,
+    proof=dict(compiled=True,wifi_battery_runtime_trial=True,shared_owner=True,shared_owner_alias='ewt',shared_owner_mode=4,
+        radio_only_no_charger_set=True,chemistry_two_gauges_epoch_age_checked=True,
         controls_and_charger_permission_unchanged=True,pmic_archive=str(archive),pmic_archive_sha256=sha(archive),parent_pmic_archive=str(oldar),
         parent_pmic_archive_sha256=sha(oldar),pmic_retained_members=retained,consumers=proofs,
         source_inputs={n:sha(ROOT/n) for n in own},hardware_tested=False)
