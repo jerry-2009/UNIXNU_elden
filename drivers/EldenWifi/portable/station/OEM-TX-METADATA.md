@@ -38,3 +38,11 @@ CiscoMac 的实际发送路径测试验证了 bank 写值和普通帧行为。�
 settle 和阶段期限，并在发第二轮扫描前检查 HTT 端点所用 CE 源环的消费指针。
 到期未消费则在 HTT 环阶段返回传输错误。源环消费只能确认设备取走描述符，
 固件是否应用环配置及 UMAC 超时原因仍需实机证据。
+
+TB322FC 原厂 `htt_srng_setup` 在 `0x4924` 把 56 字节交给 `skb_put`。
+原厂 `htt_sring_setup_t` 的第 14 字是 IPA 丢包阈值。ArmadaOS 四代内核的
+`htt_srng_setup_cmd` 和成功供体均为 13 字。新增 `--oem-srng-size` 在
+`--wait-htt-drain` 基础上用原厂长度，最后一字填零，沿用已审查的 13 字配置。
+保留两个 RXDMA 实例、已有环标识与 DMA 地址、八字节版本请求以及原期限。
+真实编码器的六条配置及整核检查通过。签名候选 `b0d308f0`，
+会话 `bf1555e8dd6c5c07`。

@@ -134,6 +134,21 @@ static void test_htt_drain(){
 }
 #endif
 
+#if ELDEN_TEST_OEM_SRNG
+static void test_oem_srng(){
+    uint8_t payload[57];
+    for(const auto &ring:htt.ring){
+        std::memset(payload,0xa5,sizeof payload);
+        assert(!httBuildSrngSetup(payload,55,ring));
+        assert(payload[0]==0xa5);
+        assert(httBuildSrngSetup(payload,56,ring)==56);
+        assert(httdetail::get32(payload)==(kHttMsgSrngSetup | ring.radio<<8 | ring.htt<<16 | ring.kind<<24));
+        assert(httdetail::get32(payload+4)==uint32_t(ring.bus));
+        assert(httdetail::get32(payload+52)==0 && payload[56]==0xa5);
+    }
+}
+#endif
+
 int main(){
     int owner;EldenStationPort port={&owner,take,give,message};assert(!elden_wifi_station_port_install(&port));
     uint8_t mac[6]={2,1,2,3,4,5};void *memory=std::aligned_alloc(4u<<20,4u<<20);assert(memory);
@@ -176,6 +191,9 @@ int main(){
 #endif
 #if ELDEN_TEST_HTT_DRAIN
     test_htt_drain();
+#endif
+#if ELDEN_TEST_OEM_SRNG
+    test_oem_srng();
 #endif
     elden_wifi_portable_disable(&owner);std::free(memory);
     return 0;

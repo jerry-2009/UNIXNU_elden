@@ -84,26 +84,36 @@ def qualify_oem_eapol_critical(r):
     expected_overlay = read(prior['base']['overlay'])
     expected_overlay['roots'].append({
         'type': 'file',
-        'name': dp_paths[0],
+        'name': str(Path(dp_paths[0]).resolve()),
         'external-contents': r['dp_header'],
     })
     headers[r['dp_header']]=r['dp_header_sha256']
-    wait_htt_drain=r.get('wait_htt_drain',False)
-    if type(wait_htt_drain) is not bool:
-        raise ValueError('Invalid HTT source-ring drain choice')
-    if wait_htt_drain:
-        from ScanHttDrain import LINK_SHA,link_header
-        paths=[path for path in headers if Path(path).name=='WifiLink.h']
-        if len(paths)!=1 or headers.pop(paths[0])!=LINK_SHA:
-            raise ValueError('Missing original link header')
-        original_link=STA.parent/'upstream/WifiLink.h'
-        if (link_header(original_link.read_bytes())!=Path(r['link_header']).read_bytes() or
-                sha(r['link_header'])!=r['link_header_sha256']):
-            raise ValueError('HTT source-ring drain derivation differs')
-        expected_overlay['roots'].append({'type':'file','name':paths[0],'external-contents':r['link_header']})
-        headers[r['link_header']]=r['link_header_sha256']
-    elif 'link_header' in r or 'link_header_sha256' in r:
-        raise ValueError('Unexpected HTT source-ring drain header')
+    from ScanHttDrain import LINK_SHA,HTT_SHA,link_header,oem_srng_header
+    if r.get('oem_srng_size') and r.get('wait_htt_drain') is not True:
+        raise ValueError('The OEM SRNG size requires HTT source-ring drain')
+    for flag, key, name, frozen_digest, derive in (
+        ('wait_htt_drain','link_header','WifiLink.h',LINK_SHA,link_header),
+        ('oem_srng_size','htt_header','WifiHtt.h',HTT_SHA,oem_srng_header),
+    ):
+        enabled=r.get(flag,False)
+        if type(enabled) is not bool:
+            raise ValueError('Invalid station HTT option: '+flag)
+        if not enabled:
+            if key in r or key+'_sha256' in r:
+                raise ValueError('Unexpected station header: '+name)
+            continue
+        paths=[path for path in headers if Path(path).name==name]
+        if len({Path(path).resolve() for path in paths})!=1 or any(headers[path]!=frozen_digest for path in paths):
+            raise ValueError('Missing original '+name)
+        for path in paths:
+            headers.pop(path)
+        original=STA.parent/'upstream'/name
+        generated=r[key]
+        digest=r[key+'_sha256']
+        if derive(original.read_bytes())!=Path(generated).read_bytes() or sha(generated)!=digest:
+            raise ValueError('Station header derivation differs: '+name)
+        expected_overlay['roots'].append({'type':'file','name':str(Path(paths[0]).resolve()),'external-contents':generated})
+        headers[generated]=digest
     if (read(r['overlay']) != expected_overlay or
             sha(r['overlay']) != r['overlay_sha256'] or
             r['command'].count('-ivfsoverlay') != 1 or

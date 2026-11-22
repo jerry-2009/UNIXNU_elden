@@ -46,6 +46,7 @@ def main():
     if r['station_runtime'].get('oem_eapol_critical'):
         checks=['critical-declaration','flow-override','high-priority-notify','station-bank']
         if r['station_runtime'].get('wait_htt_drain'):checks.append('htt-drain')
+        if r['station_runtime'].get('oem_srng_size'):checks.append('oem-srng-size')
         for name in checks:
             changed=copy.deepcopy(r)
             value=changed['station_runtime']
@@ -55,7 +56,8 @@ def main():
             elif name=='station-bank':
                 value['oem_single_pdev_bank']=not value.get('oem_single_pdev_bank',False)
                 value['no_board_ring_bank_clock_timeout_change']=not value['oem_single_pdev_bank']
-            else:value['wait_htt_drain']=False
+            elif name=='htt-drain':value['wait_htt_drain']=False
+            else:value['oem_srng_size']=False
             try:qualify_components(changed)
             except (ValueError,KeyError):count+=1
             else:raise AssertionError('Malformed OEM critical TX declaration accepted: '+name)

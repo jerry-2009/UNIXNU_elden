@@ -24,6 +24,8 @@ def main():
                         help='Match the TB322FC station bank VDEV check setting')
     parser.add_argument('--wait-htt-drain', action='store_true',
                         help='Require HTT source-ring progress before the second scan')
+    parser.add_argument('--oem-srng-size', action='store_true',
+                        help='Use the TB322FC 56-byte HTT ring-setup payload')
     args = parser.parse_args()
     if args.oem_metadata and args.oem_eapol_critical:
         parser.error('Choose one TX adaptation')
@@ -31,6 +33,8 @@ def main():
         parser.error('--single-pdev-bank requires --oem-eapol-critical')
     if args.wait_htt_drain and not args.oem_eapol_critical:
         parser.error('--wait-htt-drain requires --oem-eapol-critical')
+    if args.oem_srng_size and not args.wait_htt_drain:
+        parser.error('--oem-srng-size requires --wait-htt-drain')
     if args.oem_eapol_critical:
         from StationOemEapolCritical import station, dp_header
         source_recipe = 'StationOemEapolCritical.py'
@@ -67,13 +71,18 @@ def main():
         if args.wait_htt_drain:
             from ScanHttDrain import link_header
             header_specs.append((STA.parent / 'upstream/WifiLink.h', link_header, {}))
+        if args.oem_srng_size:
+            from ScanHttDrain import oem_srng_header
+            header_specs.append((STA.parent / 'upstream/WifiHtt.h', oem_srng_header, {}))
         for frozen, derive, options in header_specs:
             paths = [path for path in expected_headers if Path(path).name == frozen.name]
-            if len(paths) != 1 or expected_headers.pop(paths[0]) != sha(frozen):
+            if len({Path(path).resolve() for path in paths}) != 1 or any(expected_headers[path] != sha(frozen) for path in paths):
                 raise ValueError('Profile-ready runtime did not consume ' + frozen.name)
+            for path in paths:
+                expected_headers.pop(path)
             generated_header = output / frozen.name
             generated_header.write_bytes(derive(frozen.read_bytes(), **options))
-            roots.append({'type':'file','name':paths[0],'external-contents':str(generated_header)})
+            roots.append({'type':'file','name':str(Path(paths[0]).resolve()),'external-contents':str(generated_header)})
             expected_headers[str(generated_header)] = sha(generated_header)
         overlay_path = output / 'overlay.json'
         overlay_path.write_text(json.dumps(overlay_value, indent=2) + '\n')
@@ -142,6 +151,11 @@ def main():
                 pins[path.relative_to(ROOT).as_posix()] = sha(path)
             result.update(wait_htt_drain=True,link_header=str(output/'WifiLink.h'),
                           link_header_sha256=sha(output/'WifiLink.h'))
+        if args.oem_srng_size:
+            frozen=STA.parent/'upstream/WifiHtt.h'
+            pins[frozen.relative_to(ROOT).as_posix()] = sha(frozen)
+            result.update(oem_srng_size=True,htt_header=str(output/frozen.name),
+                          htt_header_sha256=sha(output/frozen.name))
     qualify_runtime(result)
     (output / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'compiled': True, 'binding_sha256': result['binding_sha256']}))
