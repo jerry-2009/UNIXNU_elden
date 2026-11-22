@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-22",
+  "source_commit": "cd9034c",
+  "session": "87b97e86dbecf233",
+  "boot_nonce": "ef658cf2887b9e43",
+  "image_sha256": "44bf406e9d9ae0c5490aa617d4106882415cbfef6f7bf2140e779c2655c91033",
+  "candidate_full_readback_sha256": "44bf406e9d9ae0c5490aa617d4106882415cbfef6f7bf2140e779c2655c91033",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "raw_path": "edl_work/live-station-htt-drain-20261122/usb/20261122-023222.bin",
+  "raw_sha256": "9d599fc303ec1eacebb4d220ae28d279099c8848caa0e432d538f4f38d74688e",
+  "raw_bytes": 245106,
+  "raw_lines": {
+    "htt_wait": 1689,
+    "ce_totals": 1691,
+    "transport_timeout": 2115,
+    "stop_umac_timeout": 4565,
+    "physical_fence": 4696
+  },
+  "first_scan_completed": true,
+  "first_scan_bss": 0,
+  "htt_rx_announcements": 6,
+  "aggregate_ce": {
+    "submitted": 22,
+    "received": 300,
+    "completed": 18,
+    "dropped": 0
+  },
+  "second_scan_submitted": false,
+  "htt_source_ring_drained": false,
+  "wait_stage": 628,
+  "terminal_stage": 612,
+  "terminal_error": -4,
+  "umac_timeout_during_stop": -110,
+  "station_handoff_reached": false,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "physical_fastboot": true,
+  "full_readback_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "stock_boot_root_green_and_settings_verified": true,
+  "restore_local_time": "2026-11-22T10:34:54+08:00"
+}

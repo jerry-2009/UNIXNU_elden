@@ -1,14 +1,16 @@
 # Wi-Fi当前主线 · 2026-11-22
 
-候选 `44bf406e` 在原有 HTT 环建立期限内等待该端点的 CE 源环被实际消费，再发第二轮扫描。
-失败日志在第二轮开始附近为 CE 提交 23／完成 18，成功日志为 23／23。这是总计数，
-不能据此确定是哪一环停住。此前六个 HTT 环的「已通告」只统计主机提交。新候选用
-HTT 端点的源环指针判定，保留成功路径、八字节 HTT 和上一版单 PDEV bank。
-CiscoMac 的实际状态机测试覆盖未消费、消费后提交扫描和到期返回传输错误。
-完整链接及 21 项错误组合检查通过，签名与 Windows 整像摘要一致，
-会话为 `87b97e86dbecf233`。[增量构建入口](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md)
+候选 `44bf406e` 实测未发出第二轮扫描。第一轮结束后，六个 HTT 环的描述符已提交，
+但 HTT 端点的 CE 源环未在原期限内被消费，状态从 628 进入 612，返回传输错误 `-4`。
+当时 CE 总计提交 22／完成 18。UMAC `-110` 在后续停机时才出现。下一步追查
+HTT 环建立阶段设备为什么停止消费。此次未进入关联后的 bank 设置。已完整恢复原厂 Android。
+[实机记录](evidence/wifi-station-htt-drain-hardware-20261122.json)
 
-最新单 PDEV bank 候选 `c9427d2f` 在第二轮扫描前再次遇到 UMAC `-110`。
+CiscoMac 的状态机测试覆盖了源环等待、消费后提交扫描及到期返回传输错误。整核链接、
+21 项错误组合检查、签名审查和 Windows 整像摘要核对均通过。
+[增量构建入口](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md)
+
+上一份单 PDEV bank 候选 `c9427d2f` 在第二轮扫描前遇到 UMAC `-110`。
 该版保留八字节 HTT。原厂 bit 14 对照只在关联后写 bank，本轮未进入该路径，
 因此 bank 对 WBM 的影响仍未实测。单字 HTT 的历史失败不能解释这一轮。
 候选已完整恢复原厂 Android。下一步先追第二轮扫描前的 UMAC 生命周期，
@@ -42,7 +44,7 @@ macOS27系统ABI与Y700固件不整包覆盖。
 
 八字节基线候选 `9c9fc5d3`，源码 `c62a26e`，session `80ad897d6443755d`，floor 1738713600／0／3。CiscoMac 的 ARM64 对象、整核、20 项拒绝用例及签名包静态审查通过。增量入口为 `tools/build_wifi_station_tx_priority.py`，沿用原 PMK 就绪 runtime2。四份旧构建输入逐字恢复了冻结的 CRLF，Git 保留原字节。
 
-最新实测源码 `6f27cf0`，session `6f87a81d1e1da868`，候选与恢复镜像均通过整像读回，回滚索引为 1738713600／0／3。八字节 HTT 继续用于扫描、关联、WBM、WPA2、DHCP 和流量的综合验收。
+最新实测源码 `cd9034c`，session `87b97e86dbecf233`，候选与恢复镜像均通过整像读回，回滚索引为 1738713600／0／3。八字节 HTT 继续用于扫描、关联、WBM、WPA2、DHCP 和流量的综合验收。
 
 实际OEM模块排除隐式RBM：相关helper为ret，TCL0→WBM0/RBM5与donor一致。
 单设备vdev-ID检查和物理MAC选择有差异，尚未证明是TX原因；没有因此猜写bank。
