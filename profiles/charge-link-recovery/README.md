@@ -113,8 +113,11 @@ changes while the PD startup handoff is active.
 
 CiscoMac built this combined variant incrementally over v144 and reused the
 backlight archive. The signed image `f6352810`, session `bd8811563167f017`,
-passed static audit. The combined empty-output build and hardware acceptance
-remain pending. [Combined build evidence](../../docs/evidence/charge-link-pd-20261122.json)
+passed static audit and completed the PD startup handoff on the tablet.
+All ten post-handoff battery samples showed net discharge. The combined
+empty-output build and hardware link-loss recovery remain pending.
+[Combined build evidence](../../docs/evidence/charge-link-pd-20261122.json) ·
+[Hardware evidence](../../docs/evidence/charge-link-pd-hardware-20261123.json)
 
 Host validation:
 

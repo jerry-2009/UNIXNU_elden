@@ -16,7 +16,7 @@ Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚�
 | CPU／RAM | 八核实际online/work/timers/ipis=ff；本轮诊断RAM6GiB，GUI8GiB有独立实录 | 全16GB、安全地址压力验证；不要强制全核满载 |
 | UFS／Data | 多槽IRQ/DMA与自动空闲唤醒已有实机；2GiB sparse Data独立GUI路径通过 | 诊断仍用旧RAM Data；持久Data、完整应用容量与压力 |
 | USB／回程 | 内核CDC日志、会话绑定RPC、panic定时SDAM返回fastboot，完整stock恢复 | 断线／异常供电长期恢复 |
-| 电源 | 原厂ADSP/GLINK/PD与BMS、单短口供电及模式请求有实录；断链恢复版完整28阶段源码clean build和静态签名审查通过 | 双口净充、稳定旁路、80%与40–60%完整周期和持久化，候选未实机测试 |
+| 电源 | 原厂 ADSP／GLINK／BMS 已接入。正常 GUI 亮度候选实测第二口 9 V／3 A 合同和 PD 交接完成，交接后十个样本全为净放电。[实录](evidence/charge-link-pd-hardware-20261123.json) | 双口净充、断链恢复、稳定旁路、80% 与 40–60% 完整周期和持久化 |
 | Wi-Fi | SM8750 成功供体的扫描、VDEV/auth/assoc 与 iOS 17 桥已接入。实测关联并提交 EAPOL message 2 | WBM 回执、message 3/keys、DHCP 和流量 |
 | 蓝牙 | v138 实机有 349 条完整扩展广播交给系统 HCI socket。共享 WCN 候选用 `ewt=1` 选择 mode 4，已链接和刷机，两次均未获得 CDC 会话 | 与当前 station 合并后实测 Settings 列表、配对、双向数据、睡眠与 WLAN 共存 |
 | 其他外设 | offline-peripheral-fixes有笔/触觉/运动/RTC/相机离线交付；GPU另在独立工作树 | 主线逐项评审及实机；RTC NVMEM/alarm provider未绑定，马达和喇叭未经实测校准保持禁用 |
