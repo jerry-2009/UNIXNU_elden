@@ -94,6 +94,46 @@ static void test_oem_critical(const EldenPortableIo &io){
 }
 #endif
 
+#if ELDEN_TEST_HTT_DRAIN
+static void test_htt_drain(){
+    constexpr unsigned endpoint=2;
+    const int index=ceIndexOf(4);
+    assert(index>=0 && ce.pipes[index].hasSrc);
+    CeRing &source=ce.pipes[index].src;
+    const auto stage=[&]{
+        link.step=kLinkRxRings;
+        link.pending=kLinkSendNothing;
+        link.httEndpoint=endpoint;
+        link.htc.ep[endpoint].used=true;
+        link.htc.ep[endpoint].ulPipe=4;
+        link.srngSent=kHttRings;
+        link.ringSettle=20;
+        link.deadline=60;
+        link.options.noScan=false;
+        link.endpoint=3;
+        link.htc.ep[3].used=true;
+        link.htc.ep[3].ulPipe=3;
+        link.htc.ep[3].creditFlow=false;
+        source.ours=1;
+        source.taken=0;
+        *source.theirs=0;
+    };
+    stage();
+    const auto submitted=ce.sent;
+    assert(linkRun(link,20)==kLinkRxRings);
+    assert(link.pending==kLinkSendNothing && ce.sent==submitted);
+    *source.theirs=source.words;
+    assert(linkRun(link,25)==kLinkScanning);
+    assert(source.taken==source.ours);
+    assert(ce.sent==submitted+1 && link.request.scanId==kWmiScanId+2);
+
+    stage();
+    assert(linkRun(link,60)==kLinkErrTransport);
+    assert(link.step==kLinkStopped && link.failedStep==kLinkRxRings);
+    assert(ce.sent==submitted+1);
+}
+#endif
+
 int main(){
     int owner;EldenStationPort port={&owner,take,give,message};assert(!elden_wifi_station_port_install(&port));
     uint8_t mac[6]={2,1,2,3,4,5};void *memory=std::aligned_alloc(4u<<20,4u<<20);assert(memory);
@@ -133,6 +173,9 @@ int main(){
 #else
     // Old actual adapter associates after enqueue, without crypto completion.
     assert(station_began);
+#endif
+#if ELDEN_TEST_HTT_DRAIN
+    test_htt_drain();
 #endif
     elden_wifi_portable_disable(&owner);std::free(memory);
     return 0;

@@ -87,12 +87,29 @@ def qualify_oem_eapol_critical(r):
         'name': dp_paths[0],
         'external-contents': r['dp_header'],
     })
+    headers[r['dp_header']]=r['dp_header_sha256']
+    wait_htt_drain=r.get('wait_htt_drain',False)
+    if type(wait_htt_drain) is not bool:
+        raise ValueError('Invalid HTT source-ring drain choice')
+    if wait_htt_drain:
+        from ScanHttDrain import LINK_SHA,link_header
+        paths=[path for path in headers if Path(path).name=='WifiLink.h']
+        if len(paths)!=1 or headers.pop(paths[0])!=LINK_SHA:
+            raise ValueError('Missing original link header')
+        original_link=STA.parent/'upstream/WifiLink.h'
+        if (link_header(original_link.read_bytes())!=Path(r['link_header']).read_bytes() or
+                sha(r['link_header'])!=r['link_header_sha256']):
+            raise ValueError('HTT source-ring drain derivation differs')
+        expected_overlay['roots'].append({'type':'file','name':paths[0],'external-contents':r['link_header']})
+        headers[r['link_header']]=r['link_header_sha256']
+    elif 'link_header' in r or 'link_header_sha256' in r:
+        raise ValueError('Unexpected HTT source-ring drain header')
     if (read(r['overlay']) != expected_overlay or
             sha(r['overlay']) != r['overlay_sha256'] or
             r['command'].count('-ivfsoverlay') != 1 or
             r['command'][r['command'].index('-ivfsoverlay') + 1] != r['overlay']):
         raise ValueError('OEM TCL critical overlay differs')
-    if r['retained_objects']!=prior['retained_objects'] or r['consumed_inputs']!={**headers,r['source']:r['source_sha256'],r['dp_header']:r['dp_header_sha256']}:
+    if r['retained_objects']!=prior['retained_objects'] or r['consumed_inputs']!={**headers,r['source']:r['source_sha256']}:
         raise ValueError('OEM TCL critical compile inputs differ')
     for key, digest in (('source', 'source_sha256'), ('object', 'object_sha256')):
         if sha(r[key]) != r[digest]:

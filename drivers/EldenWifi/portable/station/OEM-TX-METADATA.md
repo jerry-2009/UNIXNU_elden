@@ -33,3 +33,8 @@ python tools/build_wifi_station_tx_priority.py --oem-metadata \
 
 CiscoMac 的实际发送路径测试验证了 bank 写值和普通帧行为。完整 ARM64 链接及
 20 项拒绝用例通过，签名候选 `c9427d2f` 的会话是 `6f87a81d1e1da868`。
+
+在上述选项上加 `--wait-htt-drain` 可构建候选 `44bf406e`。它沿用原来的 300 ms
+settle 和阶段期限，并在发第二轮扫描前检查 HTT 端点所用 CE 源环的消费指针。
+到期未消费则在 HTT 环阶段返回传输错误。源环消费只能确认设备取走描述符，
+固件是否应用环配置及 UMAC 超时原因仍需实机证据。

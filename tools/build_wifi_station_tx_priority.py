@@ -22,11 +22,15 @@ def main():
                         help='Add OEM EAPOL critical flow-override and TX-notify fields')
     parser.add_argument('--single-pdev-bank', action='store_true',
                         help='Match the TB322FC station bank VDEV check setting')
+    parser.add_argument('--wait-htt-drain', action='store_true',
+                        help='Require HTT source-ring progress before the second scan')
     args = parser.parse_args()
     if args.oem_metadata and args.oem_eapol_critical:
         parser.error('Choose one TX adaptation')
     if args.single_pdev_bank and not args.oem_eapol_critical:
         parser.error('--single-pdev-bank requires --oem-eapol-critical')
+    if args.wait_htt_drain and not args.oem_eapol_critical:
+        parser.error('--wait-htt-drain requires --oem-eapol-critical')
     if args.oem_eapol_critical:
         from StationOemEapolCritical import station, dp_header
         source_recipe = 'StationOemEapolCritical.py'
@@ -51,22 +55,26 @@ def main():
     source = output / 'Station.cpp'
     source.write_bytes(generated)
     overlay_path = None
+    expected_headers = dict(prior['consumed_inputs'])
+    expected_headers.pop(prior['source'])
     if args.oem_eapol_critical:
         wire = prior['base']['overlay']
         overlay_value = json.loads(Path(wire).read_text())
         roots = overlay_value.get('roots')
         if not isinstance(roots, list) or len(roots) != 1:
             raise ValueError('Expected the exact existing station codec overlay')
-        dp_source = STA / 'upstream/WifiDp.h'
-        dp_paths = [path for path in prior['consumed_inputs'] if Path(path).name == dp_source.name]
-        if len(dp_paths) != 1 or sha(dp_paths[0]) != sha(dp_source):
-            raise ValueError('Profile-ready runtime did not consume the pinned DP header')
-        dp_virtual_path = dp_paths[0]
-        dp_bytes = dp_header(dp_source.read_bytes(), single_pdev_bank=args.single_pdev_bank)
-        dp_header_path = output / 'WifiDp.h'
-        dp_header_path.write_bytes(dp_bytes)
-        roots.append({'type': 'file', 'name': dp_virtual_path,
-                      'external-contents': str(dp_header_path)})
+        header_specs = [(STA / 'upstream/WifiDp.h', dp_header, {'single_pdev_bank':args.single_pdev_bank})]
+        if args.wait_htt_drain:
+            from ScanHttDrain import link_header
+            header_specs.append((STA.parent / 'upstream/WifiLink.h', link_header, {}))
+        for frozen, derive, options in header_specs:
+            paths = [path for path in expected_headers if Path(path).name == frozen.name]
+            if len(paths) != 1 or expected_headers.pop(paths[0]) != sha(frozen):
+                raise ValueError('Profile-ready runtime did not consume ' + frozen.name)
+            generated_header = output / frozen.name
+            generated_header.write_bytes(derive(frozen.read_bytes(), **options))
+            roots.append({'type':'file','name':paths[0],'external-contents':str(generated_header)})
+            expected_headers[str(generated_header)] = sha(generated_header)
         overlay_path = output / 'overlay.json'
         overlay_path.write_text(json.dumps(overlay_value, indent=2) + '\n')
     obj = output / 'Station.o'
@@ -82,11 +90,6 @@ def main():
 
     deps = shlex.split(dep.read_text().replace('\\\n', ' ').split(':', 1)[1])
     consumed = {path: sha(path) for path in deps}
-    expected_headers = dict(prior['consumed_inputs'])
-    expected_headers.pop(prior['source'])
-    if args.oem_eapol_critical:
-        expected_headers.pop(dp_virtual_path)
-        expected_headers[str(dp_header_path)] = sha(dp_header_path)
     if consumed != {**expected_headers, str(source):sha(source)}:
         raise ValueError('TX priority changed the station header inputs')
 
@@ -134,6 +137,11 @@ def main():
         )
         if args.single_pdev_bank:
             result['oem_single_pdev_bank'] = True
+        if args.wait_htt_drain:
+            for path in (STA/'ScanHttDrain.py',STA.parent/'upstream/WifiLink.h'):
+                pins[path.relative_to(ROOT).as_posix()] = sha(path)
+            result.update(wait_htt_drain=True,link_header=str(output/'WifiLink.h'),
+                          link_header_sha256=sha(output/'WifiLink.h'))
     qualify_runtime(result)
     (output / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'compiled': True, 'binding_sha256': result['binding_sha256']}))
