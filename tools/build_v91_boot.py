@@ -44,6 +44,7 @@ def main():
     p.add_argument('--bt-runtime',type=Path)
     p.add_argument('--pd-gui',action='store_true',help='Use the existing GUI brightness branch of a qualified PD integration kernel')
     p.add_argument('--early-stall',action='store_true',help='Controlled pre-UFS interrupt-masked watchdog qualification')
+    p.add_argument('--bootshim',type=Path,help='Reuse the exact source-pinned 128-byte BootShim binary')
     p.add_argument('--hid-report',type=Path,help='Explicit v100 result-bearing touch delivery build; retains the v94 menu')
     p.add_argument('--wait-sample',action='store_true',help='v106 only: enable existing bounded process-wait sampler')
     a=p.parse_args();out=a.output.resolve()
@@ -122,9 +123,15 @@ def main():
     config=tomllib.loads(menu)
     if config['boot']['default']!='xnu' or config['boot']['timeout']!=8 or any(len(e.get('args','').encode())>1023 for e in config['entry']):raise RuntimeError('Unexpected boot menu policy')
     (assets/'unixnu.toml').write_text(menu,encoding='utf-8',newline='\n')
-    shim_source=ROOT/'patches/overlays/mu_wide_platforms/BootShim/BootShim.S';obj=out/'BootShim.o'
-    run([a.clang,'--target=aarch64-none-elf','-c',path(shim_source),'-o',path(obj),'-DUEFI_BASE=0xFF300000','-DUEFI_SIZE=0x00400000','-DEMBEDDED_PAYLOAD_SIZE=58720256'])
-    shim=extract_alloc_sections(obj.read_bytes())
+    shim_source=ROOT/'patches/overlays/mu_wide_platforms/BootShim/BootShim.S'
+    if a.bootshim:
+        shim=a.bootshim.read_bytes()
+        shim_source_sha256=sha(shim_source)
+    else:
+        obj=out/'BootShim.o'
+        run([a.clang,'--target=aarch64-none-elf','-c',path(shim_source),'-o',path(obj),'-DUEFI_BASE=0xFF300000','-DUEFI_SIZE=0x00400000','-DEMBEDDED_PAYLOAD_SIZE=58720256'])
+        shim=extract_alloc_sections(obj.read_bytes())
+        shim_source_sha256=sha(shim_source)
     if len(shim)!=128 or hashlib.sha256(shim).hexdigest()!='ac27ecc2bcec5440606d77e69b7726921b0bf3803dd2234f23b10d1619149e1d':raise RuntimeError('BootShim differs from qualified v91')
     (out/'BootShim.bin').write_bytes(shim)
     image=out/'payload.img'
@@ -152,7 +159,7 @@ def main():
     for key,value in meta['props'].items():cmd+=['--prop',key+':'+value]
     run(cmd);checked=check_image(signed,'boot_a')
     if metadata(signed)['props']!=meta['props'] or checked.bytes!=100663296:raise RuntimeError('Stock signing properties changed')
-    result={'kernel_sha256':sha(a.kernel),'image_sha256':checked.sha256,'rollback_index':checked.index,'footer_location':checked.location,'session':session,'fat_files':expected,'bootshim_sha256':hashlib.sha256(shim).hexdigest(),'external_assets':{name:sha(getattr(a,name)) for name in HASHES},'firmware_contract':firmware_contract,'loader_contract':loader_contract,'data_contract':data_contract,'assembled_without_old_boot_carrier':True,'hardware_tested':False,'device_operation':False,'full_asset_source_closure':not data_contract.get('legacy_frozen_seed',False)}
+    result={'kernel_sha256':sha(a.kernel),'image_sha256':checked.sha256,'rollback_index':checked.index,'footer_location':checked.location,'session':session,'fat_files':expected,'bootshim_sha256':hashlib.sha256(shim).hexdigest(),'bootshim_source_sha256':shim_source_sha256,'bootshim_reused_prebuilt':bool(a.bootshim),'external_assets':{name:sha(getattr(a,name)) for name in HASHES},'firmware_contract':firmware_contract,'loader_contract':loader_contract,'data_contract':data_contract,'assembled_without_old_boot_carrier':True,'hardware_tested':False,'device_operation':False,'full_asset_source_closure':not data_contract.get('legacy_frozen_seed',False)}
     if fbwc:result['framebuffer_experiment']=fbwc
     if battery_ui:result['battery_ui']=battery_ui
     if bt:result['bluetooth_runtime']=bt
