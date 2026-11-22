@@ -223,6 +223,18 @@ def main():
             'tools/build_charge_verification.py','tools/build_wifi_service_native.py','tools/build_wifi_service_kernel.py']
     changed_policy={name:dict(parent_sha256=prior['source_inputs'].get(name),current_sha256=sha(ROOT/name)) for name in policy}
     inputs={**prior['source_inputs'],**own,**{name:item['current_sha256'] for name,item in changed_policy.items()}}
+    # The radio-only candidate deliberately rebuilds the PMIC consumer from the
+    # current charging source. The retained service parent predates that source
+    # update, so record the exact parent/current pair instead of weakening the
+    # inherited-input check globally.
+    if battery:
+        name='drivers/EldenPmicGlink/PdStartupSource.py'
+        parent_hash=prior['source_inputs'].get(name)
+        current_hash=sha(ROOT/name)
+        if parent_hash and parent_hash!=current_hash:
+            changed_policy[name]=dict(parent_sha256=parent_hash,current_sha256=current_hash,
+                                      reason='battery-admission PMIC consumer rebuilt from current charging source')
+            inputs[name]=current_hash
     plan='profiles/current-build/plan.json'
     if plan in inputs and sha(ROOT/plan)!=inputs[plan]:
         from build_wifi_service_kernel import relocated_baseline_plan

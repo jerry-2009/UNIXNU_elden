@@ -78,6 +78,7 @@ def main():
     archive=folder/'libEldenPmicClient.a';subprocess.run(['ar','rcs',str(archive),*names],cwd=folder,env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
     own=['tools/build_wifi_battery_admission.py','tools/test_wifi_battery_admission.py',
          'drivers/EldenWifi/BatteryAdmissionSource.py','drivers/EldenWifi/BatteryAdmission.h','drivers/EldenWifi/BatteryAdmission.inc',
+         'drivers/EldenPmicGlink/PdStartupSource.py',
          'drivers/EldenPcie/MhiRuntimeSource.py','drivers/EldenSmmu/EarlySource.py',
          'drivers/EldenPcie/NativeHookSource.py','drivers/EldenPcie/PowerNativeSource.py',
          'drivers/EldenWifi/SharedNativeSource.py','drivers/EldenWifi/WlanPowerNative.inc',
