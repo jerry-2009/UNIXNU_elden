@@ -18,7 +18,7 @@ Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚�
 | USB／回程 | 内核CDC日志、会话绑定RPC、panic定时SDAM返回fastboot，完整stock恢复 | 断线／异常供电长期恢复 |
 | 电源 | 原厂ADSP/GLINK/PD与BMS、单短口供电及模式请求有实录；断链恢复版完整28阶段源码clean build和静态签名审查通过 | 双口净充、稳定旁路、80%与40–60%完整周期和持久化，候选未实机测试 |
 | Wi-Fi | SM8750 成功供体的扫描、VDEV/auth/assoc 与 iOS 17 桥已接入。实测关联并提交 EAPOL message 2 | 第二轮扫描稳定性、WBM 回执、message 3/keys、DHCP 和流量 |
-| 蓝牙 | v138 实机有 349 条完整扩展广播交给系统 HCI socket。近期 Wi-Fi 独立候选的蓝牙控制器设为 mode 0 | Settings 列表、配对、双向数据、睡眠与 WLAN 共存 |
+| 蓝牙 | v138 实机有 349 条完整扩展广播交给系统 HCI socket。Wi-Fi network-17 候选曾将控制器设为 mode 0，现已把共享 WCN owner、电池新鲜度准入和 `elden-wcn-power=4` 菜单条件接入源码 | 新候选尚未整核链接或刷机，仍需 Settings 列表、配对、双向数据、睡眠与 WLAN 共存 |
 | 其他外设 | offline-peripheral-fixes有笔/触觉/运动/RTC/相机离线交付；GPU另在独立工作树 | 主线逐项评审及实机；RTC NVMEM/alarm provider未绑定，马达和喇叭未经实测校准保持禁用 |
 
 最新实机源码为 `7f7bb65`，session `bf1555e8dd6c5c07`。保留已通过的扫描配置，继续核对发送完成路径。[Wi-Fi 状态](WIFI-STATUS.md)

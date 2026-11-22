@@ -301,9 +301,13 @@ def main():
     import tomllib
     config=tomllib.loads(text)
     if config['boot']!={'timeout':8,'fallback_timeout':120,'default':'xnu'}:raise AssertionError('Countdown or fallback changed')
+    if 'elden-wcn-power=4' in config['entry'][0]['args'].split():raise AssertionError('Unqualified candidate enabled Bluetooth')
     if len(config['entry'][0]['args'].replace('@SESSION@','0'*16).encode())>1023:raise AssertionError('Boot argument ABI exceeded')
+    shared=tomllib.loads(menu(dict(q,shared_wcn_owner=True,station_trial=True)))
+    if 'elden-wcn-power=4' not in shared['entry'][0]['args'].split():raise AssertionError('Shared WCN menu did not enable Bluetooth')
+    if 'Bluetooth' not in shared['entry'][0]['title']:raise AssertionError('Shared WCN menu title lost Bluetooth')
     result=dict(passed=True,mutation_cases=cases,menu_dispatch=True,countdown_and_fallback_preserved=True,
-        actual_component_report_qualified=True,hardware_tested=False)
+        actual_component_report_qualified=True,shared_wcn_menu=True,hardware_tested=False)
     args.output.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))
 
 

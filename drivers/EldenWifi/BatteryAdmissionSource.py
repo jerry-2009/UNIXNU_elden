@@ -47,4 +47,8 @@ def wcn():
     text=replace(text,'||!elden_charge_policy_ready())return false;',')return false;')
     text=replace(text,'temperature>3800||(expected&&expected!=e))return false;',
         'temperature>3800||(expected&&expected!=e)||!elden_wifi_battery_ready(e))return false;')
+    declaration='int elden_recovery_armed(void);'
+    text=replace(text,declaration,declaration+'\nint elden_wifi_battery_available(void);')
+    old='if(!elden_recovery_armed()||native_owner_data_status||!elden_init_exec_accepted)return -11;'
+    text=replace(text,old,'if(!elden_recovery_armed()||native_owner_data_status||!elden_init_exec_accepted||!elden_wifi_battery_available())return -11;')
     return text.encode()

@@ -11,6 +11,8 @@ def main():
     sys.path.insert(0,str(ROOT/'drivers/EldenWifi'))
     import BatteryAdmissionSource as source
     (out/'PmicClient.cpp').write_bytes(source.client());(out/'WcnPowerNative.cpp').write_bytes(source.wcn())
+    if '!elden_wifi_battery_available()' not in source.wcn().decode():
+        raise ValueError('Shared WCN owner is missing its battery admission gate')
     cache=(ROOT/'drivers/EldenWifi/BatteryAdmission.inc').read_text()
     code=r'''
 #include "BatteryAdmission.h"
@@ -49,11 +51,11 @@ int main(){
  r=good();r.value[EldenChargeVoltage].raw=3799999;assert(!elden_wifi_battery_snapshot_safe(&r,0,1));cases++;
  r=good();r.value[EldenChargeInputSuspended].raw=1;assert(!elden_wifi_battery_snapshot_safe(&r,0,1));cases++;
  r=good();r.value[EldenChargeEnabled].raw=0;assert(elden_wifi_battery_snapshot_safe(&r,0,1));cases++; // battery charge permission is independent
- assert(!elden_wifi_battery_ready(1));r=good();wifiBatteryPublish(&r,100);assert(elden_wifi_battery_ready(1));assert(!elden_wifi_battery_ready(2));cases++;
- now+=9900;assert(!elden_wifi_battery_ready(1));cases++;
- now=100;wifiBatteryPublish(&r,0);linkUp=0;assert(!elden_wifi_battery_ready(1));cases++;
- linkUp=1;linkEpoch+=2;assert(!elden_wifi_battery_ready(1));cases++;
- wifiBatteryPublish(&r,0);assert(elden_wifi_battery_ready(1));wifiBatteryPublish(&r,10000);assert(!elden_wifi_battery_ready(1));cases++;
+ assert(!elden_wifi_battery_ready(1));assert(!elden_wifi_battery_available());r=good();wifiBatteryPublish(&r,100);assert(elden_wifi_battery_ready(1));assert(elden_wifi_battery_available());assert(!elden_wifi_battery_ready(2));cases++;
+ now+=9900;assert(!elden_wifi_battery_ready(1));assert(!elden_wifi_battery_available());cases++;
+ now=100;wifiBatteryPublish(&r,0);linkUp=0;assert(!elden_wifi_battery_ready(1));assert(!elden_wifi_battery_available());cases++;
+ linkUp=1;linkEpoch+=2;assert(!elden_wifi_battery_ready(1));assert(!elden_wifi_battery_available());cases++;
+ wifiBatteryPublish(&r,0);assert(elden_wifi_battery_ready(1));assert(elden_wifi_battery_available());wifiBatteryPublish(&r,10000);assert(!elden_wifi_battery_ready(1));assert(!elden_wifi_battery_available());cases++;
  printf("PASS %u radio-only admission/cache cases; chemistry, two gauges, age, epoch and link-loss fenced; no charger SET\n",cases);
 }
 '''.replace('@CACHE@',cache)

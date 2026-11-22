@@ -53,10 +53,10 @@ def main():
         cmd=list(report['command']);cmd[cmd.index('-ivfsoverlay')+1]=str(vfs);target=out/objname;cmd[cmd.index('-o')+1]=str(target)
         cwd=report.get('cwd',str(a.clean_build/'units/working/WcnPowerNative'))
         r=subprocess.run(cmd,cwd=cwd,capture_output=True);(out/(unit+'.log')).write_bytes(r.stdout+r.stderr);r.check_returncode()
-        adds={'_elden_wifi_battery_ready'} if unit=='PmicClient' else set()
+        adds={'_elden_wifi_battery_ready','_elden_wifi_battery_available'} if unit=='PmicClient' else set()
         if unit=='WcnPowerNative' and a.board_state:adds.add('_elden_wifi_board_state')
         if symbols(target,True)!=symbols(old,True)|adds:raise ValueError('Consumer export delta changed')
-        refs=symbols(target,False);allowed=symbols(parent/'native.macho',True)|{'_elden_wifi_battery_ready'}
+        refs=symbols(target,False);allowed=symbols(parent/'native.macho',True)|{'_elden_wifi_battery_ready','_elden_wifi_battery_available'}
         if refs-allowed:raise ValueError('Unresolved consumer imports: '+str(refs-allowed))
         asm=subprocess.check_output([str(a.llvm/'llvm-objdump'),'-dr',target],text=True);(out/(unit+'.asm')).write_text(asm)
         if any(n.endswith('/__mod_init_func') for n in sections(target)) or re.search(r'^\s*[0-9a-f]+:\s+[0-9a-f]{8}\s+.*\b[qvdshb]\d+(?:\b|\.)',asm,re.M):raise ValueError('Consumer initializer/SIMD')
@@ -76,10 +76,18 @@ def main():
             data=(out/'PmicClient.o').read_bytes()
         (folder/name).write_bytes(data)
     archive=folder/'libEldenPmicClient.a';subprocess.run(['ar','rcs',str(archive),*names],cwd=folder,env=dict(os.environ,ZERO_AR_DATE='1'),check=True)
-    own=['tools/build_wifi_battery_admission.py','tools/test_wifi_battery_admission.py','drivers/EldenWifi/BatteryAdmissionSource.py','drivers/EldenWifi/BatteryAdmission.h','drivers/EldenWifi/BatteryAdmission.inc']
+    own=['tools/build_wifi_battery_admission.py','tools/test_wifi_battery_admission.py',
+         'drivers/EldenWifi/BatteryAdmissionSource.py','drivers/EldenWifi/BatteryAdmission.h','drivers/EldenWifi/BatteryAdmission.inc',
+         'drivers/EldenPcie/MhiRuntimeSource.py','drivers/EldenSmmu/EarlySource.py',
+         'drivers/EldenPcie/NativeHookSource.py','drivers/EldenPcie/PowerNativeSource.py',
+         'drivers/EldenWifi/SharedNativeSource.py','drivers/EldenWifi/WlanPowerNative.inc',
+         'drivers/EldenWifi/WlanPowerExports.inc','drivers/EldenWifi/WlanPower.h',
+         'drivers/EldenWifi/WlanGpio.h','drivers/EldenBluetooth/WcnSharedPower.h',
+         'drivers/EldenBluetooth/WcnSharedPower.inc','drivers/EldenBluetooth/WcnPower.c',
+         'soc/sm8750/include/EldenWifiResources.h']
     if a.sideband_pins:own+=['tools/test_wifi_sideband_pins.py','drivers/EldenWifi/SidebandSource.py','drivers/EldenWifi/SidebandPins.h']
     if a.board_state:own+=['drivers/EldenWifi/BoardState.inc','tools/test_wifi_board_state.py']
-    proof=dict(compiled=True,wifi_battery_runtime_trial=True,radio_only_no_charger_set=True,chemistry_two_gauges_epoch_age_checked=True,
+    proof=dict(compiled=True,wifi_battery_runtime_trial=True,shared_owner=True,radio_only_no_charger_set=True,chemistry_two_gauges_epoch_age_checked=True,
         controls_and_charger_permission_unchanged=True,pmic_archive=str(archive),pmic_archive_sha256=sha(archive),parent_pmic_archive=str(oldar),
         parent_pmic_archive_sha256=sha(oldar),pmic_retained_members=retained,consumers=proofs,
         source_inputs={n:sha(ROOT/n) for n in own},hardware_tested=False)

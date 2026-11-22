@@ -255,6 +255,7 @@ def main():
         window_reselect_trial=bool(stride and stride.get('window_reselect_trial')),
         pci_state_trace_trial=bool(stride and stride.get('pci_state_trace_trial')),
         wifi_battery_runtime_trial=bool(battery),battery_admission=battery,
+        shared_wcn_owner=bool(battery and battery.get('shared_owner')),
         sideband_pins_trial=bool(battery and battery.get('sideband_pins_trial')),
         umac_access_trial=bool(stride and stride.get('umac_access_trial')),
         umac_command_lease_trial=bool(stride and stride.get('umac_command_lease_trial')),

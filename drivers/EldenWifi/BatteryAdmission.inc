@@ -4,6 +4,13 @@ static EldenChargeRawSnapshot wifiBatterySnapshot;
 static uint64_t wifiBatteryDeadline;
 static unsigned wifiBatteryLink;
 static bool wifiBatteryReported;
+static bool wifiBatteryReadyLocked(uint32_t expected_epoch)
+{
+    return wifiBatteryDeadline&&mach_absolute_time()<wifiBatteryDeadline&&
+        __atomic_load_n(&linkUp,__ATOMIC_ACQUIRE)&&
+        __atomic_load_n(&linkEpoch,__ATOMIC_ACQUIRE)==wifiBatteryLink&&
+        elden_wifi_battery_snapshot_safe(&wifiBatterySnapshot,0,expected_epoch);
+}
 static void wifiBatteryPublish(const EldenChargeRawSnapshot *r,uint64_t age_ms)
 {
     bool safe=elden_wifi_battery_snapshot_safe(r,age_ms,0);
@@ -24,10 +31,12 @@ static void wifiBatteryPublish(const EldenChargeRawSnapshot *r,uint64_t age_ms)
 extern "C" int elden_wifi_battery_ready(uint32_t expected_epoch)
 {
     if(!lock||!expected_epoch)return 0;
-    IOLockLock(lock);
-    bool ready=wifiBatteryDeadline&&mach_absolute_time()<wifiBatteryDeadline&&
-        __atomic_load_n(&linkUp,__ATOMIC_ACQUIRE)&&
-        __atomic_load_n(&linkEpoch,__ATOMIC_ACQUIRE)==wifiBatteryLink&&
-        elden_wifi_battery_snapshot_safe(&wifiBatterySnapshot,0,expected_epoch);
+    IOLockLock(lock);bool ready=wifiBatteryReadyLocked(expected_epoch);
+    IOLockUnlock(lock);return ready?1:0;
+}
+extern "C" int elden_wifi_battery_available(void)
+{
+    if(!lock)return 0;
+    IOLockLock(lock);bool ready=wifiBatteryReadyLocked(0);
     IOLockUnlock(lock);return ready?1:0;
 }

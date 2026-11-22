@@ -278,6 +278,7 @@ def qualify(report_path,entry_path,runtime):
     result['window_reselect_trial']=report.get('window_reselect_trial') is True
     result['pci_state_trace_trial']=report.get('pci_state_trace_trial') is True
     result['wifi_battery_runtime_trial']=report.get('wifi_battery_runtime_trial') is True
+    result['shared_wcn_owner']=report.get('shared_wcn_owner') is True
     result['umac_access_trial']=report.get('umac_access_trial') is True
     result['umac_command_lease_trial']=report.get('umac_command_lease_trial') is True
     result['oem_init_mode_trial']=report.get('oem_init_mode_trial') is True
@@ -340,7 +341,12 @@ def menu(qualification):
         before=tomllib.loads(text);first=before['entry'][0];args=first['args']
         if arguments(args).get('epd')!='2' or args.split().count('epd=2')!=1:raise ValueError('Unexpected PD trial parent')
         value=args.replace('epd=2','epd=0',1)
-        text=text.replace('args = "'+args+'"','args = "'+value+'"',1)
+        needle='args = "'+args+'"'
+        if text.count(needle)!=1:
+            needle='args="'+args+'"'
+        if text.count(needle)!=1:
+            raise ValueError('Shared WCN boot argument anchor changed')
+        text=text.replace(needle,'args = "'+value+'"',1)
         if tomllib.loads(text)['entry'][1:]!=before['entry'][1:] or tomllib.loads(text)['boot']!=before['boot']:raise ValueError('Radio-only fallback changed')
     if qualification.get('umac_access_trial'):
         if not qualification.get('pci_state_trace_trial'):raise ValueError('First-access contrast requires its state parent')
@@ -366,4 +372,16 @@ def menu(qualification):
         import tomllib
         current=tomllib.loads(text)['entry'][0]['title']
         text=text.replace(current,'Wi-Fi SM8750 WPA2 and data + USB - TEST',1)
+    if qualification.get('shared_wcn_owner'):
+        import tomllib
+        from battery_boot import arguments
+        config=tomllib.loads(text);args=config['entry'][0]['args']
+        if arguments(args).get('elden-wcn-power') is not None:
+            raise ValueError('Shared WCN menu already contains a Bluetooth mode')
+        value=args+' elden-wcn-power=4'
+        if len(value.replace('@SESSION@','0'*16).encode())>1023:
+            raise ValueError('Shared WCN menu exceeds parser contract')
+        text=text.replace('args = "'+args+'"','args = "'+value+'"',1)
+        text=text.replace('Wi-Fi SM8750 WPA2 and data + USB - TEST',
+                          'Wi-Fi SM8750 WPA2 + Bluetooth and data + USB - TEST',1)
     return text

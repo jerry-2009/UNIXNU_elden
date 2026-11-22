@@ -1,5 +1,11 @@
 # WLAN原生供电接入：组件已编译，尚未上机
 
+2026-11-22：Wi-Fi network-17 的 Bluetooth 消失原因已定位为候选启动参数
+`mode=0`，不是 QcaBluetooth 源码被删除。`BatteryAdmissionSource.wcn()` 继续
+使用共享 WCN owner，并增加只读的 `elden_wifi_battery_available()` 门。只有经
+shared-owner 资格标记的候选菜单才加入 `elden-wcn-power=4`。变更保持电池、GLINK、
+WLAN 和 Bluetooth 共用同一 owner。host 回归通过，整核与实机验收仍未完成。
+
 冷启动顺序更正：现区分预期板级身份取得供电与上电后实读端点身份，后者确认前QMI不准入。
 见[PCIe冷启动组件](../drivers/EldenPcie/README.md)；旧文中的“先验证实际端点再上电”不适用于断电芯片。
 

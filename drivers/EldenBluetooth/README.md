@@ -79,6 +79,16 @@ ELDEN_BLUETOOTH_HCI_BUILD links the executor and adds both normal assets to
 the read-only preflight inspector; it does not invoke startup. Physical power/
 UART, native21H461 bluetoothd/UART.SK and persistent pairing remain pending.
 
+## Wi-Fi candidate coexistence
+
+The Wi-Fi network-17 candidate previously selected `mode=0` for the WCN worker,
+so Bluetooth disappearing from Settings was a candidate boot-policy result. The
+radio-only admission path now records a shared WCN owner and adds the
+freshness-only `elden_wifi_battery_available` gate. A qualified network
+candidate may append `elden-wcn-power=4` exactly once. This does not claim that
+Bluetooth discovery or pairing passed on Elden hardware. Those still require
+one combined hardware window.
+
 ## HCI completion envelope correction (2026-11-11)
 
 The native bridge build now uses `BridgeCompletion.py` to apply a narrow,
