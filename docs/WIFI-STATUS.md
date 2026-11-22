@@ -1,6 +1,12 @@
 # Wi-Fi当前主线 · 2026-11-22
 
-最新实机候选 `60ca685d` 恢复第二轮扫描，保留 32 BSS、收到 142 管理帧，随后认证和关联成功。TCL 消费 3 个 EAPOL message 2 描述符，实际记录了 critical 字段，WBM 完成、ACK、密钥与端口开放仍为 0。已回真实 fastboot 并完成原厂镜像整像读回、root、green、原充电与无线设置恢复。[本轮实录](evidence/wifi-station-critical-hardware-20261122.json)
+最新单 PDEV bank 候选 `c9427d2f` 在第二轮扫描前再次遇到 UMAC `-110`。
+该版保留八字节 HTT。原厂 bit 14 对照只在关联后写 bank，本轮未进入该路径，
+因此 bank 对 WBM 的影响仍未实测。单字 HTT 的历史失败不能解释这一轮。
+候选已完整恢复原厂 Android。下一步先追第二轮扫描前的 UMAC 生命周期，
+等链路稳定后再验证 bank 与 WBM。[单 PDEV bank 实录](evidence/wifi-station-bank-hardware-20261122.json)
+
+最近一次到达关联的候选 `60ca685d` 恢复第二轮扫描，保留 32 BSS、收到 142 管理帧，随后认证和关联成功。TCL 消费 3 个 EAPOL message 2 描述符，实际记录了 critical 字段，WBM 完成、ACK、密钥与端口开放仍为 0。已回真实 fastboot 并完成原厂镜像整像读回、root、green、原充电与无线设置恢复。[关联实录](evidence/wifi-station-critical-hardware-20261122.json)
 
 上一份单字 HTT 候选 `3f8f74e1` 的第二轮扫描未启动，UMAC 访问 `0x1b86400` 超时（`-110`），最终停在 `state=612 error=-8`。[单字 HTT 实录](evidence/wifi-station-oem-metadata-hardware-20261122.json)
 
@@ -28,7 +34,7 @@ macOS27系统ABI与Y700固件不整包覆盖。
 
 八字节基线候选 `9c9fc5d3`，源码 `c62a26e`，session `80ad897d6443755d`，floor 1738713600／0／3。CiscoMac 的 ARM64 对象、整核、20 项拒绝用例及签名包静态审查通过。增量入口为 `tools/build_wifi_station_tx_priority.py`，沿用原 PMK 就绪 runtime2。四份旧构建输入逐字恢复了冻结的 CRLF，Git 保留原字节。
 
-最新实测源码 `30a930c`，session `e29fe911571aa175`，候选与恢复镜像均通过整像读回，回滚索引为 1738713600／0／3。八字节 HTT 继续用于扫描、关联、WBM、WPA2、DHCP 和流量的综合验收。
+最新实测源码 `6f27cf0`，session `6f87a81d1e1da868`，候选与恢复镜像均通过整像读回，回滚索引为 1738713600／0／3。八字节 HTT 继续用于扫描、关联、WBM、WPA2、DHCP 和流量的综合验收。
 
 实际OEM模块排除隐式RBM：相关helper为ret，TCL0→WBM0/RBM5与donor一致。
 单设备vdev-ID检查和物理MAC选择有差异，尚未证明是TX原因；没有因此猜写bank。

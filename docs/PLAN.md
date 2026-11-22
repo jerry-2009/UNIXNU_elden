@@ -5,10 +5,10 @@
 
 1. 本周Mac整理已完成：137项旧产物、18项临时内容移入原生Trash，原路径／新路径／SHA
    清单和当前依赖保留；垃圾桶未清空，GPU和其他工作树未改。文档入口为INDEX。
-2. Wi-Fi集中修数据发送。PMK 就绪、PEER_ASSOC 21ms、TCL 消费 1，WBM 完成 0。
-   成功供体 Piano2438556c 的 legacy WPA2 使用 TID 0，EAPOL 完成来自固件。新候选
-   采用本机原厂单字 HTT 与同一版本 TCL 元数据布局，验证 firmware/WBM 回执、
-   EAPOL 3/4 和密钥授权。握手通过后在同一窗口继续验证 BSD 收发、DHCP、流量和完整回程。
+2. Wi-Fi先稳定第二轮扫描。八字节 HTT 的 `60ca685d` 已关联并由 TCL 消费 3 个 EAPOL，
+   WBM 回执仍为 0。单 PDEV bank 候选在关联前发生 UMAC `-110`，尚未写 bank。
+   成功供体 Piano2438556c 的 legacy WPA2 使用 TID 0，EAPOL 完成来自固件。
+   下一次将扫描、关联、WBM、WPA2、BSD 收发、DHCP、流量和完整回程放入同一窗口。
 3. 系统Wi-Fi接口：复用Sheng同21H461桥；Mac27 donor ABI只作方法参考。
    要求系统扫描/选择SSID/加入/退出/重新加入与实际网络一致，不能靠虚假ready／credit。
 4. 电源剩余：双口仲裁和真实净充、旁路、80%／40–60%完整阈值、拔插／睡眠恢复／持久设置。
