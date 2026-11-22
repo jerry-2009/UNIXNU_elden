@@ -1,5 +1,11 @@
 # Wi-Fi当前主线 · 2026-11-22
 
+原厂 56 字节 HTT 环配置候选 `b0d308f0` 已跑完第二轮扫描和关联，保留 32 个 BSS、
+收到 136 个管理帧，CE 提交与完成均为 59。这是一次实机通过，尚需确认重复启动稳定性。
+关联后确认 bank 为 `0x0a04`，TCL 消费 3 个 EAPOL message 2，WBM 指针仍为 0，
+密钥和受控端口尚未开启。原厂 Android、root、green、原充电和无线设置已恢复。
+[56 字节配置实录](evidence/wifi-station-oem-srng-hardware-20261122.json)
+
 候选 `44bf406e` 实测未发出第二轮扫描。第一轮结束后，六个 HTT 环的描述符已提交，
 但 HTT 端点的 CE 源环未在原期限内被消费，状态从 628 进入 612，返回传输错误 `-4`。
 当时 CE 总计提交 22／完成 18。UMAC `-110` 在后续停机时才出现。下一步追查
@@ -44,7 +50,7 @@ macOS27系统ABI与Y700固件不整包覆盖。
 
 八字节基线候选 `9c9fc5d3`，源码 `c62a26e`，session `80ad897d6443755d`，floor 1738713600／0／3。CiscoMac 的 ARM64 对象、整核、20 项拒绝用例及签名包静态审查通过。增量入口为 `tools/build_wifi_station_tx_priority.py`，沿用原 PMK 就绪 runtime2。四份旧构建输入逐字恢复了冻结的 CRLF，Git 保留原字节。
 
-最新实测源码 `cd9034c`，session `87b97e86dbecf233`，候选与恢复镜像均通过整像读回，回滚索引为 1738713600／0／3。八字节 HTT 继续用于扫描、关联、WBM、WPA2、DHCP 和流量的综合验收。
+最新实测源码 `7f7bb65`，session `bf1555e8dd6c5c07`，候选与恢复镜像均通过整像读回，回滚索引为 1738713600／0／3。保留八字节 HTT 版本请求及 56 字节环配置，继续核对关联后的发送路径。
 
 实际OEM模块排除隐式RBM：相关helper为ret，TCL0→WBM0/RBM5与donor一致。
 单设备vdev-ID检查和物理MAC选择有差异，尚未证明是TX原因；没有因此猜写bank。

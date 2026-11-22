@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-22",
+  "source_commit": "7f7bb65",
+  "image_sha256": "b0d308f0041b969859307d138c65514bf9e50d7654f78d341bd525356d6cdf2f",
+  "candidate_full_readback_sha256": "b0d308f0041b969859307d138c65514bf9e50d7654f78d341bd525356d6cdf2f",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "session": "bf1555e8dd6c5c07",
+  "boot_nonce": "dec2278739133153",
+  "raw_path": "edl_work/live-station-oem-srng-20261122/usb/20261122-041033.bin",
+  "raw_sha256": "182a656a6767e0af75c58227317120bf325bcd62339905b88ec101a0a644b36c",
+  "raw_bytes": 263882,
+  "raw_lines": {
+    "ring_stage": 1683,
+    "scan_completed": 1782,
+    "tx_snapshot": 2611,
+    "tcl": 2613,
+    "wbm": 2615,
+    "bank": 2617,
+    "endpoint_fence": 4974
+  },
+  "hardware_tested": true,
+  "httsrng_config_bytes": 56,
+  "htt_version_request_bytes": 8,
+  "httrx_announcements": 6,
+  "second_scan_completed": true,
+  "retained_bss": 32,
+  "management_frames": 136,
+  "ce_submitted": 59,
+  "ce_completed": 59,
+  "associated": true,
+  "tx_bank_observed": "0x0a04",
+  "eapol_rx": 3,
+  "eapol_tx_submitted": 3,
+  "tcl_hp_tp_words": [
+    24,
+    24
+  ],
+  "wbm_hp_tp_words": [
+    0,
+    0
+  ],
+  "tx_completed": 0,
+  "tx_acked": 0,
+  "keys_installed": 0,
+  "controlled_port_open": false,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "protocol_stop": -110,
+  "physical_fastboot": true,
+  "full_readback_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "stock_boot_root_green_and_settings_verified": true,
+  "restore_local_time": "2026-11-22T12:13:08+08:00"
+}

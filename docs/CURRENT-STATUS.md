@@ -1,6 +1,6 @@
 # Elden 当前状态 · 2026-11-22
 
-最新 Wi-Fi 候选 `44bf406e` 实测在 HTT 环建立阶段等不到设备消费，第二轮扫描未提交，UMAC 超时在后续停机时出现。此前 `60ca685d` 已关联，TCL 消费 3 个 EAPOL message 2，WBM、密钥和端口开放均为 0。[最新实录](evidence/wifi-station-htt-drain-hardware-20261122.json) · [关联实录](evidence/wifi-station-critical-hardware-20261122.json)
+最新 Wi-Fi 候选 `b0d308f0` 使用 56 字节 HTT 环配置，实测通过第二轮扫描和关联。单 PDEV bank 读回为 `0x0a04`，TCL 消费 3 个 EAPOL message 2，WBM、密钥和端口开放均为 0。[最新实录](evidence/wifi-station-oem-srng-hardware-20261122.json)
 
 充电断链恢复 profile 的完整 28 阶段空目录 clean build 也已通过。BaseCrypto 994 个固定输入逐件校验并以包路径复制到临时 EDK II workspace，signed boot 通过静态 AVB/rollback 审核。它没有刷入设备，不能视为充电功能验收。
 Mac本周整理已完成，137项旧产物及18项临时内容仅入Trash，未清空。
@@ -21,10 +21,10 @@ Wi-Fi 已从长期首次WMI阻塞推进到真实扫描、认证与关联。尚�
 | 蓝牙 | 原厂HCI／用户态与扫描链已有阶段性记录，Settings选项可见 | 配对、双向数据、持续使用／睡眠 |
 | 其他外设 | offline-peripheral-fixes有笔/触觉/运动/RTC/相机离线交付；GPU另在独立工作树 | 主线逐项评审及实机；RTC NVMEM/alarm provider未绑定，马达和喇叭未经实测校准保持禁用 |
 
-最新实机源码为 `cd9034c`，session `87b97e86dbecf233`。优先定位 HTT 源环停止消费的原因。[Wi-Fi 状态](WIFI-STATUS.md)
+最新实机源码为 `7f7bb65`，session `bf1555e8dd6c5c07`。保留已通过的扫描配置，继续核对发送完成路径。[Wi-Fi 状态](WIFI-STATUS.md)
 扫描通过来自前一份[8ecacf44实录](evidence/wifi-portable-scan-hardware-20261120.json)，不是host模型。
 
-北京时间 11 月 22 日 10:34:54，实测候选已返回物理 fastboot，并完成 stock Android 整像回读及 root、green、原充电／无线／扫描设置恢复。监督进程已结束。
+北京时间 11 月 22 日 12:13:08，实测候选已返回物理 fastboot，完成 stock Android 整像回读及 root、green、原充电／无线／扫描设置恢复。监督进程已结束。
 
 源码唯一入口是本仓main。新克隆在工作台research，研究笔记在lab/reference-reviews。
 完整 Goal 仍在进行。下一次 Wi-Fi 窗口合并扫描、关联、发送完成、WPA2、DHCP 与流量验收。充电断链恢复和双口净充仍待实机。RTC 离线 owner 未合入主线，持久化与闹钟仍待硬件验收。
