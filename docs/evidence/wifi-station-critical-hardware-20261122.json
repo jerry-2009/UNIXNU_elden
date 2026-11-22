@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-22",
+  "source_commit": "30a930c",
+  "hardware_tested": true,
+  "session": "e29fe911571aa175",
+  "boot_nonce": "132a66fad69eab69",
+  "floor": [
+    1738713600,
+    0,
+    3
+  ],
+  "image_sha256": "60ca685d910d0cc83ca30ac8b90ca03ca0366bc109c07a39249cdfa951a5eeaa",
+  "candidate_full_readback_sha256": "60ca685d910d0cc83ca30ac8b90ca03ca0366bc109c07a39249cdfa951a5eeaa",
+  "raw_path": "edl_work/live-station-critical-20261122/usb/20261122-000121.bin",
+  "raw_sha256": "42a0d3e40fb730e3880597ba2e54670de8ae0dfd213ff663a4e4e519bdd09379",
+  "raw_bytes": 263631,
+  "raw_line_ranges": [
+    [
+      1766,
+      1766
+    ],
+    [
+      2525,
+      2533
+    ],
+    [
+      2599,
+      2607
+    ],
+    [
+      4807,
+      4809
+    ],
+    [
+      4962,
+      4962
+    ]
+  ],
+  "second_scan_completed": true,
+  "retained_bss": 32,
+  "management_frames": 142,
+  "htt_rx_rings": 6,
+  "associated": true,
+  "eapol_rx": 3,
+  "eapol_tx_submitted": 3,
+  "eapol_tx_last_message": 2,
+  "tcl_hp_tp_words": [
+    24,
+    24
+  ],
+  "wbm_hp_tp_words": [
+    0,
+    0
+  ],
+  "tcl_descriptor_words_2_to_7": [
+    "00000300",
+    "00010000",
+    "00000087",
+    "00000007",
+    "00c0000c",
+    "00000000"
+  ],
+  "tx_completed": 0,
+  "tx_acked": 0,
+  "keys_installed": 0,
+  "controlled_port_open": false,
+  "wpa2": false,
+  "dhcp": false,
+  "traffic": false,
+  "physical_fastboot": true,
+  "full_readback_stock_sha256": "8b8e72dad85a65d3bf6fc2c6b2a88064d0487e4696ae578e9fd4c46a33565890",
+  "stock_boot_root_green_and_settings_verified": true,
+  "restore_local_time": "2026-11-22T08:03:53+08:00",
+  "supervisor_complete": true
+}
