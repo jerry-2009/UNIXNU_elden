@@ -194,7 +194,7 @@ def main():
     if portable:
         from wifi_portable_scan import added_exports
         added.update(added_exports(portable))
-    if battery:added.add('_elden_wifi_battery_ready')
+    if battery:added.update({'_elden_wifi_battery_ready','_elden_wifi_battery_available'})
     if battery and battery.get('board_state_trial'):added.add('_elden_wifi_board_state')
     if defs(out/'native.macho')!=old_defs|added:raise ValueError('Unexpected complete native export set')
     if refs(out/'native.macho')!=refs(parent/'native.macho'):raise ValueError('Unresolved complete native imports changed')

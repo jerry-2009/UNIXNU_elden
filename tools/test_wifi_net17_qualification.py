@@ -136,6 +136,10 @@ def main():
             try:qualify_components(selected)
             except ValueError:cases+=1
             else:raise AssertionError('Mutated radio-only admission accepted: '+name)
+        selected=copy.deepcopy(report);selected['battery_admission']['shared_owner']=False
+        try:qualify_components(selected)
+        except ValueError:cases+=1
+        else:raise AssertionError('Unshared WCN owner accepted with radio-only admission')
     if report.get('umac_access_trial'):
         for name in ('reversible','first','pair','bound','ring','report'):
             selected=copy.deepcopy(report);runtime=selected['mac_phy_stride_runtime']

@@ -152,6 +152,7 @@ def qualify_components(report):
     stride=report.get('mac_phy_stride_runtime')
     battery=report.get('battery_admission')
     if bool(report.get('wifi_battery_runtime_trial'))!=bool(battery):raise ValueError('Radio-only admission report mismatch')
+    if battery and battery.get('shared_owner') is not True:raise ValueError('Radio-only admission must use the shared WCN owner')
     if bool(report.get('sideband_pins_trial'))!=bool(battery and battery.get('sideband_pins_trial')):raise ValueError('Sideband report mismatch')
     if report.get('ce_wmi_firmware_objects_unchanged') is not (not bool(stride)) or report.get('core_filelist_unchanged') is not True or (report['changed_core_objects'],report['changed_native_objects'],report['added_native_objects'])!=(0,(2 if stride else 1)+int(bool(battery)),1):
         raise ValueError('Wrong network-only composition')
