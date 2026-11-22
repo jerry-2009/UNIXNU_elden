@@ -65,7 +65,9 @@ static void test_oem_critical(const EldenPortableIo &io){
     uint8_t version[8]={};
     assert(httBuildVersionReq(version,sizeof version)==8);
     dpTxSetup(dp,{io.owner,io.read,io.write},0,kDpPdevSingle,0,0);
-#if ELDEN_TEST_SINGLE_PDEV_BANK
+#if ELDEN_TEST_OEM_INDEX_BANK
+    assert(bank_config==0x40204);
+#elif ELDEN_TEST_SINGLE_PDEV_BANK
     assert(bank_config==0x0a04);
 #else
     assert(bank_config==0x4a04);

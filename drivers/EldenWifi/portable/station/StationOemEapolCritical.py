@@ -32,17 +32,24 @@ def station(data):
     return derive(data, READY_SOURCE_SHA, [(send, replacement)])
 
 
-def dp_header(data, *, single_pdev_bank=False):
+def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
     if sha(data) != DP_SOURCE_SHA:
         raise ValueError('OEM EAPOL critical patch requires the fixed donor Dp header')
     text = data.decode()
+    if oem_index_bank and not single_pdev_bank:
+        raise ValueError('OEM index bank requires the single-PDEV station')
     if single_pdev_bank:
         # The installed TB322FC module clears vdev_id_check_en on attach.
         # Keep the existing station search mode and the descriptor's VDEV ID.
+        bank = 'kDpBankStation & ~kDpBankVdevCheck'
+        if oem_index_bank:
+            # dp_soc_init sets index mode. The OEM HAL packs MEC mode 2
+            # into bank bits 22:17, with AddrX, AddrY and VDEV check clear.
+            bank = 'kDpBankEncapEthernet | kDpBankIndexLookup | (2u << 17)'
         text = replace_once(
             text,
             '  write(dp, io, kDpTclBankConfig + 4 * dp.bank, kDpBankStation);',
-            '  write(dp, io, kDpTclBankConfig + 4 * dp.bank, kDpBankStation & ~kDpBankVdevCheck);',
+            f'  write(dp, io, kDpTclBankConfig + 4 * dp.bank, {bank});',
             'single-PDEV station bank',
         )
     text = replace_once(

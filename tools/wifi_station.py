@@ -56,6 +56,9 @@ def qualify_oem_eapol_critical(r):
     single_pdev_bank=r.get('oem_single_pdev_bank',False)
     if type(single_pdev_bank) is not bool or r.get('no_board_ring_bank_clock_timeout_change') is not (not single_pdev_bank):
         raise ValueError('OEM station bank choice differs')
+    oem_index_bank=r.get('oem_index_bank',False)
+    if type(oem_index_bank) is not bool or (oem_index_bank and not (single_pdev_bank and r.get('oem_srng_size') is True)):
+        raise ValueError('OEM index bank requires the single-PDEV and OEM SRNG baseline')
     if r.get('hardware_tested') is not False:
         raise ValueError('An offline descriptor build cannot claim hardware acceptance')
     if len(r.get('retained_objects', {})) != 125:
@@ -72,7 +75,7 @@ def qualify_oem_eapol_critical(r):
             expected_source != Path(r['source']).read_bytes()):
         raise ValueError('OEM EAPOL station source derivation differs')
     original_dp = STA / 'upstream/WifiDp.h'
-    generated_dp = dp_header(original_dp.read_bytes(),single_pdev_bank=single_pdev_bank)
+    generated_dp = dp_header(original_dp.read_bytes(),single_pdev_bank=single_pdev_bank,oem_index_bank=oem_index_bank)
     if (sha(original_dp) != DP_SOURCE_SHA or generated_dp != Path(r['dp_header']).read_bytes() or
             sha(r['dp_header']) != r['dp_header_sha256']):
         raise ValueError('OEM TCL critical field derivation differs')

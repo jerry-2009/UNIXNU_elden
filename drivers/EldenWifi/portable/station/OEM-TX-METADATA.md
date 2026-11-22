@@ -46,3 +46,12 @@ TB322FC 原厂 `htt_srng_setup` 在 `0x4924` 把 56 字节交给 `skb_put`。
 保留两个 RXDMA 实例、已有环标识与 DMA 地址、八字节版本请求以及原期限。
 真实编码器的六条配置及整核检查通过。签名候选 `b0d308f0`，
 会话 `bf1555e8dd6c5c07`。
+
+在 56 字节 SRNG 候选上加 `--oem-index-bank` 可构建 `dc553008`，会话
+`1e9b27c2e2a87b47`。原厂 `dp_soc_init` 在 `0x3f4984`、`0x3f4998`
+和 `0x3f52f8` 把 1 写到 SoC 偏移 `0x4289`。station attach 在
+`0x54c0c` 至 `0x54c14` 取该值，`dp_tx_get_bank_profile` 在
+`0x3ef0d0` 至 `0x3ef0f0` 选择 index lookup、关闭 AddrX/Y 并设置 MEC。
+`hal_tx_populate_bank_register_be` 在 `0x4123ac` 至 `0x4123bc` 把
+MEC 模式 2 编入硬件字段。新候选因此把 bank 从 `0x0a04` 改为 `0x40204`，
+保留现有 VDEV、PDEV 元数据、环和队列。主机路径与 23 项错误组合检查通过。

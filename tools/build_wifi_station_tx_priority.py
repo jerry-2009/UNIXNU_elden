@@ -26,6 +26,8 @@ def main():
                         help='Require HTT source-ring progress before the second scan')
     parser.add_argument('--oem-srng-size', action='store_true',
                         help='Use the TB322FC 56-byte HTT ring-setup payload')
+    parser.add_argument('--oem-index-bank', action='store_true',
+                        help='Use the TB322FC station index lookup and MEC bank configuration')
     args = parser.parse_args()
     if args.oem_metadata and args.oem_eapol_critical:
         parser.error('Choose one TX adaptation')
@@ -35,6 +37,8 @@ def main():
         parser.error('--wait-htt-drain requires --oem-eapol-critical')
     if args.oem_srng_size and not args.wait_htt_drain:
         parser.error('--oem-srng-size requires --wait-htt-drain')
+    if args.oem_index_bank and not (args.single_pdev_bank and args.oem_srng_size):
+        parser.error('--oem-index-bank requires --single-pdev-bank and --oem-srng-size')
     if args.oem_eapol_critical:
         from StationOemEapolCritical import station, dp_header
         source_recipe = 'StationOemEapolCritical.py'
@@ -67,7 +71,8 @@ def main():
         roots = overlay_value.get('roots')
         if not isinstance(roots, list) or len(roots) != 1:
             raise ValueError('Expected the exact existing station codec overlay')
-        header_specs = [(STA / 'upstream/WifiDp.h', dp_header, {'single_pdev_bank':args.single_pdev_bank})]
+        header_specs = [(STA / 'upstream/WifiDp.h', dp_header,
+                         {'single_pdev_bank':args.single_pdev_bank,'oem_index_bank':args.oem_index_bank})]
         if args.wait_htt_drain:
             from ScanHttDrain import link_header
             header_specs.append((STA.parent / 'upstream/WifiLink.h', link_header, {}))
@@ -146,6 +151,8 @@ def main():
         )
         if args.single_pdev_bank:
             result['oem_single_pdev_bank'] = True
+        if args.oem_index_bank:
+            result['oem_index_bank'] = True
         if args.wait_htt_drain:
             for path in (STA/'ScanHttDrain.py',STA.parent/'upstream/WifiLink.h'):
                 pins[path.relative_to(ROOT).as_posix()] = sha(path)

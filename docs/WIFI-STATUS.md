@@ -6,6 +6,12 @@
 密钥和受控端口尚未开启。原厂 Android、root、green、原充电和无线设置已恢复。
 [56 字节配置实录](evidence/wifi-station-oem-srng-hardware-20261122.json)
 
+官方 Ath12kWifi 的 `7a70ef0` 报告实机扫描、WPA2 流量和加入结果回传。
+远端 `84e02e0` 增加指定频率扫描和跨睡眠的 BSS 年龄。Elden 已使用
+`5f7f5a8` 的 125 对象运行时初始化本机 MHI/QMI，当前第二轮扫描及发送则由
+SM8750 成功供体的 portable 路径负责。官方上游更新为后续系统扫描与重连提供参考，
+当前 WBM 不推进仍需在本机发送路径解决。[Ath12kWifi](https://github.com/UniXNU/Ath12kWifi/tree/84e02e0c0a3354c341c76affef582c7c41883f1f)
+
 候选 `44bf406e` 实测未发出第二轮扫描。第一轮结束后，六个 HTT 环的描述符已提交，
 但 HTT 端点的 CE 源环未在原期限内被消费，状态从 628 进入 612，返回传输错误 `-4`。
 当时 CE 总计提交 22／完成 18。UMAC `-110` 在后续停机时才出现。下一步追查

@@ -15,6 +15,19 @@ This validates the delayed-listener scenario, not every unplugged/charger/sleep
 configuration. The separate v137 stage1/-19 power refusal remains unexplained;
 v138 passed the same checks and did not exercise its stored-admission error log.
 
+Recent `wifi-network-17` images deliberately omit the controller's
+`elden-wcn-power=4` enable. In `b0d308f0` the boot audit records mode 0
+and Bluetooth userspace reports a missing device-tree service. This accounts
+for the absent controller in Settings on that image. Wi-Fi and Bluetooth
+use the same native WCN power provider. The current WLAN sideband setup
+checks that both radios are off before configuring shared pins.
+
+QcaBluetooth `fa52814` reports pairing, reboot reconnection, A2DP and Wi-Fi
+coexistence on Sheng iPadOS 27. Elden should reuse its UART/H4/IBS and
+shutdown ordering with the existing local iPadOS 17 adapter. The next Elden
+test must qualify shared startup and verify the Settings list, pairing and
+traffic while WLAN is active. [QcaBluetooth](https://github.com/UniXNU/QcaBluetooth/tree/fa528145aee3073c47533d74ea260eb2818b6b63)
+
 The original21H461 reader at0x10009abc0 already uses IOServiceNameMatching,
 IOServiceGetMatchingService and IORegistryEntrySearchCFProperty for
 `local-mac-address` in the IODeviceTree plane. The earlier daemon could run before
