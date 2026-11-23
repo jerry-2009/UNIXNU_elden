@@ -2,6 +2,7 @@
 
 | 需要查什么 | 当前入口 |
 | --- | --- |
+| Devin worker 协同与交接 | [DEVIN-WORKER-WORKFLOW](DEVIN-WORKER-WORKFLOW.md) |
 | 当前实机状态与下一步 | [CURRENT-STATUS](CURRENT-STATUS.md)、[PLAN](PLAN.md) |
 | Wi-Fi | [WIFI-STATUS](WIFI-STATUS.md)、[成功SM8750审核](SM8750-WIFI-REUSE-AUDIT-20261120.md)、[本机WMI格式](../drivers/EldenWifi/portable/station/OEM-WIRE.md)、[HTT/TCL数据路径](../drivers/EldenWifi/portable/station/OEM-TX-METADATA.md)、[全组织复用审核](UNIXNU-ORG-REUSE-AUDIT-20261115.md) |
 | 充电／双口／保护 | [CHARGING-STATUS](CHARGING-STATUS.md)、[验收范围](CHARGING-ACCEPTANCE-REVIEW-20261119.md)、[双口接口契约](DUAL-INPUT-CONTRACT.md) |

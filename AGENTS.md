@@ -1,6 +1,7 @@
 # UniXNU Elden 工作规则
 
 本仓 `D:\Desktop\Git\UniXNU_elden` main 为唯一有效源码；配套工作台为Patch/Y700-Elden。
+主线通过 Devin CLI worker 协作的固定规则见[DEVIN-WORKER-WORKFLOW](docs/DEVIN-WORKER-WORKFLOW.md)。不派 Codex subagent 不影响按用户指定流程派发 Devin-worker-agent-Y700。
 简版交接含 CiscoMac 和工作区入口。[basic-agents.md](basic-agents.md)
 最新实况见[CURRENT-STATUS](docs/CURRENT-STATUS.md)、[PLAN](docs/PLAN.md)、[WIFI-STATUS](docs/WIFI-STATUS.md)。
 全部旧AGENTS流水记录已原样归档到docs/archive/20261121/AGENTS-source-20261121.md，历史SHA保持。
@@ -26,7 +27,7 @@
   SM8750四代固定源，TB321FU/SM8650三代只作比较。本机双口/旁路/保护以OEM/HAL/实证为准。
 - 保持GPU codex/elden-gpu-offline与offline-peripheral-fixes工作树独立，勿改/切分支/清理。
   GPU最后；马达未经校准gain/boost/连续波形及喇叭保持关闭，声音先讨论衰减保护。
-- 不派子代理，不跑QEMU。保留QRTR草稿、AnyRouter暂存及其他用户改动，显式路径提交。
+- 不派 Codex 子代理，不跑QEMU。Devin CLI worker 按[协作流程](docs/DEVIN-WORKER-WORKFLOW.md)受限派发，并由主线 agent 审查及提交。保留QRTR草稿、AnyRouter暂存及其他用户改动，显式路径提交。
 - 临时一次性工具放Windows TEMP/Mac /private/tmp；research只独立Git克隆，笔记放lab。
   旧artifact Windows/WSL进Windows回收站，Mac原生Trash；不永久删除/清空Trash。
 - 配套工作台maintenance/IN_PROGRESS.json存在时先完成该事务；引用同步应自动让开。
