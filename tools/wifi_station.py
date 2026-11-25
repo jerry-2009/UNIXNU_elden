@@ -76,7 +76,7 @@ def qualify_oem_eapol_critical(r):
             any(prior.get(k) or r.get(k) for k in ('eapol_voice','oem_tcl_v1'))):
         raise ValueError('Critical TX requires the original eight-byte HTT station baseline')
     qualify_runtime(prior)
-    from StationOemEapolCritical import DP_SOURCE_SHA, WMI_SOURCE_SHA, dp_header, station, wmi_header
+    from StationOemEapolCritical import DP_SOURCE_SHA, dp_header, station
     parent_source = Path(r['parent_source']).read_bytes()
     expected_source = station(parent_source, oem_target_pdev=oem_target_pdev, oem_tcl_v1=oem_v1_metadata)
     if (r['parent_source'] != prior['source'] or sha(r['parent_source']) != r['parent_source_sha256'] or
@@ -105,7 +105,6 @@ def qualify_oem_eapol_critical(r):
     for flag, key, name, frozen_digest, derive in (
         ('wait_htt_drain','link_header','WifiLink.h',LINK_SHA,link_header),
         ('oem_srng_size','htt_header','WifiHtt.h',HTT_SHA,oem_srng_header),
-        ('oem_v1_metadata','wmi_header','WifiWmi.h',WMI_SOURCE_SHA,wmi_header),
     ):
         enabled=r.get(flag,False)
         if type(enabled) is not bool:
