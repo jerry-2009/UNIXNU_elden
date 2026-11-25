@@ -40,7 +40,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     }'''
         if oem_tcl_v1:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
-        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
+        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,tx_target_pdev,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
         dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<2)|(tx_target_pdev<<10);
     }'''
         else:
@@ -110,7 +110,8 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
         '  put32(e + 20, kDpTclTidOverwrite | (dp.tid & 0xfu) << kDpTclTidShift | (dp.vdevId & 0xffu) << kDpTclVdevShift);',
         '  put32(e + 20, kDpTclTidOverwrite |\n'
         '                    (critical ? flowOverrideEnable | classifyInfoSelOne : 0u) |\n'
-        '                    (dp.tid & 0xfu) << kDpTclTidShift | (dp.vdevId & 0xffu) << kDpTclVdevShift);',
+        '                    (dp.tid & 0xfu) << kDpTclTidShift |\n'
+        '                    ((dp.pdevId & 0x3u) << 9) | (dp.vdevId & 0xffu) << kDpTclVdevShift);',
         'critical queue fields',
     )
     return text.encode()
