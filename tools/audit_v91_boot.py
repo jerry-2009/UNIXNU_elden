@@ -28,6 +28,7 @@ def main():
     p.add_argument('--battery-ui',action='store_true')
     p.add_argument('--wcn-report',type=Path)
     p.add_argument('--bt-runtime',type=Path)
+    p.add_argument('--wifi-bluetooth',action='store_true')
     p.add_argument('--pd-gui',action='store_true')
     p.add_argument('--early-stall',action='store_true',help='Controlled pre-UFS interrupt-masked watchdog qualification')
     p.add_argument('--hid-report',type=Path)
@@ -116,6 +117,9 @@ def main():
     if bt:
         if json.loads(a.entry_report.read_text())['derivative_sha256']!=sha(kernel):raise ValueError('v99 entry mismatch')
         template=bt_runtime_boot.menu(bt)
+    if a.wifi_bluetooth:
+        from wifi_station_menu import with_bluetooth
+        template=with_bluetooth(template,bt)
     wait_sample=None
     if a.wait_sample:
         if not hid or hid['profile']!='v106-rt-memory':raise ValueError('Wait capture requires v106')
@@ -137,6 +141,7 @@ def main():
     if fbwc:report['framebuffer_experiment']=fbwc
     if battery_ui:report['battery_ui']=battery_ui
     if bt:report['bluetooth_runtime']=bt
+    if a.wifi_bluetooth:report['wifi_bluetooth']=True
     if hid:report['touch_delivery']=hid
     if wait_sample:report['wait_sample']=wait_sample
     if a.output.exists():raise RuntimeError('Audit output must be new')

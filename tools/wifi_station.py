@@ -59,6 +59,9 @@ def qualify_oem_eapol_critical(r):
     oem_index_bank=r.get('oem_index_bank',False)
     if type(oem_index_bank) is not bool or (oem_index_bank and not (single_pdev_bank and r.get('oem_srng_size') is True)):
         raise ValueError('OEM index bank requires the single-PDEV and OEM SRNG baseline')
+    oem_target_pdev=r.get('oem_target_pdev',False)
+    if type(oem_target_pdev) is not bool or (oem_target_pdev and not oem_index_bank):
+        raise ValueError('OEM target PDEV requires the OEM index bank baseline')
     if r.get('hardware_tested') is not False:
         raise ValueError('An offline descriptor build cannot claim hardware acceptance')
     if len(r.get('retained_objects', {})) != 125:
@@ -70,7 +73,7 @@ def qualify_oem_eapol_critical(r):
     qualify_runtime(prior)
     from StationOemEapolCritical import DP_SOURCE_SHA, dp_header, station
     parent_source = Path(r['parent_source']).read_bytes()
-    expected_source = station(parent_source)
+    expected_source = station(parent_source, oem_target_pdev=oem_target_pdev)
     if (r['parent_source'] != prior['source'] or sha(r['parent_source']) != r['parent_source_sha256'] or
             expected_source != Path(r['source']).read_bytes()):
         raise ValueError('OEM EAPOL station source derivation differs')

@@ -55,6 +55,12 @@ Pass `--require-wifi-station` to `tools/build_v91_boot.py` when packaging a
 connectivity test. It rejects a bridge-only build even when shared WCN mode
 is enabled.
 
+For Bluetooth coexistence on the qualified radio-only station profile with
+board sideband support, pass `--wifi-bluetooth` to both the packer and auditor.
+The station entry uses the explicit mode 4 argument required by WCN and BlueTool.
+It leaves PD handoff disabled and omits optional PDO logging to fit the command
+line. USB logging, battery admission, and fallback entries stay enabled.
+
 The donor's original assoc/sta/dp/net tests and helper crypto/replay/group-rekey
 self-test pass ASan/UBSan. `TestStation.cpp` executes our real owner/profile/
 generation/port/queue refusal code; modeled memory is not hardware success.

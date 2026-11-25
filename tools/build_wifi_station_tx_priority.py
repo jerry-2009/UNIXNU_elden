@@ -27,7 +27,9 @@ def main():
     parser.add_argument('--oem-srng-size', action='store_true',
                         help='Use the TB322FC 56-byte HTT ring-setup payload')
     parser.add_argument('--oem-index-bank', action='store_true',
-                        help='Use the TB322FC station index lookup and MEC bank configuration')
+                        help='Use the TB322FC station index lookup HW bank configuration (0x0204)')
+    parser.add_argument('--oem-target-pdev', action='store_true',
+                        help='Encode VDEV_START_REPLY target PDEV (1) into v2 TCL metadata (0x0801)')
     args = parser.parse_args()
     if args.oem_metadata and args.oem_eapol_critical:
         parser.error('Choose one TX adaptation')
@@ -39,6 +41,8 @@ def main():
         parser.error('--oem-srng-size requires --wait-htt-drain')
     if args.oem_index_bank and not (args.single_pdev_bank and args.oem_srng_size):
         parser.error('--oem-index-bank requires --single-pdev-bank and --oem-srng-size')
+    if args.oem_target_pdev and not args.oem_index_bank:
+        parser.error('--oem-target-pdev requires --oem-index-bank')
     if args.oem_eapol_critical:
         from StationOemEapolCritical import station, dp_header
         source_recipe = 'StationOemEapolCritical.py'
@@ -58,7 +62,8 @@ def main():
     if not prior.get('station_ready') or prior.get('eapol_voice') or prior.get('oem_tcl_v1') or prior.get('oem_eapol_critical'):
         raise ValueError('Expected the original profile-ready station build')
 
-    generated = station(Path(prior['source']).read_bytes())
+    generated = (station(Path(prior['source']).read_bytes(), oem_target_pdev=args.oem_target_pdev)
+                 if args.oem_eapol_critical else station(Path(prior['source']).read_bytes()))
     output.mkdir(parents=True, exist_ok=False)
     source = output / 'Station.cpp'
     source.write_bytes(generated)
@@ -153,6 +158,8 @@ def main():
             result['oem_single_pdev_bank'] = True
         if args.oem_index_bank:
             result['oem_index_bank'] = True
+        if args.oem_target_pdev:
+            result['oem_target_pdev'] = True
         if args.wait_htt_drain:
             for path in (STA/'ScanHttDrain.py',STA.parent/'upstream/WifiLink.h'):
                 pins[path.relative_to(ROOT).as_posix()] = sha(path)

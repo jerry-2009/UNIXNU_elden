@@ -43,6 +43,7 @@ def main():
     p.add_argument('--wcn-report',type=Path)
     p.add_argument('--bt-runtime',type=Path)
     p.add_argument('--require-wifi-station',action='store_true',help='Require a qualified Wi-Fi station profile when packaging a connectivity test')
+    p.add_argument('--wifi-bluetooth',action='store_true',help='Enable Bluetooth on the qualified radio-only station boot entry')
     p.add_argument('--pd-gui',action='store_true',help='Use the existing GUI brightness branch of a qualified PD integration kernel')
     p.add_argument('--early-stall',action='store_true',help='Controlled pre-UFS interrupt-masked watchdog qualification')
     p.add_argument('--bootshim',type=Path,help='Reuse the exact source-pinned 128-byte BootShim binary')
@@ -112,6 +113,9 @@ def main():
     template=boot_template(bool(fbwc or hid))
     if hid:template=hid_delivery_boot.menu(hid)
     if bt:template=bt_runtime_boot.menu(bt)
+    if a.wifi_bluetooth:
+        from wifi_station_menu import with_bluetooth
+        template=with_bluetooth(template,bt)
     wait_sample=None
     if a.wait_sample:
         if not hid or hid['profile']!='v106-rt-memory':raise ValueError('Wait capture requires v106')
@@ -166,6 +170,7 @@ def main():
     if fbwc:result['framebuffer_experiment']=fbwc
     if battery_ui:result['battery_ui']=battery_ui
     if bt:result['bluetooth_runtime']=bt
+    if a.wifi_bluetooth:result['wifi_bluetooth']=True
     if hid:result['touch_delivery']=hid
     if wait_sample:result['wait_sample']=wait_sample
     (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:result[k] for k in ('image_sha256','rollback_index','footer_location','session','full_asset_source_closure')},indent=2))

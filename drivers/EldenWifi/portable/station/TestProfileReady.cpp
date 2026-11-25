@@ -66,18 +66,25 @@ static void test_oem_critical(const EldenPortableIo &io){
     assert(httBuildVersionReq(version,sizeof version)==8);
     dpTxSetup(dp,{io.owner,io.read,io.write},0,kDpPdevSingle,0,0);
 #if ELDEN_TEST_OEM_INDEX_BANK
-    assert(bank_config==0x40204);
+    assert(bank_config==0x0204);
 #elif ELDEN_TEST_SINGLE_PDEV_BANK
     assert(bank_config==0x0a04);
 #else
     assert(bank_config==0x4a04);
+#endif
+#if ELDEN_TEST_OEM_TARGET_PDEV
+    dpTxSetup(dp,{io.owner,io.read,io.write},0,1,0,0);
 #endif
     uint8_t eapol[14]={};
     eapol[12]=0x88;eapol[13]=0x8e;
     assert(netQueuePut(tx_queue,eapol,sizeof eapol,true));
     transmit();
     assert(dpdetail::get32(dp.tcl.va+8)==0x300);
+#if ELDEN_TEST_OEM_TARGET_PDEV
+    assert(dpdetail::get32(dp.tcl.va+12)==0x08010000);
+#else
     assert(dpdetail::get32(dp.tcl.va+12)==0x00010000);
+#endif
     assert(dpdetail::get32(dp.tcl.va+20)==0x07); // Legacy TID 0 with critical routing
     sta.phy.qos=true;
     assert(netQueuePut(tx_queue,eapol,sizeof eapol,true));
