@@ -40,6 +40,8 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     }'''
         if oem_tcl_v1:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
+        {WmiWriter aw;const uint32_t an=assocBuildPeerSetParam(aw,key_output,sizeof(key_output),0,sta.bssid,kWmiPeerParamAuthorize,1);
+         const int ar=an?linkSendWmi(link,key_output,an):-1;const uint32_t av[]={(uint32_t)ar,an};diag_line("PRE_AUTH rc/bytes",av,2);}
         dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
         dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<3);
     }'''
@@ -91,8 +93,6 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         edits.append((diag_anchor, diag_extra))
         edits.append((bhi_anchor, bhi_extra))
         edits.append(('if(now-first_tx<2000)return;', 'if(now-first_tx<150)return;'))
-        edits.append(('LinkOptions options;options.htt=&htt;options.handOff=true;options.ownMacSet=true;',
-                      'LinkOptions options;options.htt=&htt;options.handOff=true;options.ownMacSet=true;options.pre&=~kPreHwMode;'))
         edits.append(('if(id==kWmiEvtVdevInstallKeyComplete){',
                       'if(dp.st.txFrames){static unsigned post_ev;if(post_ev<16){++post_ev;'
                       'const uint32_t pv[]={post_ev,id,bytes,link.events};'
