@@ -23,11 +23,12 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     if sha(data) != READY_SOURCE_SHA:
         raise ValueError('OEM EAPOL critical patch requires the qualified ready object')
     send = '        const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length);'
-    replacement = '''        // The successful station donor uses voice TID 7 on WMM peers.
+    critical_arg = 'false' if oem_tcl_v1 else 'f->eapol'
+    replacement = f'''        // The successful station donor uses voice TID 7 on WMM peers.
         // OEM critical-flow routing remains a separate TCL decision.
         const uint32_t normal_tid=dp.tid;
         if(f->eapol&&sta.phy.qos)dp.tid=7;
-        const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length,f->eapol);
+        const bool sent=dpSend(dp,{{owner_io.owner,owner_io.read,owner_io.write}},f->bytes,f->length,{critical_arg});
         dp.tid=normal_tid;'''
     edits = [(send, replacement)]
     if oem_target_pdev or oem_tcl_v1:
@@ -58,12 +59,12 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         diag_extra = diag_anchor + '''
     const uint32_t wbm_diag[]={
         io.read(io.ctx,kDpWbmCookieConvert),io.read(io.ctx,kDpReoSwCookieCfg1),
-        io.read(io.ctx,kDpWbm2Sw0R2+8),io.read(io.ctx,kDpWbm2Sw0R2+16),
-        io.read(io.ctx,kDpWbm2Sw0R2+24),io.read(io.ctx,kDpWbm2Sw0R2+32),
+        io.read(io.ctx,kDpWbm2Sw0R2+8),dp.st.lastTxSource,
+        io.read(io.ctx,kDpWbm2Sw0R2+24),dp.st.lastTxReason,
         io.read(io.ctx,kDpIdleLinkR2),io.read(io.ctx,kDpIdleLinkR2+4),
-        dp.st.relEntries,dp.st.excEntries,dp.st.txFwReleased,dp.st.txBadCookie
+        dp.st.relEntries,dp.st.txNotAcked,dp.st.txFwReleased,dp.st.txOtherRelease
     };
-    diag_line("WBM_DIAG wbmCC/reoCC/wbm1..4HP/idleHP-TP/rel/exc/fwRel/badC",wbm_diag,12);'''
+    diag_line("WBM_DIAG wbmCC/reoCC/wbm1HP/src/wbm3HP/rsn/idleHP-TP/rel/nAck/fwRel/othRel",wbm_diag,12);'''
         edits.append((diag_anchor, diag_extra))
     return derive(data, READY_SOURCE_SHA, edits)
 
