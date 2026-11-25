@@ -49,10 +49,10 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     }'''
         edits.extend([
             (dp_state, dp_state + '\nstatic uint32_t tx_target_pdev;'),
-            (begin, '        tx_target_pdev=0;o.phy=kPhyHt;\n' + begin),
+            (begin, '        tx_target_pdev=0;o.phy=kPhyHt;o.flags=kStaFlagsDefault&~kStaFlagPrefer5;\n' + begin),
             (response, response + '''
             if(station_began&&sta.step==kStaVdevStart&&sta.vdevStartSent&&facts[1]==0&&facts[2]==0)
-                tx_target_pdev=(facts[3]==kWmiVdevStartOk&&facts[6]==1)?facts[6]:0;'''),
+                tx_target_pdev=(facts[3]==kWmiVdevStartOk)?(facts[6]+1u):0;'''),
             (tx_setup, tx_replace),
         ])
         diag_anchor = '    diag_line("TX_DESC metadata-only words2..7",desc,6);'
