@@ -50,7 +50,7 @@ def main():
     if args.oem_v1_metadata and args.oem_target_pdev:
         parser.error('Choose either --oem-target-pdev (v2) or --oem-v1-metadata (v1)')
     if args.oem_eapol_critical:
-        from StationOemEapolCritical import station, dp_header
+        from StationOemEapolCritical import station, dp_header, wmi_header
         source_recipe = 'StationOemEapolCritical.py'
         flag = 'oem_eapol_critical'
     elif args.oem_metadata:
@@ -90,6 +90,8 @@ def main():
         if args.oem_srng_size:
             from ScanHttDrain import oem_srng_header
             header_specs.append((STA.parent / 'upstream/WifiHtt.h', oem_srng_header, {}))
+        if args.oem_v1_metadata:
+            header_specs.append((STA.parent / 'upstream/WifiWmi.h', wmi_header, {}))
         for frozen, derive, options in header_specs:
             paths = [path for path in expected_headers if Path(path).name == frozen.name]
             if len({Path(path).resolve() for path in paths}) != 1 or any(expected_headers[path] != sha(frozen) for path in paths):
@@ -178,6 +180,11 @@ def main():
             pins[frozen.relative_to(ROOT).as_posix()] = sha(frozen)
             result.update(oem_srng_size=True,htt_header=str(output/frozen.name),
                           htt_header_sha256=sha(output/frozen.name))
+        if args.oem_v1_metadata:
+            frozen=STA.parent/'upstream/WifiWmi.h'
+            pins[frozen.relative_to(ROOT).as_posix()] = sha(frozen)
+            result.update(wmi_header=str(output/frozen.name),
+                          wmi_header_sha256=sha(output/frozen.name))
     qualify_runtime(result)
     (output / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({'compiled': True, 'binding_sha256': result['binding_sha256']}))

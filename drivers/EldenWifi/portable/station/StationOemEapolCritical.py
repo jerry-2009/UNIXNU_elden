@@ -7,6 +7,7 @@ from ProfileReadySource import derive
 
 READY_SOURCE_SHA = '66585bb02c6a5428a23efbc1ab7de8b29482ebb202d99f500ad8ca741f81c592'
 DP_SOURCE_SHA = 'e34fd826570c827b3c20790a895296a963066450790196df55b8d2d4a3afa5ef'
+WMI_SOURCE_SHA = '2f469578e4e7829551e3be68eee36d26e15941a5d4c27646a3267586c19c29ae'
 
 
 def sha(data):
@@ -66,17 +67,24 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         dp.st.relEntries,dp.st.txFwReleased,dp.st.txOtherRelease,dp.st.txBadCookie
     };
     diag_line("WBM_DIAG w2/w3/w4/src/rsn/nAck/idleHP-TP/rel/fwRel/oth/badC",wbm_diag,12);'''
+        diag_extra = diag_extra + '''
+    const uint32_t dp_cookie[]={
+        dp.reoCookieCfg,dp.wbmCookieConvert,(uint32_t)dp.tx[0].bus,(uint32_t)(dp.tx[0].bus>>32),
+        dp.tx[0].length,dp.tx[0].va?dpdetail::get32(dp.tx[0].va+12):0
+    };
+    diag_line("DP_COOKIE reoC/wbmC/tx0Lo/tx0Hi/len/eth12",dp_cookie,6);'''
         bhi_anchor = 'follow(now);key_turn(now);transmit();tx_diagnostic(now);port_replies();publish_snapshot();protocol_status(out);'
         bhi_extra = bhi_anchor + '''
-    {static uint64_t t0;static unsigned bdone;
-     if(dp.st.txFrames&&!bdone){if(!t0)t0=now;else if(now-t0>=8000){bdone=1;
+    {static uint64_t t0;static uint32_t last_st,nlog;
+     if(dp.st.txFrames&&nlog<8){if(!t0)t0=now;
        const ChipIo io{owner_io.owner,owner_io.read,owner_io.write};
-       const uint32_t bhi=io.read(io.ctx,0x18);
-       const uint32_t v[]={bhi,io.read(io.ctx,0x48),io.read(io.ctx,bhi+0x28),
-         io.read(io.ctx,bhi+0x30),io.read(io.ctx,bhi+0x34),io.read(io.ctx,bhi+0x38),
-         io.read(io.ctx,bhi+0x3c),(uint32_t)dp.tx[0].bus,(uint32_t)(dp.tx[0].bus>>32),
-         io.read(io.ctx,dp.tcl.r2),io.read(io.ctx,dp.tcl.r2+4),io.read(io.ctx,dp.txComp.r2)};
-       diag_line("BHI_DIAG bhi/mhiSt/ee/err/dbg1..3/tx0Lo-Hi/tclHP-TP/wbmHP",v,12);}}}'''
+       const uint32_t dt=(uint32_t)(now-t0),st=io.read(io.ctx,0x48);
+       const bool due=(nlog==0)||(st!=last_st)||(nlog==1&&dt>=5000)||(nlog==2&&dt>=15000)||(nlog==3&&dt>=30000);
+       if(due){last_st=st;++nlog;
+         const uint32_t v[]={dt,st,io.read(io.ctx,dp.tcl.r2),io.read(io.ctx,dp.tcl.r2+4),
+           io.read(io.ctx,dp.txComp.r2),io.read(io.ctx,dp.txComp.r2+4),
+           io.read(io.ctx,kDpIdleLinkR2),io.read(io.ctx,kDpIdleLinkR2+4),link.events};
+         diag_line("MHI_WATCH dt/mhiSt/tclHP-TP/wbmHP-TP/idleHP-TP/ev",v,9);}}}'''
         edits.append((diag_anchor, diag_extra))
         edits.append((bhi_anchor, bhi_extra))
     return derive(data, READY_SOURCE_SHA, edits)
@@ -120,17 +128,24 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
     )
     text = replace_once(
         text,
-        '  put32(e + 16, length & 0xffffu);                                              // no offset, not to the firmware',
-        '  put32(e + 16, (length & 0xffffu) | (critical && ' + ('true' if oem_index_bank else 'false') + ' ? kDpTclToFw : 0u));',
-        'TX to_fw field',
-    )
-    text = replace_once(
-        text,
         '  put32(e + 20, kDpTclTidOverwrite | (dp.tid & 0xfu) << kDpTclTidShift | (dp.vdevId & 0xffu) << kDpTclVdevShift);',
         '  put32(e + 20, kDpTclTidOverwrite |\n'
         '                    (critical && !' + ('true' if oem_index_bank else 'false') + ' ? flowOverrideEnable | classifyInfoSelOne : 0u) |\n'
         '                    (dp.tid & 0xfu) << kDpTclTidShift |\n'
         '                    ((dp.pdevId & 0x3u) << 9) | (dp.vdevId & 0xffu) << kDpTclVdevShift);',
         'critical queue fields',
+    )
+    return text.encode()
+
+
+def wmi_header(data):
+    if sha(data) != WMI_SOURCE_SHA:
+        raise ValueError('OEM WMI resource config patch requires the fixed donor WMI header')
+    text = data.decode()
+    text = replace_once(
+        text,
+        '  uint8_t *cfg = wmiStruct(w, kWmiTagResourceConfig, kWmiResourceConfigWords);',
+        '  uint8_t *cfg = wmiStruct(w, kWmiTagResourceConfig, 84);',
+        'OEM 84-word WMI resource config',
     )
     return text.encode()
