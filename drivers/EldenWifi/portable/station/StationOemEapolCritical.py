@@ -23,7 +23,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     if sha(data) != READY_SOURCE_SHA:
         raise ValueError('OEM EAPOL critical patch requires the qualified ready object')
     send = '        const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length);'
-    critical_arg = 'false' if oem_tcl_v1 else 'f->eapol'
+    critical_arg = 'f->eapol'
     replacement = f'''        // The successful station donor uses voice TID 7 on WMM peers.
         // OEM critical-flow routing remains a separate TCL decision.
         const uint32_t normal_tid=dp.tid;
@@ -115,14 +115,20 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
         text,
         '  put32(e + 8, (dp.bank & 0x3fu) << kDpTclBankShift);                          // a buffer, bank 0',
         '  put32(e + 8, (dp.bank & 0x3fu) << kDpTclBankShift |\n'
-        '                (critical ? txNotifySemiHard : 0u));',
+        '                (critical && !' + ('true' if oem_index_bank else 'false') + ' ? txNotifySemiHard : 0u));',
         'TX notify field',
+    )
+    text = replace_once(
+        text,
+        '  put32(e + 16, length & 0xffffu);                                              // no offset, not to the firmware',
+        '  put32(e + 16, (length & 0xffffu) | (critical && ' + ('true' if oem_index_bank else 'false') + ' ? kDpTclToFw : 0u));',
+        'TX to_fw field',
     )
     text = replace_once(
         text,
         '  put32(e + 20, kDpTclTidOverwrite | (dp.tid & 0xfu) << kDpTclTidShift | (dp.vdevId & 0xffu) << kDpTclVdevShift);',
         '  put32(e + 20, kDpTclTidOverwrite |\n'
-        '                    (critical ? flowOverrideEnable | classifyInfoSelOne : 0u) |\n'
+        '                    (critical && !' + ('true' if oem_index_bank else 'false') + ' ? flowOverrideEnable | classifyInfoSelOne : 0u) |\n'
         '                    (dp.tid & 0xfu) << kDpTclTidShift |\n'
         '                    ((dp.pdevId & 0x3u) << 9) | (dp.vdevId & 0xffu) << kDpTclVdevShift);',
         'critical queue fields',
