@@ -41,7 +41,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         if oem_tcl_v1:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
         dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
-        dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<2)|(tx_target_pdev<<10);
+        dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<3);
     }'''
         else:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
