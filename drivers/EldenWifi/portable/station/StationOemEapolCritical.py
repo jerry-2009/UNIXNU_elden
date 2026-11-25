@@ -66,7 +66,19 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         dp.st.relEntries,dp.st.txFwReleased,dp.st.txOtherRelease,dp.st.txBadCookie
     };
     diag_line("WBM_DIAG w2/w3/w4/src/rsn/nAck/idleHP-TP/rel/fwRel/oth/badC",wbm_diag,12);'''
+        bhi_anchor = 'follow(now);key_turn(now);transmit();tx_diagnostic(now);port_replies();publish_snapshot();protocol_status(out);'
+        bhi_extra = bhi_anchor + '''
+    {static uint64_t t0;static unsigned bdone;
+     if(dp.st.txFrames&&!bdone){if(!t0)t0=now;else if(now-t0>=8000){bdone=1;
+       const ChipIo io{owner_io.owner,owner_io.read,owner_io.write};
+       const uint32_t bhi=io.read(io.ctx,0x18);
+       const uint32_t v[]={bhi,io.read(io.ctx,0x48),io.read(io.ctx,bhi+0x28),
+         io.read(io.ctx,bhi+0x30),io.read(io.ctx,bhi+0x34),io.read(io.ctx,bhi+0x38),
+         io.read(io.ctx,bhi+0x3c),(uint32_t)dp.tx[0].bus,(uint32_t)(dp.tx[0].bus>>32),
+         io.read(io.ctx,dp.tcl.r2),io.read(io.ctx,dp.tcl.r2+4),io.read(io.ctx,dp.txComp.r2)};
+       diag_line("BHI_DIAG bhi/mhiSt/ee/err/dbg1..3/tx0Lo-Hi/tclHP-TP/wbmHP",v,12);}}}'''
         edits.append((diag_anchor, diag_extra))
+        edits.append((bhi_anchor, bhi_extra))
     return derive(data, READY_SOURCE_SHA, edits)
 
 
