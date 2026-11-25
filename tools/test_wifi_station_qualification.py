@@ -49,6 +49,7 @@ def main():
         if r['station_runtime'].get('oem_srng_size'):checks.append('oem-srng-size')
         if r['station_runtime'].get('oem_index_bank'):checks.append('oem-index-bank')
         if r['station_runtime'].get('oem_target_pdev'):checks.append('oem-target-pdev')
+        if r['station_runtime'].get('oem_v1_metadata'):checks.append('oem-v1-metadata')
         for name in checks:
             changed=copy.deepcopy(r)
             value=changed['station_runtime']
@@ -61,7 +62,8 @@ def main():
             elif name=='htt-drain':value['wait_htt_drain']=False
             elif name=='oem-srng-size':value['oem_srng_size']=False
             elif name=='oem-index-bank':value['oem_index_bank']=False
-            else:value['oem_target_pdev']=False
+            elif name=='oem-target-pdev':value['oem_target_pdev']=False
+            else:value['oem_v1_metadata']=False
             try:qualify_components(changed)
             except (ValueError,KeyError):count+=1
             else:raise AssertionError('Malformed OEM critical TX declaration accepted: '+name)

@@ -30,6 +30,8 @@ def main():
                         help='Use the TB322FC station index lookup HW bank configuration (0x0204)')
     parser.add_argument('--oem-target-pdev', action='store_true',
                         help='Encode VDEV_START_REPLY target PDEV (1) into v2 TCL metadata (0x0801)')
+    parser.add_argument('--oem-v1-metadata', action='store_true',
+                        help='Use TB322FC 4-byte HTT v1 version request with v1 TCL metadata (0x0401) on 56-byte SRNG')
     args = parser.parse_args()
     if args.oem_metadata and args.oem_eapol_critical:
         parser.error('Choose one TX adaptation')
@@ -43,6 +45,10 @@ def main():
         parser.error('--oem-index-bank requires --single-pdev-bank and --oem-srng-size')
     if args.oem_target_pdev and not args.oem_index_bank:
         parser.error('--oem-target-pdev requires --oem-index-bank')
+    if args.oem_v1_metadata and not args.oem_index_bank:
+        parser.error('--oem-v1-metadata requires --oem-index-bank')
+    if args.oem_v1_metadata and args.oem_target_pdev:
+        parser.error('Choose either --oem-target-pdev (v2) or --oem-v1-metadata (v1)')
     if args.oem_eapol_critical:
         from StationOemEapolCritical import station, dp_header
         source_recipe = 'StationOemEapolCritical.py'
@@ -62,7 +68,7 @@ def main():
     if not prior.get('station_ready') or prior.get('eapol_voice') or prior.get('oem_tcl_v1') or prior.get('oem_eapol_critical'):
         raise ValueError('Expected the original profile-ready station build')
 
-    generated = (station(Path(prior['source']).read_bytes(), oem_target_pdev=args.oem_target_pdev)
+    generated = (station(Path(prior['source']).read_bytes(), oem_target_pdev=args.oem_target_pdev, oem_tcl_v1=args.oem_v1_metadata)
                  if args.oem_eapol_critical else station(Path(prior['source']).read_bytes()))
     output.mkdir(parents=True, exist_ok=False)
     source = output / 'Station.cpp'
@@ -83,7 +89,7 @@ def main():
             header_specs.append((STA.parent / 'upstream/WifiLink.h', link_header, {}))
         if args.oem_srng_size:
             from ScanHttDrain import oem_srng_header
-            header_specs.append((STA.parent / 'upstream/WifiHtt.h', oem_srng_header, {}))
+            header_specs.append((STA.parent / 'upstream/WifiHtt.h', oem_srng_header, {'oem_htt_v1': args.oem_v1_metadata}))
         for frozen, derive, options in header_specs:
             paths = [path for path in expected_headers if Path(path).name == frozen.name]
             if len({Path(path).resolve() for path in paths}) != 1 or any(expected_headers[path] != sha(frozen) for path in paths):
@@ -160,6 +166,8 @@ def main():
             result['oem_index_bank'] = True
         if args.oem_target_pdev:
             result['oem_target_pdev'] = True
+        if args.oem_v1_metadata:
+            result['oem_v1_metadata'] = True
         if args.wait_htt_drain:
             for path in (STA/'ScanHttDrain.py',STA.parent/'upstream/WifiLink.h'):
                 pins[path.relative_to(ROOT).as_posix()] = sha(path)

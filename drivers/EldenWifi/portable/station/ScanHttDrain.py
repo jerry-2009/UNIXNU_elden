@@ -32,7 +32,7 @@ def link_header(data):
     return text.replace(anchor, replacement, 1).encode()
 
 
-def oem_srng_header(data):
+def oem_srng_header(data, *, oem_htt_v1=False):
     if hashlib.sha256(data).hexdigest() != HTT_SHA:
         raise ValueError('OEM SRNG setup requires the pinned HTT header')
     old = b'  const uint32_t bytes = kHttSrngSetupWords * 4;'
@@ -41,4 +41,19 @@ def oem_srng_header(data):
   const uint32_t bytes = (kHttSrngSetupWords + 1) * 4;'''
     if data.count(old) != 1:
         raise ValueError('SRNG setup encoder differs')
-    return data.replace(old, new, 1)
+    out = data.replace(old, new, 1)
+    if oem_htt_v1:
+        v_old = (b'  if (!at || capacity < 8) return 0;\r\n'
+                 b'  put32(at, kHttMsgVersionReq);\r\n'
+                 b'  put32(at + 4, kHttOptionTclMetadataVersion | kHttOptionTclMetadataLength << 8 | kHttTclMetadataV2 << 16);\r\n'
+                 b'  return 8;')
+        v_new = (b'  if (!at || capacity < 4) return 0;\r\n'
+                 b'  put32(at, kHttMsgVersionReq);\r\n'
+                 b'  return 4;')
+        if out.count(v_old) != 1:
+            v_old = v_old.replace(b'\r\n', b'\n')
+            v_new = v_new.replace(b'\r\n', b'\n')
+            if out.count(v_old) != 1:
+                raise ValueError('HTT version request encoder differs')
+        out = out.replace(v_old, v_new, 1)
+    return out

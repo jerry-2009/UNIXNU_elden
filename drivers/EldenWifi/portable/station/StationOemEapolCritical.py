@@ -19,7 +19,7 @@ def replace_once(text, old, new, label):
     return text.replace(old, new, 1)
 
 
-def station(data, *, oem_target_pdev=False):
+def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     if sha(data) != READY_SOURCE_SHA:
         raise ValueError('OEM EAPOL critical patch requires the qualified ready object')
     send = '        const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length);'
@@ -30,12 +30,21 @@ def station(data, *, oem_target_pdev=False):
         const bool sent=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},f->bytes,f->length,f->eapol);
         dp.tid=normal_tid;'''
     edits = [(send, replacement)]
-    if oem_target_pdev:
+    if oem_target_pdev or oem_tcl_v1:
         dp_state = 'static Dp dp;'
         begin = '        sta.note=sta_notice;sta.report=station_report;sta.ctx=owner_io.owner;staBegin(sta,o,environment,now);'
         response = '            uint32_t facts[9];for(unsigned i=0;i<9;i++)facts[i]=wmiGet(reply,i);'
         tx_setup = '''    if(current&&sta.vdevUp&&!dp.txReady){
         dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
+    }'''
+        if oem_tcl_v1:
+            tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
+        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
+        dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<2)|(tx_target_pdev<<10);
+    }'''
+        else:
+            tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
+        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,tx_target_pdev,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
     }'''
         edits.extend([
             (dp_state, dp_state + '\nstatic uint32_t tx_target_pdev;'),
@@ -43,9 +52,7 @@ def station(data, *, oem_target_pdev=False):
             (response, response + '''
             if(station_began&&sta.step==kStaVdevStart&&sta.vdevStartSent&&facts[1]==0&&facts[2]==0)
                 tx_target_pdev=(facts[3]==kWmiVdevStartOk&&facts[6]==1)?facts[6]:0;'''),
-            (tx_setup, '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
-        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,tx_target_pdev,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
-    }'''),
+            (tx_setup, tx_replace),
         ])
     return derive(data, READY_SOURCE_SHA, edits)
 
