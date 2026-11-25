@@ -103,8 +103,8 @@ def qualify_oem_eapol_critical(r):
     if r.get('oem_srng_size') and r.get('wait_htt_drain') is not True:
         raise ValueError('The OEM SRNG size requires HTT source-ring drain')
     for flag, key, name, frozen_digest, derive in (
-        ('wait_htt_drain','link_header','WifiLink.h',LINK_SHA,lambda b: link_header(b)),
-        ('oem_srng_size','htt_header','WifiHtt.h',HTT_SHA,lambda b: oem_srng_header(b, oem_htt_v1=oem_v1_metadata)),
+        ('wait_htt_drain','link_header','WifiLink.h',LINK_SHA,link_header),
+        ('oem_srng_size','htt_header','WifiHtt.h',HTT_SHA,oem_srng_header),
     ):
         enabled=r.get(flag,False)
         if type(enabled) is not bool:

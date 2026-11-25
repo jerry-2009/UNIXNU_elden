@@ -31,7 +31,7 @@ def main():
     parser.add_argument('--oem-target-pdev', action='store_true',
                         help='Encode VDEV_START_REPLY target PDEV (1) into v2 TCL metadata (0x0801)')
     parser.add_argument('--oem-v1-metadata', action='store_true',
-                        help='Use TB322FC 4-byte HTT v1 version request with v1 TCL metadata (0x0401) on 56-byte SRNG')
+                        help='Encode VDEV_START_REPLY target PDEV (1) into v1 TCL metadata (0x0401) on 8-byte HTT + 56-byte SRNG')
     args = parser.parse_args()
     if args.oem_metadata and args.oem_eapol_critical:
         parser.error('Choose one TX adaptation')
@@ -89,7 +89,7 @@ def main():
             header_specs.append((STA.parent / 'upstream/WifiLink.h', link_header, {}))
         if args.oem_srng_size:
             from ScanHttDrain import oem_srng_header
-            header_specs.append((STA.parent / 'upstream/WifiHtt.h', oem_srng_header, {'oem_htt_v1': args.oem_v1_metadata}))
+            header_specs.append((STA.parent / 'upstream/WifiHtt.h', oem_srng_header, {}))
         for frozen, derive, options in header_specs:
             paths = [path for path in expected_headers if Path(path).name == frozen.name]
             if len({Path(path).resolve() for path in paths}) != 1 or any(expected_headers[path] != sha(frozen) for path in paths):
