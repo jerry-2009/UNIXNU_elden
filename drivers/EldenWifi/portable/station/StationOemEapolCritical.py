@@ -80,7 +80,8 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
      if(dp.st.txFrames&&nlog<8){if(!t0)t0=now;
        const ChipIo io{owner_io.owner,owner_io.read,owner_io.write};
        const uint32_t dt=(uint32_t)(now-t0),st=io.read(io.ctx,0x48);
-       const bool due=(nlog==0)||(st!=last_st)||(nlog==1&&dt>=5000)||(nlog==2&&dt>=15000)||(nlog==3&&dt>=30000);
+       static const uint32_t marks[]={0,50,200,500,1000,2000,5000,15000};
+       const bool due=(st!=last_st)||(dt>=marks[nlog]);
        if(due){last_st=st;++nlog;
          const uint32_t bhi=io.read(io.ctx,0x28);
          const uint32_t v[]={dt,st,bhi,io.read(io.ctx,bhi+0x28),io.read(io.ctx,bhi+0x2c),
@@ -89,6 +90,11 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
          diag_line("BHI_WATCH dt/mhiSt/bhi/ee/st/err/dbg1..3/ev",v,10);}}}'''
         edits.append((diag_anchor, diag_extra))
         edits.append((bhi_anchor, bhi_extra))
+        edits.append(('if(now-first_tx<2000)return;', 'if(now-first_tx<150)return;'))
+        edits.append(('if(id==kWmiEvtVdevInstallKeyComplete){',
+                      'if(dp.st.txFrames){static unsigned post_ev;if(post_ev<16){++post_ev;'
+                      'const uint32_t pv[]={post_ev,id,bytes,link.events};'
+                      'diag_line("POST_TX_EVT n/id/bytes/ev",pv,4);}}\n    if(id==kWmiEvtVdevInstallKeyComplete){'))
     return derive(data, READY_SOURCE_SHA, edits)
 
 
