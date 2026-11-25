@@ -121,7 +121,8 @@ def qualify_oem_eapol_critical(r):
         original=STA.parent/'upstream'/name
         generated=r[key]
         digest=r[key+'_sha256']
-        if derive(original.read_bytes())!=Path(generated).read_bytes() or sha(generated)!=digest:
+        derived = derive(original.read_bytes(), oem_htt_v1=oem_v1_metadata) if derive is oem_srng_header else derive(original.read_bytes())
+        if derived!=Path(generated).read_bytes() or sha(generated)!=digest:
             raise ValueError('Station header derivation differs: '+name)
         expected_overlay['roots'].append({'type':'file','name':str(Path(paths[0]).resolve()),'external-contents':generated})
         headers[generated]=digest

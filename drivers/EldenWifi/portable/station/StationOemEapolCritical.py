@@ -40,7 +40,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     }'''
         if oem_tcl_v1:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
-        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,tx_target_pdev,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
+        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
         dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<2)|(tx_target_pdev<<10);
     }'''
         else:
@@ -57,14 +57,15 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         ])
         diag_anchor = '    diag_line("TX_DESC metadata-only words2..7",desc,6);'
         diag_extra = diag_anchor + '''
+    const uint32_t lw=(dp.txComp.ours+dp.txComp.entries-1)%dp.txComp.entries;
+    const uint8_t *we=dp.txComp.va+lw*dp.txComp.words*4;
     const uint32_t wbm_diag[]={
-        io.read(io.ctx,kDpWbmCookieConvert),io.read(io.ctx,kDpReoSwCookieCfg1),
-        io.read(io.ctx,kDpWbm2Sw0R2+8),dp.st.lastTxSource,
-        io.read(io.ctx,kDpWbm2Sw0R2+24),dp.st.lastTxReason,
+        dpdetail::get32(we+8),dpdetail::get32(we+12),dpdetail::get32(we+16),
+        dp.st.lastTxSource,dp.st.lastTxReason,dp.st.txNotAcked,
         io.read(io.ctx,kDpIdleLinkR2),io.read(io.ctx,kDpIdleLinkR2+4),
-        dp.st.relEntries,dp.st.txNotAcked,dp.st.txFwReleased,dp.st.txOtherRelease
+        dp.st.relEntries,dp.st.txFwReleased,dp.st.txOtherRelease,dp.st.txBadCookie
     };
-    diag_line("WBM_DIAG wbmCC/reoCC/wbm1HP/src/wbm3HP/rsn/idleHP-TP/rel/nAck/fwRel/othRel",wbm_diag,12);'''
+    diag_line("WBM_DIAG w2/w3/w4/src/rsn/nAck/idleHP-TP/rel/fwRel/oth/badC",wbm_diag,12);'''
         edits.append((diag_anchor, diag_extra))
     return derive(data, READY_SOURCE_SHA, edits)
 

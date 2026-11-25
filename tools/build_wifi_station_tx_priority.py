@@ -89,7 +89,7 @@ def main():
             header_specs.append((STA.parent / 'upstream/WifiLink.h', link_header, {}))
         if args.oem_srng_size:
             from ScanHttDrain import oem_srng_header
-            header_specs.append((STA.parent / 'upstream/WifiHtt.h', oem_srng_header, {}))
+            header_specs.append((STA.parent / 'upstream/WifiHtt.h', oem_srng_header, {'oem_htt_v1': args.oem_v1_metadata}))
         for frozen, derive, options in header_specs:
             paths = [path for path in expected_headers if Path(path).name == frozen.name]
             if len({Path(path).resolve() for path in paths}) != 1 or any(expected_headers[path] != sha(frozen) for path in paths):
