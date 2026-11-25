@@ -54,6 +54,17 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
                 tx_target_pdev=(facts[3]==kWmiVdevStartOk&&facts[6]==1)?facts[6]:0;'''),
             (tx_setup, tx_replace),
         ])
+        diag_anchor = '    diag_line("TX_DESC metadata-only words2..7",desc,6);'
+        diag_extra = diag_anchor + '''
+    const uint32_t wbm_diag[]={
+        io.read(io.ctx,kDpWbmCookieConvert),io.read(io.ctx,kDpReoSwCookieCfg1),
+        io.read(io.ctx,kDpWbm2Sw0R2+8),io.read(io.ctx,kDpWbm2Sw0R2+16),
+        io.read(io.ctx,kDpWbm2Sw0R2+24),io.read(io.ctx,kDpWbm2Sw0R2+32),
+        io.read(io.ctx,kDpIdleLinkR2),io.read(io.ctx,kDpIdleLinkR2+4),
+        dp.st.relEntries,dp.st.excEntries,dp.st.txFwReleased,dp.st.txBadCookie
+    };
+    diag_line("WBM_DIAG wbmCC/reoCC/wbm1..4HP/idleHP-TP/rel/exc/fwRel/badC",wbm_diag,12);'''
+        edits.append((diag_anchor, diag_extra))
     return derive(data, READY_SOURCE_SHA, edits)
 
 
