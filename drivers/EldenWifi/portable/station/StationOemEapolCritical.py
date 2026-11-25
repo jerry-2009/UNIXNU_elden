@@ -49,7 +49,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     }'''
         edits.extend([
             (dp_state, dp_state + '\nstatic uint32_t tx_target_pdev;'),
-            (begin, '        tx_target_pdev=0;o.phy=kPhyHt;o.flags=kStaFlagsDefault&~kStaFlagPrefer5;\n' + begin),
+            (begin, '        tx_target_pdev=0;o.phy=kPhyHt;\n' + begin),
             (response, response + '''
             if(station_began&&sta.step==kStaVdevStart&&sta.vdevStartSent&&facts[1]==0&&facts[2]==0)
                 tx_target_pdev=(facts[3]==kWmiVdevStartOk)?(facts[6]+1u):0;'''),
@@ -91,6 +91,8 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         edits.append((diag_anchor, diag_extra))
         edits.append((bhi_anchor, bhi_extra))
         edits.append(('if(now-first_tx<2000)return;', 'if(now-first_tx<150)return;'))
+        edits.append(('LinkOptions options;options.htt=&htt;options.handOff=true;options.ownMacSet=true;',
+                      'LinkOptions options;options.htt=&htt;options.handOff=true;options.ownMacSet=true;options.pre&=~kPreHwMode;'))
         edits.append(('if(id==kWmiEvtVdevInstallKeyComplete){',
                       'if(dp.st.txFrames){static unsigned post_ev;if(post_ev<16){++post_ev;'
                       'const uint32_t pv[]={post_ev,id,bytes,link.events};'
