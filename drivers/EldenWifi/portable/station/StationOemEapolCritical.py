@@ -129,7 +129,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
            diag_line("STATS_REQ n/tx/dt/ev",sv,4);++st_req;}}}}'''
         edits.append((diag_anchor, diag_extra))
         edits.append((bhi_anchor, bhi_extra))
-        edits.append(('if(now-first_tx<2000)return;', 'if(now-first_tx<150)return;'))
+        edits.append(('if(now-first_tx<2000)return;', 'if(now-first_tx<1200)return;'))
         edits.append(('if(id==kWmiEvtVdevInstallKeyComplete){',
                       'if(dp.st.txFrames){static unsigned post_ev;if(post_ev<16){++post_ev;'
                       'const uint32_t pv[]={post_ev,id,bytes,link.events};'
@@ -195,22 +195,79 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
     )
     text = replace_once(
         text,
-        '  if (!plan(dp.tcl, arena, kDpTclEntries, kDpTclEntryWords, kDpTcl1R0, kDpTcl1R2, 0, pointers, pointersBus, index) ||\n'
-        '      !plan(dp.txComp, arena, kDpTxCompEntries, kDpWbmEntryWords, kDpWbm2Sw0R0, kDpWbm2Sw0R2, kDpRingIdWbm2Sw0, pointers,',
-        '  if (!plan(dp.tcl, arena, kDpTclEntries, kDpTclEntryWords, kDpTcl1R0 + 0x78u, kDpTcl1R2 + 8u, 0, pointers, pointersBus, index) ||\n'
-        '      !plan(dp.txComp, arena, kDpTxCompEntries, kDpWbmEntryWords, kDpWbm2Sw0R0 + 2u * kDpWbm2SwR0Stride, kDpWbm2Sw0R2 + 2u * kDpWbm2SwR2Stride, kDpRingIdWbm2Sw0 + 2u, pointers,',
-        'r30 SW2TCL2 + WBM2SW2',
-    )
-    text = replace_once(
-        text,
         '  put32(e + 4, uint32_t((b.bus >> 32) & 0xffu) | kDpRbmSw0 << 8 | (uint32_t(buffer) & 0xfffffu) << 12);',
-        '  put32(e + 4, uint32_t((b.bus >> 32) & 0xffu) | 7u << 8 | ((uint32_t(buffer) + 1u) & 0xfffffu) << 12);',
-        'r30 RBM=7 SW2 + non-zero cookie',
+        '  put32(e + 4, uint32_t((b.bus >> 32) & 0xffu) | kDpRbmSw0 << 8 | ((uint32_t(buffer) + 1u) & 0xfffffu) << 12);',
+        'r31 non-zero cookie',
     )
     text = replace_once(
         text,
         '      if (cookie < kDpTxBuffers && dp.tx[cookie].busy && addrOf(e) == dp.tx[cookie].bus) dp.tx[cookie].busy = false;',
         '      if (cookie >= 1 && cookie <= kDpTxBuffers && dp.tx[cookie - 1].busy && addrOf(e) == dp.tx[cookie - 1].bus) dp.tx[cookie - 1].busy = false;',
-        'r30 cookie-1 poll',
+        'r31 cookie-1 poll',
+    )
+    text = replace_once(
+        text,
+        '  dp.planned = true;\n  return true;\n}',
+        '  dp.planned = true;\n  return true;\n}\n'
+        'static CeRing dp_extra_sw2wbm, dp_extra_tcl_st;\n',
+        'r31 extra rings decl',
+    )
+    text = replace_once(
+        text,
+        '  if (!dp.linkVa) return false;',
+        '  if (!dp.linkVa) return false;\n'
+        '  if (!plan(dp_extra_sw2wbm, arena, 64, 8, 0x00a3437cu, 0x00a37010u, 0, pointers, pointersBus, index) ||\n'
+        '      !plan(dp_extra_tcl_st, arena, 64, 8, 0x00a44d50u, 0x00a46048u, 0, pointers, pointersBus, index)) return false;',
+        'r31 plan sw2wbm + tcl_status',
+    )
+    text = replace_once(
+        text,
+        '    case kDpBlockIdle: {\n'
+        '      program(dp, io, dp.idle, true, true);\n'
+        '      // each link descriptor one entry of the idle ring (its address, manager "WBM idle descriptor list", cookie = its index)\n'
+        '      for (uint32_t i = 0; i < dp.linkDescs; ++i) {\n'
+        '        uint8_t *e = dp.idle.va + i * dp.idle.words * 4;\n'
+        '        const uint64_t bus = dp.linkBus + uint64_t(i) * kDpLinkDescBytes;\n'
+        '        put32(e, uint32_t(bus & 0xffffffffu));\n'
+        '        put32(e + 4, uint32_t((bus >> 32) & 0xffu) | kDpRbmIdleDescDev0 << 8 | (i & 0xfffffu) << 12);\n'
+        '      }\n'
+        '      dp.idle.ours = dp.linkDescs;\n'
+        '      publishBarrier();\n'
+        '      write(dp, io, dp.idle.r2, dp.idle.ours * dp.idle.words);\n'
+        '      break;\n'
+        '    }',
+        '    case kDpBlockIdle: {\n'
+        '      program(dp, io, dp_extra_sw2wbm, true);\n'
+        '      program(dp, io, dp_extra_tcl_st, false);\n'
+        '      for (uint32_t i = 0; i < dp.linkDescs; ++i) {\n'
+        '        uint8_t *e = dp.idle.va + i * 8u;\n'
+        '        const uint64_t bus = dp.linkBus + uint64_t(i) * kDpLinkDescBytes;\n'
+        '        put32(e, uint32_t(bus & 0xffffffffu));\n'
+        '        put32(e + 4, uint32_t((bus >> 32) & 0xffu) | kDpRbmIdleDescDev0 << 8 | (i & 0xfffffu) << 12);\n'
+        '      }\n'
+        '      put32(dp.idle.va + dp.linkDescs * 8u, 0);\n'
+        '      put32(dp.idle.va + dp.linkDescs * 8u + 4u, 0);\n'
+        '      publishBarrier();\n'
+        '      const uint32_t sLo = uint32_t(dp.idle.bus & 0xffffffffu);\n'
+        '      const uint32_t sHi = uint32_t((dp.idle.bus >> 32) & 0xffu);\n'
+        '      const uint32_t regSz = (1024u * 8u) / 64u;\n'
+        '      const uint32_t endOff = dp.linkDescs * 8u;\n'
+        '      write(dp, io, 0x00a34240u, (regSz << 2) | 0x2u);\n'
+        '      write(dp, io, 0x00a34244u, regSz << 16);\n'
+        '      write(dp, io, 0x00a34250u, sLo);\n'
+        '      write(dp, io, 0x00a34254u, sHi | (5u << 8));\n'
+        '      write(dp, io, 0x00a34260u, sLo);\n'
+        '      write(dp, io, 0x00a34264u, sHi | ((endOff >> 2) << 8));\n'
+        '      write(dp, io, 0x00a34270u, sLo);\n'
+        '      write(dp, io, 0x00a34274u, sHi);\n'
+        '      write(dp, io, 0x00a3427cu, 2u * dp.linkDescs);\n'
+        '      write(dp, io, 0x00a34d4cu, (1u << 6) | 1u);\n'
+        '      const uint32_t cmn = io.read(io.ctx, 0x00a44020u);\n'
+        '      write(dp, io, 0x00a44020u, cmn | (1u << 23));\n'
+        '      for (uint32_t d = 0; d < 8u; ++d) write(dp, io, 0x00a44240u + d * 4u, 0);\n'
+        '      write(dp, io, 0x00a44020u, cmn & ~(1u << 23));\n'
+        '      break;\n'
+        '    }',
+        'r31 scatter idle + sw2wbm + tcl_status + dscp_tid_map',
     )
     return text.encode()
