@@ -29,7 +29,15 @@ def link_header(data):
     link.ringSettle = 0;'''
     if text.count(anchor) != 1:
         raise ValueError('Second scan transition differs')
-    return text.replace(anchor, replacement, 1).encode()
+    text = text.replace(anchor, replacement, 1)
+    vdev_old = 'return wmiBuildVdevCreate(w, at, capacity, vdevId, mac, kWmiPdevIdSoc, chains);'
+    vdev_new = ('const uint32_t n = wmiBuildVdevCreate(w, at, capacity, vdevId, mac, kWmiPdevIdSoc, chains);\n'
+                '      if (n && !w.overflow) { (void)wmiTlv(w, kWmiTagArrayStruct, 0); return wmiEnd(w); }\n'
+                '      return n;')
+    if text.count(vdev_old) != 1:
+        raise ValueError('VDEV create anchor differs')
+    text = text.replace(vdev_old, vdev_new, 1)
+    return text.encode()
 
 
 def oem_srng_header(data, *, oem_htt_v1=False):

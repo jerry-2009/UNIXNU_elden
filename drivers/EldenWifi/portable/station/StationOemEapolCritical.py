@@ -40,11 +40,10 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     }'''
         if oem_tcl_v1:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
-        const uint32_t lmac=tx_target_pdev-1u;
         const HttPeerMap *pm=httPeerMapOf(htt,link.options.vdevId,sta.bssid);
-        {const uint32_t pv[]={lmac,pm?pm->type:0,pm?pm->peerId:0,pm?pm->hwPeerId:0,pm?pm->astHash:0,pm?(uint32_t)pm->hasSearch:0};diag_line("TX_LMAC_PM lmac/type/pid/hwpid/hash/has",pv,6);}
-        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,lmac,pm);
-        dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<3)|((lmac&0x3u)<<11);
+        {const uint32_t pv[]={0u,pm?pm->type:0,pm?pm->peerId:0,pm?pm->hwPeerId:0,pm?pm->astHash:0,pm?(uint32_t)pm->hasSearch:0};diag_line("TX_LMAC_PM lmac/type/pid/hwpid/hash/has",pv,6);}
+        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,pm);
+        dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<3);
     }'''
         else:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
@@ -115,7 +114,7 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
             # hal_tx_populate_bank_register_be masks SW bank_config with 0x1ffff
             # (dropping SW mcast_pkt_ctrl bits 18:17) and shifts dscp_tid_map_id
             # (bits 24:19) to HW bits 22:17, writing 0x00000204 for STA index mode.
-            bank = 'kDpBankEncapEthernet | kDpBankIndexLookup | ((dp.pdevId & 0x3u) << 15)'
+            bank = 'kDpBankEncapEthernet | kDpBankIndexLookup'
         text = replace_once(
             text,
             '  write(dp, io, kDpTclBankConfig + 4 * dp.bank, kDpBankStation);',
