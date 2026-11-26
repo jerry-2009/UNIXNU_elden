@@ -193,4 +193,10 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
         '                    ((dp.pdevId & 0x3u) << 9) | (dp.vdevId & 0xffu) << kDpTclVdevShift);',
         'critical queue fields',
     )
+    text = replace_once(
+        text,
+        '  put32(e + 16, length & 0xffffu);                                              // no offset, not to the firmware',
+        '  put32(e + 16, (length & 0xffffu) | kDpTclToFw);',
+        'r29 to_fw bisect',
+    )
     return text.encode()
