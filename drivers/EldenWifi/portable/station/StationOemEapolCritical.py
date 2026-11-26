@@ -56,8 +56,6 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
             if(station_began&&sta.step==kStaVdevStart&&sta.vdevStartSent&&facts[1]==0&&facts[2]==0)
                 tx_target_pdev=(facts[3]==kWmiVdevStartOk)?(facts[6]+1u):0;'''),
             (tx_setup, tx_replace),
-            ('LinkOptions options;options.htt=&htt;options.handOff=true;options.ownMacSet=true;',
-             'LinkOptions options;options.htt=&htt;options.handOff=true;options.ownMacSet=true;options.pre&=~kPreHwMode;'),
         ])
         diag_anchor = '    diag_line("TX_DESC metadata-only words2..7",desc,6);'
         diag_extra = diag_anchor + '''
@@ -78,6 +76,23 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         io.read(io.ctx,kDpWbm2Sw0R2+24),io.read(io.ctx,kDpWbm2Sw0R2+32)
     };
     diag_line("TX_HDR w0..w3/wbm1..4HP",tx_hdr,8);'''
+        diag_extra = diag_extra + '''
+    const uint32_t tx_w01[]={
+        dpdetail::get32(dp.tcl.va+0),dpdetail::get32(dp.tcl.va+4),
+        (uint32_t)dp.tx[0].bus,(uint32_t)(dp.tx[0].bus>>32),
+        dp.reoCookieCfg,dp.wbmCookieConvert,
+        io.read(io.ctx,kDpReoSwCookieCfg1),io.read(io.ctx,kDpWbmCookieConvert)
+    };
+    diag_line("TX_W01 w0/w1/busLo/Hi/reoCC0/wbmCC0/reoCC/wbmCC",tx_w01,8);
+    const uint32_t dp_hw[]={
+        io.read(io.ctx,0x00a44000u),io.read(io.ctx,0x00a46048u),io.read(io.ctx,0x00a4604cu),
+        io.read(io.ctx,0x00a37010u),io.read(io.ctx,0x00a37014u),
+        htt.t2hMessages,
+        (htt.t2hTypes[0]&0xffu)|((htt.t2hTypes[1]&0xffu)<<8)|((htt.t2hTypes[2]&0xffu)<<16)|((htt.t2hTypes[3]&0xffu)<<24),
+        (htt.t2hTypes[4]&0xffu)|((htt.t2hTypes[5]&0xffu)<<8)|((htt.t2hTypes[6]&0xffu)<<16)|((htt.t2hTypes[7]&0xffu)<<24),
+        htt.errorsSeen,dp.st.excEntries,dp.st.rxEntries,dp.st.rxErrors
+    };
+    diag_line("DP_HW tclMisc/tclStHP-TP/wbmRelHP-TP/httN/t0..3/t4..7/httErr/exc/rx/rxErr",dp_hw,12);'''
         bhi_anchor = 'follow(now);key_turn(now);transmit();tx_diagnostic(now);port_replies();publish_snapshot();protocol_status(out);'
         bhi_extra = bhi_anchor + '''
     {static uint64_t t0;static uint32_t last_st,nlog;

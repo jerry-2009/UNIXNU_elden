@@ -38,20 +38,9 @@ def link_header(data):
         raise ValueError('VDEV create anchor differs')
     text = text.replace(vdev_old, vdev_new, 1)
     init_old = 'return wmiBuildInit(w, at, capacity, chains);'
-    init_new = '''const uint32_t n = wmiBuildInit(w, at, capacity, chains);
-      if (n && !w.overflow) {
-        uint8_t *hm = wmiStruct(w, kWmiTagPdevSetHwModeCmd, 3);
-        if (hm) { wmiPut(hm, 0, kWmiPdevIdSoc); wmiPut(hm, 1, 5u); wmiPut(hm, 2, 2u); }
-        uint8_t *bm = wmiTlv(w, kWmiTagArrayStruct, 32u);
-        if (bm) {
-          const uint32_t hdr = 12u | (uint32_t(kWmiTagPdevBandToMac) << kWmiTlvTagShift);
-          for (unsigned i = 0; i < 4; ++i) { bm[i] = uint8_t(hdr >> (8 * i)); bm[16 + i] = uint8_t(hdr >> (8 * i)); }
-          wmiPut(bm + 4, 0, 1u); wmiPut(bm + 4, 1, 2300u); wmiPut(bm + 4, 2, 2500u);
-          wmiPut(bm + 20, 0, 2u); wmiPut(bm + 20, 1, 4900u); wmiPut(bm + 20, 2, 7125u);
-        }
-        return wmiEnd(w);
-      }
-      return n;'''
+    init_new = ('const uint32_t n = wmiBuildInit(w, at, capacity, chains);\n'
+                '      if (n >= 96 && wmiGet(at + 40, 13) == 1u) wmiPut(at + 40, 13, 2u);\n'
+                '      return n;')
     if text.count(init_old) != 1:
         raise ValueError('WMI init anchor differs')
     text = text.replace(init_old, init_new, 1)
