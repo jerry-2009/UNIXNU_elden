@@ -207,9 +207,8 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
     )
     text = replace_once(
         text,
-        '  dp.planned = true;\n  return true;\n}',
-        '  dp.planned = true;\n  return true;\n}\n'
-        'static CeRing dp_extra_sw2wbm, dp_extra_tcl_st;\n',
+        'inline bool dpPlan(Dp &dp, Arena &arena, HttRx *rx)',
+        'static CeRing dp_extra_sw2wbm, dp_extra_tcl_st;\ninline bool dpPlan(Dp &dp, Arena &arena, HttRx *rx)',
         'r31 extra rings decl',
     )
     text = replace_once(
