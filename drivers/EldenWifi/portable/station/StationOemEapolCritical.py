@@ -27,6 +27,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     replacement = f'''        // The successful station donor uses voice TID 7 on WMM peers.
         // OEM critical-flow routing remains a separate TCL decision.
         const uint32_t normal_tid=dp.tid;
+        if(f->eapol){{unlock();return;}}
         if(f->eapol&&sta.phy.qos)dp.tid=7;
         const bool sent=dpSend(dp,{{owner_io.owner,owner_io.read,owner_io.write}},f->bytes,f->length,{critical_arg});
         dp.tid=normal_tid;'''
@@ -42,8 +43,17 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
         const HttPeerMap *pm=httPeerMapOf(htt,link.options.vdevId,sta.bssid);
         {const uint32_t pv[]={0u,pm?pm->type:0,pm?pm->peerId:0,pm?pm->hwPeerId:0,pm?pm->astHash:0,pm?(uint32_t)pm->hasSearch:0};diag_line("TX_LMAC_PM lmac/type/pid/hwpid/hash/has",pv,6);}
+        {WmiWriter aw;const uint32_t an=assocBuildPeerSetParam(aw,key_output,sizeof(key_output),0,sta.bssid,kWmiPeerParamAuthorize,1);
+         const int ar=an?linkSendWmi(link,key_output,an):-1;const uint32_t av[]={(uint32_t)ar,an};diag_line("PRE_AUTH rc/bytes",av,2);}
         dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,pm);
         dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<3);
+        {static uint64_t up_at;if(!up_at)up_at=now;}
+    }
+    if(dp.txReady&&!dp.st.txFrames&&now>=sta.associatedAt+100){
+        uint8_t arp[60]={};for(unsigned i=0;i<6;i++){arp[i]=sta.bssid[i];arp[6+i]=link.vdevMac[i];}
+        arp[12]=0x08;arp[13]=0x06;arp[15]=1;arp[16]=0x08;arp[18]=6;arp[19]=4;arp[21]=1;
+        const bool ok=dpSend(dp,{owner_io.owner,owner_io.read,owner_io.write},arp,sizeof(arp),false);
+        const uint32_t av[]={(uint32_t)ok,(uint32_t)sizeof(arp)};diag_line("ARP_PROBE ok/bytes",av,2);
     }'''
         else:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
