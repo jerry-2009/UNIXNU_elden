@@ -195,8 +195,22 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
     )
     text = replace_once(
         text,
-        '  put32(e + 16, length & 0xffffu);                                              // no offset, not to the firmware',
-        '  put32(e + 16, (length & 0xffffu) | kDpTclToFw);',
-        'r29 to_fw bisect',
+        '  if (!plan(dp.tcl, arena, kDpTclEntries, kDpTclEntryWords, kDpTcl1R0, kDpTcl1R2, 0, pointers, pointersBus, index) ||\n'
+        '      !plan(dp.txComp, arena, kDpTxCompEntries, kDpWbmEntryWords, kDpWbm2Sw0R0, kDpWbm2Sw0R2, kDpRingIdWbm2Sw0, pointers,',
+        '  if (!plan(dp.tcl, arena, kDpTclEntries, kDpTclEntryWords, kDpTcl1R0 + 0x78u, kDpTcl1R2 + 8u, 0, pointers, pointersBus, index) ||\n'
+        '      !plan(dp.txComp, arena, kDpTxCompEntries, kDpWbmEntryWords, kDpWbm2Sw0R0 + 2u * kDpWbm2SwR0Stride, kDpWbm2Sw0R2 + 2u * kDpWbm2SwR2Stride, kDpRingIdWbm2Sw0 + 2u, pointers,',
+        'r30 SW2TCL2 + WBM2SW2',
+    )
+    text = replace_once(
+        text,
+        '  put32(e + 4, uint32_t((b.bus >> 32) & 0xffu) | kDpRbmSw0 << 8 | (uint32_t(buffer) & 0xfffffu) << 12);',
+        '  put32(e + 4, uint32_t((b.bus >> 32) & 0xffu) | 7u << 8 | ((uint32_t(buffer) + 1u) & 0xfffffu) << 12);',
+        'r30 RBM=7 SW2 + non-zero cookie',
+    )
+    text = replace_once(
+        text,
+        '      if (cookie < kDpTxBuffers && dp.tx[cookie].busy && addrOf(e) == dp.tx[cookie].bus) dp.tx[cookie].busy = false;',
+        '      if (cookie >= 1 && cookie <= kDpTxBuffers && dp.tx[cookie - 1].busy && addrOf(e) == dp.tx[cookie - 1].bus) dp.tx[cookie - 1].busy = false;',
+        'r30 cookie-1 poll',
     )
     return text.encode()
