@@ -115,13 +115,37 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
            io.read(io.ctx,bhi+0x30),io.read(io.ctx,bhi+0x34),io.read(io.ctx,bhi+0x38),
            io.read(io.ctx,bhi+0x3c),link.events};
          diag_line("BHI_WATCH dt/mhiSt/bhi/ee/st/err/dbg1..3/ev",v,10);}}}'''
+        bhi_extra = bhi_extra + '''
+    {static uint32_t st_req;static uint64_t st_t0;
+     if(dp.txReady){
+       if(dp.st.txFrames&&!st_t0)st_t0=now;
+       const bool want=(st_req==0)||(st_req==1&&st_t0&&now-st_t0>=600)||(st_req==2&&st_t0&&now-st_t0>=2500);
+       if(want){
+         uint8_t sb[64];WmiWriter ww;wmiBegin(ww,sb,sizeof(sb),kWmiCmdRequestStats);
+         uint8_t *sc=wmiStruct(ww,kWmiTagRequestStatsCmd,5);
+         if(sc){wmiPut(sc,0,kWmiStatsPdev);wmiPut(sc,1,0);wmiPut(sc,4,kWmiPdevIdSoc);}
+         const uint32_t sl=wmiEnd(ww);
+         if(sl&&linkSendWmi(link,sb,sl)==1){
+           const uint32_t sv[]={st_req,dp.st.txFrames,(uint32_t)(st_t0?now-st_t0:0),link.events};
+           diag_line("STATS_REQ n/tx/dt/ev",sv,4);++st_req;}}}}'''
         edits.append((diag_anchor, diag_extra))
         edits.append((bhi_anchor, bhi_extra))
         edits.append(('if(now-first_tx<2000)return;', 'if(now-first_tx<150)return;'))
         edits.append(('if(id==kWmiEvtVdevInstallKeyComplete){',
                       'if(dp.st.txFrames){static unsigned post_ev;if(post_ev<16){++post_ev;'
                       'const uint32_t pv[]={post_ev,id,bytes,link.events};'
-                      'diag_line("POST_TX_EVT n/id/bytes/ev",pv,4);}}\n    if(id==kWmiEvtVdevInstallKeyComplete){'))
+                      'diag_line("POST_TX_EVT n/id/bytes/ev",pv,4);}}\n'
+                      '    if(id==kWmiEvtUpdateStats&&dp.txReady){\n'
+                      '        uint32_t fs=0,ds=0;const uint8_t *fx=wmiFind(payload,bytes,kWmiTagStatsEvent,&fs);\n'
+                      '        const uint8_t *da=wmiFind(payload,bytes,kWmiTagArrayByte,&ds);\n'
+                      '        if(fx&&fs>=36&&da&&ds>=kWmiPdevStatsWords*4){\n'
+                      '            const uint32_t tx1[]={dp.st.txFrames,wmiGet(da,7),wmiGet(da,8),wmiGet(da,9),wmiGet(da,10),wmiGet(da,11),wmiGet(da,12),wmiGet(da,13),wmiGet(da,14),wmiGet(da,15),wmiGet(da,16),wmiGet(da,17)};\n'
+                      '            const uint32_t tx2[]={wmiGet(da,18),wmiGet(da,19),wmiGet(da,20),wmiGet(da,21),wmiGet(da,22),wmiGet(da,23),wmiGet(da,24),wmiGet(da,25),wmiGet(da,26),wmiGet(da,27),wmiGet(da,28),wmiGet(da,29)};\n'
+                      '            diag_line("PDEV_TX1 tx/cQ/cD/msduQ/mpduQ/wmmD/locQ/locF/hwQ/hwR/ur/abrt",tx1,12);\n'
+                      '            diag_line("PDEV_TX2 req/ko/rc/sTrg/swR/illR/xRet/tmo/rst/tidF/pUr/txop",tx2,12);\n'
+                      '        }\n'
+                      '    }\n'
+                      '    if(id==kWmiEvtVdevInstallKeyComplete){'))
     return derive(data, READY_SOURCE_SHA, edits)
 
 
