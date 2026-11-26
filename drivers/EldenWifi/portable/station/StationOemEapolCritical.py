@@ -40,10 +40,11 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     }'''
         if oem_tcl_v1:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
-        {WmiWriter aw;const uint32_t an=assocBuildPeerSetParam(aw,key_output,sizeof(key_output),0,sta.bssid,kWmiPeerParamAuthorize,1);
-         const int ar=an?linkSendWmi(link,key_output,an):-1;const uint32_t av[]={(uint32_t)ar,an};diag_line("PRE_AUTH rc/bytes",av,2);}
-        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,httPeerMapOf(htt,link.options.vdevId,sta.bssid));
-        dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<3);
+        const uint32_t lmac=tx_target_pdev-1u;
+        const HttPeerMap *pm=httPeerMapOf(htt,link.options.vdevId,sta.bssid);
+        {const uint32_t pv[]={lmac,pm?pm->type:0,pm?pm->peerId:0,pm?pm->hwPeerId:0,pm?pm->astHash:0,pm?(uint32_t)pm->hasSearch:0};diag_line("TX_LMAC_PM lmac/type/pid/hwpid/hash/has",pv,6);}
+        dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,lmac,pm);
+        dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<3)|((lmac&0x3u)<<11);
     }'''
         else:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
@@ -72,10 +73,10 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     const uint32_t tx_hdr[]={
         dp.tx[0].va?dpdetail::get32(dp.tx[0].va+0):0,dp.tx[0].va?dpdetail::get32(dp.tx[0].va+4):0,
         dp.tx[0].va?dpdetail::get32(dp.tx[0].va+8):0,dp.tx[0].va?dpdetail::get32(dp.tx[0].va+12):0,
-        io.read(io.ctx,kUnitTcl+0x2048),io.read(io.ctx,kUnitTcl+0x204c),
-        io.read(io.ctx,kUnitWbm+0x3010),io.read(io.ctx,kUnitWbm+0x3014)
+        io.read(io.ctx,kDpWbm2Sw0R2+8),io.read(io.ctx,kDpWbm2Sw0R2+16),
+        io.read(io.ctx,kDpWbm2Sw0R2+24),io.read(io.ctx,kDpWbm2Sw0R2+32)
     };
-    diag_line("TX_HDR w0..w3/tclStHP-TP/wbmRelHP-TP",tx_hdr,8);'''
+    diag_line("TX_HDR w0..w3/wbm1..4HP",tx_hdr,8);'''
         bhi_anchor = 'follow(now);key_turn(now);transmit();tx_diagnostic(now);port_replies();publish_snapshot();protocol_status(out);'
         bhi_extra = bhi_anchor + '''
     {static uint64_t t0;static uint32_t last_st,nlog;
@@ -114,7 +115,7 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
             # hal_tx_populate_bank_register_be masks SW bank_config with 0x1ffff
             # (dropping SW mcast_pkt_ctrl bits 18:17) and shifts dscp_tid_map_id
             # (bits 24:19) to HW bits 22:17, writing 0x00000204 for STA index mode.
-            bank = 'kDpBankEncapEthernet | kDpBankIndexLookup'
+            bank = 'kDpBankEncapEthernet | kDpBankIndexLookup | ((dp.pdevId & 0x3u) << 15)'
         text = replace_once(
             text,
             '  write(dp, io, kDpTclBankConfig + 4 * dp.bank, kDpBankStation);',
