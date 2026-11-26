@@ -27,7 +27,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     replacement = f'''        // The successful station donor uses voice TID 7 on WMM peers.
         // OEM critical-flow routing remains a separate TCL decision.
         const uint32_t normal_tid=dp.tid;
-        if(f->eapol&&sta.phy.qos)dp.tid=7;
+        if(false&&f->eapol&&sta.phy.qos)dp.tid=7;
         const bool sent=dpSend(dp,{{owner_io.owner,owner_io.read,owner_io.write}},f->bytes,f->length,{critical_arg});
         dp.tid=normal_tid;'''
     edits = [(send, replacement)]
@@ -43,7 +43,6 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         const HttPeerMap *pm=httPeerMapOf(htt,link.options.vdevId,sta.bssid);
         {const uint32_t pv[]={0u,pm?pm->type:0,pm?pm->peerId:0,pm?pm->hwPeerId:0,pm?pm->astHash:0,pm?(uint32_t)pm->hasSearch:0};diag_line("TX_LMAC_PM lmac/type/pid/hwpid/hash/has",pv,6);}
         dpTxSetupPeer(dp,{owner_io.owner,owner_io.read,owner_io.write},link.options.vdevId,kDpPdevSingle,pm);
-        dp.tclMetadata=1u|((link.options.vdevId&0xffu)<<3);
     }'''
         else:
             tx_replace = '''    if(current&&sta.vdevUp&&!dp.txReady&&tx_target_pdev){
@@ -51,7 +50,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     }'''
         edits.extend([
             (dp_state, dp_state + '\nstatic uint32_t tx_target_pdev;'),
-            (begin, '        tx_target_pdev=0;o.phy=kPhyHt;\n' + begin),
+            (begin, '        tx_target_pdev=0;o.phy=kPhyLegacy;\n' + begin),
             (response, response + '''
             if(station_began&&sta.step==kStaVdevStart&&sta.vdevStartSent&&facts[1]==0&&facts[2]==0)
                 tx_target_pdev=(facts[3]==kWmiVdevStartOk)?(facts[6]+1u):0;'''),
@@ -163,7 +162,7 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
             # hal_tx_populate_bank_register_be masks SW bank_config with 0x1ffff
             # (dropping SW mcast_pkt_ctrl bits 18:17) and shifts dscp_tid_map_id
             # (bits 24:19) to HW bits 22:17, writing 0x00000204 for STA index mode.
-            bank = 'kDpBankEncapEthernet | kDpBankIndexLookup'
+            bank = 'kDpBankStation'
         text = replace_once(
             text,
             '  write(dp, io, kDpTclBankConfig + 4 * dp.bank, kDpBankStation);',
