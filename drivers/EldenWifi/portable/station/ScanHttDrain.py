@@ -37,13 +37,6 @@ def link_header(data):
     if text.count(vdev_old) != 1:
         raise ValueError('VDEV create anchor differs')
     text = text.replace(vdev_old, vdev_new, 1)
-    init_old = 'return wmiBuildInit(w, at, capacity, chains);'
-    init_new = ('const uint32_t n = wmiBuildInit(w, at, capacity, chains);\n'
-                '      if (n >= 96 && wmiGet(at + 40, 13) == 1u) wmiPut(at + 40, 13, 2u);\n'
-                '      return n;')
-    if text.count(init_old) != 1:
-        raise ValueError('WMI init anchor differs')
-    text = text.replace(init_old, init_new, 1)
     return text.encode()
 
 
