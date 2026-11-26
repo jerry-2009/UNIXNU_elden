@@ -93,6 +93,14 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
         htt.errorsSeen,dp.st.excEntries,dp.st.rxEntries,dp.st.rxErrors
     };
     diag_line("DP_HW tclMisc/tclStHP-TP/wbmRelHP-TP/httN/t0..3/t4..7/httErr/exc/rx/rxErr",dp_hw,12);'''
+        diag_extra = diag_extra + '''
+    const uint32_t tcl_regs[]={
+        io.read(io.ctx,0x00a4408cu),io.read(io.ctx,0x00a44020u),
+        io.read(io.ctx,0x00a34240u),io.read(io.ctx,0x00a34244u),
+        io.read(io.ctx,0x00a34254u),io.read(io.ctx,0x00a34d4cu),
+        io.read(io.ctx,0x00a44990u),io.read(io.ctx,0x00a46008u)
+    };
+    diag_line("TCL_REGS bank0/cmnCtrl/idleCtrl/idleSz/idleMsb/idleMisc/tcl2Base/tcl2HP",tcl_regs,8);'''
         bhi_anchor = 'follow(now);key_turn(now);transmit();tx_diagnostic(now);port_replies();publish_snapshot();protocol_status(out);'
         bhi_extra = bhi_anchor + '''
     {static uint64_t t0;static uint32_t last_st,nlog;
