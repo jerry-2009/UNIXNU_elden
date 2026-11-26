@@ -50,7 +50,7 @@ def oem_srng_header(data, *, oem_htt_v1=False):
     if data.count(old) != 1:
         raise ValueError('SRNG setup encoder differs')
     out = data.replace(old, new, 1)
-    if oem_htt_v1:
+    if False and oem_htt_v1:
         v_old = (b'  if (!at || capacity < 8) return 0;\r\n'
                  b'  put32(at, kHttMsgVersionReq);\r\n'
                  b'  put32(at + 4, kHttOptionTclMetadataVersion | kHttOptionTclMetadataLength << 8 | kHttTclMetadataV2 << 16);\r\n'
