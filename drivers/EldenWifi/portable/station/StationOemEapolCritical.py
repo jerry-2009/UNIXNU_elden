@@ -259,6 +259,7 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
     text = replace_once(
         text,
         '  for (uint32_t i = 0; i < length; ++i) b.va[i] = frame[i];',
+        '  (void)critical;\n'
         '  const uint32_t off = 0x28u;\n'
         '  for (uint32_t i = 0; i < off; ++i) b.va[i] = 0;\n'
         '  for (uint32_t i = 0; i < length; ++i) b.va[off + i] = frame[i];',
@@ -381,12 +382,7 @@ constexpr uint32_t kDpReoCmdEntryWords = 10, kDpReoStatusEntryWords = 28;
     return false;
 ''',
         '''      !plan(dp.idle, arena, kDpIdleEntries, kDpIdleEntryWords, kDpIdleLinkR0, kDpIdleLinkR2, 0, pointers, pointersBus, index) ||
-      !plan(dp.sw2wbm, arena, 512, kDpWbmEntryWords, kDpSw2WbmR0, kDpSw2WbmR2, kDpRingIdSw2Wbm, pointers, pointersBus, index) ||
-      !plan(dp.reoCmd, arena, 64, kDpReoCmdEntryWords, kDpReoCmdR0, kDpReoCmdR2, kDpRingIdReoCmd, pointers, pointersBus, index) ||
-      !plan(dp.reoStatus, arena, 256, kDpReoStatusEntryWords, kDpReoStatusR0, kDpReoStatusR2, kDpRingIdReoStatus, pointers,
-            pointersBus, index) ||
-      !plan(dp.reoReinject, arena, 256, kDpReoEntryWords, kDpReoReinjectR0, kDpReoReinjectR2, kDpRingIdReoReinject, pointers,
-            pointersBus, index))
+      !plan(dp.sw2wbm, arena, 128, kDpWbmEntryWords, kDpSw2WbmR0, kDpSw2WbmR2, kDpRingIdSw2Wbm, pointers, pointersBus, index))
     return false;
 ''',
         'r75 fabric ring planning',
@@ -397,9 +393,6 @@ constexpr uint32_t kDpReoCmdEntryWords = 10, kDpReoStatusEntryWords = 28;
       break;''',
         '''      program(dp, io, dp.txComp2, false);
       program(dp, io, dp.sw2wbm, true);
-      program(dp, io, dp.reoCmd, true);
-      program(dp, io, dp.reoStatus, false);
-      program(dp, io, dp.reoReinject, true);
       break;''',
         'r75 fabric rings programmed',
     )
