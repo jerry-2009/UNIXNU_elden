@@ -262,6 +262,7 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
         '  (void)critical;\n'
         '  const uint32_t off = 0x28u;\n'
         '  for (uint32_t i = 0; i < off; ++i) b.va[i] = 0;\n'
+        '  put32(b.va, 0x80000000u); // r79: ext2 dword0 host_tx_desc_pool (TQM-BYPASS host-pool completion linkage)\n'
         '  for (uint32_t i = 0; i < length; ++i) b.va[off + i] = frame[i];',
         'Peach 0x28 headroom zeroed before Ethernet frame',
     )
