@@ -182,7 +182,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     ))
     edits.append((
         '    dpPoll(dp,{owner_io.owner,owner_io.read,owner_io.write},receive);',
-        '    rx_now=now;dpPoll(dp,{owner_io.owner,owner_io.read,owner_io.write},receive);'
+        '    rx_now=now;{static unsigned short txAge[80];for(unsigned bi=0;bi<kDpTxBuffers&&bi<80;++bi){if(dp.tx[bi].busy){if(++txAge[bi]>120){dp.tx[bi].busy=false;txAge[bi]=0;}}else txAge[bi]=0;}dpPoll(dp,{owner_io.owner,owner_io.read,owner_io.write},receive);}'
     ))
     rx_old="""        uint8_t message[PIANO_WIFI_8021X_MSG_MAX];
         const uint32_t n=netBuildEapolRx(message,sizeof(message),++message_sequence,generation,frame+6,frame+14,bytes-14);
