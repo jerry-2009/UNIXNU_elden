@@ -1022,6 +1022,14 @@ constexpr uint32_t kDpReo2Sw1R0 = kUnitReo + 0x500, kDpReo2Sw1R2 = kUnitReo + 0x
 constexpr uint32_t kDpReo2Sw0R0 = kUnitReo + 0x8c0, kDpReo2Sw0R2 = kUnitReo + 0x3088;
 constexpr uint32_t kDpIdleLinkR0 = kUnitWbm + 0xd3c, kDpIdleLinkR2 = kUnitWbm + 0x30b8;
 constexpr uint32_t kDpRingIdReo2Sw0 = 0, kDpRingIdReo2Sw1 = 1, kDpRingIdWbm2Sw0 = 128;
+// The rest of the Peach ring fabric, from hw_srng_table_peach in the real qca_cld3_peach_v2.ko (2026-11-28: the table sits at
+// 0x121b0 in its .data, 28 entries of 36 bytes). The missing pieces the OEM driver initializes and we did not.
+constexpr uint32_t kDpSw2WbmR0 = kUnitWbm + 0x37c, kDpSw2WbmR2 = kUnitWbm + 0x3010;
+constexpr uint32_t kDpReoCmdR0 = kUnitReo + 0x2a8, kDpReoCmdR2 = kUnitReo + 0x3020;
+constexpr uint32_t kDpReoStatusR0 = kUnitReo + 0xaa0, kDpReoStatusR2 = kUnitReo + 0x30a8;
+constexpr uint32_t kDpReoReinjectR0 = kUnitReo + 0x320, kDpReoReinjectR2 = kUnitReo + 0x3028;
+constexpr uint32_t kDpRingIdSw2Wbm = 121, kDpRingIdReoCmd = 20, kDpRingIdReoStatus = 21, kDpRingIdReoReinject = 16;
+constexpr uint32_t kDpReoCmdEntryWords = 10, kDpReoStatusEntryWords = 28;
 constexpr uint32_t kDpTclEntryWords = 8, kDpWbmEntryWords = 8, kDpReoEntryWords = 8, kDpIdleEntryWords = 2;
 constexpr uint32_t kRingMiscNoRingId = 1u << 0;
 // The reorder unit's own set-up (this chip's host, at its start): REO1_GEN_ENABLE (+0) gains the aging list and the aging
