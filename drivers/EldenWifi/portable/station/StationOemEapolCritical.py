@@ -360,6 +360,21 @@ def dp_header(data, *, single_pdev_bank=False, oem_index_bank=False):
         '  CeRing tcl, txComp, tcl1, txComp1, tcl2, txComp2, reo, reoExc, rel3, idle, sw2wbm, reoCmd, reoStatus, reoReinject;',
         'r75 fabric ring objects',
     )
+    # The ring fabric constants live here rather than in portable/upstream/WifiHw.h because the donor provenance
+    # check hashes that header. Values from the hw_srng_table_peach dump inside qca_cld3_peach_v2.ko.
+    text = replace_once(
+        text,
+        '// Every ring, the link descriptors and the transmit buffers out of the window.',
+        '''constexpr uint32_t kDpSw2WbmR0 = kUnitWbm + 0x37c, kDpSw2WbmR2 = kUnitWbm + 0x3010;
+constexpr uint32_t kDpReoCmdR0 = kUnitReo + 0x2a8, kDpReoCmdR2 = kUnitReo + 0x3020;
+constexpr uint32_t kDpReoStatusR0 = kUnitReo + 0xaa0, kDpReoStatusR2 = kUnitReo + 0x30a8;
+constexpr uint32_t kDpReoReinjectR0 = kUnitReo + 0x320, kDpReoReinjectR2 = kUnitReo + 0x3028;
+constexpr uint32_t kDpRingIdSw2Wbm = 121, kDpRingIdReoCmd = 20, kDpRingIdReoStatus = 21, kDpRingIdReoReinject = 16;
+constexpr uint32_t kDpReoCmdEntryWords = 10, kDpReoStatusEntryWords = 28;
+
+// Every ring, the link descriptors and the transmit buffers out of the window.''',
+        'r75 fabric ring constants',
+    )
     text = replace_once(
         text,
         '''      !plan(dp.idle, arena, kDpIdleEntries, kDpIdleEntryWords, kDpIdleLinkR0, kDpIdleLinkR2, 0, pointers, pointersBus, index))
