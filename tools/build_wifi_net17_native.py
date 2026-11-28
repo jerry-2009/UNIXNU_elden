@@ -84,8 +84,23 @@ def main():
     own=['tools/build_wifi_net17_native.py','drivers/EldenWifi/net/Net17NativeSource.py','drivers/EldenWifi/net/EldenNet17.h']
     if args.dma_inspect:own+=['drivers/EldenWifi/DmaInspect.h','drivers/EldenWifi/DmaInspect.inc']
     if args.battery_only:own+=['drivers/EldenWifi/BatteryAdmissionSource.py','drivers/EldenWifi/BatteryAdmission.h','drivers/EldenWifi/BatteryAdmission.inc']
+    # Surface the inherited chain pins at top level so kernel composition can
+    # refresh them. Generation inputs inlined by the source cascade and the
+    # build machinery itself are re-hashed live because this rebuild genuinely
+    # consumes their current bytes; every other inherited pin is a frozen
+    # component input and must still match the repository exactly.
+    regenerated={'drivers/EldenPcie/Native.cpp','drivers/EldenPcie/NativeRuntime.inc','drivers/EldenPcie/NativeExports.inc',
+        'drivers/EldenPcie/EndpointNativeRuntime.inc','drivers/EldenPcie/TransportNativeRuntime.inc','drivers/EldenPcie/MhiRuntime.inc',
+        'drivers/EldenPcie/MhiRuntimeExports.inc','drivers/EldenPcie/ControlNative.inc','drivers/EldenPcie/PlatformFenceNative.inc',
+        'drivers/EldenWifi/FactoryMacRuntime.inc','drivers/EldenWifi/ControlTrace.inc','drivers/EldenWifi/ControlScan.inc'}
+    chain={}
+    for name,digest in prior['source_inputs'].items():
+        live=name.endswith('Source.py') or name.startswith('tools/') or name in regenerated
+        current=sha(ROOT/name)
+        if not live and current!=digest:raise ValueError('Frozen native chain input changed: '+name)
+        chain[name]=current if live else digest
     proof=dict(compiled=True,object_sha256=sha(obj),base_object_sha256=prior['object_sha256'],
-        source_inputs={name:sha(ROOT/name) for name in own},retained_parent_source_inputs=prior['source_inputs'],
+        source_inputs={**chain,**{name:sha(ROOT/name) for name in own}},retained_parent_source_inputs=prior['source_inputs'],
         generated_sources={name:hashlib.sha256(data).hexdigest() for name,data in new.items()},
         private_assets=prior['private_assets'],net_object_sha256=net['object_sha256'],
         source_bindings=bindings,command=command,imports_missing=[],added_exports=sorted(additions),
