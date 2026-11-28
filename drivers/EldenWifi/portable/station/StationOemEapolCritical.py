@@ -153,7 +153,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
        if(want){
          uint8_t sb[64];WmiWriter ww;wmiBegin(ww,sb,sizeof(sb),kWmiCmdRequestStats);
          uint8_t *sc=wmiStruct(ww,kWmiTagRequestStatsCmd,5);
-         if(sc){wmiPut(sc,0,kWmiStatsPdev);wmiPut(sc,1,0);wmiPut(sc,4,kWmiPdevIdSoc);}
+         if(sc){wmiPut(sc,0,kWmiStatsPdev|kWmiStatsVdev|0x10u);wmiPut(sc,1,0);wmiPut(sc,4,kWmiPdevIdSoc);}
          const uint32_t sl=wmiEnd(ww);
          if(sl&&linkSendWmi(link,sb,sl)==1){
            const uint32_t sv[]={st_req,dp.st.txFrames,(uint32_t)(st_t0?now-st_t0:0),link.events};
@@ -171,6 +171,10 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
                       '        if(fx&&fs>=36&&da&&ds>=kWmiPdevStatsWords*4){\n'
                       '            const uint32_t tx1[]={dp.st.txFrames,wmiGet(da,7),wmiGet(da,8),wmiGet(da,9),wmiGet(da,10),wmiGet(da,11),wmiGet(da,12),wmiGet(da,13),wmiGet(da,14),wmiGet(da,15),wmiGet(da,16),wmiGet(da,17)};\n'
                       '            const uint32_t tx2[]={wmiGet(da,18),wmiGet(da,19),wmiGet(da,20),wmiGet(da,21),wmiGet(da,22),wmiGet(da,23),wmiGet(da,24),wmiGet(da,25),wmiGet(da,26),wmiGet(da,27),wmiGet(da,28),wmiGet(da,29)};\n'
+                      '            {uint32_t meta[13];meta[0]=ds;for(unsigned wi=0;wi<12;wi++)meta[wi+1]=wmiGet(da,wi);\n'
+                      '            diag_line("PDEV_W0 ds/w0..11",meta,13);\n'
+                      '            uint32_t fxw[11];for(unsigned wi2=0;wi2<11;wi2++)fxw[wi2]=(fs>=44)?wmiGet(fx,wi2):0;\n'
+                      '            diag_line("PDEV_FX fxw0..10",fxw,11);}\n'
                       '            diag_line("PDEV_TX1 tx/cQ/cD/msduQ/mpduQ/wmmD/locQ/locF/hwQ/hwR/ur/abrt",tx1,12);\n'
                       '            diag_line("PDEV_TX2 req/ko/rc/sTrg/swR/illR/xRet/tmo/rst/tidF/pUr/txop",tx2,12);\n'
                       '            {uint32_t rxw[13];rxw[0]=dp.st.rxEntries;for(unsigned wi=0;wi<12;wi++)rxw[wi+1]=wmiGet(da,30+wi);\n'
