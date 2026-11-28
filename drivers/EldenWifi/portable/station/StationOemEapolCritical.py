@@ -157,7 +157,25 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
          const uint32_t sl=wmiEnd(ww);
          if(sl&&linkSendWmi(link,sb,sl)==1){
            const uint32_t sv[]={st_req,dp.st.txFrames,(uint32_t)(st_t0?now-st_t0:0),link.events};
-           diag_line("STATS_REQ n/tx/dt/ev",sv,4);++st_req;}}}}'''
+           diag_line("STATS_REQ n/tx/dt/ev",sv,4);
+           if(st_req==1){
+             const ChipIo cio{owner_io.owner,owner_io.read,owner_io.write};
+             const int cp0=ceIndexOf(0),cp1=ceIndexOf(1),cp2=ceIndexOf(2),cp3=ceIndexOf(3),cp4=ceIndexOf(4);
+             const CePipe *p0=(cp0>=0&&link.ce)?&link.ce->pipes[cp0]:nullptr;
+             const CePipe *p1=(cp1>=0&&link.ce)?&link.ce->pipes[cp1]:nullptr;
+             const CePipe *p2=(cp2>=0&&link.ce)?&link.ce->pipes[cp2]:nullptr;
+             const CePipe *p3=(cp3>=0&&link.ce)?&link.ce->pipes[cp3]:nullptr;
+             const CePipe *p4=(cp4>=0&&link.ce)?&link.ce->pipes[cp4]:nullptr;
+             const uint32_t cw[]={cio.read(cio.ctx,0x3278),
+               p0?cio.read(cio.ctx,p0->src.r2):0,p0?cio.read(cio.ctx,p0->src.r2+4):0,
+               p3?cio.read(cio.ctx,p3->src.r2):0,p3?cio.read(cio.ctx,p3->src.r2+4):0,
+               p4?cio.read(cio.ctx,p4->src.r2):0,p4?cio.read(cio.ctx,p4->src.r2+4):0,
+               p1?cio.read(cio.ctx,p1->dst.r2):0,p1?cio.read(cio.ctx,p1->dst.r2+4):0,
+               p2?cio.read(cio.ctx,p2->dst.r2):0,p2?cio.read(cio.ctx,p2->dst.r2+4):0,
+               p2?cio.read(cio.ctx,p2->status.r2):0,p2?cio.read(cio.ctx,p2->status.r2+4):0};
+             diag_line("CEWIN win/c0hp/c0tp/c3hp/c3tp/c4hp/c4tp/d1hp/d1tp/d2hp/d2tp/s2hp/s2tp",cw,13);
+           }
+           ++st_req;}}}}'''
         edits.append((diag_anchor, diag_extra))
         edits.append((bhi_anchor, bhi_extra))
         edits.append((ms_old, ms_new))
@@ -193,6 +211,27 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
     edits.append((
         'static uint64_t control_session,profile_revision,join_revision;',
         'static uint64_t control_session,profile_revision,join_revision;\nstatic uint64_t rx_now;'
+    ))
+    edits.append((
+        'static EldenPortableIo owner_io;',
+        'static EldenPortableIo owner_io;\n'
+        'static void (*raw_io_write)(void *,uint32_t,uint32_t);\n'
+        'static void barrier_io_write(void *ctx,uint32_t address,uint32_t value){\n'
+        '#if defined(__aarch64__)\n'
+        '    __asm__ volatile("dmb oshst" ::: "memory");\n'
+        '#else\n'
+        '    __atomic_thread_fence(__ATOMIC_RELEASE);\n'
+        '#endif\n'
+        '    raw_io_write(ctx,address,value);\n'
+        '}'
+    ))
+    edits.append((
+        'prepared=1;owner_io=*io;arenaInit(arena,(uint8_t *)cpu,bus,bytes);',
+        'prepared=1;owner_io=*io;raw_io_write=owner_io.write;owner_io.write=barrier_io_write;arenaInit(arena,(uint8_t *)cpu,bus,bytes);'
+    ))
+    edits.append((
+        'httFill(htt);const ChipIo chip{io->owner,io->read,io->write};',
+        'httFill(htt);const ChipIo chip{owner_io.owner,owner_io.read,owner_io.write};'
     ))
     edits.append((
         '    dpPoll(dp,{owner_io.owner,owner_io.read,owner_io.write},receive);',
