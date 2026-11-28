@@ -86,9 +86,14 @@ static int quiesce(const void *provider,uint64_t epoch,uint64_t deadline){
 static int power_up(void *p,unsigned gen,uint64_t *epoch){
     Context *c=static_cast<Context *>(p);trace(c,99,1);
     EldenWlanIdentity id={c,ELDEN_WIFI_PCI_VENDOR,ELDEN_WIFI_PCI_DEVICE,ELDEN_WIFI_ENDPOINT_RID,ELDEN_WIFI_ENDPOINT_SID,quiesce};
-    uint64_t e=0;int rc=elden_wlan_power_acquire(&id,&e);if(rc)return rc;
+    log("\nELDEN_PCIE power-up gen=%u\n",gen);
+    uint64_t e=0;int rc=elden_wlan_power_acquire(&id,&e);
+    log("\nELDEN_PCIE acquire rc=%d epoch=%llu\n",rc,(unsigned long long)e);
+    if(rc)return rc;
     c->wlan_epoch=e;*epoch=e;
-    rc=elden_wlan_root_power(c,e,gen);if(!rc)c->power_ready=true;return rc;
+    rc=elden_wlan_root_power(c,e,gen);
+    log("\nELDEN_PCIE root-power rc=%d\n",rc);
+    if(!rc)c->power_ready=true;return rc;
 }
 static void finish(Context *c,int error){
     terminal.version=1;terminal.run=2;terminal.error=error;
@@ -103,12 +108,26 @@ static void finish(Context *c,int error){
         terminal.last_window,terminal.last_offset,terminal.last_value,terminal.writes,terminal.phy_writes,terminal.gcc_held);
     __atomic_store_n(&run,2u,__ATOMIC_RELEASE);
 }
+/* r83: branch-level boot-failure diagnosis. The freshness wait below historically ends
+ * boots with rc=-11 and zero hardware interaction; log which gate actually blocks. */
+static void wait_diag(const char *tag,unsigned n){
+    int t=-1;uint32_t e=0,cy=0;
+    const int bt=elden_battery_temperature_get(&t,&e,&cy);
+    log("\nELDEN_PCIE wait-%s n=%u armed=%u rpc=%u dl=%u cpol=%u stop=%u batt=%d t=%d be=%u cy=%u\n",
+        tag,n,(unsigned)elden_recovery_armed(),(unsigned)elden_recovery_rpc_ready(),
+        elden_recovery_deadline_remaining(),(unsigned)elden_charge_policy_ready(),
+        (unsigned)__atomic_load_n(&stop_requested,__ATOMIC_ACQUIRE),bt,t,e,cy);
+}
 static void worker(void *arg,wait_result_t){
     unsigned gen=(unsigned)(uintptr_t)arg;uint32_t epoch=0;bool ready=false;
+    log("\nELDEN_PCIE worker-start gen=%u\n",gen);
     for(unsigned n=0;n<12000&&!__atomic_load_n(&stop_requested,__ATOMIC_ACQUIRE);n++){
-        if(fresh(0,&epoch)&&elden_recovery_deadline_remaining()>=120){ready=true;break;}IOSleep(10);
+        if(fresh(0,&epoch)&&elden_recovery_deadline_remaining()>=120){ready=true;break;}
+        if((n%500)==499)wait_diag("tick",n);
+        IOSleep(10);
     }
-    if(!ready){finish(nullptr,-11);thread_terminate(current_thread());return;}
+    if(!ready){wait_diag("final",12000);finish(nullptr,-11);thread_terminate(current_thread());return;}
+    log("\nELDEN_PCIE worker-ready epoch=%u\n",epoch);
     Context *c=new Context;
     if(!c||!c->map()){if(c)delete c;finish(nullptr,-12);thread_terminate(current_thread());return;}
     c->battery_epoch=epoch;c->pins={c,pin_read,pin_write,delay,false,false};
