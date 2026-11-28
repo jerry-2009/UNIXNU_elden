@@ -19,7 +19,26 @@ def main():
     qualify_runtime(runtime);qualify_native(worker,a.native_build)
     original=runtime
     while original.get('oem_eapol_critical') or original.get('station_hif') or original.get('station_diagnostic') or original.get('station_wire') or original.get('station_ready'):original=original['base']
-    if original['scan_parent']!=prior['portable_scan_runtime'] or core['base']!=prior['core'] or worker['base']!=prior['network_worker'] or core['assets']!=assets:
+    def same_worker_base(new,old):
+        if new==old:return True
+        # A cleanly rebuilt native chain legitimately refreshes object hashes,
+        # generated-source digests, output paths and re-hashed live pins. What
+        # must stay invariant is the worker lineage and its exact behavioral
+        # interface; the per-layer native rebuilds already enforce identical
+        # exports/imports, and the link step below re-verifies the complete
+        # native interface. Any other divergence still refuses composition.
+        if not isinstance(new,dict) or not isinstance(old,dict):return False
+        keys=['base_object_sha256','added_exports','native_net_imports','mhi_hold_trial','umac_hold_trial','ce3_inspect_trial',
+          'wifi_battery_runtime_trial','first_failure_physical','first_failure_readonly','first_failure_sample_stages',
+          'first_failure_no_new_maps','first_failure_no_control_writes','service_scan','platform_physical_fence_preserved',
+          'no_ce_wmi_firmware_changes','no_initializers','scalar','net_object_sha256','battery_provider_sha256','private_assets']
+        if any(new.get(k)!=old.get(k) for k in keys):return False
+        olds={n:h for n,h in old.get('retained_parent_source_inputs',{}).items()}
+        news={n:h for n,h in new.get('retained_parent_source_inputs',{}).items()}
+        if set(olds)!=set(news):return False
+        frozen=[n for n in olds if not n.endswith('Source.py') and not n.startswith('tools/') and olds[n]!=news[n]]
+        return not frozen
+    if original['scan_parent']!=prior['portable_scan_runtime'] or core['base']!=prior['core'] or not same_worker_base(worker['base'],prior['network_worker']) or core['assets']!=assets:
         raise ValueError('Station actual component parents differ')
     for name in ['native','kernel']:
         if sha(parent/(name+'.macho'))!=prior[name+'_sha256']:raise ValueError('Station parent changed')

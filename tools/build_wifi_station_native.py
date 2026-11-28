@@ -44,9 +44,13 @@ def main():
     if any(n.endswith('/__mod_init_func') for n in sections(obj)) or re.search(r'^\s*[0-9a-f]+:\s+[0-9a-f]{8}\s+.*\b[qvdshb]\d+(?:\b|\.)',asm,re.M):raise ValueError('Native station SIMD/initializer')
     for file,digest in inherited.items():
         if sha(file)!=digest:raise ValueError('Inherited native input changed')
+    # Carry the parent chain pins forward to this worker's top level. They were
+    # re-hashed live when the chain was rebuilt, so forwarding them preserves
+    # exact provenance and lets kernel composition refresh inherited pins.
+    chain=dict(prior.get('source_inputs',{}))
     own=['tools/build_wifi_station_native.py','drivers/EldenWifi/portable/station/StationNativeSource.py','drivers/EldenWifi/portable/station/StationPortNative.inc','drivers/EldenWifi/portable/station/StationApi.h']
     proof=dict(compiled=True,station_native=True,base=prior,base_object_sha256=prior['object_sha256'],object_sha256=sha(obj),command=cmd,
-      generated_sources={n:hashlib.sha256(v).hexdigest() for n,v in new.items()},source_inputs={n:sha(ROOT/n) for n in own},
+      generated_sources={n:hashlib.sha256(v).hexdigest() for n,v in new.items()},source_inputs={**chain,**{n:sha(ROOT/n) for n in own}},
       private_header_sha256=sha(private),inherited_sources=inherited,warnings=r.stderr.count(b'warning:'),
       real_privileged_socket=True,original_physical_fence_preserved=True,hardware_tested=False)
     (out/'result.json').write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps({k:proof[k] for k in ['compiled','object_sha256','warnings','hardware_tested']}))
