@@ -143,8 +143,8 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
          const uint32_t bhi=io.read(io.ctx,0x28);
          const uint32_t v[]={dt,st,bhi,io.read(io.ctx,bhi+0x28),io.read(io.ctx,bhi+0x2c),
            io.read(io.ctx,bhi+0x30),io.read(io.ctx,bhi+0x34),io.read(io.ctx,bhi+0x38),
-           io.read(io.ctx,bhi+0x3c),link.events};
-         diag_line("BHI_WATCH dt/mhiSt/bhi/ee/st/err/dbg1..3/ev",v,10);}}}'''
+           io.read(io.ctx,bhi+0x3c),link.events,io.read(io.ctx,0x3004)};
+         diag_line("BHI_WATCH dt/mhiSt/bhi/ee/st/err/dbg1..3/ev/wake",v,11);}}}'''
         bhi_extra = bhi_extra + '''
     {static uint32_t st_req;static uint64_t st_t0;
      if(dp.txReady){
@@ -153,7 +153,7 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
        if(want){
          uint8_t sb[64];WmiWriter ww;wmiBegin(ww,sb,sizeof(sb),kWmiCmdRequestStats);
          uint8_t *sc=wmiStruct(ww,kWmiTagRequestStatsCmd,5);
-         if(sc){wmiPut(sc,0,kWmiStatsPdev|kWmiStatsVdev|0x10u);wmiPut(sc,1,0);wmiPut(sc,4,kWmiPdevIdSoc);}
+         if(sc){wmiPut(sc,0,kWmiStatsPdev);wmiPut(sc,1,0);wmiPut(sc,4,kWmiPdevIdSoc);}
          const uint32_t sl=wmiEnd(ww);
          if(sl&&linkSendWmi(link,sb,sl)==1){
            const uint32_t sv[]={st_req,dp.st.txFrames,(uint32_t)(st_t0?now-st_t0:0),link.events};
@@ -168,6 +168,12 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
                       '    if(id==kWmiEvtUpdateStats&&dp.txReady){\n'
                       '        uint32_t fs=0,ds=0;const uint8_t *fx=wmiFind(payload,bytes,kWmiTagStatsEvent,&fs);\n'
                       '        const uint8_t *da=wmiFind(payload,bytes,kWmiTagArrayByte,&ds);\n'
+                      '        if(fx){\n'
+                      '            const uint32_t se[]={id,bytes,fs,ds,link.events};\n'
+                      '            diag_line(\"STATS_EVT id/bytes/fs/ds/ev\",se,5);\n'
+                      '            uint32_t sfx[11];for(unsigned sw=0;sw<11;sw++)sfx[sw]=(fs>=44)?wmiGet(fx,sw):0;\n'
+                      '            diag_line(\"STATS_FX fxw0..10\",sfx,11);\n'
+                      '        }\n'
                       '        if(fx&&fs>=36&&da&&ds>=kWmiPdevStatsWords*4){\n'
                       '            const uint32_t tx1[]={dp.st.txFrames,wmiGet(da,7),wmiGet(da,8),wmiGet(da,9),wmiGet(da,10),wmiGet(da,11),wmiGet(da,12),wmiGet(da,13),wmiGet(da,14),wmiGet(da,15),wmiGet(da,16),wmiGet(da,17)};\n'
                       '            const uint32_t tx2[]={wmiGet(da,18),wmiGet(da,19),wmiGet(da,20),wmiGet(da,21),wmiGet(da,22),wmiGet(da,23),wmiGet(da,24),wmiGet(da,25),wmiGet(da,26),wmiGet(da,27),wmiGet(da,28),wmiGet(da,29)};\n'
