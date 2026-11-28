@@ -173,6 +173,10 @@ def station(data, *, oem_target_pdev=False, oem_tcl_v1=False):
                       '            const uint32_t tx2[]={wmiGet(da,18),wmiGet(da,19),wmiGet(da,20),wmiGet(da,21),wmiGet(da,22),wmiGet(da,23),wmiGet(da,24),wmiGet(da,25),wmiGet(da,26),wmiGet(da,27),wmiGet(da,28),wmiGet(da,29)};\n'
                       '            diag_line("PDEV_TX1 tx/cQ/cD/msduQ/mpduQ/wmmD/locQ/locF/hwQ/hwR/ur/abrt",tx1,12);\n'
                       '            diag_line("PDEV_TX2 req/ko/rc/sTrg/swR/illR/xRet/tmo/rst/tidF/pUr/txop",tx2,12);\n'
+                      '            {uint32_t rxw[13];rxw[0]=dp.st.rxEntries;for(unsigned wi=0;wi<12;wi++)rxw[wi+1]=wmiGet(da,30+wi);\n'
+                      '            diag_line("PDEV_W30 rxE/w30..41",rxw,13);\n'
+                      '            uint32_t rxw2[13];rxw2[0]=dp.st.txFrames;for(unsigned wi=0;wi<12;wi++)rxw2[wi+1]=wmiGet(da,42+wi);\n'
+                      '            diag_line("PDEV_W42 tx/w42..53",rxw2,13);}\n'
                       '        }\n'
                       '    }\n'
                       '    if(id==kWmiEvtVdevInstallKeyComplete){'))
